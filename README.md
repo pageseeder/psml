@@ -17,8 +17,10 @@ true representation of a PSML document.
 // Create nodes
 PSMLElement heading = new PSMLElement(Name.Heading);
 heading.setAttribute("level", "1").setText("The title of this fragment");
+PSMLElement para = new PSMLElement(Name.Para);
+para.setText("Some sample paragraph.");
 PSMLElement fragment = new PSMLElement(Name.Fragment);
-fragment.setAttribute("id", 1).addNode(heading);
+fragment.setAttribute("id", 1).addNodes(heading, para);
 
 // Serialisation to XML
 XMLStringWriter xml = new XMLStringWriter(false);
@@ -29,9 +31,10 @@ This will result in the following PSML:
 
 ```xml
 <fragment id="1">
-   <heading level="1">The title of this fragment</heading>
+  <heading level="1">The title of this fragment</heading>
+  <para>Some sample paragraph.</para>
 </fragment>
-``` 
+```
 
 ## Parsers
 

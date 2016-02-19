@@ -348,6 +348,29 @@ public class PSMLElement implements PSMLNode {
   }
 
   /**
+   * Adds a list of child nodes to this element.
+   *
+   * <p>If the element already has child nodes, the specified nodes are
+   * appended to the list of nodes.
+   *
+   * <p>Implementation note: this method will initialize the node list if
+   * necessary.
+   *
+   * @param name The name of the attribute.
+   *
+   * @return this element
+   */
+  public PSMLElement addNodes(PSMLNode... nodes) {
+    if (this.nodes == null) {
+      this.nodes = new ArrayList<>();
+    }
+    for (PSMLNode node : nodes ){
+      this.nodes.add(node);
+    }
+    return this;
+  }
+
+  /**
    * Set the text node for this element.
    *
    * <p>If the element already has child nodes, they are removed and replaced
