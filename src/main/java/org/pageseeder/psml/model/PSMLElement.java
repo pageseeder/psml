@@ -28,6 +28,8 @@ import org.pageseeder.xmlwriter.XMLWriter;
 /**
  * A PSML element.
  *
+ * <p>Note: the setters and adders are chainable.
+ *
  * @see <a href="https://dev.pageseeder.com/api/psml/element_reference.html">PSML element reference</a>
  *
  * @author Christophe Lauret
@@ -248,9 +250,12 @@ public class PSMLElement implements PSMLNode {
    * Changes the name of this element.
    *
    * @param name The name of the element.
+   *
+   * @return this element
    */
-  public void setElement(Name name) {
+  public PSMLElement setElement(Name name) {
     this.element = name;
+    return this;
   }
 
   /**
@@ -284,18 +289,20 @@ public class PSMLElement implements PSMLNode {
   /**
    * Sets the attribute value of the specified attribute.
    *
-   * <p>Implementation node: this method will initialize the attribute map
+   * <p>Implementation note: this method will initialize the attribute map
    * if necessary.
    *
-   * @param name The name of the attribute.
+   * @param name  The name of the attribute.
+   * @param value The string value of the attribute.
    *
-   * @return The corresponding value or <code>null</code>.
+   * @return this element
    */
-  public void setAttribute(String name, String value) {
+  public PSMLElement setAttribute(String name, String value) {
     if (this.attributes == null) {
       this.attributes = new HashMap<>(4);
     }
     this.attributes.put(name, value);
+    return this;
   }
 
   /**
@@ -304,18 +311,19 @@ public class PSMLElement implements PSMLNode {
    * <p>If the element already has child nodes, the specified node is appended
    * to the list of nodes.
    *
-   * <p>Implementation node: this method will initialize the node list if
+   * <p>Implementation note: this method will initialize the node list if
    * necessary.
    *
    * @param name The name of the attribute.
    *
-   * @return The corresponding value or <code>null</code>.
+   * @return this element
    */
-  public void addNode(PSMLNode node) {
+  public PSMLElement addNode(PSMLNode node) {
     if (this.nodes == null) {
       this.nodes = new ArrayList<>();
     }
     this.nodes.add(node);
+    return this;
   }
 
   /**
@@ -324,24 +332,69 @@ public class PSMLElement implements PSMLNode {
    * <p>If the element already has child nodes, the specified nodes are
    * appended to the list of nodes.
    *
-   * <p>Implementation node: this method will initialize the node list if
+   * <p>Implementation note: this method will initialize the node list if
    * necessary.
    *
    * @param name The name of the attribute.
    *
-   * @return The corresponding value or <code>null</code>.
+   * @return this element
    */
-  public void addNodes(List<? extends PSMLNode> nodes) {
+  public PSMLElement addNodes(List<? extends PSMLNode> nodes) {
     if (this.nodes == null) {
       this.nodes = new ArrayList<>();
     }
     this.nodes.addAll(nodes);
+    return this;
+  }
+
+  /**
+   * Set the text node for this element.
+   *
+   * <p>If the element already has child nodes, they are removed and replaced
+   * with a single text node.
+   *
+   * <p>Implementation note: this method will initialize the node list if
+   * necessary.
+   *
+   * @param text The text to set.
+   *
+   * @return this element
+   */
+  public PSMLElement setText(String text) {
+    if (this.nodes == null) {
+      this.nodes = new ArrayList<>(1);
+    } else {
+      this.nodes.clear();
+    }
+    this.nodes.add(new PSMLText(text));
+    return this;
+  }
+
+  /**
+   * Add a text node to this element.
+   *
+   * <p>If the element already has child nodes, a new text node is appended
+   * to the list.
+   *
+   * <p>Implementation note: this method will initialize the node list if
+   * necessary.
+   *
+   * @param name The text to add to this element.
+   *
+   * @return this element
+   */
+  public PSMLElement addText(String text) {
+    if (this.nodes == null) {
+      this.nodes = new ArrayList<>();
+    }
+    this.nodes.add(new PSMLText(text));
+    return this;
   }
 
   /**
    * Returns the actual list of nodes in this element (not a copy)
    *
-   * <p>Implementation node: this method will initialize the node list if
+   * <p>Implementation note: this method will initialize the node list if
    * necessary.
    *
    * @return the actual list of nodes in this element.
