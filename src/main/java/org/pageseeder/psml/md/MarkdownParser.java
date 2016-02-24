@@ -70,8 +70,6 @@ public class MarkdownParser extends Parser {
     return wrapper;
   }
 
-
-
   /**
    *
    * @param reader The reader

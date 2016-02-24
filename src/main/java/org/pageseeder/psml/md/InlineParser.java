@@ -36,12 +36,39 @@ import org.pageseeder.psml.model.PSMLText;
  */
 public class InlineParser {
 
+  /**
+   * Bold text: <code>**text**</code>
+   */
   private static final String DOUBLE_EMPHASIS = "(\\*\\*(.*?)\\*\\*)";
+
+  /**
+   * Italic text: <code>*text*</code>
+   */
   private static final String EMPHASIS = "(\\*(.*?)\\*)";
+
+  /**
+   * Bold text: <code>__text__</code>
+   */
   private static final String DOUBLE_UNDERSCORE = "(__(.*?)__)";
+
+  /**
+   * Italic text: <code>_text_</code>
+   */
   private static final String UNDERSCORE = "(\\b_(.*?)_\\b)";
+
+  /**
+   * Escaped code: <code>``code``</code>
+   */
   private static final String CODE_ESCAPE = "(``\\s?(.*?)\\s?``)";
+
+  /**
+   * Code: <code>`code`</code>
+   */
   private static final String CODE = "(`(.*?)`)";
+
+  /**
+   * Image: <code>![alt](src)</code>
+   */
   private static final String IMAGE = "(\\!\\[(.*?)\\]\\((.*?)\\))";
   private static final String REF = "(\\[(.*?)\\]\\((.*?)\\))";
   private static final String LINK = "(<((https?://|mailto:)(.*?))>)";

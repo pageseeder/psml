@@ -75,9 +75,7 @@ public class BlockParserTest {
   @Test
   public void testBlockquotes() throws Exception {
     List<String> q1 = Arrays.asList("> Hello");
-//    List<String> q2 = Arrays.asList("> Hello", "> ", "> This is a quote!");
-    Assert.assertEquals("<block>Hello</block>", toPSML(q1));
-//    Assert.assertEquals("<block> Hello</block>", toPSML(q2));
+    Assert.assertEquals("<block label=\"quoted\">Hello</block>", toPSML(q1));
   }
 
   @Test

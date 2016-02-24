@@ -31,4 +31,9 @@ import org.pageseeder.xmlwriter.XMLWritable;
  */
 public interface PSMLNode extends XMLWritable {
 
+  /**
+   * @return the text of this node.
+   */
+  public String getText();
+
 }

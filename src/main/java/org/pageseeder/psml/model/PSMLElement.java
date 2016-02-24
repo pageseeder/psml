@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
@@ -128,66 +129,334 @@ public class PSMLElement implements PSMLNode {
      */
     Content("content"),
 
-    Document("document"),
+    /**
+     * &lt;description&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-description.html">description element</a>
+     */
+    Description("description"),
 
-    Element("element"),
+    /**
+     * &lt;diff&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-diff.html">diff element</a>
+     */
+    Diff("diff"),
 
-    Fragment("fragment"),
+    /**
+     * &lt;displaytitle&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-displaytitle.html">displaytitle element</a>
+     */
+    Displaytitle("displaytitle"),
 
+    /**
+     * &lt;document&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-document.html">document element</a>
+     */
+    Document("document", "date", "edit", "id", "level", "lockstructure", "schemaversion", "status", "type", "version"),
+
+    /**
+     * &lt;documentinfo&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-documentinfo.html">documentinfo element</a>
+     */
+    Documentinfo("documentinfo"),
+
+    /**
+     * &lt;fragment&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fragment.html">fragment element</a>
+     */
+    Fragment("fragment", "id", "type"),
+
+    /**
+     * &lt;fragmentinfo&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fragmentinfo.html">fragmentinfo element</a>
+     */
+    Fragmentinfo("fragmentinfo"),
+
+    /**
+     * &lt;fullname&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fullname.html">fullname element</a>
+     */
+    Fullname("fullname"),
+
+    /**
+     * &lt;hcell&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-hcell.html">hcell element</a>
+     *
+     * @deprecated
+     */
+    Hcell("hcell", "align", "alignment", "colspan", "role", "rowspan", "valign", "width"),
+
+    /**
+     * &lt;heading&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-heading.html">heading element</a>
+     */
     Heading("heading"),
 
-    Image("image"),
+    /**
+     * &lt;image&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-image.html">image element</a>
+     */
+    Image("image", "src", "docid", "uriid", "alt", "height", "unresolved", "width"),
 
-    Inline("inline"),
+    /**
+     * &lt;inline&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-inline.html">inline element</a>
+     */
+    Inline("inline", "label"),
 
+    /**
+     * &lt;italic&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-italic.html">italic element</a>
+     */
     Italic("italic"),
 
+    /**
+     * &lt;item&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-item.html">item element</a>
+     */
     Item("item"),
 
-    Link("link"),
+    /**
+     * &lt;item&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-item.html">item element</a>
+     */
+    Labels("labels"),
 
-    List("list"),
+    /**
+     * &lt;link&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-link.html">link element</a>
+     */
+    Link("link", "href", "role"),
 
-    MediaFragment("media-fragment"),
+    /**
+     * &lt;list&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-list.html">list element</a>
+     */
+    List("list", "type", "role"),
 
+    /**
+     * &lt;locator&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-locator.html">locator element</a>
+     */
+    Locator("locator", "editid", "fragment", "id", "modified"),
+
+    /**
+     * &lt;media-fragment&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-media-fragment.html">media-fragment element</a>
+     */
+    MediaFragment("media-fragment", "id", "mediatype", "type"),
+
+    /**
+     * &lt;metadata&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-metadata.html">metadata element</a>
+     */
     Metadata("metadata"),
 
+    /**
+     * &lt;monospace&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-monospace.html">monospace element</a>
+     */
     Monospace("monospace"),
 
-    Nlist("nlist"),
+    /**
+     * &lt;nlist&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-nlist.html">nlist element</a>
+     */
+    Nlist("nlist", "start", "type", "role"),
 
-    Para("para"),
+    /**
+     * &lt;note&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-note.html">note element</a>
+     */
+    Note("note", "id", "modified", "title"),
 
+    /**
+     * &lt;notes&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-notes.html">notes element</a>
+     */
+    Notes("notes"),
+
+    /**
+     * &lt;para&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-para.html">para element</a>
+     */
+    Para("para", "indent", "numbered", "prefix"),
+
+    /**
+     * &lt;preformat&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-preformat.html">preformat element</a>
+     */
     Preformat("preformat"),
 
+    /**
+     * &lt;properties&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-properties.html">properties element</a>
+     */
     Properties("properties"),
 
+    /**
+     * &lt;properties-fragment&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-properties-fragment.html">properties-fragment element</a>
+     */
     PropertiesFragment("properties-fragment"),
 
-    Property("property"),
+    /**
+     * &lt;property&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-property.html">property element</a>
+     */
+    Property("property", "count", "datatype", "name", "title", "value"),
 
-    Row("row"),
+    /**
+     * &lt;reversexrefs&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-reversexrefs.html">reversexrefs element</a>
+     */
+    Reversexref("reversexref", "docid","documenttype","forwardtitle","forwardtype","frag","href","id","labels","level","mediatype","title","type","uriid","urititle"),
 
-    Section("section"),
+    /**
+     * &lt;reversexrefs&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-reversexrefs.html">reversexrefs element</a>
+     */
+    Reversexrefs("reversexrefs", "limitreached"),
 
+    /**
+     * &lt;row&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-row.html">row element</a>
+     */
+    Row("row", "align", "part", "role"),
+
+    /**
+     * &lt;section&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-section.html">section element</a>
+     */
+    Section("section", "edit", "fragmenttype", "id", "lockstructure", "overwrite", "title"),
+
+    /**
+     * &lt;sub&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-sub.html">sub element</a>
+     */
     Sub("sub"),
 
+    /**
+     * &lt;sup&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-sup.html">sup element</a>
+     */
     Sup("sup"),
 
-    Table("table"),
+    /**
+     * &lt;table&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-table.html">table element</a>
+     */
+    Table("table", "height", "role", "summary", "width"),
 
+    /**
+     * &lt;title&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-title.html">title element</a>
+     */
+    Title("title"),
+
+    /**
+     * &lt;toc&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-toc.html">toc element</a>
+     */
     Toc("toc"),
 
+    /**
+     * &lt;tocref&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-tocref.html">tocref element</a>
+     */
+    Tocref("tocref", "level", "idref", "canonical", "prefix"),
+
+    /**
+     * &lt;underline&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-underline.html">underline element</a>
+     */
     Underline("underline"),
 
-    Xref("xref"),
+    /**
+     * &lt;uri&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-uri.html">uri element</a>
+     */
+    Uri("uri", "created", "decodedpath", "docid", "documenttype", "external", "folder", "host", "id", "mediatype", "modified", "path", "port", "scheme", "title"),
 
-    XrefFragment("xref-fragment"),
+    /**
+     * &lt;value&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-value.html">value element</a>
+     */
+    Value("value"),
 
-    XrefType("xref-type"),
+    /**
+     * &lt;version&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-version.html">version element</a>
+     */
+    Version("version", "created", "id", "name"),
 
+    /**
+     * &lt;versions&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-versions.html">versions element</a>
+     */
+    Versions("versions"),
+
+    /**
+     * &lt;xref&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-xref.html">xref element</a>
+     */
+    Xref("xref", "display","docid","documenttype","external","frag","href","id","labels","level","mediatype","reverselink","reversetitle","reversetype","title","type","unresolved","uriid","urititle"),
+
+    /**
+     * &lt;xref-fragment&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-xref-fragment.html">xref-fragment element</a>
+     */
+    XrefFragment("xref-fragment", "id", "type"),
+
+    /**
+     * This element is used for any unrecognized PSML element.
+     */
     Unknown("unknown");
-
 
     /**
      * The actual element name.
@@ -224,27 +493,36 @@ public class PSMLElement implements PSMLNode {
       return this._attributes;
     }
 
+    public static Name forElement(String name) {
+      for (Name element : values()) {
+        if (element._element.equals(name)) return element;
+      }
+      return Name.Unknown;
+    }
+
   }
 
   /**
    *
    */
-  private Name element = Name.Unknown;
+  private Name name = Name.Unknown;
 
   private Map<String, String> attributes;
 
   public List<PSMLNode> nodes;
 
   public PSMLElement(Name name) {
-    this.element = name;
+    this.name = name;
   }
 
   /**
    * @return the name of the element.
    */
   public Name getElement() {
-    return this.element;
+    return this.name;
   }
+
+
 
   /**
    * Changes the name of this element.
@@ -253,8 +531,8 @@ public class PSMLElement implements PSMLNode {
    *
    * @return this element
    */
-  public PSMLElement setElement(Name name) {
-    this.element = name;
+  public PSMLElement setName(Name name) {
+    this.name = name;
     return this;
   }
 
@@ -271,7 +549,7 @@ public class PSMLElement implements PSMLNode {
    * @return <code>true</code> if and only if it is the same.
    */
   public boolean isElement(Name name) {
-    return this.element == name;
+    return this.name == name;
   }
 
   /**
@@ -471,9 +749,19 @@ public class PSMLElement implements PSMLNode {
   }
 
   @Override
+  public String getText() {
+    if (this.nodes == null) return "";
+    StringBuilder out = new StringBuilder();
+    for (PSMLNode node : this.nodes) {
+      out.append(node.getText());
+    }
+    return out.toString();
+  }
+
+  @Override
   public void toXML(XMLWriter xml) throws IOException {
     boolean hasChildren = hasOnlyElementAsChildren();
-    xml.openElement(this.element.element(), hasChildren);
+    xml.openElement(this.name.element(), hasChildren);
     // Se attributes if any
     if (this.attributes != null) {
       for (Entry<String, String> e : this.attributes.entrySet()) {
@@ -487,6 +775,18 @@ public class PSMLElement implements PSMLNode {
       }
     }
     xml.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    XMLStringWriter xml = new XMLStringWriter(false);
+    try {
+      toXML(xml);
+    } catch (IOException ex) {
+      // TODO Auto-generated catch block
+      ex.printStackTrace();
+    }
+    return xml.toString();
   }
 
   /**
