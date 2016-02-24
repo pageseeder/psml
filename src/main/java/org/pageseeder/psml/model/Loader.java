@@ -105,10 +105,7 @@ public final class Loader {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
       // Commit any text
-      PSMLElement current = current();
-      if (current != null) {
-        current.addNode(new PSMLText(this.text.toString()));
-      }
+      commitText();
       // Push new element
       PSMLElement element = new PSMLElement(Name.forElement(qName));
       for (int i=0; i < attributes.getLength(); i++) {
@@ -122,10 +119,7 @@ public final class Loader {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
       // Commit any text
-      PSMLElement current = current();
-      if (current != null) {
-        current.addNode(new PSMLText(this.text.toString()));
-      }
+      commitText();
       // Pop element and attach to parent
       PSMLElement element = pop();
       PSMLElement parent = current();
@@ -165,6 +159,14 @@ public final class Loader {
      */
     private void push(PSMLElement element) {
       this.context.add(element);
+    }
+
+    private void commitText() {
+      PSMLElement current = current();
+      if (current != null) {
+        current.addNode(new PSMLText(this.text.toString()));
+        this.text.setLength(0);
+      }
     }
 
   }

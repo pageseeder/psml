@@ -38,7 +38,7 @@ public class PSML {
    *
    * @throws IOException Should an I/O error occur while reading the input.
    */
-  public PSMLElement load(Reader reader) throws IOException {
+  public static PSMLElement load(Reader reader) throws IOException {
     Loader loader = new Loader();
     return loader.parse(reader);
   }

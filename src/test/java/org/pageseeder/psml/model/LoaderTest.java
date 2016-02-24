@@ -47,4 +47,16 @@ public class LoaderTest {
     System.out.println(element);
   }
 
+  @Test
+  public void testParse3() throws IOException {
+    Loader loader = new Loader();
+    String psml = "<para>A <bold>test</bold>!</para>";
+    PSMLElement element = loader.parse(new StringReader(psml));
+    Assert.assertNotNull(element);
+    Assert.assertEquals(Name.Para, element.getElement());
+    System.out.println(element);
+  }
+
+
+
 }
