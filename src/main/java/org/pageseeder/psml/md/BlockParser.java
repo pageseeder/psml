@@ -23,12 +23,26 @@ import java.util.regex.Pattern;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
-import org.pageseeder.psml.model.PSMLText;
 
+/**
+ * The block parser parses Markdown and generates the block-level elements
+ * delegating inline elements to the inline parser.
+ *
+ * @author Christophe Lauret
+ */
 public class BlockParser {
 
+  private Configuration configuration;
 
   public BlockParser() {
+  }
+
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
+  }
+
+  public Configuration getConfiguration() {
+    return this.configuration;
   }
 
   /**
@@ -70,17 +84,28 @@ public class BlockParser {
   public void processLine(String line, String next, State state, Configuration config) {
 
     // Lines made entirely of '=' or '-' are used for heading 1 and 2
-    if (line.matches("^\\s?(==+|\\-\\-+)\\s*$")) {
-      // DO nothing
+    if (line.matches("\\s?(==+|\\-\\-+)\\s*")) {
+      // DO nothing, we've already handled it
+    }
+
+    // Separators
+    else if (line.matches("\\s*\\*\\s?\\*\\s?\\*[\\s\\*]*")) {
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
+        state.newFragment();
+      }
     }
 
     // Empty lines are used to separate the different kinds of blocks
     else if (line.matches("\\s*")) {
-      state.commitAll();
+      state.commitUpto(Name.Fragment);
     }
 
     // New list items starting with '+', '-', '*' or number followed by a '.'
-    else if (line.matches("^\\s*(-|\\+|\\*|\\d+\\.)\\s.+")) {
+    else if (line.matches("\\s*(-|\\+|\\*|\\d+\\.)\\s.+")) {
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
+      }
 
       // Create a new item
       Pattern x  = Pattern.compile("^\\s*(-|\\+|\\*|\\d+\\.)\\s+(.+)$");
@@ -92,12 +117,15 @@ public class BlockParser {
           state.commit();
         } else {
           // A new list! Clear the context...
-          state.commitAll();
+          state.commitUpto(Name.Fragment);
           // An create a new list
           PSMLElement list;
           if (no.matches("\\d+\\.")) {
             list = new PSMLElement(Name.Nlist);
-            list.setAttribute("start", no.substring(0, no.length()-1));
+            String initial = no.substring(0, no.length()-1);
+            if (!"1".equals(initial)) {
+              list.setAttribute("start", initial);
+            }
           } else {
             list = new PSMLElement(Name.List);
           }
@@ -110,92 +138,181 @@ public class BlockParser {
 
     // Continuation of a list item
     else if (state.isInList()) {
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
+      }
       if (!state.context.isEmpty() && state.text != null) {
         state.append(line.trim());
       }
-      state.endMetadata();
     }
 
     // Lines starting with two spaces: preformatted code
-    else if (line.matches("^\\s{2}")) {
-      if (!state.isElement(Name.Preformat)) {
-        state.commitAll();
-        state.push(Name.Preformat, line.substring(3));
-      } else {
-        state.append(line.substring(3));
+    else if (line.matches("\\s{4}.*")) {
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
       }
+      if (!state.isElement(Name.Preformat)) {
+        state.commitUpto(Name.Fragment);
+        state.push(Name.Preformat, line.substring(4));
+      } else {
+        state.append(line.substring(4));
+      }
+    }
 
-      // Metadata no longer allowed
-      state.endMetadata();
+    // Beginning/end of fenced code block
+    else if (line.startsWith("```")) {
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
+      }
+      if (state.isElement(Name.Preformat)) {
+        state.append("");
+        state.commitUpto(Name.Fragment);
+      } else {
+        state.commitUpto(Name.Fragment);
+        PSMLElement pre = new PSMLElement(Name.Preformat);
+        if (line.length() > 3) {
+          String language = line.substring(3).trim();
+          if (language.length() > 0) {
+            pre.setAttribute("role", language);
+          }
+        }
+        state.push(pre, "");
+      }
+    }
+
+    // Beginning/end of fenced block labels
+    else if (line.startsWith("~~~")) {
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
+      }
+      if (state.isElement(Name.Block)) {
+        state.commitUpto(Name.Fragment);
+      } else {
+        state.commitUpto(Name.Fragment);
+        PSMLElement pre = new PSMLElement(Name.Block);
+        if (line.length() > 3) {
+          String label = line.substring(3).trim();
+          if (label.length() > 0) {
+            pre.setAttribute("label", label);
+          }
+        }
+        state.push(pre, "");
+      }
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("^\\s*>+\\s?")) {
-      if (!state.isElement(Name.Block)) {
-        state.commitAll();
-        state.push(Name.Block, line.substring(line.indexOf('>')));
-      } else {
-        state.text.append(line.substring(line.indexOf('>')));
+    else if (line.matches("\\s*>+\\s+.*")) {
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
       }
-      // Metadata no longer allowed
-      state.endMetadata();
+      if (!state.isElement(Name.Block)) {
+        state.commitUpto(Name.Fragment);
+        PSMLElement block = new PSMLElement(Name.Block);
+        block.setAttribute("label", "quoted");
+        state.push(block, line.substring(line.indexOf('>')+2));
+      } else {
+        state.append(line.substring(line.indexOf('>')+2));
+      }
     }
 
-    // Metadata
-    else if (state.metadata && line.matches("^\\w+\\:\\s.*")) {
+    // Metadata (document mode only)
+    else if (config.isDocumentMode() && !state.isDescendantOf(Name.Section) && line.matches("^\\w+\\:\\s.*")) {
       int colon = line.indexOf(':');
-      if (state.context.isEmpty()) {
-        state.push(new PSMLElement(Name.Metadata), "");
-        state.push(new PSMLElement(Name.Properties), "");
+      if (!state.isDescendantOf(Name.Metadata)) {
+        state.push(Name.Metadata);
+        state.push(Name.Properties);
       }
-      PSMLElement element = new PSMLElement(Name.Property);
-      element.setAttribute("name", line.substring(0,colon));
-      element.setAttribute("value", line.substring(colon+2).trim());
-      state.push(element);
+      // Create and commit a property
+      PSMLElement property = new PSMLElement(Name.Property);
+      property.setAttribute("name", line.substring(0,colon));
+      property.setAttribute("value", line.substring(colon+2).trim());
+      state.push(property);
       state.commit();
     }
 
     // Probably a paragraph or heading
     else {
-      Pattern heading = Pattern.compile("^\\s*(#{1,6})\\s+(.*)$");
-      Matcher m = heading.matcher(line);
-      if (m.matches()) {
-        state.commitAll();
-        String h = Integer.toString(m.group(1).length());
-        String t = m.group(2).trim();
-        PSMLElement element = new PSMLElement(Name.Heading);
-        element.setAttribute("level", h);
-        element.addNode(new PSMLText(t));
-        state.elements.add(element);
+      if (config.isDocumentMode()) {
+        state.ensureFragment();
+      }
+
+      // We're in a fenced code block
+      if (state.isElement(Name.Preformat)) {
+
+        // Just add the line
+        state.append(line);
+
+        // We're in a fenced block label
+      } else if (state.isElement(Name.Block)) {
+
+        // Just add the line
+        state.append(line);
 
       } else {
 
-        // Let's check whether we have a heading
-        PSMLElement element = new PSMLElement(Name.Para);
-        if (next != null) {
-          if (next.matches("\\s*==+\\s*")) {
-            element = new PSMLElement(Name.Heading);
-            element.setAttribute("level", "1");
-          } else if (next.matches("\\s*--+\\s*")) {
-            element = new PSMLElement(Name.Heading);
-            element.setAttribute("level", "2");
+        // Heading using ATX style
+        Pattern headingPattern = Pattern.compile("^\\s*(#{1,6})\\s+(.*?)(#{1,6})?$");
+        Matcher m = headingPattern.matcher(line);
+        if (m.matches()) {
+          state.commitUpto(Name.Fragment);
+          String level = Integer.toString(m.group(1).length());
+          String text = m.group(2).trim();
+          PSMLElement heading = new PSMLElement(Name.Heading);
+          heading.setAttribute("level", level);
+          state.push(heading, text);
+          state.commit();
+
+        } else {
+
+          boolean isTitle = false;
+
+          // Let's check whether we have a heading using SetExt style
+          PSMLElement element = new PSMLElement(Name.Para);
+          if (next != null) {
+            if (next.matches("\\s*==+\\s*")) {
+              // We use the '====' as a marker for a new section
+              if (config.isDocumentMode() && !state.current().isEmpty()) {
+                state.newSection();
+              }
+              element = new PSMLElement(Name.Heading);
+              element.setAttribute("level", "1");
+
+              // Special case for title section
+              if (config.isDocumentMode()) {
+                PSMLElement section = state.ancestor(Name.Section);
+                if ("title".equals(section.getAttribute("id"))) {
+                  isTitle = true;
+                }
+              }
+
+            } else if (next.matches("\\s*--+\\s*")) {
+              // We use the '----' as a marker for a new fragment
+              if (config.isDocumentMode() && !state.current().isEmpty()) {
+                state.newFragment();
+              }
+              element = new PSMLElement(Name.Heading);
+              element.setAttribute("level", "2");
+            }
+          }
+
+          if (!state.isElement(element.getElement())) {
+            state.commitUpto(Name.Fragment);
+            state.push(element, line.trim());
+          } else {
+            state.append(line.trim());
+          }
+
+          // If the line breaks occurs before 66 characters, we assume it is intentional and insert a break
+          if (line.length() < config.getLineBreakThreshold()) {
+            state.commitUpto(Name.Fragment);
+          }
+
+          // Special case: we terminate the section title
+          if (isTitle) {
+            state.commitUpto(Name.Document);
           }
         }
-
-        if (!state.isElement(element.getElement())) {
-          state.commitAll();
-          state.push(element, line.trim());
-        } else {
-          state.append(line.trim());
-        }
-
-        // If the line breaks occurs before 66 characters, we assume it is intentional and insert a break
-        if (line.length() < config.getLineBreakThreshold()) {
-          state.commitAll();
-        }
-
       }
-      state.endMetadata();
     }
 
   }
@@ -207,15 +324,13 @@ public class BlockParser {
   public static final class State {
 
     /**
-     * List of element found by this parser
+     * List of element that have been committed.
      */
     private List<PSMLElement> elements = new ArrayList<>();
 
     /**
-     * Whether it is possible to define metadata.
+     * The inline parser to use.
      */
-    private boolean metadata = true;
-
     private InlineParser inline = new InlineParser();
 
     /**
@@ -224,10 +339,30 @@ public class BlockParser {
     private List<PSMLElement> context = new ArrayList<>(4);
 
     /**
+     * The section identifiers.
+     */
+    private String[] sectionIds = new String[]{"title", "content"};
+
+    /**
+     * Position of the section
+     */
+    private int sectionPosition = 0;
+
+    /**
+     * Id of the fragment being processed
+     */
+    private int fragmentId = 0;
+
+    /**
      * String of text for the current element
      */
     private StringBuilder text = null;
 
+    /**
+     * Indicates whether we are within an ordered or unordered list.
+     *
+     * @return <code>true</code> if the current or parent element is either a list or an nlist.
+     */
     public boolean isInList() {
       final int size = this.context.size();
       PSMLElement current = size > 0? this.context.get(size-1) : null;
@@ -237,38 +372,139 @@ public class BlockParser {
       return isCurrentList || isParentList;
     }
 
-    private PSMLElement peek() {
+    /**
+     * @return the current element.
+     */
+    public PSMLElement current() {
       if (this.context.isEmpty()) return null;
       return this.context.get(this.context.size()-1);
     }
 
+    /**
+     * Indicates whether the current element is a descendant of the specified name.
+     *
+     * @param name the name of the element to match
+     * @return <code>true</code> if the current element matches the specified name;
+     *         <code>false</code> otherwise.
+     */
+    public PSMLElement ancestor(Name name) {
+      final int size = this.context.size();
+      if (size == 0) return null;
+      for (int i = size-1; i >= 0; i--) {
+        PSMLElement element = this.context.get(i);
+        if (element.getElement() == name)
+          return element;
+      }
+      return null;
+    }
 
+    /**
+     *
+     * @param name the name of the element to match
+     * @return <code>true</code> if the current element matches the specified name;
+     *         <code>false</code> otherwise.
+     */
     public boolean isElement(Name name) {
-      PSMLElement current = peek();
+      PSMLElement current = current();
       return current != null && current.isElement(name);
     }
 
+    /**
+     * Indicates whether the current element is a descendant of the specified name.
+     *
+     * @param name the name of the element to match
+     * @return <code>true</code> if the current element matches the specified name;
+     *         <code>false</code> otherwise.
+     */
+    public boolean isDescendantOf(Name name) {
+      return ancestor(name) != null;
+    }
+
+    /**
+     * Set the state to a new section if possible
+     */
+    public void newSection() {
+      if (this.sectionPosition < this.sectionIds.length) {
+        commitAll();
+        PSMLElement section = new PSMLElement(Name.Section);
+        String sectionId = this.sectionIds[this.sectionPosition];
+        section.setAttribute("id", sectionId);
+        push(section);
+        this.sectionPosition++;
+      }
+    }
+
+    /**
+     * Set the state to a new fragment
+     */
+    public void newFragment() {
+      commitUpto(Name.Section);
+      PSMLElement fragment = new PSMLElement(Name.Fragment);
+      fragment.setAttribute("id", ++this.fragmentId);
+      push(fragment);
+    }
+
+    /**
+     * Ensure that we are in a fragment
+     */
+    public void ensureFragment() {
+      if (!isDescendantOf(Name.Section)) {
+        newSection();
+      }
+      if (!isDescendantOf(Name.Fragment)) {
+        newFragment();
+      }
+    }
+
+    /**
+     * Shorthand method to add a new element to the context and add some text.
+     *
+     * @param name Name of the element to push
+     * @param text Text for the element (not committed)
+     */
     public void push(Name name, String text) {
       push(new PSMLElement(name), text);
     }
 
+    /**
+     * Shorthand method to add a new element to the context and reset the text.
+     *
+     * @param name Name of the element to push
+     */
+    public void push(Name name) {
+      push(new PSMLElement(name));
+    }
+
+    /**
+     * Add a new element to the context and reset the text.
+     *
+     * @param name Name of the element to push
+     */
     public void push(PSMLElement element) {
       this.context.add(element);
       this.text = null;
     }
 
+    /**
+     * Add a new element to the context and add some text.
+     *
+     * @param name Name of the element to push
+     * @param text Text for the element (not committed)
+     */
     public void push(PSMLElement element, String text) {
       this.context.add(element);
       this.text = new StringBuilder(text);
     }
 
+    /**
+     * Append text to the current text node preceded by a new line.
+     */
     public void append(String text) {
       this.text.append('\n').append(text);
     }
 
     /**
-     * Empty the current stack and attach the text to the
-     * current node.
+     * Empty the current stack and attach the text to the current node.
      */
     public void commitAll() {
       commitText();
@@ -285,6 +521,33 @@ public class BlockParser {
       }
     }
 
+    /**
+     * Commit the elements in the current stack up to the specified element
+     * and attach the text to the current node.
+     */
+    public void commitUpto(Name name) {
+      commitText();
+      int size = this.context.size();
+      while (size > 0) {
+        // We stop committing when we encounter the element
+        if (isElement(name)) {
+          break;
+        }
+        PSMLElement current = this.context.remove(size-1);
+        if (size > 1) {
+          PSMLElement parent = this.context.get(size-2);
+          parent.addNode(current);
+        } else {
+          this.elements.add(current);
+        }
+        size = this.context.size();
+      }
+    }
+
+    /**
+     * Commit the text on the current element and add the current element to
+     * its parent before removing this element from current context.
+     */
     public void commit() {
       commitText();
       int size = this.context.size();
@@ -299,17 +562,17 @@ public class BlockParser {
       }
     }
 
+    /**
+     * Process the text using the inline parser and append the result to the
+     * current element.
+     */
     public void commitText() {
-      PSMLElement current = peek();
+      PSMLElement current = current();
       if (this.text != null && current != null) {
         List<PSMLNode> nodes = this.inline.parse(this.text.toString());
         current.addNodes(nodes);
         this.text = null;
       }
-    }
-
-    public void endMetadata() {
-      this.metadata = false;
     }
 
   }

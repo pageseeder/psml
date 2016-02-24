@@ -35,6 +35,7 @@ public class MarkdownParserTest {
     InputStream in = MarkdownParserTest.class.getResourceAsStream("/org/pageseeder/psml/md/test.md");
     Reader r = new InputStreamReader(in);
     MarkdownParser parser = new MarkdownParser();
+    parser.getConfig().setFragmentMode(false);
     PSMLElement document = parser.parse(r);
 
     XMLWriter xml = new XMLWriterImpl(new PrintWriter(System.out));

@@ -45,3 +45,6 @@ function() {
 
 Second chapter
 --------------
+
+Until now, we've only been interested in whether or not a match is found at some location within a particular input string. We never cared about where in the string the match was taking place.
+

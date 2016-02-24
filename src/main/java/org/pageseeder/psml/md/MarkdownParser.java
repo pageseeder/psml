@@ -32,6 +32,8 @@ import org.pageseeder.psml.spi.Parser;
  */
 public class MarkdownParser extends Parser {
 
+  private Configuration config = new Configuration();
+
   public MarkdownParser() {
   }
 
@@ -40,17 +42,32 @@ public class MarkdownParser extends Parser {
     return "text/markdown";
   }
 
+  public void setConfig(Configuration config) {
+    this.config = config;
+  }
+
+  public Configuration getConfig() {
+    return this.config;
+  }
+
   @Override
   public PSMLElement parse(Reader reader) throws IOException {
     List<String> lines = toLines(reader);
-    Configuration config = new Configuration();
     BlockParser parser = new BlockParser();
-    List<PSMLElement> elements = parser.parse(lines, config);
+    parser.setConfiguration(this.config);
+    List<PSMLElement> elements = parser.parse(lines, this.config);
 
-    PSMLElement document = new PSMLElement(Name.Document);
-    document.addNodes(elements);
+    // Wrap the element based on the configuration
+    PSMLElement wrapper = null;
+    if (this.config.isFragment()) {
+      wrapper = new PSMLElement(Name.Fragment);
+    } else {
+      wrapper = new PSMLElement(Name.Document);
+      wrapper.setAttribute("level", "portable");
+    }
+    wrapper.addNodes(elements);
 
-    return document;
+    return wrapper;
   }
 
 

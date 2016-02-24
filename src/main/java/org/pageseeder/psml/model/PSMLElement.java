@@ -306,6 +306,38 @@ public class PSMLElement implements PSMLNode {
   }
 
   /**
+   * Sets the attribute value of the specified attribute.
+   *
+   * <p>Implementation note: this method will initialize the attribute map
+   * if necessary.
+   *
+   * @param name  The name of the attribute.
+   * @param value The int value of the attribute.
+   *
+   * @return this element
+   */
+  public PSMLElement setAttribute(String name, int value) {
+    setAttribute(name, Integer.toString(value));
+    return this;
+  }
+
+  /**
+   * Sets the attribute value of the specified attribute.
+   *
+   * <p>Implementation note: this method will initialize the attribute map
+   * if necessary.
+   *
+   * @param name  The name of the attribute.
+   * @param value The boolean value of the attribute.
+   *
+   * @return this element
+   */
+  public PSMLElement setAttribute(String name, boolean value) {
+    setAttribute(name, Boolean.toString(value));
+    return this;
+  }
+
+  /**
    * Adds a child node to this element.
    *
    * <p>If the element already has child nodes, the specified node is appended
@@ -427,6 +459,15 @@ public class PSMLElement implements PSMLNode {
       this.nodes = new ArrayList<>();
     }
     return this.nodes;
+  }
+
+  /**
+   * Indicates whether the element has nay child node (attribute nodes are ignored)
+   *
+   * @return <code>true</code> is the node list is uninitialized or empty.
+   */
+  public boolean isEmpty() {
+    return this.nodes == null || this.nodes.size() == 0;
   }
 
   @Override

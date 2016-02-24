@@ -17,11 +17,36 @@ package org.pageseeder.psml.md;
 
 public class Configuration {
 
+  private int lineBreakThreshold = 66;
+
+
+  /**
+   * Indicates whether the parser should generate a document or a fragment.
+   */
+  private boolean isDocumentMode = false;
+
+
   public Configuration() {
   }
 
+  public void setFragmentMode(boolean isFragmentMode) {
+    this.isDocumentMode = !isFragmentMode;
+  }
+
+  public boolean isFragment() {
+    return !this.isDocumentMode;
+  }
+
+  public boolean isDocumentMode() {
+    return this.isDocumentMode;
+  }
+
+  public void setLineBreakThreshold(int lineBreakThreshold) {
+    this.lineBreakThreshold = lineBreakThreshold;
+  }
+
   public int getLineBreakThreshold() {
-    return 66;
+    return this.lineBreakThreshold;
   }
 
 }
