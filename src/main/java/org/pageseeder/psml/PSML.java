@@ -15,12 +15,32 @@
  */
 package org.pageseeder.psml;
 
+import java.io.IOException;
+import java.io.Reader;
+
+import org.pageseeder.psml.model.Loader;
+import org.pageseeder.psml.model.PSMLElement;
+
 /**
  * Reserving this class for future use.
  */
 public class PSML {
 
   private PSML() {
+  }
+
+  /**
+   * Generate a PSML
+   *
+   * @param reader The reader containing PSML data to load.
+   *
+   * @return The corresponding PSML element.
+   *
+   * @throws IOException Should an I/O error occur while reading the input.
+   */
+  public PSMLElement load(Reader reader) throws IOException {
+    Loader loader = new Loader();
+    return loader.parse(reader);
   }
 
 }
