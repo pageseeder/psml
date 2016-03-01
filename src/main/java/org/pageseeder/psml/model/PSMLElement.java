@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 
@@ -50,7 +51,7 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-anchor.html">anchor element</a>
      */
-    Anchor("anchor", "name"),
+    Anchor("anchor", true, "name"),
 
     /**
      * &lt;author&lt; element
@@ -78,14 +79,14 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-bold.html">bold element</a>
      */
-    Bold("bold"),
+    Bold("bold", true),
 
     /**
      * &lt;br&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-br.html">br element</a>
      */
-    Br("br"),
+    Br("br", true),
 
     /**
      * &lt;caption&lt; element
@@ -206,21 +207,21 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-image.html">image element</a>
      */
-    Image("image", "src", "docid", "uriid", "alt", "height", "unresolved", "width"),
+    Image("image", true, "src", "docid", "uriid", "alt", "height", "unresolved", "width"),
 
     /**
      * &lt;inline&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-inline.html">inline element</a>
      */
-    Inline("inline", "label"),
+    Inline("inline", true, "label"),
 
     /**
      * &lt;italic&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-italic.html">italic element</a>
      */
-    Italic("italic"),
+    Italic("italic", true),
 
     /**
      * &lt;item&lt; element
@@ -241,7 +242,7 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-link.html">link element</a>
      */
-    Link("link", "href", "role"),
+    Link("link", true, "href", "role"),
 
     /**
      * &lt;list&lt; element
@@ -256,6 +257,13 @@ public class PSMLElement implements PSMLNode {
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-locator.html">locator element</a>
      */
     Locator("locator", "editid", "fragment", "id", "modified"),
+
+    /**
+     * &lt;markdown&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-markdown.html">markdown element</a>
+     */
+    Markdown("markdown"),
 
     /**
      * &lt;media-fragment&lt; element
@@ -276,7 +284,7 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-monospace.html">monospace element</a>
      */
-    Monospace("monospace"),
+    Monospace("monospace", true),
 
     /**
      * &lt;nlist&lt; element
@@ -367,14 +375,14 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-sub.html">sub element</a>
      */
-    Sub("sub"),
+    Sub("sub", true),
 
     /**
      * &lt;sup&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-sup.html">sup element</a>
      */
-    Sup("sup"),
+    Sup("sup", true),
 
     /**
      * &lt;table&lt; element
@@ -409,7 +417,7 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-underline.html">underline element</a>
      */
-    Underline("underline"),
+    Underline("underline", true),
 
     /**
      * &lt;uri&lt; element
@@ -444,7 +452,7 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-xref.html">xref element</a>
      */
-    Xref("xref", "display","docid","documenttype","external","frag","href","id","labels","level","mediatype","reverselink","reversetitle","reversetype","title","type","unresolved","uriid","urititle"),
+    Xref("xref", true, "display","docid","documenttype","external","frag","href","id","labels","level","mediatype","reverselink","reversetitle","reversetype","title","type","unresolved","uriid","urititle"),
 
     /**
      * &lt;xref-fragment&lt; element
@@ -464,6 +472,14 @@ public class PSMLElement implements PSMLNode {
     private final String _element;
 
     /**
+     * Indicates that this element is an inline element.
+     *
+     * <p>It is defined as an inline element if it can have sibling text nodes
+     * that are significant (i.e other than white spaces)
+     */
+    private final boolean _inline;
+
+    /**
      * The possible attributes on this element.
      */
     private final List<String> _attributes;
@@ -472,11 +488,23 @@ public class PSMLElement implements PSMLNode {
      * Creates a new PSML name for the
      *
      * @param name       the name of the element
+     * @param inline     whether it is an inline element
+     * @param attributes an array of possible attribute names
+     */
+    private Name(String name, boolean inline, String... attributes) {
+      this._element = name;
+      this._inline = inline;
+      this._attributes = Arrays.asList(attributes);
+    }
+
+    /**
+     * Creates a new PSML name for the
+     *
+     * @param name       the name of the element
      * @param attributes an array of possible attribute names
      */
     private Name(String name, String... attributes) {
-      this._element = name;
-      this._attributes = Arrays.asList(attributes);
+      this(name, false, attributes);
     }
 
     /**
@@ -484,6 +512,13 @@ public class PSMLElement implements PSMLNode {
      */
     public String element() {
       return this._element;
+    }
+
+    /**
+     * @return <code>true</code> if considered an inline element.
+     */
+    public boolean isInline() {
+      return this._inline;
     }
 
     /**
@@ -760,7 +795,7 @@ public class PSMLElement implements PSMLNode {
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    boolean hasChildren = hasOnlyElementAsChildren();
+    boolean hasChildren = !this.name.isInline() && hasOnlyElementAsChildren();
     xml.openElement(this.name.element(), hasChildren);
     // Se attributes if any
     if (this.attributes != null) {
@@ -779,12 +814,11 @@ public class PSMLElement implements PSMLNode {
 
   @Override
   public String toString() {
-    XMLStringWriter xml = new XMLStringWriter(false);
+    XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
     try {
       toXML(xml);
     } catch (IOException ex) {
-      // TODO Auto-generated catch block
-      ex.printStackTrace();
+      // Will never happen
     }
     return xml.toString();
   }

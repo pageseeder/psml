@@ -38,7 +38,7 @@ public class MarkdownParserTest {
     parser.getConfig().setFragmentMode(false);
     PSMLElement document = parser.parse(r);
 
-    XMLWriter xml = new XMLWriterImpl(new PrintWriter(System.out));
+    XMLWriter xml = new XMLWriterImpl(new PrintWriter(System.out), true);
     xml.setIndentChars("  ");
     document.toXML(xml);
     xml.flush();
