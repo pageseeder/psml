@@ -451,7 +451,6 @@ public final class TemplateFactory {
           if (m.start() != from) {
             String data = value.substring(from, m.start());
             this._encoder.attribute(data, psml);
-            from = m.end();
           }
           checkPushData();
           // Get the placeholder
@@ -461,6 +460,7 @@ public final class TemplateFactory {
           } else {
             this._builder.pushValue(placeholder, true);
           }
+          from = m.end();
         }
 
         // Check the tail

@@ -102,7 +102,7 @@ public final class FragmentTemplate implements Template {
     private final Charset _charset;
 
     /**
-     * The fragment type craeted by the builder.
+     * The fragment type created by the builder.
      */
     private final String _type;
 

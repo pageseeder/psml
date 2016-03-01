@@ -1,0 +1,29 @@
+<document type="SST" level="portable" xmlns:t="http://pageseeder.com/psml/template">
+
+  <t:param name="ps.author" />
+  <t:param name="ps.title" />
+  <t:param name="ps.currentdatetime" />
+  <t:param name="phone" title="Phone" type="integer" />
+  <t:param name="dob" title="Date of Birth" type="date" />
+
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Social Security and Tenancy Record</heading> 
+    </fragment>
+    <properties-fragment id="2">
+      <property name="ps.author" title="Answered" value="{$ps.author}" />
+      <property name="ps.title"  title="Contact" value="{$ps.title}" />
+      <property name="date"      title="Created" value="{$ps.currentdatetime}" datatype="date" />
+      <property name="phone"     title="Phone" value="{$phone}" />
+      <property name="dob"       title="Date of Birth" value="{$dob}" datatype="date" />
+      <property name="composed"  title="composition" value="{$a}{$b}{$c}" datatype="date" />
+      <property name="bio"       title="Short bio" datatype="markdown" />
+    </properties-fragment>
+  </section>
+  
+  <section id="related">
+    <title>Related</title>
+    <xref-fragment id="5"/>
+  </section>
+
+</document>
