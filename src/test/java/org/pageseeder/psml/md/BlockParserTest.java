@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.pageseeder.psml.md.BlockParser.State;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
-import org.pageseeder.psml.model.PSMLNode;
+import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 
 public class BlockParserTest {
@@ -125,7 +125,11 @@ public class BlockParserTest {
     Assert.assertEquals("<preformat>\nfunction() {\n  return 'Hello!';\n}\n</preformat>", toPSML(fencedCode3));
   }
 
-
+  @Test
+  public void testUC1() throws Exception {
+    List<String> mixed = Arrays.asList("`coconut`");
+    Assert.assertEquals("<para><monospace>coconut</monospace></para>", toPSML(mixed));
+  }
 
 
 
@@ -203,10 +207,10 @@ public class BlockParserTest {
   private static String toPSML(List<String> lines) {
     try {
       BlockParser parser = new BlockParser();
-      List<PSMLElement> nodes = parser.parse(lines);
-      XMLStringWriter xml = new XMLStringWriter(false);
-      for (PSMLNode n : nodes) {
-        n.toXML(xml);
+      List<PSMLElement> elements = parser.parse(lines);
+      XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
+      for (PSMLElement e : elements) {
+        e.toXML(xml);
       }
       xml.flush();
       return xml.toString();

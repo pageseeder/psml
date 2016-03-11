@@ -106,6 +106,40 @@ public final class InlineParserTest {
   public void testAutolink() {
     Assert.assertEquals("<link href=\"http://example.org\">http://example.org</link>", toPSML("http://example.org"));
     Assert.assertEquals("<link href=\"https://example.org\">https://example.org</link>", toPSML("https://example.org"));
+    // Included characters
+    Assert.assertEquals("<link href=\"http://example.org/\">http://example.org/</link>", toPSML("http://example.org/"));
+    Assert.assertEquals("<link href=\"https://example.org/\">https://example.org/</link>", toPSML("https://example.org/"));
+    // Punctuation
+    Assert.assertEquals("<link href=\"http://example.org\">http://example.org</link>,", toPSML("http://example.org,"));
+    Assert.assertEquals("<link href=\"http://example.org\">http://example.org</link>.", toPSML("http://example.org."));
+    Assert.assertEquals("<link href=\"http://example.org\">http://example.org</link>;", toPSML("http://example.org;"));
+    Assert.assertEquals("<link href=\"http://example.org\">http://example.org</link>!", toPSML("http://example.org!"));
+    Assert.assertEquals("<link href=\"http://example.org\">http://example.org</link>:", toPSML("http://example.org:"));
+    Assert.assertEquals("<link href=\"http://example.org\">http://example.org</link>?", toPSML("http://example.org?"));
+    // Brackets
+    Assert.assertEquals("(<link href=\"http://example.org\">http://example.org</link>)", toPSML("(http://example.org)"));
+    Assert.assertEquals("{<link href=\"http://example.org\">http://example.org</link>}", toPSML("{http://example.org}"));
+    Assert.assertEquals("[<link href=\"http://example.org\">http://example.org</link>]", toPSML("[http://example.org]"));
+    // With path
+    Assert.assertEquals("<link href=\"http://example.org/home.html\">http://example.org/home.html</link>,", toPSML("http://example.org/home.html,"));
+    Assert.assertEquals("<link href=\"http://example.org/home\">http://example.org/home</link>", toPSML("http://example.org/home"));
+    Assert.assertEquals("<link href=\"http://example.org/home\">http://example.org/home</link>.", toPSML("http://example.org/home."));
+    Assert.assertEquals("<link href=\"http://example.org/home\">http://example.org/home</link>,", toPSML("http://example.org/home,"));
+    Assert.assertEquals("<link href=\"http://example.org/home/\">http://example.org/home/</link>", toPSML("http://example.org/home/"));
+    // With parameters
+    Assert.assertEquals("<link href=\"http://example.org?t\">http://example.org?t</link>", toPSML("http://example.org?t"));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>", toPSML("http://example.org?t="));
+    Assert.assertEquals("<link href=\"http://example.org?t=_\">http://example.org?t=_</link>", toPSML("http://example.org?t=_"));
+    Assert.assertEquals("<link href=\"http://example.org?t=-\">http://example.org?t=-</link>", toPSML("http://example.org?t=-"));
+    Assert.assertEquals("<link href=\"http://example.org?t==\">http://example.org?t==</link>", toPSML("http://example.org?t=="));
+    Assert.assertEquals("<link href=\"http://example.org?t=/\">http://example.org?t=/</link>", toPSML("http://example.org?t=/"));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>,", toPSML("http://example.org?t=,"));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>.", toPSML("http://example.org?t=."));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>;", toPSML("http://example.org?t=;"));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>:", toPSML("http://example.org?t=:"));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>?", toPSML("http://example.org?t=?"));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>!", toPSML("http://example.org?t=!"));
+    Assert.assertEquals("<link href=\"http://example.org?t=\">http://example.org?t=</link>)", toPSML("http://example.org?t=)"));
   }
 
   /**

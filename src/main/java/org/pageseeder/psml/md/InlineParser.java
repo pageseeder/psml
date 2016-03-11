@@ -70,9 +70,24 @@ public class InlineParser {
    * Image: <code>![alt](src)</code>
    */
   private static final String IMAGE = "(\\!\\[(.*?)\\]\\((.*?)\\))";
+
+  /**
+   * References: <code>[title](url)</code>
+   */
   private static final String REF = "(\\[(.*?)\\]\\((.*?)\\))";
+
+  /**
+   * Explicit links:
+   *  <code>&lt;http://[url]&gt;</code>,
+   *  <code>&lt;https://[url]&gt;</code>
+   *  or <code>&lt;mailto:[email]&gt;</code>
+   */
   private static final String LINK = "(<((https?://|mailto:)(.*?))>)";
-  private static final String LINK_AUTO = "(https?://\\S+[\\w])";
+
+  /**
+   * Autolinks when text starts with <code>http://</code> or <code>https://</code>
+   */
+  private static final String LINK_AUTO = "(https?://\\S+[\\w/+=@\\-])";
 
   /**
    * Define the general pattern to use to match markdown.
