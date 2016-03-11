@@ -1,3 +1,5 @@
+[ ![Download](https://api.bintray.com/packages/pageseeder/maven/psml/images/download.svg) ](https://bintray.com/pageseeder/maven/psml/_latestVersion)
+
 # PSML
 
 This library provides an API to manipulate the PageSeeder Markup Language 
