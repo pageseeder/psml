@@ -18,6 +18,7 @@ package org.pageseeder.psml.template;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +41,20 @@ public final class DocumentTemplate implements Template {
   private final List<Token> _tokens;
 
   /**
+   * The list of fragments this template is made of.
+   */
+  private final Map<String, TFragment> _fragments;
+
+  /**
    * Create a new template.
    *
-   * @param tokens the tokens this template is made of.
+   * @param tokens    the tokens this template is made of.
+   * @param fragments the fragments in this template
+   * @param charset   the charset
    */
-  private DocumentTemplate(List<Token> tokens, Charset charset) {
+  private DocumentTemplate(List<Token> tokens, Map<String, TFragment> fragments, Charset charset) {
     this._tokens = new ArrayList<Token>(tokens);
+    this._fragments = new HashMap<String, TFragment>(fragments);
     this._charset = charset;
   }
 
@@ -90,6 +99,28 @@ public final class DocumentTemplate implements Template {
     process(psml, values);
   }
 
+  /**
+   * @return the fragment types from the template
+   */
+  public Collection<String> getFragments() {
+    return new ArrayList<String>(this._fragments.keySet());
+  }
+
+  /**
+   * Build a template for the fragment name provided.
+   * 
+   * @param type the fragment type
+   * 
+   * @return the fragment template
+   */
+  public FragmentTemplate getFragmentTemplate(String type) {
+    TFragment frag = this._fragments.get(type);
+    if (frag == null) return null;
+    FragmentTemplate.Builder builder = new FragmentTemplate.Builder(this._charset, frag.type());
+    builder.setFragment(frag);
+    return builder.build();
+  }
+  
   /**
    * Use this class to build a new template.
    */
@@ -215,7 +246,7 @@ public final class DocumentTemplate implements Template {
      */
     @Override
     public DocumentTemplate build() {
-      return new DocumentTemplate(this.tokens, this._charset);
+      return new DocumentTemplate(this.tokens, this._fragments, this._charset);
     }
   }
 }
