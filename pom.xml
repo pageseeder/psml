@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pageseeder</groupId>
   <artifactId>pso-psml</artifactId>
-  <version>0.1.3-SNAPSHOT</version>
+  <version>0.1.3</version>
   <name>PSML</name>
   <description>PageSeeder Markup language API</description>
 
