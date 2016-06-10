@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.spi.Parser;
@@ -64,6 +65,32 @@ public class MarkdownParser extends Parser {
     } else {
       wrapper = new PSMLElement(Name.Document);
       wrapper.setAttribute("level", "portable");
+    }
+    wrapper.addNodes(elements);
+
+    return wrapper;
+  }
+
+  /**
+   *
+   * @param reader
+   *
+   * @return
+   *
+   * @throws IOException
+   */
+  public HTMLElement parseToHTML(Reader reader) throws IOException {
+    List<String> lines = toLines(reader);
+    HTMLBlockParser parser = new HTMLBlockParser();
+    parser.setConfiguration(this.config);
+    List<HTMLElement> elements = parser.parse(lines, this.config);
+
+    // Wrap the element based on the configuration
+    HTMLElement wrapper = null;
+    if (this.config.isFragment()) {
+      wrapper = new HTMLElement(HTMLElement.Name.section);
+    } else {
+      wrapper = new HTMLElement(HTMLElement.Name.article);
     }
     wrapper.addNodes(elements);
 
