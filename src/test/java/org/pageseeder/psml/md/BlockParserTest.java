@@ -79,6 +79,25 @@ public class BlockParserTest {
   }
 
   @Test
+  public void testParagraphs() throws Exception {
+    List<String> p1 = Arrays.asList("Hi!");
+    List<String> p2 = Arrays.asList("Hi!","","Welcome");
+    List<String> p3 = Arrays.asList("Hi!","Welcome");
+    List<String> p4 = Arrays.asList("Hi!","Welcome","","Test");
+    List<String> p5 = Arrays.asList("Hi!","","Welcome","Test");
+    List<String> p6 = Arrays.asList("Hi!","","Welcome","","Test");
+    List<String> p7 = Arrays.asList("This line is longer than sixty-six characters and should continue without", "a line break");
+    Assert.assertEquals("<para>Hi!</para>", toPSML(p1));
+    Assert.assertEquals("<para>Hi!</para><para>Welcome</para>", toPSML(p2));
+    Assert.assertEquals("<para>Hi!<br/>\nWelcome</para>", toPSML(p3));
+    Assert.assertEquals("<para>Hi!<br/>\nWelcome</para><para>Test</para>", toPSML(p4));
+    Assert.assertEquals("<para>Hi!</para><para>Welcome<br/>\nTest</para>", toPSML(p5));
+    Assert.assertEquals("<para>Hi!</para><para>Welcome</para><para>Test</para>", toPSML(p6));
+    Assert.assertEquals("<para>This line is longer than sixty-six characters and should continue without\na line break</para>", toPSML(p7));
+  }
+
+
+  @Test
   public void testUnorderedList() throws Exception {
     List<String> list1 = Arrays.asList(" * Red", " * Green", " * Blue");
     List<String> list2 = Arrays.asList(" + Red", " + Green", " + Blue");

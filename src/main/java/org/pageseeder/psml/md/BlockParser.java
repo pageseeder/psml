@@ -299,13 +299,14 @@ public class BlockParser {
             state.commitUpto(Name.Fragment);
             state.push(element, line.trim());
           } else {
+            if (state.lineBreak) {
+              state.lineBreak();
+            }
             state.append(line.trim());
           }
 
           // If the line breaks occurs before 66 characters, we assume it is intentional and insert a break
-          if (line.length() < config.getLineBreakThreshold()) {
-            state.commitUpto(Name.Fragment);
-          }
+          state.lineBreak = line.length() < config.getLineBreakThreshold();
 
           // Special case: we terminate the section title
           if (isTitle) {
@@ -357,6 +358,11 @@ public class BlockParser {
      * String of text for the current element
      */
     private StringBuilder text = null;
+
+    /**
+     * Boolean flag to possibly include a line break.
+     */
+    private boolean lineBreak = false;
 
     /**
      * Indicates whether we are within an ordered or unordered list.
@@ -507,6 +513,7 @@ public class BlockParser {
      * Empty the current stack and attach the text to the current node.
      */
     public void commitAll() {
+      this.lineBreak = false;
       commitText();
       int size = this.context.size();
       while (size > 0) {
@@ -526,6 +533,7 @@ public class BlockParser {
      * and attach the text to the current node.
      */
     public void commitUpto(Name name) {
+      this.lineBreak = false;
       commitText();
       int size = this.context.size();
       while (size > 0) {
@@ -573,6 +581,15 @@ public class BlockParser {
         current.addNodes(nodes);
         this.text = null;
       }
+    }
+
+    /**
+     * Insert a line break in a paragraph
+     */
+    public void lineBreak() {
+      commitText();
+      current().addNode(new PSMLElement(Name.Br));
+      this.text = new StringBuilder();
     }
 
   }

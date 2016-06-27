@@ -89,6 +89,24 @@ public class HTMLBlockParserTest {
   }
 
   @Test
+  public void testParagraphs() throws Exception {
+    List<String> p1 = Arrays.asList("Hi!");
+    List<String> p2 = Arrays.asList("Hi!","","Welcome");
+    List<String> p3 = Arrays.asList("Hi!","Welcome");
+    List<String> p4 = Arrays.asList("Hi!","Welcome","","Test");
+    List<String> p5 = Arrays.asList("Hi!","","Welcome","Test");
+    List<String> p6 = Arrays.asList("Hi!","","Welcome","","Test");
+    List<String> p7 = Arrays.asList("This line is longer than sixty-six characters and should continue without", "a line break");
+    Assert.assertEquals("<p>Hi!</p>", toHTML(p1));
+    Assert.assertEquals("<p>Hi!</p><p>Welcome</p>", toHTML(p2));
+    Assert.assertEquals("<p>Hi!<br/>\nWelcome</p>", toHTML(p3));
+    Assert.assertEquals("<p>Hi!<br/>\nWelcome</p><p>Test</p>", toHTML(p4));
+    Assert.assertEquals("<p>Hi!</p><p>Welcome<br/>\nTest</p>", toHTML(p5));
+    Assert.assertEquals("<p>Hi!</p><p>Welcome</p><p>Test</p>", toHTML(p6));
+    Assert.assertEquals("<p>This line is longer than sixty-six characters and should continue without\na line break</p>", toHTML(p7));
+  }
+
+  @Test
   public void testOrderedList() throws Exception {
     List<String> list1 = Arrays.asList(" 1. Bird", " 2. McHale", " 3. Parish");
     List<String> list2 = Arrays.asList(" 1. Bird", " 1. McHale", " 1. Parish");
