@@ -213,14 +213,16 @@ public final class XRefTranscluder {
     String dadPath = this.parentHandler.getParentFolderRelativePath();
     // find target file
     File target;
-    if (path.endsWith(".xml") || path.endsWith(".psml")) {
-      // try psml
-      target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path.replaceFirst("\\.xml$", ".psml"));
-      // try binary xml?
-      if (!target.exists())
-        target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
+    if (path.endsWith(".psml")) {
+       target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
     } else {
       target = new File(this.parentHandler.getBinaryRepository(), "META-INF/" + dadPath + '/' + path + ".psml");
+      try {
+        // must use canonical file as some parent folders may not exist under META-INF causing ".." to not resolve on Linux
+        target = target.getCanonicalFile();
+      } catch (IOException ex) {
+        this.parentHandler.getLogger().error(ex.getMessage(), ex);
+      }      
     }
     return target;
   }
