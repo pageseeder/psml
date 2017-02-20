@@ -155,9 +155,9 @@ public final class XRefTranscluder {
        (!inXrefFragment && this.onlyXRefFrament))) return false;
     String href = atts.getValue(image ? "src" : "href");
     String type = image ? "image" : atts.getValue("type");
-    File target = findXRefTarget(href);
     boolean transclude = image ? this.transcludeImages : this.xrefsTranscludeTypes.contains(type);
-    if (transclude) {
+    if (transclude && !"true".equals(atts.getValue("external"))) {
+      File target = findXRefTarget(href);
       // make sure it's valid
       if (target == null || !target.exists() ||!target.isFile())
         throw new XRefNotFoundException();

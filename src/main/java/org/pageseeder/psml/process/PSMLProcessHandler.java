@@ -884,7 +884,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.stripCurrentXRefElement = true;
       return true;
     }
-    if (this.strip.stripNotFoundXRefs() && this.transcluder.isNotFoundXRef(atts.getValue("href"))) {
+    if (this.strip.stripNotFoundXRefs() && !"true".equals(atts.getValue("external")) &&
+        this.transcluder.isNotFoundXRef(atts.getValue("href"))) {
       // log it?
       if (this.logXRefNotFound) {
         String href = atts.getValue("href");
