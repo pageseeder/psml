@@ -43,8 +43,31 @@ package org.pageseeder.psml.process.config;
 public final class XRefsTransclude extends IncludeExcludeConfig {
 
   public static enum XREF_IN_XREF_FRAGMENT {
-    INCLUDE, EXCLUDE, ONLY
+    
+    /** Process xrefs inside <xref-fragment> */
+    INCLUDE,
+    
+    /** Don't process xrefs inside <xref-fragment> */
+    EXCLUDE,
+    
+    /** Process only xrefs inside <xref-fragment> */
+    ONLY;
+    
+    /**
+     * Returns the XREF_IN_XREF_FRAGMENT corresponding to the given name.
+     *
+     * @param name The name of XREF_IN_XREF_FRAGMENT (include, exclude or only).
+     * 
+     * @return The corresponding XREF_IN_XREF_FRAGMENT.
+     */
+    public static XREF_IN_XREF_FRAGMENT forName(String name) {
+      for (XREF_IN_XREF_FRAGMENT n : values()) {
+        if (n.name().equalsIgnoreCase(name)) return n;
+      }
+      throw new IllegalArgumentException("Invalid xreffragment attribute value: " + name);
+    }    
   }
+  
   /**
    * List of XRefs types to match.
    */
@@ -70,8 +93,15 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
   /**
    * @param s the xRefFragment to set
    */
-  public void setXRefFragment(XREF_IN_XREF_FRAGMENT xf) {
+  public void setXRefsInXRefFragment(XREF_IN_XREF_FRAGMENT xf) {
     this.xRefFragment = xf;
+  }
+
+  /**
+   * @param s the name of xRefFragment to set  (include, exclude or only)
+   */
+  public void setXRefFragment(String s) {
+    this.xRefFragment = XREF_IN_XREF_FRAGMENT.forName(s);
   }
 
   /**

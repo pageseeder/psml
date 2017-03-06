@@ -64,15 +64,15 @@ public class Images extends IncludeExcludeConfig {
     /**
      * Returns the image src corresponding to the given name.
      *
-     * @param name The name of image src.
+     * @param name The name of image src (uriid, uriidfolders, permalink or location).
      * 
-     * @return The corresponding image src or <code>LOCATION</code> if none matches.
+     * @return The corresponding image src.
      */
     public static ImageSrc forName(String name) {
       for (ImageSrc n : values()) {
         if (n.name().equalsIgnoreCase(name)) return n;
       }
-      return ImageSrc.LOCATION;
+      throw new IllegalArgumentException("Invalid image src attribute value: " + name);
     }
 
   }
@@ -126,16 +126,14 @@ public class Images extends IncludeExcludeConfig {
   }
 
   /**
-   * @param siteprefix
-   *          the site prefix to set
+   * @param siteprefix the site prefix to set
    */
   public void setSitePrefix(String siteprefix) {
     this.sitePrefix = siteprefix;
   }
 
   /**
-   * @param loc
-   *          the location to set
+   * @param loc the location to set
    */
   public void setLocation(String loc) {
     this.location = loc;
@@ -149,16 +147,14 @@ public class Images extends IncludeExcludeConfig {
   }
 
   /**
-   * @param s
-   *          the src to set
+   * @param s  the image src to set.
    */
   public void setImageSrc(ImageSrc s) {
     this.src = s;
   }
 
   /**
-   * @param s
-   *          the src to set
+   * @param s  the src to set (uriid, uriidfolders, permalink or location)
    */
   public void setSrc(String s) {
     this.src = ImageSrc.forName(s);
