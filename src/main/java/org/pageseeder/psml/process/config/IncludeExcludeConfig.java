@@ -12,7 +12,7 @@ import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 
 /**
  * Include exclude config details.
- * 
+ *
  * @author Jean-Baptiste Reure
  * @version 1.7.9
  *
@@ -22,7 +22,7 @@ public abstract class IncludeExcludeConfig {
   /**
    * List of single files to include or exclude
    */
-  private List<IncludeExclude> includeExcludes = new ArrayList<IncludeExclude>();
+  private List<IncludeExclude> includeExcludes = new ArrayList<>();
 
   /**
    * List of include patterns
@@ -94,6 +94,27 @@ public abstract class IncludeExcludeConfig {
    */
   public void addExcludes(Collection<String> exc) {
     this.excludes.addAll(exc);
+  }
+
+  /**
+   * @return the includeExcludes
+   */
+  public List<IncludeExclude> getIncludeExcludes() {
+    return this.includeExcludes;
+  }
+
+  /**
+   * @return the includes
+   */
+  public List<String> getIncludes() {
+    return this.includes;
+  }
+
+  /**
+   * @return the excludes
+   */
+  public List<String> getExcludes() {
+    return this.excludes;
   }
 
   /**
