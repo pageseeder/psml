@@ -31,7 +31,11 @@ dependencies {
 
   testCompile (
     'junit:junit:4.12',
-    'org.slf4j:slf4j-simple:1.7.21'
+    'org.slf4j:slf4j-simple:1.7.21',
+    'org.hamcrest:java-hamcrest:2.0.0.0',
+    'org.hamcrest:hamcrest-junit:2.0.0.0',
+    'org.xmlunit:xmlunit-core:2.3.0',
+    'org.xmlunit:xmlunit-matchers:2.3.0'
   )
 
 }
