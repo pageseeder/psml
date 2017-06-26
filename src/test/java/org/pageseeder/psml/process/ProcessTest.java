@@ -31,7 +31,7 @@ public class ProcessTest {
     Process p = new Process();
     p.setPreserveSrc(true);
     p.setSrc(new File("src/test/data/process"));
-    File dest = new File("temp/process");
+    File dest = new File("temp/process/xrefs");
     if (dest.exists())
       dest.delete();
     dest.mkdirs();
@@ -39,7 +39,41 @@ public class ProcessTest {
     XRefsTransclude xrefs = new XRefsTransclude();
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes("ref_0.psml");
-    //p.setXrefs(xrefs);
+    p.setXrefs(xrefs);
+    p.process();
+  }
+
+  @Test(expected=ProcessException.class)
+  public void testProcessXRefsAmbiguous() throws IOException, ProcessException {
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File("src/test/data/process"));
+    File dest = new File("temp/process/xrefs");
+    if (dest.exists())
+      dest.delete();
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes("ref_0a.psml");
+    p.setXrefs(xrefs);
+    p.process();
+  }
+
+  @Test(expected=ProcessException.class)
+  public void testProcessXRefsAmbiguous2() throws IOException, ProcessException {
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File("src/test/data/process"));
+    File dest = new File("temp/process/xrefs");
+    if (dest.exists())
+      dest.delete();
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes("ref_0a2.psml");
+    p.setXrefs(xrefs);
     p.process();
   }
 

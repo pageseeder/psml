@@ -41,12 +41,12 @@ public final class XRefTranscluder {
   /**
    * The list of parent files (when transcluding, to avoid looping).
    */
-  private final Map<File, List<String>> parentFiles = new HashMap<File, List<String>>();
+  private final Map<File, List<String>> parentFiles = new HashMap<>();
 
   /**
    * List of XRef types to transclude.
    */
-  protected final List<String> xrefsTranscludeTypes = new ArrayList<String>();
+  protected final List<String> xrefsTranscludeTypes = new ArrayList<>();
 
   /**
    * If the xrefs in an xref-fragment are ignored.
@@ -105,7 +105,7 @@ public final class XRefTranscluder {
    * @return <code>true</code> if there could be any transclusions
    */
   public boolean isTranscluding() {
-    return isTranscluding;
+    return this.isTranscluding;
   }
 
   /**
@@ -115,7 +115,7 @@ public final class XRefTranscluder {
   public void addParentFile(File parent, String fragment) {
     if (parent != null && fragment != null) {
       List<String> fragments = this.parentFiles.get(parent);
-      if (fragments == null) fragments = new ArrayList<String>();
+      if (fragments == null) fragments = new ArrayList<>();
       // should not happen but jsut in case
       if (fragments.contains(fragment))
         throw new IllegalStateException("Should not be here: adding an existing fragment as a parent file");
@@ -141,14 +141,16 @@ public final class XRefTranscluder {
    * by the href attribute. If the fragment is not null and not "default",
    * only the content of that fragment is loaded.
    *
-   * @param atts           The attributes on the XRef
-   * @param inXrefFragment If this XRef is in an XRefFragment
+   * @param atts             The attributes on the XRef
+   * @param inXrefFragment   If this XRef is in an XRefFragment
+   * @param image            If this is an image
+   * @param inEmbedHierarchy If hierarchy has all embed XRefs
    *
    * @return <code>true</code> if the XRef is transcluded, false otherwise
    *
    * @throws ProcessException if the target is invalid or could not be read
    */
-  public boolean transcludeXRef(Attributes atts, boolean inXrefFragment, boolean image) throws ProcessException {
+  public boolean transcludeXRef(Attributes atts, boolean inXrefFragment, boolean image, boolean inEmbedHierarchy) throws ProcessException {
     // should transclude?
     if (!image &&
        ((inXrefFragment && this.excludeXRefFragment) ||
@@ -188,7 +190,8 @@ public final class XRefTranscluder {
       // clone handler
       String levelAtt = atts.getValue("level");
       int level = levelAtt == null || levelAtt.isEmpty() ? 0 : Integer.parseInt(levelAtt);
-      PSMLProcessHandler handler = parentHandler.cloneForTransclusion(target, atts.getValue("uriid"), fragment, level, image);
+      PSMLProcessHandler handler = this.parentHandler.cloneForTransclusion(
+          target, atts.getValue("uriid"), fragment, level, image, inEmbedHierarchy && "embed".equals(type));
       handler.getTranscluder().parentFiles.putAll(this.parentFiles);
       // parse now
       XMLUtils.parse(target, handler);
@@ -222,7 +225,7 @@ public final class XRefTranscluder {
         target = target.getCanonicalFile();
       } catch (IOException ex) {
         this.parentHandler.getLogger().error(ex.getMessage(), ex);
-      }      
+      }
     }
     return target;
   }

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.pageseeder.psml.process.config.ErrorHandling;
 import org.pageseeder.psml.process.config.Images;
@@ -308,9 +309,9 @@ public final class Process {
 
     // collect files
     this.logger.debug("Collecting PSML files from "+this.src.getAbsolutePath());
-    Map<String, File> psml = new HashMap<String, File>();
-    Map<String, File> metadata = new HashMap<String, File>();
-    Map<String, File> rest = new HashMap<String, File>();
+    Map<String, File> psml = new HashMap<>();
+    Map<String, File> metadata = new HashMap<>();
+    Map<String, File> rest = new HashMap<>();
     collectAll(this.src, psml, metadata, rest);
 
     String processID = "P"+System.currentTimeMillis();
@@ -321,7 +322,7 @@ public final class Process {
     // create manifest first
     File manifestFile = null;
     if (this.manifestCreator != null) {
-      logger.info("Creating manifest document");
+      this.logger.info("Creating manifest document");
       this.manifestCreator.setLog(this.logger);
       manifestFile = this.manifestCreator.createManifest(psml, this.src);
       // add it to the list of PSML source
@@ -331,13 +332,13 @@ public final class Process {
     }
 
     String tempFolder = System.getProperty("java.io.tmpdir");
-    List<File> tempFoldersToDelete = new ArrayList<File>();
+    List<File> tempFoldersToDelete = new ArrayList<>();
     List<File> originalFilesInDestination = Arrays.asList(this.dest.listFiles());
     try {
       // run pre transform
       File currentSource = this.src;
       if (this.pretransform != null) {
-        logger.info("Running Pre Transform with "+this.pretransform.getXSLT());
+        this.logger.info("Running Pre Transform with "+this.pretransform.getXSLT());
         this.pretransform.setLog(this.logger);
         this.pretransform.setPreserveSrc(this.preservesrc);
         this.pretransform.setFailOnError(this.failOnError);
@@ -364,7 +365,7 @@ public final class Process {
       ImageCache imageCache = new ImageCache(new File(this.src, "META-INF"));
       // process PSML
       if (this.processXML) {
-        logger.info("Processing content PSML (XRefs, images, strip, numbering)");
+        this.logger.info("Processing content PSML (XRefs, images, strip, numbering)");
         boolean useOutputToTempDir = this.posttransform != null;
         File output;
         if (useOutputToTempDir) {
@@ -389,14 +390,14 @@ public final class Process {
 
       // run post transform
       if (this.posttransform != null) {
-        logger.info("Running Post Transform with "+this.posttransform.getXSLT());
+        this.logger.info("Running Post Transform with "+this.posttransform.getXSLT());
         this.posttransform.setLog(this.logger);
         this.posttransform.setPreserveSrc(this.preservesrc);
         this.posttransform.setFailOnError(this.failOnError);
         this.posttransform.transform(psml, this.dest, "posttransform");
-      } else if (this.pretransform == null && !processXML) {
+      } else if (this.pretransform == null && !this.processXML) {
         // move PSML files manually
-        logger.info("Moving "+psml.size()+" PSML content file(s)");
+        this.logger.info("Moving "+psml.size()+" PSML content file(s)");
         for (String relPath : psml.keySet()) {
           moveFile(psml.get(relPath), new File(this.dest, relPath));
         }
@@ -404,8 +405,8 @@ public final class Process {
 
       // move other files, including images to maybe a new location
       boolean moveImages = this.imageHandling != null && this.imageHandling.getLocation() != null;
-      logger.info("Moving "+rest.size()+" non PSML file(s)");
-      if (moveImages) logger.info("Moving images to "+this.imageHandling.getLocation());
+      this.logger.info("Moving "+rest.size()+" non PSML file(s)");
+      if (moveImages) this.logger.info("Moving images to "+this.imageHandling.getLocation());
       for (String relPath : rest.keySet()) {
         // strip manifest?
         if ("META-INF/manifest.xml".equals(relPath) && this.strip != null && this.strip.stripManifest()) continue;
@@ -424,7 +425,7 @@ public final class Process {
       // move metadata files
       boolean stripMetadataFiles = this.strip != null && this.strip.stripDocumentInfo();
       if (!stripMetadataFiles) {
-        logger.info("Moving "+metadata.size()+" PSML metadata file(s)");
+        this.logger.info("Moving "+metadata.size()+" PSML metadata file(s)");
         for (String relPath : metadata.keySet()) {
           moveFile(metadata.get(relPath), new File(this.dest, relPath));
         }
@@ -432,7 +433,7 @@ public final class Process {
 
       // remove temp folders
       if (!tempFoldersToDelete.isEmpty()) {
-        logger.debug("Removing "+tempFoldersToDelete.size()+" temp folder(s)");
+        this.logger.debug("Removing "+tempFoldersToDelete.size()+" temp folder(s)");
         for (File folder : tempFoldersToDelete) {
           if (!deleteDirectory(folder, true))
             this.logger.warn("Failed to remove temp folder "+folder.getAbsolutePath());
@@ -441,7 +442,7 @@ public final class Process {
 
       // remove the source psml documents
       if (!this.preservesrc) {
-        logger.debug("Removing source document(s)");
+        this.logger.debug("Removing source document(s)");
         if (!deleteDirectory(this.src, false))
           throw new ProcessException("Failed to delete source files");
       } else if (manifestFile != null) {
@@ -532,7 +533,7 @@ public final class Process {
       String siteprefix = null;
       if (this.imageHandling != null && (this.imageMatcher == null ||
                                            !this.imageMatcher.hasPatterns() ||
-                                            this.imageMatcher.matches(relPath))) {        
+                                            this.imageMatcher.matches(relPath))) {
         // set proper values
         thecache          = cache;
         imageSrc          = this.imageHandling.getSrc();
@@ -562,17 +563,19 @@ public final class Process {
           throw new ProcessException("Failed to close output stream: "+ex.getMessage(), ex);
         }
       }
-//      Map<String, Map<String, Integer[]>> ids = handler1.getHierarchyUriFragIDs();
-//      Set<String> keys = ids.keySet();
-//      for (String key : keys) {
-//        logger.info("Hierarchy {}", key);
-//        Map<String, Integer[]> sub = ids.get(key);
-//          Set<String> keys2 = sub.keySet();
-//          for (String key2 : keys2) {
-//            Integer[] counts = sub.get(key2);
-//            logger.info("  Found ID {} globally {} times and locally {} times", key2, counts[0], counts[1]);
-//          }
-//      }
+      if (this.logger.isDebugEnabled()) {
+        Map<String, Map<String, Integer[]>> ids = handler1.getHierarchyUriFragIDs();
+        Set<String> keys = ids.keySet();
+        for (String key : keys) {
+          this.logger.info("Hierarchy {}", key);
+          Map<String, Integer[]> sub = ids.get(key);
+          Set<String> keys2 = sub.keySet();
+          for (String key2 : keys2) {
+            Integer[] counts = sub.get(key2);
+            this.logger.info("  Found ID {} globally {}, locally {} and embedded {} times", key2, counts[0], counts[1], counts[2]);
+          }
+        }
+      }
       // ok second pass now
       try {
         File output = new File(destination, relPath);
@@ -587,7 +590,7 @@ public final class Process {
       }
       // create parser
       PSMLTransclusionHandler handler2 = new PSMLTransclusionHandler(new OutputStreamWriter(fos, UTF8), relPath);
-      handler2.setLogger(logger);
+      handler2.setLogger(this.logger);
       handler2.setFailOnError(this.failOnError);
       handler2.setHierarchyUriFragIDs(handler1.getHierarchyUriFragIDs());
       if (this.generatetoc) {

@@ -177,13 +177,18 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * All URI IDs in the document (including transcluded docs).
    */
-  private Map<String, Integer> allUriIDs = new HashMap<String, Integer>();
+  private Map<String, Integer> allUriIDs = new HashMap<>();
 
   /**
    * Number of URI/frag IDs in the each document sub-hierarchy <root n_uriid,
-   * <uriid[_fragid], [global count, local count]>
+   * <uriid[_fragid], [global count, local count, embed count]>
    */
-  private Map<String, Map<String, Integer[]>> hierarchyUriFragIDs = new HashMap<String, Map<String, Integer[]>>();
+  private Map<String, Map<String, Integer[]>> hierarchyUriFragIDs = new HashMap<>();
+
+  /**
+   * If parsing root or in hierarchy of all embed XRefs
+   */
+  private boolean inEmbedHierarchy = true;
 
   /**
    * If the XML declaration should be included.
@@ -193,7 +198,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Current state.
    */
-  private Stack<String> elements = new Stack<String>();
+  private Stack<String> elements = new Stack<>();
 
   /**
    * If the XML should be currently ignored.
@@ -270,7 +275,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @return the list of URI IDs.
    */
   public Map<String, Integer> getAllUriIDs() {
-    return allUriIDs;
+    return this.allUriIDs;
   }
 
   /**
@@ -285,7 +290,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @return Map of number of URI/frag IDs in the each document sub-hierarchy
    */
   public Map<String, Map<String, Integer[]>> getHierarchyUriFragIDs() {
-    return hierarchyUriFragIDs;
+    return this.hierarchyUriFragIDs;
   }
 
   /**
@@ -345,6 +350,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
+   * @param embed
+   *          if in hierarchy of all embed XRefs
+   */
+  public void setInEmbedHierarchy(boolean embed) {
+    this.inEmbedHierarchy = embed;
+  }
+
+  /**
    * @param lvl
    *          the level to increase the headings by (for transclusions).
    */
@@ -374,30 +387,40 @@ public final class PSMLProcessHandler extends DefaultHandler {
 
   /**
    * Add URI or frag ID to this uri and above in hierarchy
-   * 
+   *
    * @param uriid
    *          the uri id
    * @param fragid
    *          the fragment id (may be null)
+   * @param embed
+   *          whether hierarchy has all embed XRefs
    */
-  public void addUriFragID(String uriid, String fragid) {
+  public void addUriFragID(String uriid, String fragid, boolean embed) {
     // if not root add to parent
     if (this.parent != null)
-      this.parent.addUriFragID(uriid, fragid);
+      this.parent.addUriFragID(uriid, fragid, embed);
     Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs
         .get(this.uriCount + "_" + this.uriID);
     Integer global_count = this.allUriIDs.get(uriid);
     Integer[] counts = null;
     if (sub_hierarchy == null) {
-      sub_hierarchy = new HashMap<String, Integer[]>();
+      sub_hierarchy = new HashMap<>();
       this.hierarchyUriFragIDs.put(this.uriCount + "_" + this.uriID, sub_hierarchy);
     } else
       counts = sub_hierarchy.get(uriid + (fragid == null ? "" : ("-" + fragid)));
     if (counts == null) {
-      counts = new Integer[] { global_count, 1 };
+      counts = new Integer[] { global_count, 1, embed ? 1 : 0 };
       sub_hierarchy.put(uriid + (fragid == null ? "" : ("-" + fragid)), counts);
-    } else
+    } else {
       counts[1] = counts[1] + 1;
+      if (embed) {
+        // if first embed use this as the target
+        if (counts[2] == 0) {
+          counts[0] = global_count;
+        }
+        counts[2] = counts[2] + 1;
+      }
+    }
   }
 
   /**
@@ -524,6 +547,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void startDocument() throws SAXException {
     // start to write something just in case there's an IO error
     if (this.includeXMLDeclaration)
@@ -550,7 +574,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.uriID = atts.getValue("id");
       this.uriCount = 1;
       this.allUriIDs.put(this.uriID, 1);
-      addUriFragID(this.uriID, null);
+      addUriFragID(this.uriID, null, this.inEmbedHierarchy);
     }
     // if fragment loading add temporary document element (stripped out later)
     if (this.fragmentToLoad != null && "document".equals(qName)) {
@@ -769,6 +793,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void endDocument() throws SAXException {
     // complete toc
     if (this.numberingAndTOC != null)
@@ -795,11 +820,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
    *          the fragment to transclude
    * @param lvl
    *          the start level of numbering
+   * @param fromImage
+   *          whether transclusion is from an image
+   * @param embed
+   *          whether hierarchy has all embed XRefs
    *
    * @return the handler
    */
   protected PSMLProcessHandler cloneForTransclusion(File toParse, String uriid, String fragment,
-      int lvl, boolean fromImage) {
+      int lvl, boolean fromImage, boolean embed) {
     // update uri count
     Integer count = this.allUriIDs.get(uriid);
     if (count == null)
@@ -829,15 +858,16 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.generateTOC = this.generateTOC;
     handler.setAllUriIDs(this.allUriIDs);
     handler.setHierarchyUriFragIDs(this.hierarchyUriFragIDs);
+    handler.setInEmbedHierarchy(embed);
     // load only one fragment?
     if (fragment != null && !"default".equals(fragment)) {
       handler.setFragment(fragment);
-      handler.addUriFragID(uriid, fragment);
+      handler.addUriFragID(uriid, fragment, embed);
       // create your own TOC, but use this as a parent to update our TOC too
       handler.numberingAndTOC = new NumberingAndTOCGenerator(this.numberingAndTOC, true);
 
     } else {
-      handler.addUriFragID(uriid, null);
+      handler.addUriFragID(uriid, null, embed);
       // create your own TOC, but use this as a parent to update our TOC too
       handler.numberingAndTOC = new NumberingAndTOCGenerator(this.numberingAndTOC, false);
     }
@@ -923,7 +953,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         }
       }
       // retrieve target document
-      if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image)) {
+      if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, this.inEmbedHierarchy)) {
         // then ignore content of XRef
         this.inTranscludedXRef = true;
       }
@@ -1143,7 +1173,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
 
   /**
    * Encode a file path as a valid URL
-   * 
+   *
    * @param filepath
    *          the path
    * @return the encoded path
@@ -1167,10 +1197,10 @@ public final class PSMLProcessHandler extends DefaultHandler {
 
   /**
    * Convert markdown text to PSML content.
-   * 
+   *
    * @param markdown
    *          the markdown content
-   * 
+   *
    * @return the PSML content
    */
   private String markdownToPSML(String markdown) {
@@ -1189,7 +1219,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
 
   /**
    * Remove potential META-INF folder from parent folder
-   * 
+   *
    * @return the clean parent folder
    */
   private String cleanUpParentFolder() {

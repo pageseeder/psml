@@ -62,29 +62,30 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   private final String sourceRelativePath;
 
   /**
-   * Number of URI/frag IDs in the each document sub-hierarchy <root n_uriid, <uriid[_fragid], [global count, local count]>
+   * Number of URI/frag IDs in the each document sub-hierarchy <root n_uriid,
+   * <uriid[_fragid], [global count, local count, embed count]>
    */
-  private Map<String, Map<String, Integer[]>> hierarchyUriFragIDs = new HashMap<String, Map<String, Integer[]>>();
+  private Map<String, Map<String, Integer[]>> hierarchyUriFragIDs = new HashMap<>();
 
   /**
    * Ancestor uriids of current node.
    */
-  private Stack<String> ancestorUriIDs = new Stack<String>();
-  
+  private Stack<String> ancestorUriIDs = new Stack<>();
+
   /**
    * The multiple URI IDs already found (to keep uniqueness).
    */
-  private Map<String, Integer> uriIDsAlreadyFound = new HashMap<String, Integer>();
+  private Map<String, Integer> uriIDsAlreadyFound = new HashMap<>();
 
   /**
    * List of TOCs.
    */
-  private Map<String, String> subtocs = new HashMap<String, String>();
+  private Map<String, String> subtocs = new HashMap<>();
 
   /**
    * Current state.
    */
-  private Stack<String> elements = new Stack<String>();
+  private Stack<String> elements = new Stack<>();
 
   /**
    * @param out            where the resulting XML should be written.
@@ -142,6 +143,7 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void startDocument() throws SAXException {
     // start to write something just in case there's an IO error
     try {
@@ -327,6 +329,7 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   /**
    * {@inheritDoc}
    */
+  @Override
   public void endDocument() throws SAXException {
     // flush the thing
     try {
@@ -363,13 +366,14 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
     String uriid = atts.getValue("uriid");
     String frag = atts.getValue("frag");
     if (frag == null)
-      throw new ProcessException("XRef has no frag attribute.");       
+      throw new ProcessException("XRef has no frag attribute.");
     Integer global_count = 0;
     Integer local_count = 0;
-    
+    Integer embed_count = 0;
+
     // if resolved and type is none try to find targets in ancestor sub-hierarchies
     if (uriid != null && "none".equals(type)) {
-      List<String> ancestors = new ArrayList<String>(this.ancestorUriIDs);
+      List<String> ancestors = new ArrayList<>(this.ancestorUriIDs);
       for (int i = ancestors.size() - 1; i >= 0; i--) {
         String id = ancestors.get(i);
         Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs.get(id);
@@ -377,26 +381,30 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
         if (uri_counts != null) {
           global_count = uri_counts[0];
           local_count = uri_counts[1];
-          logger.debug("Hierarchy {} found ID {} globally {} times and locally {} times", id, uriid, uri_counts[0], uri_counts[1]);
+          embed_count = uri_counts[2];
+          this.logger.debug("Hierarchy {} found ID {} globally {}, locally {} and embedded {} times",
+              id, uriid, uri_counts[0], uri_counts[1], uri_counts[2]);
         }
         // if link to fragment check transcluded fragments
         if (!"default".equals(frag)) {
           Integer[] frag_counts = sub_hierarchy.get(uriid + "-" + frag);
           if (frag_counts != null) {
             global_count = frag_counts[0];
-            local_count = local_count + frag_counts[1];            
-            logger.debug("Hierarchy {} found ID {}-{} globally {} times and locally {} times", id, uriid, frag, frag_counts[0], frag_counts[1]);
+            local_count = local_count + frag_counts[1];
+            embed_count = embed_count + frag_counts[2];
+            this.logger.debug("Hierarchy {} found ID {}-{} globally {} times, locally {} times",
+                id, uriid, frag, frag_counts[0], frag_counts[1], frag_counts[2]);
           }
         }
-        // if target found then finished
-        if (local_count >= 1) break;
+        // if embedded target or single transcluded target found then finished
+        if (embed_count > 0 || local_count == 1) break;
       }
     }
-    
+
     // generate correct target href
     if (local_count > 0) {
-      // internal
-      if (local_count > 1) {
+      // if more than 1 embedded target or only multiple transcluded targets generate error
+      if (embed_count > 1 || (embed_count == 0 && local_count > 1)) {
         String message = "Internal link pointing to URI "+uriid+
             " fragment "+frag+" is ambiguous because this content appears in multiple locations (see Dev > References check for "+
             this.sourceRelativePath+").";

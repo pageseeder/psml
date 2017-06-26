@@ -3,4 +3,6 @@
     </fragment></section><toc/><section id="xrefs"><xref-fragment id="2">
 <blockxref id="39450" frag="default" reversefrag="2" reversetitle="References" reverselink="true" reversetype="none" display="document" type="transclude" uriid="21930" href="content/content_1.psml" urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Content 1</blockxref>
 <blockxref id="39427" frag="default" reversefrag="2" reversetitle="References" reverselink="true" reversetype="none" display="document" type="embed" uriid="21931" href="content/content_2.psml" urititle="Content 2" mediatype="application/vnd.pageseeder.psml+xml">Content 2</blockxref>
+<blockxref id="99427" frag="default" reversefrag="2" reversetitle="References" reverselink="true" reversetype="none" display="document" type="none" uriid="21930" href="content/content_1.psml" urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Content 1</blockxref>
+<blockxref id="99428" frag="default" reversefrag="2" reversetitle="References" reverselink="true" reversetype="none" display="document" type="none" uriid="21934" href="content/content_3.psml" urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">Content 3</blockxref>
 </xref-fragment></section></document>
