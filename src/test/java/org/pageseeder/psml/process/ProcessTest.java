@@ -31,7 +31,7 @@ import org.xmlunit.matchers.EvaluateXPathMatcher;
 public class ProcessTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/process";
-  private static final String DEST_FOLDER = "temp/process/xrefs";
+  private static final String DEST_FOLDER = "build/test/process/xrefs";
 
   public ProcessTest() {
   }
