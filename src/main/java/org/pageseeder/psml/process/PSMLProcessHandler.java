@@ -613,7 +613,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if (isFragment && !this.elements.contains("compare"))
       this.currentFragment = atts.getValue("id");
     // write start tag
-    this.elements.push(qName);
     write('<' + qName);
     if (noNamespace && "toc".equals(qName) && this.uriID != null)
       write(" uriid=\"" + XMLUtils.escapeForAttribute(this.uriID) + '"');
@@ -700,6 +699,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         write(" relpath=\"" + XMLUtils.escapeForAttribute(relpath) + "\"");
     }
     write(">");
+    this.elements.push(qName);
     // handle markdown
     if (this.convertMarkdown && noNamespace && "markdown".equals(qName)) {
       this.markdownContent = new StringBuilder();
@@ -1083,6 +1083,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
     String dad = this.elements.isEmpty() ? null : this.elements.peek();
     if ("documentinfo".equals(dad) && "uri".equals(elemName)) {
       if (this.strip.stripDocumentInfoDocID() && "docid".equals(attName))
+        return true;
+      if (this.strip.stripDocumentInfoTitle() && "title".equals(attName))
         return true;
     }
     return false;

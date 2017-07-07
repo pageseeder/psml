@@ -22,9 +22,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
+import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.config.XRefsTransclude;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
 
@@ -32,8 +34,272 @@ public class ProcessTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/process";
   private static final String DEST_FOLDER = "build/test/process/xrefs";
+  private static final String COPY_FOLDER = "build/test/process/copy";
 
   public ProcessTest() {
+  }
+
+  @Test
+  public void testNoProcess() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setSrc(copy);
+    p.setDest(dest);
+    p.process();
+
+    // check results
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_0.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0a.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0a2.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a2.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_1.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_1.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_2.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_2.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_1.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/content/content_1.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_2.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/content/content_2.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_3.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/content/content_3.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/META-INF/content.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/content.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/META-INF/manifest.xml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/manifest.xml").toPath()));
+  }
+
+  @Test
+  public void testNoProcessPreserve() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(copy);
+    p.setDest(dest);
+    p.process();
+
+    // check results
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_0.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0a.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0a2.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a2.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_1.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_1.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_2.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/ref_2.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_1.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/content/content_1.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_2.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/content/content_2.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_3.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/content/content_3.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/META-INF/content.psml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/content.psml").toPath()));
+    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/META-INF/manifest.xml").toPath()),
+        Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/manifest.xml").toPath()));
+  }
+
+  @Test
+  public void testStripDocumentInfo() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "ref_0.psml";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripDocumentInfo(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo)", equalTo("true")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/content.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo)", equalTo("true")));
+  }
+
+  @Test
+  public void testStripDocumentInfoDocids() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "ref_0.psml";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripDocumentInfoDocID(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@id)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@docid)", equalTo("true")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/content.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@id)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@docid)", equalTo("true")));
+  }
+
+  @Test
+  public void testStripDocumentInfoLabels() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "ref_0.psml";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripDocumentInfoLabels(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/labels)", equalTo("true")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/content.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/labels)", equalTo("true")));
+  }
+
+  @Test
+  public void testStripDocumentInfoDescription() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "ref_0.psml";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripDocumentInfoDescription(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/description)", equalTo("true")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/content.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/description)", equalTo("true")));
+  }
+
+  @Test
+  public void testStripDocumentInfoTitle() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "ref_0.psml";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripDocumentInfoTitle(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@title)", equalTo("true")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/displaytitle)", equalTo("true")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/content.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@title)", equalTo("true")));
+    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/displaytitle)", equalTo("true")));
   }
 
   @Test
@@ -44,7 +310,7 @@ public class ProcessTest {
     p.setSrc(new File(SOURCE_FOLDER));
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
-      dest.delete();
+      FileUtils.deleteDirectory(dest);
     dest.mkdirs();
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();
@@ -78,7 +344,7 @@ public class ProcessTest {
     p.setSrc(new File(SOURCE_FOLDER));
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
-      dest.delete();
+      FileUtils.deleteDirectory(dest);
     dest.mkdirs();
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();
@@ -114,7 +380,7 @@ public class ProcessTest {
     p.setSrc(new File(SOURCE_FOLDER));
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
-      dest.delete();
+      FileUtils.deleteDirectory(dest);
     dest.mkdirs();
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();
@@ -132,7 +398,7 @@ public class ProcessTest {
     p.setSrc(new File(SOURCE_FOLDER));
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
-      dest.delete();
+      FileUtils.deleteDirectory(dest);
     dest.mkdirs();
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();
@@ -170,7 +436,7 @@ public class ProcessTest {
     p.setSrc(new File(SOURCE_FOLDER));
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
-      dest.delete();
+      FileUtils.deleteDirectory(dest);
     dest.mkdirs();
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();

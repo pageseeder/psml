@@ -363,6 +363,7 @@ public final class Process {
 
       // build an image cache so that their details are not copmuted multiple times
       ImageCache imageCache = new ImageCache(new File(this.src, "META-INF"));
+      boolean parseMetadata = this.strip != null;
       // process PSML
       if (this.processXML) {
         this.logger.info("Processing content PSML (XRefs, images, strip, numbering)");
@@ -377,7 +378,6 @@ public final class Process {
           output = this.dest;
         }
         // add metadata files if they need to be parsed
-        boolean parseMetadata = this.strip != null && this.strip.stripSomeMetadataContent();
         if (parseMetadata) psml.putAll(metadata);
         process(psml, currentSource, output, this.src, imageCache);
         // reload psml source if needed
@@ -423,8 +423,7 @@ public final class Process {
       }
 
       // move metadata files
-      boolean stripMetadataFiles = this.strip != null && this.strip.stripDocumentInfo();
-      if (!stripMetadataFiles) {
+      if (!parseMetadata) {
         this.logger.info("Moving "+metadata.size()+" PSML metadata file(s)");
         for (String relPath : metadata.keySet()) {
           moveFile(metadata.get(relPath), new File(this.dest, relPath));

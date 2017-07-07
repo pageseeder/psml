@@ -98,16 +98,6 @@ public class Strip {
   private boolean stripNotFoundXRefs = false;
 
   /**
-   * If any content is stripped.
-   */
-  private boolean stripSomeContent = false;
-
-  /**
-   * If any metadata content is stripped.
-   */
-  private boolean stripSomeMetadataContent = false;
-  
-  /**
    * @param stripDocumentInfo the stripDocumentInfo to set
    */
   public void setStripDocumentInfo(boolean stripDocumentInfo) {
@@ -192,38 +182,10 @@ public class Strip {
   }
 
   /**
-   * @param stripSomeContent the stripSomeContent to set
-   */
-  public void setStripSomeContent(boolean stripSomeContent) {
-    this.stripSomeContent = stripSomeContent;
-  }
-
-  /**
-   * @param stripSomeMetadataContent the stripSomeMetadataContent to set
-   */
-  public void setStripSomeMetadataContent(boolean stripSomeMetadataContent) {
-    this.stripSomeMetadataContent = stripSomeMetadataContent;
-  }
-
-  /**
    * @param deleteManifest the manifest to set
    */
   public void setManifest(boolean deleteManifest) {
     this.manifest = deleteManifest;
-  }
-
-  /**
-   * @return the stripSomeContent
-   */
-  public boolean stripSomeContent() {
-    return this.stripSomeContent;
-  }
-
-  /**
-   * @return the stripSomeMetadataContent
-   */
-  public boolean stripSomeMetadataContent() {
-    return this.stripSomeMetadataContent;
   }
 
   /**
@@ -332,8 +294,6 @@ public class Strip {
     s.stripFragmentInfo = this.stripFragmentInfo;
     s.stripFragmentInfoLabels = this.stripFragmentInfoLabels;
     s.stripNotFoundXRefs = this.stripNotFoundXRefs;
-    s.stripSomeContent = this.stripSomeContent;
-    s.stripSomeMetadataContent = this.stripSomeMetadataContent;
     s.stripUnresolvedXRefs = this.stripUnresolvedXRefs;
     s.stripXRefsDocID = this.stripXRefsDocID;
     s.stripXRefsURIID = this.stripXRefsURIID;
