@@ -138,9 +138,11 @@ public class HTMLBlockParserTest {
     List<String> fencedCode1 = Arrays.asList("```", "function() { return 'Hello!';}", "```");
     List<String> fencedCode2 = Arrays.asList("```javascript", "function() { return 'Hello!';}", "```");
     List<String> fencedCode3 = Arrays.asList("```", "function() {", "  return 'Hello!';", "}", "```");
+    List<String> fencedCode4 = Arrays.asList("```", "function() {", "  if (a", "  > b) then a = b;", "}", "```");
     Assert.assertEquals("<pre>\nfunction() { return 'Hello!';}\n</pre>", toHTML(fencedCode1));
     Assert.assertEquals("<pre><code class=\"javascript\">\nfunction() { return 'Hello!';}\n</code></pre>", toHTML(fencedCode2));
     Assert.assertEquals("<pre>\nfunction() {\n  return 'Hello!';\n}\n</pre>", toHTML(fencedCode3));
+    Assert.assertEquals("<pre>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</pre>", toHTML(fencedCode4));
   }
 
   @Test

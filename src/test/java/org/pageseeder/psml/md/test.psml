@@ -1,0 +1,69 @@
+<document level="portable">
+  <metadata>
+    <properties>
+      <property name="Title" value="A simple test"/>
+      <property name="Author" value="Christophe Lauret"/>
+      <property name="Description" value="This is a simple Markdown file to test the markdown parser"/>
+    </properties>
+  </metadata>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Simple Test</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>Let's start with a <bold>single</bold> paragraph.</para>
+      <para>This paragraph includes a piece of <monospace>code</monospace>.</para>
+    </fragment>
+    <fragment id="3">
+      <heading level="2">First chapter</heading>
+      <para>Let's have a long paragraph that <italic>continues</italic> on the next line and see if see works
+properly</para>
+      <para>This is a list:</para>
+      <list>
+        <item>First item</item>
+        <item>Second item
+(also part of the second item?)</item>
+        <item>Third item</item>
+      </list>
+      <heading level="3">A heading level 3</heading>
+      <para>Now we have a numbered list:</para>
+      <nlist start="2">
+        <item>First item</item>
+        <item>Second item
+(also part of the second item?)</item>
+        <item>Third item</item>
+      </nlist>
+      <block label="quoted">We're havin a some quoted content now
+Quoted line #2
+Quoted line #3
+Quoted line #4</block>
+      <preformat role="javascript">
+function() {
+  // do something
+  if (a
+  &gt; b) then a = b;
+}
+</preformat>
+    </fragment>
+    <fragment id="4">
+      <heading level="2">Second chapter</heading>
+      <para>Until now, we've only been interested in whether or not a match is found at some location within a particular input string. We never cared about where in the string the match was taking place.</para>
+      <para><link href="https://api.bintray.com/packages/pageseeder/maven/xmlwriter/images/download.svg"> ![Download</link> ](<link href="https://bintray.com/pageseeder/maven/xmlwriter/_latestVersion">https://bintray.com/pageseeder/maven/xmlwriter/_latestVersion</link>)</para>
+      <heading level="1">XML Writer</heading>
+      <para>The XML Writer defines an API and implementations to write XML out to a reading, DOM or SAX.</para>
+      <heading level="2">Example</heading>
+      <preformat>
+  XMLWriter xml = new XMLWriterImpl(Reader r);
+  xml.openElement("greetings");
+  xml.attribute("lang", "en");
+  xml.writeText("Hello World");
+  xml.closeElement();
+</preformat>
+      <heading level="2">Background</heading>
+      <para>We've used this API for over 15 years and it used to be included in Diff-X.
+We decided to split it off so that we would not have to include Diff-X in all our projects.</para>
+    </fragment>
+  </section>
+</document>

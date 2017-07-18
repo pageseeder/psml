@@ -204,7 +204,7 @@ public class HTMLBlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s+.*")) {
+    else if (line.matches("\\s*>+\\s+.*") && !state.isElement(Name.pre)) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }

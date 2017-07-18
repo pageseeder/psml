@@ -201,7 +201,7 @@ public class BlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s+.*")) {
+    else if (line.matches("\\s*>+\\s+.*") && !state.isElement(Name.Preformat)) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }

@@ -139,9 +139,11 @@ public class BlockParserTest {
     List<String> fencedCode1 = Arrays.asList("```", "function() { return 'Hello!';}", "```");
     List<String> fencedCode2 = Arrays.asList("```javascript", "function() { return 'Hello!';}", "```");
     List<String> fencedCode3 = Arrays.asList("```", "function() {", "  return 'Hello!';", "}", "```");
+    List<String> fencedCode4 = Arrays.asList("```", "function() {", "  if (a", "  > b) then a = b;", "}", "```");
     Assert.assertEquals("<preformat>\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode1));
     Assert.assertEquals("<preformat role=\"javascript\">\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode2));
     Assert.assertEquals("<preformat>\nfunction() {\n  return 'Hello!';\n}\n</preformat>", toPSML(fencedCode3));
+    Assert.assertEquals("<preformat>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</preformat>", toPSML(fencedCode4));
   }
 
   @Test

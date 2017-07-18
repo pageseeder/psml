@@ -40,6 +40,8 @@ Now we have a numbered list:
 ```javascript
 function() {
   // do something
+  if (a
+  > b) then a = b;
 }
 ```
 
