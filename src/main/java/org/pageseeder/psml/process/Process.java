@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.pageseeder.psml.process.config.ErrorHandling;
 import org.pageseeder.psml.process.config.Images;
@@ -562,19 +561,20 @@ public final class Process {
           throw new ProcessException("Failed to close output stream: "+ex.getMessage(), ex);
         }
       }
-      if (this.logger.isDebugEnabled()) {
-        Map<String, Map<String, Integer[]>> ids = handler1.getHierarchyUriFragIDs();
-        Set<String> keys = ids.keySet();
-        for (String key : keys) {
-          this.logger.info("Hierarchy {}", key);
-          Map<String, Integer[]> sub = ids.get(key);
-          Set<String> keys2 = sub.keySet();
-          for (String key2 : keys2) {
-            Integer[] counts = sub.get(key2);
-            this.logger.info("  Found ID {} globally {}, locally {} and embedded {} times", key2, counts[0], counts[1], counts[2]);
-          }
-        }
-      }
+      // removed as isDebugEnabled may not be reliable
+      //if (this.logger.isDebugEnabled()) {
+      //  Map<String, Map<String, Integer[]>> ids = handler1.getHierarchyUriFragIDs();
+      //  Set<String> keys = ids.keySet();
+      //  for (String key : keys) {
+      //    this.logger.info("Hierarchy {}", key);
+      //    Map<String, Integer[]> sub = ids.get(key);
+      //    Set<String> keys2 = sub.keySet();
+      //    for (String key2 : keys2) {
+      //      Integer[] counts = sub.get(key2);
+      //      this.logger.info("  Found ID {} globally {}, locally {} and embedded {} times", key2, counts[0], counts[1], counts[2]);
+      //    }
+      //  }
+      //}
       // ok second pass now
       try {
         File output = new File(destination, relPath);
