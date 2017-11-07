@@ -96,8 +96,8 @@ public class BlockParser {
       }
     }
 
-    // Empty lines are used to separate the different kinds of blocks
-    else if (line.matches("\\s*")) {
+    // Empty lines are used to separate the different kinds of blocks, except inside fenced (```) code
+    else if (line.matches("\\s*") && !state.isFenced()) {
       state.commitUpto(Name.Fragment);
     }
 
@@ -146,7 +146,7 @@ public class BlockParser {
       }
     }
 
-    // Lines starting with two spaces: preformatted code
+    // Lines starting with four spaces: preformatted code
     else if (line.matches("\\s{4}.*")) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
@@ -165,6 +165,7 @@ public class BlockParser {
         state.ensureFragment();
       }
       if (state.isElement(Name.Preformat)) {
+        state.setFenced(false);
         state.append("");
         state.commitUpto(Name.Fragment);
       } else {
@@ -177,6 +178,7 @@ public class BlockParser {
           }
         }
         state.push(pre, "");
+        state.setFenced(true);
       }
     }
 
@@ -363,6 +365,29 @@ public class BlockParser {
      * Boolean flag to possibly include a line break.
      */
     private boolean lineBreak = false;
+
+    /**
+     * Boolean flag for being inside fenced (```) code.
+     */
+    private boolean fenced = false;
+
+    /**
+     * Indicates whether we are inside fenced (```) code.
+     *
+     * @return <code>true</code> if inside fenced code.
+     */
+    public boolean isFenced() {
+      return this.fenced;
+    }
+
+    /**
+     * Sets whether we are inside fenced (```) code.
+     *
+     * @param whether inside fenced code.
+     */
+    public void setFenced(boolean fence) {
+      this.fenced = fence;
+    }
 
     /**
      * Indicates whether we are within an ordered or unordered list.

@@ -17,6 +17,10 @@ First chapter
 Let's have a long paragraph that *continues* on the next line and see if see works
 properly 
 
+    this is
+    a code
+    block
+
 This is a list:
  * First item
  * Second item
@@ -39,6 +43,7 @@ Now we have a numbered list:
 
 ```javascript
 function() {
+
   // do something
   if (a
   > b) then a = b;

@@ -20,6 +20,9 @@
       <heading level="2">First chapter</heading>
       <para>Let's have a long paragraph that <italic>continues</italic> on the next line and see if see works
 properly</para>
+      <preformat>this is
+a code
+block</preformat>
       <para>This is a list:</para>
       <list>
         <item>First item</item>
@@ -41,6 +44,7 @@ Quoted line #3
 Quoted line #4</block>
       <preformat role="javascript">
 function() {
+
   // do something
   if (a
   &gt; b) then a = b;
