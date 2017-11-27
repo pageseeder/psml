@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.config.XRefsTransclude;
+import org.pageseeder.psml.process.config.XSLTTransformation;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
 
 public class ProcessTest {
@@ -443,6 +444,47 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
+    p.process();
+  }
+
+  @Test
+  public void testPostTransform() throws IOException, ProcessException {
+    String filename = "content_2.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER + "/content"));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XSLTTransformation xslt = new XSLTTransformation();
+    xslt.setXSLT(SOURCE_FOLDER + "/transform1.xsl");
+    xslt.setIncludes(filename);
+    p.setPostTransform(xslt);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//heading)[1]/@level", equalTo("3")));
+  }
+
+  @Test(expected=ProcessException.class)
+  public void testPostTransformFail() throws IOException, ProcessException {
+    String filename = "content_2.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER + "/content"));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XSLTTransformation xslt = new XSLTTransformation();
+    xslt.setXSLT(SOURCE_FOLDER + "/transform2.xsl");
+    xslt.setIncludes(filename);
+    p.setPostTransform(xslt);
     p.process();
   }
 

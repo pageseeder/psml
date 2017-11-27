@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?stylesheet format="schema" xsl-rootelement="root"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="0.10">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="0.11">
 
   <xs:annotation>
     <xs:documentation>This is the XML schema for PSML document processed content.</xs:documentation>
@@ -715,6 +715,11 @@
       <xs:attribute name="urititle" type="xs:string">
         <xs:annotation>
           <xs:documentation>The title of the source document</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="urilabels" type="label-list">
+        <xs:annotation>
+          <xs:documentation>The labels of the source document</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="level">
@@ -1805,6 +1810,11 @@
     <xs:attribute name="urititle" type="xs:string">
       <xs:annotation>
         <xs:documentation>The target document's title. INFORMATIONAL - ignored by upload.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="urilabels" type="label-list">
+      <xs:annotation>
+        <xs:documentation>The target document's labels.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
     <xs:attribute name="mediatype" type="xs:string">
