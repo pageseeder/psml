@@ -1022,7 +1022,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @return true if this element is a fragment
    */
   private boolean isFragment(String element) {
-    return "fragment".equals(element) || "ext-fragment".equals(element)
+    return "fragment".equals(element) || "media-fragment".equals(element)
         || "xref-fragment".equals(element) || "properties-fragment".equals(element);
   }
 

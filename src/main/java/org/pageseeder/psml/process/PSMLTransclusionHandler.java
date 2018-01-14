@@ -168,7 +168,7 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
     boolean isDocument = noNamespace && "document".equals(qName);
 //    boolean isLocator  = noNamespace && "locator".equals(qName);
     boolean isFrag     = noNamespace && ("fragment".equals(qName) ||
-                                         "ext-fragment".equals(qName) ||
+                                         "media-fragment".equals(qName) ||
                                          "xref-fragment".equals(qName) ||
                                          "properties-fragment".equals(qName));
     if (isDocument && atts.getValue("id") == null)
