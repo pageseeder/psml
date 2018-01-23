@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="681940" schemaversion="0.10" type="act_master" date="2017-04-03T18:58:55+10:00" version="current" level="portable">
+  <documentinfo>
+    <uri id="681940" scheme="http" host="eval.pageseeder.com"
+      port="80"
+      path="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/content.psml"
+      decodedpath="/ps/waccc/legislation/documents/legislation/corruption,_crime_and_misconduct_act_2003/content.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      documenttype="act_master" created="2017-03-28T16:41:30+11:00"
+      modified="2017-04-03T18:58:55+10:00" title=" Corruption, Crime and Misconduct Act 2003">
+      <displaytitle> Corruption, Crime and Misconduct Act 2003
+      </displaytitle>
+      <description>Corruption, Crime and Misconduct Act 2003
+      </description>
+      <labels>master_documents,normal</labels>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="682360"
+        href="/ps/waccc/guidance/documents/sample_processed_pdfs/20160707_advice_-_reporting_serious_misconduct/pages/P1-L1-1.psml"
+        frag="1" urititle="Legal Advice - Reporting Serious Misconduct - P1"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="page" id="2059611" title="References" type="none"
+        forwardtype="none" forwarddisplay="document" forwardfrag="default" />
+      <reversexref uriid="681371"
+        href="/ps/waccc/legal_services/quick_links.psml" frag="1"
+        urititle="Quick Links" mediatype="application/vnd.pageseeder.psml+xml"
+        id="2059638" title="" type="none" forwardtype="none"
+        forwarddisplay="document" forwardfrag="default" />
+      <reversexref uriid="682421"
+        href="/ps/waccc/guidance/documents/sample_migrated_content/fact_sheets/fs_003.psml"
+        frag="2" urititle="Reporting Serious Misconduct" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="guideline" id="2059843"
+        title="What reports are dealt with by the CCC?" type="none"
+        forwardtype="none" forwardtitle="Corruption, Crime and Misconduct Act 2003"
+        forwarddisplay="manual" forwardfrag="default" />
+    </reversexrefs>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="1095471" fragment="subcontentlinks" editid="2058263"
+      modified="2017-03-28T16:41:30+11:00" />
+    <locator id="1096168" fragment="longTitle-1" />
+  </fragmentinfo>
+  <metadata />
+  <section id="content-metadata" title="Metadata" overwrite="true"
+    edit="true" lockstructure="true">
+    <properties-fragment id="content-metadata"
+      type="content-metadata">
+      <property name="content-sdate" datatype="date" title="Start Date"
+        value="2017-01-21T00:00:00+10:00" />
+      <property name="content-edate" datatype="date" title="End Date"
+        value="" />
+    </properties-fragment>
+  </section>
+  <section id="title">
+    <fragment id="title">
+      <block label="ShortTitle">
+        <para>Corruption, Crime and Misconduct Act 2003</para>
+      </block>
+    </fragment>
+  </section>
+  <section id="longTitle-1">
+    <fragment id="longTitle-1">
+      <block label="longTitle">
+        <para>An Act to —</para>
+      </block>
+    </fragment>
+  </section>
+  <section id="longTitle-2">
+    <fragment id="longTitle-2">
+      <block label="longTitle">
+        <para>• provide for the establishment and operation of a
+          Corruption and Crime Commission with functions with
+          respect to serious misconduct by public officers and
+          organised crime; and</para>
+      </block>
+    </fragment>
+  </section>
+  <section id="longTitle-3">
+    <fragment id="longTitle-3">
+      <block label="longTitle">
+        <para>• confer on the Public Sector Commissioner functions
+          with respect to misconduct by public officers; and</para>
+      </block>
+    </fragment>
+  </section>
+  <section id="longTitle-4">
+    <fragment id="longTitle-4">
+      <block label="longTitle">
+        <para>• provide for the establishment and operation of a
+          Parliamentary Inspector of the Corruption and Crime
+          Commission.</para>
+      </block>
+    </fragment>
+  </section>
+  <section id="note-5">
+    <fragment id="note-5">
+      <block label="note">
+        <para>[Long title amended by No. 78 of 2003 s. 4; No. 35 of
+          2014 s. 4.]</para>
+      </block>
+    </fragment>
+  </section>
+  <section id="subcontentlinks">
+    <xref-fragment id="subcontentlinks">
+      <blockxref id="2058241" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681724"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt1.psml"
+        urititle="Part 1 — Preliminary" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 1 — Preliminary</blockxref>
+      <blockxref id="2058242" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681736"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt2.psml"
+        urititle="Part 2 — The Corruption and Crime Commission"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 2 — The Corruption and Crime Commission
+      </blockxref>
+      <blockxref id="2058243" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681662"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt3.psml"
+        urititle="Part 3 — Serious misconduct: role of Commission"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 3 — Serious misconduct: role of Commission
+      </blockxref>
+      <blockxref id="2058244" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681871"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt4A.psml"
+        urititle="Part 4A — Misconduct: role of Public Sector Commissioner"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 4A — Misconduct: role of Public Sector
+        Commissioner</blockxref>
+      <blockxref id="2058245" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681816"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt4.psml"
+        urititle="Part 4 — Organised crime: exceptional powers and fortification removal"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 4 — Organised crime: exceptional powers
+        and fortification removal</blockxref>
+      <blockxref id="2058246" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681971"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt5.psml"
+        urititle="Part 5 — Reporting" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 5 — Reporting</blockxref>
+      <blockxref id="2058247" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681809"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt6.psml"
+        urititle="Part 6 — Powers" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 6 — Powers</blockxref>
+      <blockxref id="2058248" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681653"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt7.psml"
+        urititle="Part 7 — Examinations and deciding claims of privilege and excuse"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 7 — Examinations and deciding claims of
+        privilege and excuse</blockxref>
+      <blockxref id="2058249" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681775"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt8.psml"
+        urititle="Part 8 — Arrest warrants" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 8 — Arrest warrants</blockxref>
+      <blockxref id="2058250" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681717"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt9.psml"
+        urititle="Part 9 — Disclosure, secrecy and protection of witnesses"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 9 — Disclosure, secrecy and protection of
+        witnesses</blockxref>
+      <blockxref id="2058251" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681667"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt10.psml"
+        urititle="Part 10 — Contempt" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 10 — Contempt</blockxref>
+      <blockxref id="2058252" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681782"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt11.psml"
+        urititle="Part 11 — Offences" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 11 — Offences</blockxref>
+      <blockxref id="2058253" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681607"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt12.psml"
+        urititle="Part 12 — Administration" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 12 — Administration</blockxref>
+      <blockxref id="2058254" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681851"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt13.psml"
+        urititle="Part 13 — Parliamentary Inspector of the Corruption and Crime Commission"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 13 — Parliamentary Inspector of the
+        Corruption and Crime Commission</blockxref>
+      <blockxref id="2058255" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681937"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt13A.psml"
+        urititle="Part 13A — Standing Committee" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 13A — Standing Committee</blockxref>
+      <blockxref id="2058256" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681739"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt14.psml"
+        urititle="Part 14 — Other matters" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 14 — Other matters</blockxref>
+      <blockxref id="2058257" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681751"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt15.psml"
+        urititle="Part 15 — Transitional matters" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Part 15 — Transitional matters</blockxref>
+      <blockxref id="2058258" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681618"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/sch1.psml"
+        urititle="Schedule 1 — Offences that may be relevant for Part 4"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Schedule 1 — Offences that may be relevant for
+        Part 4</blockxref>
+      <blockxref id="2058259" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681845"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/sch2.psml"
+        urititle="Schedule 2 — Terms and conditions of service of Commissioner"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Schedule 2 — Terms and conditions of service of
+        Commissioner</blockxref>
+      <blockxref id="2058260" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681931"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/sch3.psml"
+        urititle="Schedule 3 — Terms and conditions of service of Parliamentary Inspector"
+        mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Schedule 3 — Terms and conditions of service of
+        Parliamentary Inspector</blockxref>
+      <blockxref id="2058261" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681631"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/end.psml"
+        urititle="Notes" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Notes</blockxref>
+      <blockxref id="2058262" title="" frag="default"
+        reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
+        reverselink="true" reversetype="none" display="document"
+        type="embed" labels="toc" uriid="681691"
+        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/defs.psml"
+        urititle="Defined terms" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="section_master">Defined terms</blockxref>
+    </xref-fragment>
+  </section>
+</document>

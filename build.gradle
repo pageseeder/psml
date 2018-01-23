@@ -29,6 +29,8 @@ dependencies {
     'org.pageseeder.xmlwriter:pso-xmlwriter:1.0.2'
   )
 
+  compileOnly 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
+
   testCompile (
     'junit:junit:4.12',
     'org.slf4j:slf4j-simple:1.7.21',

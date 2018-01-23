@@ -1,0 +1,42 @@
+<!-- 
+  Note: Some attributes in this PSML document have been removed to only include data that is relevant for testing.
+-->
+<document id="2">
+  <documentinfo>
+    <uri id="2" mediatype="application/vnd.pageseeder.psml+xml">
+      <displaytitle>test_2.html</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="197490"
+        href="/ps/dev/berlioz/testrefs/bravo.psml" frag="2" urititle="Bravo"
+        mediatype="application/vnd.pageseeder.psml+xml" documenttype="references"
+        id="615694" title="References" type="none" forwardtype="embed"
+        forwarddisplay="document" forwardfrag="default" />
+    </reversexrefs>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Test #2</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <heading level="1">A</heading>
+      <heading level="2">A.1</heading>
+      <heading level="4">A.1.a.x</heading>
+    </fragment>
+    <fragment id="3">
+      <heading level="1">B</heading>
+      <heading level="3">B.0.a</heading>
+      <para>Ignored</para>
+      <heading level="3">B.0.b</heading>
+      <para>Ignored</para>
+      <heading level="2">B.1</heading>
+      <heading level="3">B.1.a</heading>
+    </fragment>
+    <fragment id="4">
+      <heading level="2">B.2</heading>
+      <para>Ignored</para>
+    </fragment>
+  </section>
+</document>

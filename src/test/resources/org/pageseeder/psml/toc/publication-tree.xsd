@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
+
+<xs:element name="publication-tree">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="part" type="part" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id"    type="xs:integer" use="required"/>
+    <xs:attribute name="title" type="xs:string"  use="required"/>
+    <xs:attribute name="trees" type="xs:string"  use="required"/>
+    <xs:attribute name="content"  type="xs:boolean"/>
+  </xs:complexType>
+</xs:element>
+
+<!-- ====================================================================== -->
+<!-- Element types                                                          -->
+<!-- ====================================================================== -->
+
+<xs:complexType name="part">
+  <xs:sequence>
+    <xs:choice minOccurs="0" maxOccurs="1">
+      <xs:element name="ref"     type="ref"/>
+      <xs:element name="heading" type="heading"/>
+    </xs:choice>
+    <xs:element name="part" type="part" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="level"    type="level" use="required"/>
+  <xs:attribute name="content"  type="xs:boolean"/>
+  <xs:attribute name="uri"      type="uri"/>
+</xs:complexType>
+
+<xs:complexType name="ref">
+  <xs:attribute name="level"    type="level"     use="required"/>
+  <xs:attribute name="title"    type="xs:string" use="required"/>
+  <xs:attribute name="type"     type="xs:string" use="required"/>
+  <xs:attribute name="uri"      type="uri"       use="required"/>
+</xs:complexType>
+
+<xs:complexType name="heading">
+  <xs:attribute name="level"    type="level"     use="required"/>
+  <xs:attribute name="title"    type="xs:string" use="required"/>
+  <xs:attribute name="fragment" type="fragment"  use="required"/>
+  <xs:attribute name="index"    type="index"     use="required"/>
+  <xs:attribute name="prefix"   type="xs:string"/>
+  <xs:attribute name="numbered" type="xs:boolean"/>
+</xs:complexType>
+
+
+<!-- ====================================================================== -->
+<!-- Attribute types                                                        -->
+<!-- ====================================================================== -->
+
+<xs:simpleType name="fragment">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="[a-zA-Z0-9_\-\.]+"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="from">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="reference" />
+    <xs:enumeration value="heading" />
+    <xs:enumeration value="phantom" />
+    <xs:enumeration value="title" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="index">
+  <xs:restriction base="xs:int">
+    <xs:minInclusive value="0"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="level">
+  <xs:restriction base="xs:int">
+    <xs:minInclusive value="1"/>
+    <xs:maxInclusive value="15"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="uri">
+  <xs:restriction base="xs:long">
+    <xs:minInclusive value="1"/>
+  </xs:restriction>
+</xs:simpleType>
+
+</xs:schema>

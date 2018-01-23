@@ -1,0 +1,20 @@
+<!-- 
+  Note: Some attributes in this PSML document have been removed to only include data that is relevant for testing.
+-->
+<document id="3">
+  <documentinfo>
+    <uri id="3" mediatype="application/vnd.pageseeder.psml+xml" title="test_3.html">
+      <displaytitle>Test 4</displaytitle>
+    </uri>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="3">Test 4</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <heading level="4">Another heading</heading>
+    </fragment>
+  </section>
+</document>

@@ -1,0 +1,143 @@
+<document id="6" schemaversion="0.10" type="references"
+  date="2017-04-21T16:14:02+10:00" version="current" level="portable">
+  <documentinfo>
+    <uri id="186249" scheme="http" host="ps.allette.com.au" port="8080"
+      path="/ps/dev/test/clauret/assembly.psml" decodedpath="/ps/dev/test/clauret/assembly.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      documenttype="references" created="2017-04-21T16:11:56+10:00"
+      modified="2017-04-21T16:14:02+10:00" title="Assembly">
+      <displaytitle>Assembly</displaytitle>
+    </uri>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="288685" fragment="2" editid="939314"
+      modified="2017-04-21T16:14:02+10:00" />
+  </fragmentinfo>
+  <metadata />
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Assembly</heading>
+    </fragment>
+  </section>
+  <toc />
+  <section id="xrefs">
+    <xref-fragment id="2">
+      <blockxref id="939311" title="" frag="default"
+        reversefrag="2" reversetitle="References" reverselink="true"
+        reversetype="none" display="document" type="transclude" uriid="186250"
+        href="/ps/dev/test/clauret/part_a.psml" urititle="Part A"
+        mediatype="application/vnd.pageseeder.psml+xml">
+        <document id="186250" schemaversion="0.10"
+          date="2017-04-21T16:14:02+10:00" version="current" level="portable">
+          <documentinfo>
+            <uri id="186250" scheme="http" host="ps.allette.com.au"
+              port="8080" path="/ps/dev/test/clauret/part_a.psml"
+              decodedpath="/ps/dev/test/clauret/part_a.psml" external="false"
+              mediatype="application/vnd.pageseeder.psml+xml" created="2017-04-21T16:12:56+10:00"
+              modified="2017-04-21T16:14:02+10:00" title="Part A">
+              <displaytitle>Part A</displaytitle>
+            </uri>
+            <reversexrefs>
+              <reversexref uriid="186249"
+                href="/ps/dev/test/clauret/assembly.psml" frag="2"
+                urititle="Assembly" mediatype="application/vnd.pageseeder.psml+xml"
+                documenttype="references" id="939311" title="References"
+                type="none" forwardtype="transclude" forwarddisplay="document"
+                forwardfrag="default" />
+            </reversexrefs>
+          </documentinfo>
+          <fragmentinfo />
+          <metadata />
+          <section id="title">
+            <fragment id="1">
+              <heading level="1">Part A</heading>
+            </fragment>
+          </section>
+          <section id="content">
+            <fragment id="2">
+              <para />
+            </fragment>
+          </section>
+        </document>
+      </blockxref>
+      <blockxref id="939312" title="" frag="default"
+        reversefrag="2" reversetitle="References" reverselink="true"
+        reversetype="none" display="document" level="1" type="transclude"
+        uriid="186251" href="/ps/dev/test/clauret/sub-part_1.psml"
+        urititle="Sub-part 1" mediatype="application/vnd.pageseeder.psml+xml">
+        <document id="186251" schemaversion="0.10"
+          date="2017-04-21T16:14:02+10:00" version="current" level="portable">
+          <documentinfo>
+            <uri id="186251" scheme="http" host="ps.allette.com.au"
+              port="8080" path="/ps/dev/test/clauret/sub-part_1.psml"
+              decodedpath="/ps/dev/test/clauret/sub-part_1.psml"
+              external="false" mediatype="application/vnd.pageseeder.psml+xml"
+              created="2017-04-21T16:13:08+10:00" modified="2017-04-21T16:14:02+10:00"
+              title="Sub-part 1">
+              <displaytitle>Sub-part 1</displaytitle>
+            </uri>
+            <reversexrefs>
+              <reversexref uriid="186249"
+                href="/ps/dev/test/clauret/assembly.psml" frag="2"
+                urititle="Assembly" mediatype="application/vnd.pageseeder.psml+xml"
+                documenttype="references" id="939312" title="References"
+                type="none" forwardtype="transclude" forwarddisplay="document"
+                forwardfrag="default" level="1" />
+            </reversexrefs>
+          </documentinfo>
+          <fragmentinfo />
+          <metadata />
+          <section id="title">
+            <fragment id="1">
+              <heading level="1">Sub-part 1</heading>
+            </fragment>
+          </section>
+          <section id="content">
+            <fragment id="2">
+              <para />
+            </fragment>
+          </section>
+        </document>
+      </blockxref>
+      <blockxref id="939313" title="" frag="default"
+        reversefrag="2" reversetitle="References" reverselink="true"
+        reversetype="none" display="document" level="2" type="transclude"
+        uriid="186252" href="/ps/dev/test/clauret/division_a.psml"
+        urititle="Division a" mediatype="application/vnd.pageseeder.psml+xml">
+        <document id="186252" schemaversion="0.10"
+          date="2017-04-21T16:14:02+10:00" version="current" level="portable">
+          <documentinfo>
+            <uri id="186252" scheme="http" host="ps.allette.com.au"
+              port="8080" path="/ps/dev/test/clauret/division_a.psml"
+              decodedpath="/ps/dev/test/clauret/division_a.psml"
+              external="false" mediatype="application/vnd.pageseeder.psml+xml"
+              created="2017-04-21T16:13:50+10:00" modified="2017-04-21T16:14:02+10:00"
+              title="Division a">
+              <displaytitle>Division a</displaytitle>
+            </uri>
+            <reversexrefs>
+              <reversexref uriid="186249"
+                href="/ps/dev/test/clauret/assembly.psml" frag="2"
+                urititle="Assembly" mediatype="application/vnd.pageseeder.psml+xml"
+                documenttype="references" id="939313" title="References"
+                type="none" forwardtype="transclude" forwarddisplay="document"
+                forwardfrag="default" level="2" />
+            </reversexrefs>
+          </documentinfo>
+          <fragmentinfo />
+          <metadata />
+          <section id="title">
+            <fragment id="1">
+              <heading level="1">Division a</heading>
+            </fragment>
+          </section>
+          <section id="content">
+            <fragment id="2">
+              <para />
+            </fragment>
+          </section>
+        </document>
+      </blockxref>
+    </xref-fragment>
+  </section>
+</document>

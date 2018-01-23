@@ -1,0 +1,28 @@
+<!-- 
+  This PSML is invalid and ONLY contains the markup that may be processed by the parser.
+-->
+<document id="10" type="references" level="portable">
+  <documentinfo>
+    <uri id="10" decodedpath="/ps/dev/berlioz/testrefs/bravo.psml" mediatype="application/vnd.pageseeder.psml+xml" title="Bravo">
+      <displaytitle>A</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="1" forwardtype="embed" />
+      <reversexref uriid="2" forwardtype="embed" />
+      <reversexref uriid="3" forwardtype="none"  /><!-- Not the correct forward type -->
+      <reversexref uriid="1" forwardtype="embed" /><!-- Already added -->
+    </reversexrefs>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">A</heading>
+    </fragment>
+  </section>
+  <toc />
+  <section id="xrefs">
+    <xref-fragment id="2">
+      <blockxref uriid="101" title="" frag="default" display="document" type="embed" urititle="B" mediatype="application/vnd.pageseeder.psml+xml">B</blockxref>
+      <blockxref uriid="102" title="" frag="default" display="document" type="embed" urititle="C" mediatype="application/vnd.pageseeder.psml+xml">C</blockxref>
+    </xref-fragment>
+  </section>
+</document>

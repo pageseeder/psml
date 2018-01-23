@@ -1,0 +1,54 @@
+<!-- 
+  Note: Some attributes in this PSML document have been removed to only include data that is relevant for testing.
+
+  Simple example with no references, just a deep tree structure and a collapsible title
+  
+  A
+    A.1
+    A.2
+  B
+    B.1
+      B.1.a
+      B.1.b
+        B.1.b.x
+        B.1.b.y
+          B.1.b.y.i
+        B.1.b.z
+      B.1.c
+        B.1.c.x
+    B.2
+    B.3
+  C
+-->
+<document id="1">
+  <documentinfo>
+    <uri id="1" mediatype="application/vnd.pageseeder.psml+xml" title="test.html">
+      <displaytitle>Test</displaytitle>
+    </uri>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Test</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <heading level="2">A</heading>
+      <heading level="3">A.1</heading>
+      <heading level="3">A.2</heading>
+      <heading level="2">B</heading>
+      <heading level="3">B.1</heading>
+      <heading level="4">B.1.a</heading>
+      <heading level="4">B.1.b</heading>
+      <heading level="5">B.1.b.x</heading>
+      <heading level="5">B.1.b.y</heading>
+      <heading level="6">B.1.b.y.i</heading>
+      <heading level="5">B.1.b.z</heading>
+      <heading level="4">B.1.c</heading>
+      <heading level="5">B.1.c.x</heading>
+      <heading level="3">B.2</heading>
+      <heading level="3">B.3</heading>
+      <heading level="2">C</heading>
+    </fragment>
+  </section>
+</document>

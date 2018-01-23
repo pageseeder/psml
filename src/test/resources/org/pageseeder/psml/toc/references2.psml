@@ -1,0 +1,34 @@
+<!-- 
+  This PSML is invalid and ONLY contains the markup that may be processed by the parser.
+-->
+<document id="10" type="references" level="portable">
+  <documentinfo>
+    <uri id="10" decodedpath="/ps/dev/berlioz/testrefs/bravo.psml" mediatype="application/vnd.pageseeder.psml+xml" title="Test References #2">
+      <displaytitle>A</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="1" forwardtype="embed" />
+      <reversexref uriid="2" forwardtype="embed" />
+      <reversexref uriid="3" forwardtype="none" /><!-- Not the correct forward type -->
+      <reversexref uriid="1" forwardtype="embed" /><!-- Already added -->
+    </reversexrefs>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Test References #2</heading>
+    </fragment>
+  </section>
+  <toc />
+  <section id="xrefs">
+    <xref-fragment id="2">
+      <blockxref uriid="101" title="" frag="default" display="document" type="embed" urititle="Alpha" mediatype="application/vnd.pageseeder.psml+xml">A</blockxref>
+      <blockxref uriid="102" title="" frag="default" display="document" type="embed" urititle="Bravo" mediatype="application/vnd.pageseeder.psml+xml">B</blockxref>
+      <blockxref uriid="103" title="" level="1" frag="default" display="document" type="embed" urititle="Bravo 1" mediatype="application/vnd.pageseeder.psml+xml">B-1</blockxref>
+      <blockxref uriid="104" title="" level="1" frag="default" display="document" type="embed" urititle="Bravo 2" mediatype="application/vnd.pageseeder.psml+xml">B-2</blockxref>
+      <blockxref uriid="105" title="" frag="default" display="document" type="embed" urititle="Charlie" mediatype="application/vnd.pageseeder.psml+xml">C</blockxref>
+      <blockxref uriid="106" title="" level="1" frag="default" display="document" type="embed" urititle="Charlie 1" mediatype="application/vnd.pageseeder.psml+xml">C-1</blockxref>
+      <blockxref uriid="107" title="" level="2" frag="default" display="document" type="embed" urititle="Charlie 1A" mediatype="application/vnd.pageseeder.psml+xml">C-1A</blockxref>
+      <blockxref uriid="108" title="" level="2" frag="default" display="document" type="embed" urititle="Charlie 1B" mediatype="application/vnd.pageseeder.psml+xml">C-1B</blockxref>
+    </xref-fragment>
+  </section>
+</document>
