@@ -2,7 +2,10 @@ package org.pageseeder.psml.toc;
 
 import static org.pageseeder.psml.toc.Tests.h1;
 import static org.pageseeder.psml.toc.Tests.h2;
+import static org.pageseeder.psml.toc.Tests.parse;
 import static org.pageseeder.psml.toc.Tests.ref;
+
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -110,6 +113,14 @@ public final class PublicationTreeTest {
     DocumentTree tree = Tests.parse(1, "hub.psml").normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(tree);
     assertValidPublication(publication);
+  }
+
+  @Test
+  public void testParseXrefLevel1() throws SAXException, IOException {
+    DocumentTree tree = parse(1, "xref-level1.psml").normalize(TitleCollapse.auto);
+    Tests.print(tree);
+    PublicationTree publication = new PublicationTree(tree);
+    Tests.print(publication);
   }
 
   private static void assertValidPublication(PublicationTree publication) {

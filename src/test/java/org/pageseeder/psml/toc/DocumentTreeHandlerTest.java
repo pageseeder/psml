@@ -11,6 +11,7 @@ import static org.pageseeder.psml.toc.Tests.phantom;
 import static org.pageseeder.psml.toc.Tests.ref;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -232,6 +233,29 @@ public final class DocumentTreeHandlerTest {
     DocumentTree tree = parse(1, "hub.psml").normalize(TitleCollapse.auto);
     tree.normalize(TitleCollapse.auto);
     // TODO Write test
+  }
+
+  @Test
+  public void testParseXrefLevel1() throws SAXException, IOException {
+    DocumentTree tree = parse(1, "xref-level1.psml");
+    Tests.print(tree);
+    Part<Phantom> p = phantom(1,
+        phantom(2,
+          ref(3, "Test doc 1", 199329)),
+        ref(2, "Another heading 2", 199328,
+          ref(3, "Another heading 2a", 199326)));
+    List<Long> reverse = new ArrayList<>();
+    DocumentTree expected = new DocumentTree(4, "Test doc 1", reverse, Collections.singletonList(p));
+    Tests.assertDocumentTreeEquals(expected, tree);
+    tree = tree.normalize(TitleCollapse.auto);
+    Tests.print(tree);
+    List<Part<?>> parts = Arrays.asList(
+        phantom(1,
+          ref(2, "Test doc 1", 199329)),
+        ref(1, "Another heading 2", 199328,
+          ref(2, "Another heading 2a", 199326)));
+    expected = new DocumentTree(4, "Test doc 1", reverse, parts);
+    Tests.assertDocumentTreeEquals(expected, tree);
   }
 
 }
