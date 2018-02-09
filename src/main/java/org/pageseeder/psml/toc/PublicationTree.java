@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -26,11 +29,14 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   private static final long serialVersionUID = 4L;
 
   /**
-   * List of trees that make up this tree.
-   *
-   * The first one is the root of the tree, the last is the content tree.
+   * The ID of the root of the tree.
    */
-  private final List<DocumentTree> _stack;
+  private final long _rootid;
+
+  /**
+   * Map of trees that make up this tree.
+   */
+  private final Map<Long, DocumentTree> _map;
 
   /**
    * Creates a simple publication tree wrapping a document tree
@@ -38,7 +44,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param tree The document tree.
    */
   public PublicationTree(DocumentTree tree) {
-    this._stack = Collections.singletonList(tree);
+    this._map = Collections.singletonMap(tree.id(), tree);
+    this._rootid = tree.id();
   }
 
   /**
@@ -50,25 +57,25 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param trunk  The rest of the tree
    */
   private PublicationTree(DocumentTree parent, PublicationTree trunk) {
-    List<DocumentTree> stack = new ArrayList<>(trunk._stack.size()+1);
-    stack.add(parent);
-    stack.addAll(trunk._stack);
-    this._stack = Collections.unmodifiableList(stack);
+    Map<Long, DocumentTree> map = new HashMap<>(trunk._map);
+    map.put(parent.id(), parent);
+    this._map = Collections.unmodifiableMap(map);
+    this._rootid = parent.id();
   }
 
   /**
    * Creates a new tree appending existing publication tree with another document tree.
    *
-   * <p>Note: the leaf should have at least one reference from the existing publication tree.
+   * <p>Note: the tree should have at least one reference from the existing publication tree.
    *
    * @param trunk  The rest of the tree
-   * @param leaf   The new leaf for the tree
+   * @param tree   The new tree to add
    */
-  private PublicationTree(PublicationTree trunk, DocumentTree leaf) {
-    List<DocumentTree> stack = new ArrayList<>(trunk._stack.size()+1);
-    stack.addAll(trunk._stack);
-    stack.add(leaf);
-    this._stack = Collections.unmodifiableList(stack);
+  private PublicationTree(PublicationTree trunk, DocumentTree tree) {
+    Map<Long, DocumentTree> map = new HashMap<>(trunk._map);
+    map.put(tree.id(), tree);
+    this._map = Collections.unmodifiableMap(map);
+    this._rootid = trunk._rootid;
   }
 
   /**
@@ -93,7 +100,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   @Override
   public List<Long> listForwardReferences() {
     List<Long> uris = new ArrayList<>();
-    for (DocumentTree tree : this._stack) {
+    for (DocumentTree tree : this._map.values()) {
       uris.addAll(tree.listForwardReferences());
     }
     return uris;
@@ -111,35 +118,34 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @return Indicates whether this publication contains the tree specified by its URI ID.
    */
   public boolean containsTree(long id) {
-    for (Tree t : this._stack) {
-      if (t.id() == id) return true;
-    }
-    return false;
+    return this._map.containsKey(id);
   }
 
   /**
    * @return the root of this tree.
    */
   public DocumentTree root() {
-    return this._stack.get(0);
+    return this._map.get(this._rootid);
   }
 
   /**
-   * @return the top of this tree.
+   * @id     the tree ID
+   *
+   * @return the a tree in the publication.
    */
-  public DocumentTree leaf() {
-    return this._stack.get(this._stack.size()-1);
+  public DocumentTree tree(long id) {
+    return this._map.get(id);
   }
 
   /**
-   * Create a new tree by adding the specified leaf.
+   * Create a new publication tree by adding the specified document tree.
    *
-   * @param leaf The leaf to add
+   * @param tree The document tree to add
    *
-   * @return The new tree
+   * @return The new publication tree
    */
-  public PublicationTree leaf(DocumentTree leaf) {
-    return new PublicationTree(this, leaf);
+  public PublicationTree add(DocumentTree tree) {
+    return new PublicationTree(this, tree);
   }
 
   /**
@@ -157,8 +163,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   public int hashCode() {
     final int prime = 31;
     int hashCode = 1;
-    for (DocumentTree t : this._stack) {
-      hashCode = prime*hashCode + (t==null ? 0 : Long.hashCode(t.id()));
+    for (Long id : this._map.keySet()) {
+      hashCode = prime*hashCode + Long.hashCode(id);
     }
     return hashCode;
   }
@@ -174,41 +180,72 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
+    toXML(xml, -1);
+  }
+
+  /**
+   * Serialize the partial tree down to content ID.
+   *
+   * @param xml   The XML writer
+   * @param cid   The ID of the content tree (leaf).
+   *
+   * @throws IOException If thrown by XML writer
+   */
+  public void toXML(XMLWriter xml, long cid) throws IOException {
     xml.openElement("publication-tree", true);
     xml.attribute("id", Long.toString(id()));
     xml.attribute("title", title());
-    xml.attribute("trees", this._stack.stream().map(t -> Long.toString(t.id())).collect(Collectors.joining(",")));
-    if (this._stack.size() == 1) {
+    xml.attribute("trees", this._map.keySet().stream().map(t -> Long.toString(t)).collect(Collectors.joining(",")));
+    if (this._map.size() == 1) {
       xml.attribute("content", "true");
     }
-    toXML(xml, 0, 1);
+    List<Long> trees = new ArrayList<>();
+    // Collect partial tree nodes
+    if (cid != -1) {
+      collectReferences(tree(cid), trees);
+    }
+    toXML(xml, this._rootid, 1, cid, trees);
     xml.closeElement();
   }
 
   /**
-   * Serialize the tree at index i as XML.
+   * Add
+   * @param t
+   * @param trees
+   */
+  private void collectReferences(DocumentTree t, List<Long> trees) {
+    if (t == null || trees.contains(t.id())) return;
+    trees.add(t.id());
+    for (Long ref : t.listReverseReferences()) {
+      collectReferences(tree(ref), trees);
+    };
+  }
+
+  /**
+   * Serialize the tree with ID i as XML.
    *
    * @param xml   The XML writer
-   * @param i     The index of the tree in our stack.
+   * @param i     The ID of the tree to output.
    * @param level The level that we are currently at
+   * @param cid   The ID of the content tree (leaf).
+   * @param trees The IDs of trees that cid is a decendant of.
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, int i, int level) throws IOException {
-    if (i == this._stack.size()-1) {
+  private void toXML(XMLWriter xml, long i, int level, long cid, List<Long> trees) throws IOException {
+    if (i == cid) {
       // We've reached the content tree (the TOC of the visible content)
       //xml.attribute("content", "true");
-      DocumentTree tree = leaf();
+      DocumentTree tree = tree(cid);
       for (Part<?> part : tree.parts()) {
         part.toXML(xml, level);
       }
 
     } else {
       // More trees to process
-      DocumentTree current = this._stack.get(i);
-      long next = this._stack.get(i+1).id();
+      DocumentTree current = tree(i);
       for (Part<?> part : current.parts()) {
-        toXML(xml, i, level, part, next);
+        toXML(xml, i, level, part, cid, trees);
       }
     }
   }
@@ -218,36 +255,48 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @param xml     The XML writer
    * @param level   The level that we are currently at
-   * @param i       The index of the tree in our stack.
+   * @param i       The ID of the tree to output.
    * @param element The reference to serialize
-   * @param next    The URI ID of the next tree
+   * @param cid     The ID of the content tree (leaf).
+   * @param trees The IDs of trees that cid is a decendant of.
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, int i, int level, Part<?> part, long next) throws IOException {
-    DocumentTree tree = this._stack.get(i);
+  private void toXML(XMLWriter xml, long i, int level, Part<?> part, long cid, List<Long> trees) throws IOException {
+    DocumentTree tree = tree(i);
     Element element = part.element();
-    boolean toNext = (element instanceof Reference && ((Reference)element).uri() == next);
+    boolean toNext = false;
+    Long next = null;
+    DocumentTree nextTree = null;
+    if (element instanceof Reference) {
+      next = ((Reference)element).uri();
+      nextTree = tree(next);
+      toNext = nextTree != null && (cid == -1 || trees.contains(next));
+    }
     xml.openElement("part", !part.parts().isEmpty() || toNext);
     xml.attribute("level", level);
-    if (toNext && i == this._stack.size()-2) {
+    if (toNext && cid == next) {
       xml.attribute("content", "true");
     } else if (element instanceof Heading) {
       xml.attribute("uri", Long.toString(tree.id()));
     }
 
     // Output the element
-    element.toXML(xml, level);
+    if (nextTree != null) {
+      element.toXML(xml, level, nextTree.numbered(), nextTree.prefix());
+    } else {
+      element.toXML(xml, level);
+    }
 
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, i+1, level+1);
+      toXML(xml, next, level+1, cid, trees);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      toXML(xml, i, level+1, r, next);
+      toXML(xml, i, level+1, r, cid, trees);
     }
     xml.closeElement();
   }
@@ -255,8 +304,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * @return list of tree IDs
    */
-  private List<Long> ids() {
-    return this._stack.stream().map(t -> t.id()).collect(Collectors.toList());
+  private Set<Long> ids() {
+    return this._map.keySet();
   }
 
   @Override

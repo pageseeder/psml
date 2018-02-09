@@ -118,6 +118,61 @@ public class Tests {
     return new Part<>(Phantom.of(level), parts);
   }
 
+  public static Part<Heading> h1(String title, String fragment, int index, boolean numbered, String prefix) {
+    return heading(1, title, fragment, index, numbered, prefix);
+  }
+  public static Part<Heading> h1(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(1, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h2(String title, String fragment, int index, boolean numbered, String prefix) {
+    return heading(2, title, fragment, index, numbered, prefix);
+  }
+
+  public static Part<Heading> h2(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(2, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h3(String title, String fragment, int index, boolean numbered, String prefix) {
+    return heading(3, title, fragment, index, numbered, prefix);
+  }
+
+  public static Part<Heading> h3(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(3, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h4(String title, String fragment, int index, boolean numbered, String prefix) {
+    return heading(4, title, fragment, index, numbered, prefix);
+  }
+
+  public static Part<Heading> h4(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(4, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h5(String title, String fragment, int index, boolean numbered, String prefix) {
+    return heading(5, title, fragment, index, numbered, prefix);
+  }
+
+  public static Part<Heading> h5(String title, String fragment, int index, boolean numbered, String prefix,  @NonNull Part<?>... parts) {
+    return heading(5, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h6(String title, String fragment, int index, boolean numbered, String prefix) {
+    return heading(6, title, fragment, index, numbered, prefix);
+  }
+
+  public static Part<Heading> h6(String title, String fragment, int index, boolean numbered, String prefix,  @NonNull Part<?>... parts) {
+    return heading(6, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> heading(int level,  String title, String fragment, int index, boolean numbered, String prefix) {
+    return new Part<>(new Heading(level, title, fragment, index).numbered(numbered).prefix(prefix));
+  }
+
+  public static Part<Heading> heading(int level,  String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return new Part<>(new Heading(level, title, fragment, index).numbered(numbered).prefix(prefix), parts);
+  }
+
   public static void assertElementEquals(Element e, Element f) {
     Assert.assertEquals(e.getClass(), f.getClass());
     if (e instanceof Heading) {
@@ -273,6 +328,18 @@ public class Tests {
     xml.setIndentChars("  ");
     try {
       o.toXML(xml);
+    } catch (IOException ex) {
+      // Won't happen
+    }
+    xml.flush();
+    System.out.println(xml.toString());
+  }
+
+  public static void print(PublicationTree o, long contentid) {
+    XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
+    xml.setIndentChars("  ");
+    try {
+      o.toXML(xml, contentid);
     } catch (IOException ex) {
       // Won't happen
     }

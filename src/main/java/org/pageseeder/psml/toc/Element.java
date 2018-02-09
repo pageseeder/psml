@@ -116,6 +116,20 @@ public abstract class Element implements Serializable, XMLWritable {
   public abstract void toXML(XMLWriter xml, int level) throws IOException;
 
   /**
+   * Writes this element as XML.
+   *
+   * @param xml   The XML output.
+   * @param level The level (if overridden)
+   * @param numbered Whether the heading is auto-numbered
+   * @param prefix   Any prefix given to the title.
+   *
+   * @throws IOException Should an I/O error occur
+   */
+  public void toXML(XMLWriter xml, int level, boolean numbered, String prefix) throws IOException {
+    toXML(xml, level);
+  }
+
+  /**
    * Prints the XML attributes associated with this element.
    *
    * @param xml   The XML output.

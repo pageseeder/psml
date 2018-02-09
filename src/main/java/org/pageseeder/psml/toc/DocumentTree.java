@@ -49,6 +49,9 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   /** As per requirement for Serializable. */
   private static final long serialVersionUID = 3L;
 
+  /** When there is no title */
+  public static final String NO_PREFIX = "";
+
   /**
    * URI ID of the document.
    */
@@ -74,6 +77,30 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   private final List<Part<?>> _parts;
 
+  /** Whether the title is numbered */
+  private final boolean _numbered;
+
+  /** Prefix of title if any */
+  private final String _prefix;
+
+  /**
+   * @param id       The URI ID of the document.
+   * @param title    The title the document.
+   * @param reverse  The list of reverse references.
+   * @param numbered Whether the heading is auto-numbered
+   * @param prefix   Any prefix given to the title.
+   * @param parts    The list of parts.
+   */
+  private DocumentTree(long id, String title, List<Long> reverse, boolean numbered, String prefix, List<Part<?>> parts) {
+    this._id = id;
+    this._title = title;
+    this._reverse = Collections.unmodifiableList(reverse);
+    this._parts = Collections.unmodifiableList(parts);
+    this._level = computeActualLevel();
+    this._numbered = numbered;
+    this._prefix = prefix;
+  }
+
   /**
    * @param id      The URI ID of the document.
    * @param title   The title the document.
@@ -81,11 +108,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param parts   The list of parts.
    */
   public DocumentTree(long id, String title, List<Long> reverse, List<Part<?>> parts) {
-    this._id = id;
-    this._title = title;
-    this._reverse = Collections.unmodifiableList(reverse);
-    this._parts = Collections.unmodifiableList(parts);
-    this._level = computeActualLevel();
+    this(id, title,  reverse, false, NO_PREFIX, parts);
   }
 
   @Override
@@ -100,6 +123,50 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
   public int level() {
     return this._level;
+  }
+
+  /**
+   * @return The full title of this heading including the prefix
+   */
+  public String getPrefixedTitle() {
+    return !NO_PREFIX.equals(this._prefix)? this._prefix+" "+title() : title();
+  }
+
+  /**
+   * @return The prefix given to this heading or empty if none.
+   */
+  public String prefix() {
+    return this._prefix;
+  }
+
+  /**
+   * @return Whether the heading is automatically numbered
+   */
+  public boolean numbered() {
+    return this._numbered;
+  }
+
+  /**
+   * Create a new tree identical to this tree but with the specified title prefix.
+   *
+   * @param prefix The different title prefix
+   *
+   * @return A new tree instance.
+   */
+  public DocumentTree prefix(String prefix) {
+    return new DocumentTree(this._id, this._title, this._reverse, this._numbered, prefix, this._parts);
+  }
+
+  /**
+   * Create a new tree identical to this tree but with the specified numbered flag.
+   *
+   * @param numbered Whether the title is numbered
+   *
+   * @return A new tree instance.
+   */
+  public DocumentTree numbered(boolean numbered) {
+    if (this._numbered == numbered) return this;
+    return new DocumentTree(this._id, this._title, this._reverse, numbered, this._prefix, this._parts);
   }
 
   /**
@@ -313,7 +380,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
           children.add(p.adjustLevel(-1));
         }
       }
-      normalized = new DocumentTree(tree._id, tree._title, tree._reverse, children);
+      normalized = new DocumentTree(tree._id, tree._title, tree._reverse, children)
+          .numbered(firstHeading.numbered()).prefix(firstHeading.prefix());
     }
     return normalized;
   }

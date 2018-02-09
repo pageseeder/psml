@@ -90,6 +90,11 @@ public final class Reference extends Element implements Serializable {
 
   @Override
   public void toXML(@NonNull XMLWriter xml, int level) throws IOException {
+    toXMLNoClose(xml, level);
+    xml.closeElement();
+  }
+
+  public void toXMLNoClose(@NonNull XMLWriter xml, int level) throws IOException {
     xml.openElement("ref");
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(title())) {
@@ -98,6 +103,17 @@ public final class Reference extends Element implements Serializable {
     xml.attribute("type", this._type);
     if (this._uri > 0) {
       xml.attribute("uri", Long.toString(this._uri));
+    }
+  }
+
+  @Override
+  public void toXML(@NonNull XMLWriter xml, int level, boolean numbered, String prefix) throws IOException {
+    toXMLNoClose(xml, level);
+    if (numbered) {
+      xml.attribute("numbered", "true");
+    }
+    if (!DocumentTree.NO_PREFIX.equals(prefix)) {
+      xml.attribute("prefix", prefix);
     }
     xml.closeElement();
   }

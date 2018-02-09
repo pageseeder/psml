@@ -126,7 +126,7 @@ public final class Heading extends Element implements Serializable {
   /**
    * Create a new heading identical to this heading but with the specified numbered flag.
    *
-   * @param prefix The different prefix
+   * @param numbered Whether the title is numbered
    *
    * @return A new heading instance unless the numbered flag is equal to the numbered flag of current heading.
    */
