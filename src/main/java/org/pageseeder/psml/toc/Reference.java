@@ -89,7 +89,7 @@ public final class Reference extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(@NonNull XMLWriter xml, int level) throws IOException {
+  public void toXML(@NonNull XMLWriter xml, int level, NumberingGenerator number) throws IOException {
     toXMLNoClose(xml, level);
     xml.closeElement();
   }
@@ -107,13 +107,17 @@ public final class Reference extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(@NonNull XMLWriter xml, int level, boolean numbered, String prefix) throws IOException {
+  public void toXML(@NonNull XMLWriter xml, int level, NumberingGenerator number, boolean numbered, String prefix) throws IOException {
     toXMLNoClose(xml, level);
     if (numbered) {
       xml.attribute("numbered", "true");
     }
-    if (!DocumentTree.NO_PREFIX.equals(prefix)) {
-      xml.attribute("prefix", prefix);
+    if (numbered && number != null) {
+      number.generateHeadingNumbering(level, xml);
+    } else {
+      if (!DocumentTree.NO_PREFIX.equals(prefix)) {
+        xml.attribute("prefix", prefix);
+      }
     }
     xml.closeElement();
   }

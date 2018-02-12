@@ -359,18 +359,18 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   public static DocumentTree removeTitleHeading(DocumentTree tree, TitleCollapse collapse) {
     List<Part<?>> parts = tree.parts();
     // No normalization
-    if (parts.isEmpty() || collapse == TitleCollapse.never) return tree;
+    if (parts.isEmpty()) return tree;
     Part<?> firstPart = parts.get(0);
     if (!(firstPart.element() instanceof Heading)) return tree;
     Heading firstHeading = (Heading)firstPart.element();
-    DocumentTree normalized = tree;
     // Title heading
     String headingTitle = firstHeading.title();
     String prefixedTitle = firstHeading.getPrefixedTitle();
     String documentTitle = tree._title;
+    List<Part<?>> children = new ArrayList<>();
     // The first heading 1 matches the document title and all other headings appear under it
-    if (headingTitle.equals(documentTitle) || prefixedTitle.equals(documentTitle) || collapse == TitleCollapse.always) {
-      List<Part<?>> children = new ArrayList<>();
+    if ((headingTitle.equals(documentTitle) || prefixedTitle.equals(documentTitle) || collapse == TitleCollapse.always)
+        && collapse != TitleCollapse.never) {
       if (parts.size() > 1) {
         // Copy the other parts
         children.addAll(parts.subList(1, parts.size()));
@@ -380,10 +380,16 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
           children.add(p.adjustLevel(-1));
         }
       }
-      normalized = new DocumentTree(tree._id, tree._title, tree._reverse, children)
-          .numbered(firstHeading.numbered()).prefix(firstHeading.prefix());
+    } else {
+      children.add(firstPart.element(firstHeading.numbered(false).prefix(NO_PREFIX)));
+      if (parts.size() > 1) {
+        // Copy the other parts
+        children.addAll(parts.subList(1, parts.size()));
+      }
     }
-    return normalized;
+    // Always move the numbered and prefix from the first heading to the tree
+    return new DocumentTree(tree._id, tree._title, tree._reverse, children)
+        .numbered(firstHeading.numbered()).prefix(firstHeading.prefix());
   }
 
 

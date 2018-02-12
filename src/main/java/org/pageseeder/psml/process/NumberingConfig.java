@@ -4,6 +4,9 @@
 package org.pageseeder.psml.process;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -98,12 +101,12 @@ public final class NumberingConfig {
   /**
    * List of schemes for heading numbering
    */
-  private final Map<Integer, String> headingSchemes = new HashMap<Integer, String>();
+  private final Map<Integer, String> headingSchemes = new HashMap<>();
 
   /**
    * List of schemes for heading numbering
    */
-  private final Map<Integer, String> paraSchemes = new HashMap<Integer, String>();
+  private final Map<Integer, String> paraSchemes = new HashMap<>();
 
   /**
    * @param prefixpara the prefixPara to set
@@ -211,7 +214,7 @@ public final class NumberingConfig {
     }
     // find the values for each level
     Matcher canonicalMatcher = CANONICAL_PATTERN.matcher(canonical);
-    Map<String, Integer> levels = new HashMap<String, Integer>();
+    Map<String, Integer> levels = new HashMap<>();
     int currentLevel = 1;
     while (canonicalMatcher.find()) {
       levels.put(String.valueOf(currentLevel++),
@@ -262,15 +265,32 @@ public final class NumberingConfig {
   public static NumberingConfig loadNumberingConfigFile(File configFile) throws ProcessException {
     if (!configFile.exists() || !configFile.isFile())
       throw new ProcessException("Numbering config file not found: "+configFile.getAbsolutePath());
+    try {
+      return loadNumberingConfig(new FileInputStream(configFile));
+    } catch (FileNotFoundException ex) {
+      throw new ProcessException("Numbering config file not found: "+configFile.getAbsolutePath());
+    }
+  }
+
+  /**
+   * Parse the config file provided into a NumberingConfig object.
+   *
+   * @param in  the file input stream to parse
+   *
+   * @return the loaded config
+   *
+   * @throws PageseederException If invalid file or parsing the file failed
+   */
+  public static NumberingConfig loadNumberingConfig(InputStream in) throws ProcessException {
     NumberingConfigHandler handler = new NumberingConfigHandler();
     try {
-      XMLUtils.parse(configFile, handler);
+      XMLUtils.parse(in, handler);
     } catch (ProcessException ex) {
       throw new ProcessException("Invalid numbering config file: "+ex.getMessage(), ex);
     }
     return handler.getConfig();
   }
-  /**
+/**
    * Parser for the numbering config file.
    *
    * @author Jean-Baptiste Reure
@@ -328,6 +348,7 @@ public final class NumberingConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
       if ("strip-zeros".equals(qName)) {
         this.config.setStripZeros(Boolean.parseBoolean(this.text.toString()));
@@ -353,6 +374,7 @@ public final class NumberingConfig {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
       if (this.inStripZeros || this.inPrefixPara || this.inScheme)
         this.text.append(ch, start, length);

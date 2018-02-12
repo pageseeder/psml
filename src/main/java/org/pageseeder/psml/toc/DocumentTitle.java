@@ -40,7 +40,7 @@ public final class DocumentTitle extends Element {
   }
 
   @Override
-  public void toXML(XMLWriter xml, int level) throws IOException {
+  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
     xml.openElement("title", false);
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(title())) {

@@ -166,7 +166,7 @@ public final class Heading extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(XMLWriter xml, int level) throws IOException {
+  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
     xml.openElement("heading", false);
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(title())) {
@@ -177,8 +177,12 @@ public final class Heading extends Element implements Serializable {
     if (this._numbered) {
       xml.attribute("numbered", "true");
     }
-    if (!NO_PREFIX.equals(this._prefix)) {
-      xml.attribute("prefix", this._prefix);
+    if (this._numbered && number != null) {
+      number.generateHeadingNumbering(level, xml);
+    } else {
+      if (!NO_PREFIX.equals(this._prefix)) {
+        xml.attribute("prefix", this._prefix);
+      }
     }
     xml.closeElement();
   }

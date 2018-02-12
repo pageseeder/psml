@@ -108,25 +108,27 @@ public abstract class Element implements Serializable, XMLWritable {
   /**
    * Writes this element as XML.
    *
-   * @param xml   The XML output.
-   * @param level The level (if overridden)
+   * @param xml     The XML output.
+   * @param level   The level (if overridden)
+   * @param number  The numbering generator
    *
    * @throws IOException Should an I/O error occur
    */
-  public abstract void toXML(XMLWriter xml, int level) throws IOException;
+  public abstract void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException;
 
   /**
    * Writes this element as XML.
    *
-   * @param xml   The XML output.
-   * @param level The level (if overridden)
+   * @param xml      The XML output.
+   * @param level    The level (if overridden)
+   * @param number   The numbering generator
    * @param numbered Whether the heading is auto-numbered
    * @param prefix   Any prefix given to the title.
    *
    * @throws IOException Should an I/O error occur
    */
-  public void toXML(XMLWriter xml, int level, boolean numbered, String prefix) throws IOException {
-    toXML(xml, level);
+  public void toXML(XMLWriter xml, int level, NumberingGenerator number, boolean numbered, String prefix) throws IOException {
+    toXML(xml, level, number);
   }
 
   /**
@@ -141,7 +143,7 @@ public abstract class Element implements Serializable, XMLWritable {
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    toXML(xml, level());
+    toXML(xml, level(), null);
   }
 
 }

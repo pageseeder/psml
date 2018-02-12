@@ -74,6 +74,17 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   }
 
   /**
+   * Create a new part identical to this part but with the specified element.
+   *
+   * @param element the element for the new part
+   *
+   * @return A new part instance
+   */
+  public Part<T> element(Element element) {
+    return new Part<>((T)element, this._parts);
+  }
+
+  /**
    * @return The element at the origin of this part.
    */
   public final @NonNull T element() {
@@ -225,15 +236,15 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    toXML(xml, level());
+    toXML(xml, level(), null);
   }
 
-  public void toXML(XMLWriter xml, int level) throws IOException {
+  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
     xml.openElement("part", parts().size() > 0);
     xml.attribute("level", level);
-    element().toXML(xml, level);
+    element().toXML(xml, level, number);
     for (Part<?> p : parts()) {
-      p.toXML(xml, level+1);
+      p.toXML(xml, level+1, number);
     }
     xml.closeElement();
   }

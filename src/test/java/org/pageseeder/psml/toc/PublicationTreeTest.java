@@ -2,6 +2,7 @@ package org.pageseeder.psml.toc;
 
 import static org.pageseeder.psml.toc.Tests.h1;
 import static org.pageseeder.psml.toc.Tests.h2;
+import static org.pageseeder.psml.toc.Tests.h3;
 import static org.pageseeder.psml.toc.Tests.parse;
 import static org.pageseeder.psml.toc.Tests.ref;
 
@@ -9,6 +10,8 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.pageseeder.psml.process.NumberingConfig;
+import org.pageseeder.psml.process.ProcessException;
 import org.xml.sax.SAXException;
 
 public final class PublicationTreeTest {
@@ -85,7 +88,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testThreeLevelsTopDown() throws SAXException {
+  public void testThreeLevelsTopDown() throws SAXException, ProcessException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 0))
         .part(ref(1, "A", 100L))
@@ -100,21 +103,32 @@ public final class PublicationTreeTest {
         .part(ref(1, "BX", 1000L))
         .part(ref(1, "BY", 1001L))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
-    DocumentTree tree = new DocumentTree.Builder(1001).title("Y")
-        .part(h1("a", "1", 0, true, "x.x"))
-        .part(h1("b", "1", 1, true, "", h2("x", "1", 2, true, "")))
-        .part(h1("c", "1", 3, true, ""))
+    DocumentTree tree = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 0, true, "x.x"))
+        .part(h2("a", "1", 0, true, "x.x.x"))
+        .part(h2("b", "1", 1, true, "", h3("x", "1", 2, true, "")))
+        .part(h2("c", "1", 3, false, ""))
+        .part(h2("d", "1", 4, true, "", h3("xc", "1", 5, false, "x.x.x.x")))
+        .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
+        .part(h1("Y", "1", 0, true, "x.x"))
+        .part(h2("a", "1", 0, true, "x.x.x"))
+        .part(h2("b", "1", 1, true, "", h3("x", "1", 2, true, "")))
+        .part(h2("c", "1", 3, false, ""))
+        .part(h2("d", "1", 4, true, "", h3("xc", "1", 5, false, "x.x.x.x")))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(inter2);
     publication = publication.add(tree);
+    publication = publication.add(tree2);
     Assert.assertEquals(root.id(), publication.id());
     Assert.assertTrue(publication.listReverseReferences().isEmpty());
-    Tests.assertDocumentTreeEquals(tree, publication.tree(1001));
+    Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-    Tests.print(publication, 1001);
+    NumberingConfig numbering = Tests.parseNumbering("numbering-config.xml");
+    Tests.print(publication, 100, numbering);
     // Tests.print(tree);
   }
 

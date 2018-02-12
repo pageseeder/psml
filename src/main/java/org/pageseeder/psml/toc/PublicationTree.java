@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.pageseeder.psml.process.NumberingConfig;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
 
@@ -180,18 +181,23 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    toXML(xml, -1);
+    toXML(xml, -1, null);
   }
 
   /**
    * Serialize the partial tree down to content ID.
    *
-   * @param xml   The XML writer
-   * @param cid   The ID of the content tree (leaf).
+   * @param xml       The XML writer
+   * @param cid       The ID of the content tree (leaf).
+   * @param numbering The numbering config to autonumber the TOC (optional)
    *
    * @throws IOException If thrown by XML writer
    */
-  public void toXML(XMLWriter xml, long cid) throws IOException {
+  public void toXML(XMLWriter xml, long cid, @Nullable NumberingConfig numbering) throws IOException {
+    NumberingGenerator number = null;
+    if (numbering != null) {
+      number = new NumberingGenerator(numbering);
+    }
     xml.openElement("publication-tree", true);
     xml.attribute("id", Long.toString(id()));
     xml.attribute("title", title());
@@ -204,14 +210,15 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (cid != -1) {
       collectReferences(tree(cid), trees);
     }
-    toXML(xml, this._rootid, 1, cid, trees);
+    toXML(xml, this._rootid, 1, cid, trees, number);
     xml.closeElement();
   }
 
   /**
-   * Add
-   * @param t
-   * @param trees
+   * Collect all the ancestor references to a tree.
+   *
+   * @param t      the tree
+   * @param trees  the list of ancestor IDs
    */
   private void collectReferences(DocumentTree t, List<Long> trees) {
     if (t == null || trees.contains(t.id())) return;
@@ -224,28 +231,29 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * Serialize the tree with ID i as XML.
    *
-   * @param xml   The XML writer
-   * @param i     The ID of the tree to output.
-   * @param level The level that we are currently at
-   * @param cid   The ID of the content tree (leaf).
-   * @param trees The IDs of trees that cid is a decendant of.
+   * @param xml     The XML writer
+   * @param i       The ID of the tree to output.
+   * @param level   The level that we are currently at
+   * @param cid     The ID of the content tree (leaf).
+   * @param trees   The IDs of trees that cid is a decendant of.
+   * @param number  The numbering generator
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long i, int level, long cid, List<Long> trees) throws IOException {
+  private void toXML(XMLWriter xml, long i, int level, long cid, List<Long> trees, NumberingGenerator number) throws IOException {
     if (i == cid) {
       // We've reached the content tree (the TOC of the visible content)
       //xml.attribute("content", "true");
       DocumentTree tree = tree(cid);
       for (Part<?> part : tree.parts()) {
-        part.toXML(xml, level);
+        part.toXML(xml, level, number);
       }
 
     } else {
       // More trees to process
       DocumentTree current = tree(i);
       for (Part<?> part : current.parts()) {
-        toXML(xml, i, level, part, cid, trees);
+        toXML(xml, i, level, part, cid, trees, number);
       }
     }
   }
@@ -258,11 +266,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param i       The ID of the tree to output.
    * @param element The reference to serialize
    * @param cid     The ID of the content tree (leaf).
-   * @param trees The IDs of trees that cid is a decendant of.
+   * @param trees   The IDs of trees that cid is a decendant of.
+   * @param number  The numbering generator
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long i, int level, Part<?> part, long cid, List<Long> trees) throws IOException {
+  private void toXML(XMLWriter xml, long i, int level, Part<?> part, long cid, List<Long> trees, NumberingGenerator number) throws IOException {
     DocumentTree tree = tree(i);
     Element element = part.element();
     boolean toNext = false;
@@ -283,20 +292,20 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
     // Output the element
     if (nextTree != null) {
-      element.toXML(xml, level, nextTree.numbered(), nextTree.prefix());
+      element.toXML(xml, level, number, nextTree.numbered(), nextTree.prefix());
     } else {
-      element.toXML(xml, level);
+      element.toXML(xml, level, number);
     }
 
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, cid, trees);
+      toXML(xml, next, level+1, cid, trees, number);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      toXML(xml, i, level+1, r, cid, trees);
+      toXML(xml, i, level+1, r, cid, trees, number);
     }
     xml.closeElement();
   }

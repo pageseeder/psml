@@ -74,7 +74,7 @@ public final class Phantom extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(XMLWriter xml, int level) throws IOException {
+  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
     xml.openElement("phantom", false);
     xml.attribute("level", level);
     xml.closeElement();
