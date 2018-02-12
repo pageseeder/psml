@@ -128,7 +128,7 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     NumberingConfig numbering = Tests.parseNumbering("numbering-config.xml");
-    Tests.print(publication, 100, numbering);
+    Tests.print(publication, 1001, numbering);
     // Tests.print(tree);
   }
 
