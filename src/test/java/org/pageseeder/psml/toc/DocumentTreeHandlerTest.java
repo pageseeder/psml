@@ -239,11 +239,12 @@ public final class DocumentTreeHandlerTest {
   public void testParseXrefLevel1() throws SAXException, IOException {
     DocumentTree tree = parse(1, "xref-level1.psml");
     Tests.print(tree);
-    Part<Phantom> p = phantom(1,
-        phantom(2,
-          ref(3, "Test doc 1", 199329)),
-        ref(2, "Another heading 2", 199328,
-          ref(3, "Another heading 2a", 199326)));
+    Part<Heading> p = h1("Test doc 1", "1", 0,
+      phantom(2,
+        phantom(3,
+          ref(4, "Test doc 1", 199329)),
+        ref(3, "Another heading 2", 199328,
+          ref(4, "Another heading 2a", 199326))));
     List<Long> reverse = new ArrayList<>();
     DocumentTree expected = new DocumentTree(4, "Test doc 1", reverse, Collections.singletonList(p));
     Tests.assertDocumentTreeEquals(expected, tree);

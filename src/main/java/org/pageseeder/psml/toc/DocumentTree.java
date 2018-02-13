@@ -271,8 +271,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public DocumentTree normalize(TitleCollapse collapse) {
     DocumentTree normalized = this;
+    // handle first heading with level > 1
     normalized = removePhantomParts(normalized);
+    // collapse first heading
     normalized = removeTitleHeading(normalized, collapse);
+    // remove top phantom levels left after collapse
+    normalized = removePhantomParts(normalized);
     return normalized;
   }
 
@@ -380,6 +384,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
           children.add(p.adjustLevel(-1));
         }
       }
+    } else if (!firstHeading.numbered() && NO_PREFIX.equals(firstHeading.prefix())){
+      return tree;
     } else {
       children.add(firstPart.element(firstHeading.numbered(false).prefix(NO_PREFIX)));
       if (parts.size() > 1) {

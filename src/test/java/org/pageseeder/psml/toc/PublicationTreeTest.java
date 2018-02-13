@@ -3,7 +3,10 @@ package org.pageseeder.psml.toc;
 import static org.pageseeder.psml.toc.Tests.h1;
 import static org.pageseeder.psml.toc.Tests.h2;
 import static org.pageseeder.psml.toc.Tests.h3;
+import static org.pageseeder.psml.toc.Tests.h4;
+import static org.pageseeder.psml.toc.Tests.h5;
 import static org.pageseeder.psml.toc.Tests.parse;
+import static org.pageseeder.psml.toc.Tests.phantom;
 import static org.pageseeder.psml.toc.Tests.ref;
 
 import java.io.IOException;
@@ -90,32 +93,39 @@ public final class PublicationTreeTest {
   @Test
   public void testThreeLevelsTopDown() throws SAXException, ProcessException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 0))
-        .part(ref(1, "A", 100L))
-        .part(ref(1, "B", 101L)).build().normalize(TitleCollapse.auto);
+        .part(h1("T", "1", 0,
+            phantom(2,
+            ref(3, "A", 100L),
+            ref(3, "B", 101L)))).build();
+    Tests.print(root);
+    root = root.normalize(TitleCollapse.auto);
+    Tests.print(root);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 0, true, ""))
-        .part(ref(1, "X", 1000L))
-        .part(ref(1, "Y", 1001L))
-        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+        .part(h1("A", "1", 0, true, "",
+            ref(2, "X", 1000L),
+            ref(2, "Y", 1001L)))
+        .addReverseReference(1L).build();
+    //Tests.print(inter);
+    inter = inter.normalize(TitleCollapse.auto);
+    //Tests.print(inter);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 0, true, ""))
-        .part(ref(1, "BX", 1000L))
-        .part(ref(1, "BY", 1001L))
+        .part(h1("BA", "1", 0, true, "",
+              ref(1, "BX", 1000L),
+              ref(1, "BY", 1001L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
-        .part(h1("X", "1", 0, true, "x.x"))
-        .part(h2("a", "1", 0, true, "x.x.x"))
-        .part(h2("b", "1", 1, true, "", h3("x", "1", 2, true, "")))
-        .part(h2("c", "1", 3, false, ""))
-        .part(h2("d", "1", 4, true, "", h3("xc", "1", 5, false, "x.x.x.x")))
+        .part(h1("X", "1", 0, true, "x.x",
+            h2("a", "2", 0, true, "x.x.x"),
+            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
+            h2("c", "4", 3, false, ""),
+            h2("d", "4", 4, true, "", h3("xc", "4", 5, false, "x.x.x.x"))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
-        .part(h1("Y", "1", 0, true, "x.x"))
-        .part(h2("a", "1", 0, true, "x.x.x"))
-        .part(h2("b", "1", 1, true, "", h3("x", "1", 2, true, "")))
-        .part(h2("c", "1", 3, false, ""))
-        .part(h2("d", "1", 4, true, "", h3("xc", "1", 5, false, "x.x.x.x")))
+        .part(h1("Y", "1", 0, true, "x.x",
+            h2("a", "2", 0, true, "x.x.x"),
+            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
+            h2("c", "4", 3, false, ""),
+            phantom(3, h4("d", "4", 4, true, "", h5("xc", "4", 5, false, "x.x.x.x")))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
@@ -128,8 +138,7 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     NumberingConfig numbering = Tests.parseNumbering("numbering-config.xml");
-    Tests.print(publication, 1001, numbering);
-    // Tests.print(tree);
+    Tests.print(publication, 100, numbering);
   }
 
   @Test
@@ -149,7 +158,9 @@ public final class PublicationTreeTest {
 
   @Test
   public void testParseXrefLevel1() throws SAXException, IOException {
-    DocumentTree tree = parse(1, "xref-level1.psml").normalize(TitleCollapse.auto);
+    DocumentTree tree = parse(1, "xref-level1.psml");
+    Tests.print(tree);
+    tree = tree.normalize(TitleCollapse.auto);
     Tests.print(tree);
     PublicationTree publication = new PublicationTree(tree);
     Tests.print(publication);
