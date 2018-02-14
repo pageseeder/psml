@@ -154,12 +154,12 @@ public final class PublicationTreeTest {
   @Test
   public void testAutoNumberingPerformance() throws SAXException, ProcessException {
     Builder builder = new DocumentTree.Builder(1).title("T");
-    for(int i = 0; i < 100000; i++) {
+    for(int i = 0; i < 1000; i++) {
       builder = builder.part(ref(2, "A", 1000L + i));
     }
     DocumentTree root = builder.build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
-    for(int i = 0; i < 100000; i++) {
+    for(int i = 0; i < 1000; i++) {
       DocumentTree tree = new DocumentTree.Builder(1000 + i).title("X")
           .part(h1("X", "0", 0, true, "",
               h2("a", "1", 1, true, ""),
