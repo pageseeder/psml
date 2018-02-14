@@ -13,7 +13,7 @@ public final class Heading extends Element implements Serializable {
   /** Required for caching */
   private static final long serialVersionUID = 1L;
 
-  /** When there is no title */
+  /** When there is no prefix */
   public static final String NO_PREFIX = "";
 
   /** Fragment ID this part starts in */

@@ -251,8 +251,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * Serialize a part as XML.
    *
    * @param xml     The XML writer
-   * @param level   The level that we are currently at
    * @param id      The ID of the tree to output.
+   * @param level   The level that we are currently at
    * @param part    The part to serialize
    * @param cid     The ID of the content tree (leaf).
    * @param trees   The IDs of trees that cid is a descendant of.

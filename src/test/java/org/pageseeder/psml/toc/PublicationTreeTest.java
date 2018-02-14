@@ -10,11 +10,14 @@ import static org.pageseeder.psml.toc.Tests.phantom;
 import static org.pageseeder.psml.toc.Tests.ref;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.process.NumberingConfig;
 import org.pageseeder.psml.process.ProcessException;
+import org.pageseeder.psml.toc.DocumentTree.Builder;
 import org.xml.sax.SAXException;
 
 public final class PublicationTreeTest {
@@ -91,15 +94,15 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testThreeLevelsTopDown() throws SAXException, ProcessException {
+  public void testAutoNumbering() throws SAXException, ProcessException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 0,
             phantom(2,
             ref(3, "A", 100L),
             ref(3, "B", 101L)))).build();
-    Tests.print(root);
+    //Tests.print(root);
     root = root.normalize(TitleCollapse.auto);
-    Tests.print(root);
+    //Tests.print(root);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
         .part(h1("A", "1", 0, true, "",
             ref(2, "X", 1000L),
@@ -118,14 +121,14 @@ public final class PublicationTreeTest {
             h2("a", "2", 0, true, "x.x.x"),
             h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
             h2("c", "4", 3, false, ""),
-            h2("d", "4", 4, true, "", h3("xc", "4", 5, false, "x.x.x.x"))))
+            h2("d", "4", 4, true, "", h3("xc", "5", 5, false, "x.x.x.x"))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 0, true, "x.x",
             h2("a", "2", 0, true, "x.x.x"),
             h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
             h2("c", "4", 3, false, ""),
-            phantom(3, h4("d", "4", 4, true, "", h5("xc", "4", 5, false, "x.x.x.x")))))
+            phantom(3, h4("d", "4", 4, true, "", h5("xc", "5", 5, false, "x.x.x.x")))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
@@ -137,8 +140,54 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-    NumberingConfig numbering = Tests.parseNumbering("numbering-config.xml");
-    Tests.print(publication, 100, numbering);
+    NumberingConfig number = Tests.parseNumbering("numbering-config.xml");
+    Tests.print(publication, -1, number);
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, number);
+    String result = numbering.getAllPrefixes().entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+  }
+
+  @Test
+  public void testAutoNumberingPerformance() throws SAXException, ProcessException {
+    Builder builder = new DocumentTree.Builder(1).title("T");
+    for(int i = 0; i < 100000; i++) {
+      builder = builder.part(ref(2, "A", 1000L + i));
+    }
+    DocumentTree root = builder.build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    for(int i = 0; i < 100000; i++) {
+      DocumentTree tree = new DocumentTree.Builder(1000 + i).title("X")
+          .part(h1("X", "0", 0, true, "",
+              h2("a", "1", 1, true, ""),
+              h2("b", "2", 2, true, ""),
+              h2("c", "3", 3, true, ""),
+              h2("d", "4", 4, true, ""),
+              h2("e", "5", 5, true, ""),
+              h2("f", "6", 6, true, ""),
+              h2("g", "7", 7, true, ""),
+              h2("h", "8", 8, true, ""),
+              h2("h", "9", 9, true, "")))
+          .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+      publication = publication.add(tree);
+    }
+    // Generate fragment numbering
+    NumberingConfig number = Tests.parseNumbering("numbering-config.xml");
+    //Tests.print(publication, -1, number);
+    long start = System.currentTimeMillis();
+    FragmentNumbering numbering = new FragmentNumbering(publication, number);
+    long end = System.currentTimeMillis();
+    Map<String,String> prefixes = numbering.getAllPrefixes();
+    //String result = prefixes.entrySet()
+    //    .stream().sorted(Map.Entry.comparingByKey())
+    //    .map(entry -> entry.getKey() + " - " + entry.getValue())
+    //    .collect(Collectors.joining("\n"));
+    //System.out.println(result);
+    System.out.println("Number of prefixes: " + prefixes.size());
+    System.out.println("Generation time: " + (end - start));
   }
 
   @Test

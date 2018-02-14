@@ -64,6 +64,25 @@ public final class NumberingGenerator {
   }
 
   /**
+   * Generate and return heading numbering
+   *
+   * @param level         the level of the heading
+   *
+   * @return the heading numbering
+   */
+  public String generateHeadingNumbering(int level) {
+    if (this.numberConfig != null) {
+      // add it to current levels
+      addNewLevel(this.headingLevels, level);
+      // compute canonical label
+      String canonical = canonicalLabel(this.headingLevels);
+      // compute numbered label
+      return this.numberConfig.getHeadingLabel(canonical);
+    }
+    return null;
+  }
+
+  /**
    * Add the canonical and prefix attribute for generated paragraph numbering.
    *
    * @param indent  the indent of the paragraph
@@ -81,6 +100,25 @@ public final class NumberingGenerator {
       xml.attribute("canonical", canonical);
       xml.attribute("prefix", label);
     }
+  }
+
+  /**
+   * Generate and return paragraph numbering
+   *
+   * @param level         the level of the heading
+   *
+   * @return the paragraph numbering
+   */
+  public String generateParaNumbering(int level) {
+    if (this.numberConfig != null) {
+      // add it to current levels
+      addNewLevel(this.paraLevels, level);
+      // compute canonical label
+      String canonical = canonicalLabel(this.paraLevels);
+      // compute numbered label
+      return this.numberConfig.getParaLabel(canonical, canonicalLabel(this.headingLevels));
+    }
+    return null;
   }
 
   /**
