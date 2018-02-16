@@ -74,32 +74,16 @@ public final class NumberingGenerator {
     if (this.numberConfig != null) {
       // add it to current levels
       addNewLevel(this.headingLevels, level);
+      // restart paragraph numbering
+      if (this.numberConfig.shouldRestartPara()) {
+        this.paraLevels.clear();
+      }
       // compute canonical label
       String canonical = canonicalLabel(this.headingLevels);
       // compute numbered label
       return this.numberConfig.getHeadingLabel(canonical);
     }
     return null;
-  }
-
-  /**
-   * Add the canonical and prefix attribute for generated paragraph numbering.
-   *
-   * @param indent  the indent of the paragraph
-   * @param xml     the XML writer where the attributes are written to
-   *
-   * @throws IOException            if the writing the attributes to the XML failed
-   */
-  public void generateParaNumbering(int indent, XMLWriter xml)
-      throws IOException, NumberFormatException {
-    if (this.numberConfig != null) {
-      addNewLevel(this.paraLevels, indent);
-      String canonical = canonicalLabel(this.paraLevels);
-      String label = this.numberConfig.getParaLabel(canonical, canonicalLabel(this.headingLevels));
-      // add attributes to XML
-      xml.attribute("canonical", canonical);
-      xml.attribute("prefix", label);
-    }
   }
 
   /**

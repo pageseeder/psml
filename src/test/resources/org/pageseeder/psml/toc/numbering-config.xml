@@ -8,6 +8,8 @@
                                          if there is para a.i. under the heading 2.1, it will be displayed as 2.1.a.i.
                                          Paragraph numbering restarts after each numbered heading.
                                          Allowed values are 'true' or 'false', default is 'false'.
+     - restart-para:                     If enabled, paragraph numbering restarts after each numbered heading.
+                                         Allowed values are 'true' or 'false', default is 'false'.
      - para-schemes and heading-schemes: A list of patterns that the numbering should follow. The patterns are defined below.
                                          Each pattern corresponds to a level in the numbering hierarchy: for example
                                          for heading patterns, level 1 is for heading1 elements.
@@ -35,14 +37,7 @@
 <numbering>
   <strip-zeros>true</strip-zeros>
   <prefix-para>false</prefix-para>
-  <para-schemes>
-    <scheme level="1">[11.]</scheme>
-    <scheme level="2">[11.][12.]</scheme>
-    <scheme level="3">[11.][12.][13.]</scheme>
-    <scheme level="4">[11.][12.][13.][14.]</scheme>
-    <scheme level="5">[11.][12.][13.][14.][15.]</scheme>
-    <scheme level="6">[11.][12.][13.][14.][15.][16.]</scheme>
-  </para-schemes>
+  <restart-para>true</restart-para>
   <heading-schemes>
     <scheme level="1">[11.]</scheme>
     <scheme level="2">[11.][12.]</scheme>
@@ -51,4 +46,12 @@
     <scheme level="5">[11.][12.][13.][14.][15.]</scheme>
     <scheme level="6">[11.][12.][13.][14.][15.][16.]</scheme>
   </heading-schemes>
+  <para-schemes>
+    <scheme level="1">[11.]</scheme>
+    <scheme level="2">[11.][12.]</scheme>
+    <scheme level="3">[11.][12.][(a3)]</scheme>
+    <scheme level="4">[11.][12.][(a3)][(i4)]</scheme>
+    <scheme level="5">[11.][12.][(a3)][(i4)][(A5)]</scheme>
+    <scheme level="6">[11.][12.][(a3)][(i4)][(A5)][(I6)]</scheme>
+  </para-schemes>
 </numbering>

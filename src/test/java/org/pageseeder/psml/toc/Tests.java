@@ -175,6 +175,14 @@ public class Tests {
     return new Part<>(new Heading(level, title, fragment, index).numbered(numbered).prefix(prefix), parts);
   }
 
+  public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix) {
+    return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix));
+  }
+
+  public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix), parts);
+  }
+
   public static void assertElementEquals(Element e, Element f) {
     Assert.assertEquals(e.getClass(), f.getClass());
     if (e instanceof Heading) {

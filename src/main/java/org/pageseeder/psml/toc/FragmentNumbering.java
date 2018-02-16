@@ -77,6 +77,8 @@ public final class FragmentNumbering implements Serializable {
       }
     } else if (element instanceof Heading) {
       processHeading((Heading)element, level, id, number);
+    } else if (element instanceof Paragraph) {
+      processParagraph((Paragraph)element, id, number);
     }
 
     // Expand found reference
@@ -129,9 +131,30 @@ public final class FragmentNumbering implements Serializable {
     }
     if (p == null || NO_PREFIX.equals(p)) return;
     String key = Long.toString(id) + "-" + h.fragment();
-    // if this is not the first heading in fragment then ignore
+    // if this is not the first heading/para in fragment then ignore
     if (this.numbering.containsKey(key)) return;
-    // store prefix on first heading fragment
+    // store prefix on fragment
+    this.numbering.put(key, p);
+  }
+
+  /**
+   * Process numbering for a paragraph.
+   *
+   * @param para     The paragraph element
+   * @param level    The level that we are currently at
+   * @param id       The ID of the tree containing the heading.
+   * @param number   The numbering generator
+   */
+  public void processParagraph(Paragraph para, long id, NumberingGenerator number) {
+    String p = para.prefix();
+    if (para.numbered()) {
+      p = number.generateParaNumbering(para.level());
+    }
+    if (p == null || NO_PREFIX.equals(p)) return;
+    String key = Long.toString(id) + "-" + para.fragment();
+    // if this is not the first heading/para in fragment then ignore
+    if (this.numbering.containsKey(key)) return;
+    // store prefix on fragment
     this.numbering.put(key, p);
   }
 

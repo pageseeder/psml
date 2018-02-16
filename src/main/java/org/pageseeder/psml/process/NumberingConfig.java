@@ -99,6 +99,11 @@ public final class NumberingConfig {
   private boolean prefixPara = false;
 
   /**
+   * If enabled, restart paragraph nambers after each heading.
+   */
+  private boolean restartPara = false;
+
+  /**
    * List of schemes for heading numbering
    */
   private final Map<Integer, String> headingSchemes = new HashMap<>();
@@ -116,6 +121,13 @@ public final class NumberingConfig {
   }
 
   /**
+   * @param restartpara the restartPara to set
+   */
+  public void setRestartPara(boolean restartpara ) {
+    this.restartPara = restartpara ;
+  }
+
+  /**
    * @param stripzeros the stripZeros to set
    */
   public void setStripZeros(boolean stripzeros) {
@@ -127,6 +139,13 @@ public final class NumberingConfig {
    */
   public boolean shouldPrefixPara() {
     return this.prefixPara;
+  }
+
+  /**
+   * @return the restartPara
+   */
+  public boolean shouldRestartPara() {
+    return this.restartPara;
   }
 
   /**
@@ -305,6 +324,8 @@ public final class NumberingConfig {
     private boolean inStripZeros = false;
     /** If numered paras are prefixed by the heading's numbering. */
     private boolean inPrefixPara = false;
+    /** If para numbering is restarted after heading. */
+    private boolean inRestartPara = false;
     /** Local state flag to know if the handler is in a scheme element. */
     private boolean inScheme = false;
     /** Local state flag to know if the handler is in a heading-schemes element. */
@@ -331,6 +352,7 @@ public final class NumberingConfig {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if ("strip-zeros".equals(qName)) this.inStripZeros = true;
       else if ("prefix-para".equals(qName)) this.inPrefixPara = true;
+      else if ("restart-para".equals(qName)) this.inRestartPara = true;
       else if ("para-schemes".equals(qName)) this.inParaScheme = true;
       else if ("heading-schemes".equals(qName)) this.inHeadingScheme = true;
       else if ("scheme".equals(qName)) {
@@ -358,6 +380,10 @@ public final class NumberingConfig {
         this.config.setPrefixPara(Boolean.parseBoolean(this.text.toString()));
         this.text.setLength(0);
         this.inPrefixPara = false;
+      } else if ("restart-para".equals(qName))  {
+        this.config.setRestartPara(Boolean.parseBoolean(this.text.toString()));
+        this.text.setLength(0);
+        this.inRestartPara = false;
       } else if ("para-schemes".equals(qName)) this.inParaScheme = false;
       else if ("heading-schemes".equals(qName)) this.inHeadingScheme = false;
       else if ("scheme".equals(qName))  {
@@ -376,7 +402,7 @@ public final class NumberingConfig {
      */
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-      if (this.inStripZeros || this.inPrefixPara || this.inScheme)
+      if (this.inStripZeros || this.inPrefixPara || this.inRestartPara || this.inScheme)
         this.text.append(ch, start, length);
     }
   }

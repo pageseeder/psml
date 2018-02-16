@@ -52,6 +52,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private int counter = 0;
 
   /**
+   * We count the paras to use as index.
+   */
+  private int paracounter = 0;
+
+  /**
    * The level to adjust headings with if updated by transclusion.
    */
   private int transclusionLevel = 0;
@@ -67,6 +72,9 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   public void startElement(String element, Attributes attributes) {
     if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
+    } else if (isElement("para") && ("true".equals(attributes.getValue("numbered")) ||
+        (!Paragraph.NO_PREFIX.equals(attributes.getValue("prefix")) && attributes.getValue("prefix") != null))) {
+      startPara(attributes);
     } else if (isAny("fragment", "xref-fragment", "properties-fragment", "media-fragment")) {
       startFragment(attributes);
     } else if ("blockxref".equals(element) && "embed".equals(attributes.getValue("type"))) {
@@ -100,6 +108,26 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
     this.currentHeading = heading;
     this.counter++;
+  }
+
+  /**
+   * Found `para` element with `@numbered="true"`.
+   *
+   * @param attributes The attributes
+   */
+  private void startPara(Attributes attributes) {
+    int level = getInt(attributes, "indent");
+    String prefix = attributes.getValue("prefix");
+    Paragraph para = new Paragraph(level, this.fragment, this.paracounter);
+    if ("true".equals(attributes.getValue("numbered"))) {
+      para = para.numbered(true);
+    }
+    if (prefix != null) {
+      para = para.prefix(prefix);
+    }
+
+    this._expander.add(para);
+    this.paracounter++;
   }
 
   /**
