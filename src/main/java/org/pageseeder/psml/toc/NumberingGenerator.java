@@ -106,6 +106,24 @@ public final class NumberingGenerator {
   }
 
   /**
+   * Get the current canonical heading numbering
+   *
+   * @return the canonical numbering
+   */
+  public String getCurrentCanonicalHeading() {
+    return canonicalLabel(this.headingLevels);
+  }
+
+  /**
+   * Get the current canonical heading numbering
+   *
+   * @return the canonical numbering
+   */
+  public String getCurrentCanonicalPara() {
+    return canonicalLabel(this.paraLevels);
+  }
+
+  /**
    * @param levels  list of current levels
    * @param level   the level to add to the list
    */

@@ -268,6 +268,50 @@ public final class PublicationTreeTest {
     System.out.println("Generation time: " + (end - start));
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void testLoopDetection() throws SAXException, ProcessException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 0,
+            phantom(2,
+            ref(3, "A", 100L))))
+        .addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter = new DocumentTree.Builder(100).title("A")
+        .part(h1("A", "1", 0, true, "",
+            ref(2, "B", 101L)))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
+        .part(h1("BA", "1", 0, true, "",
+              ref(1, "BX", 1L)))
+        .addReverseReference(100L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(inter);
+    publication = publication.add(inter2);
+    Tests.print(publication, -1, null);
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testLoopDetectionAutonumber() throws SAXException, ProcessException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 0,
+            phantom(2,
+            ref(3, "A", 100L))))
+        .addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter = new DocumentTree.Builder(100).title("A")
+        .part(h1("A", "1", 0, true, "",
+            ref(2, "B", 101L)))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
+        .part(h1("BA", "1", 0, true, "",
+              ref(1, "BX", 1L)))
+        .addReverseReference(100L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(inter);
+    publication = publication.add(inter2);
+    // Generate fragment numbering
+    NumberingConfig number = Tests.parseNumbering("numbering-config.xml");
+    new FragmentNumbering(publication, number);
+  }
+
   @Test
   public void testParseWACCC() throws SAXException {
     DocumentTree tree = Tests.parse(1, "waccc.psml").normalize(TitleCollapse.auto);

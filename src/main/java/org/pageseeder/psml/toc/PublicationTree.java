@@ -30,6 +30,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   private static final long serialVersionUID = 4L;
 
   /**
+   * Maximum number of reverse references to follow when serializing to XML
+   */
+  private static final int MAX_REVERSE_FOLLOW = 100;
+
+  /**
    * The ID of the root of the tree.
    */
   private final long _rootid;
@@ -210,7 +215,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (cid != -1) {
       collectReferences(tree(cid), trees);
     }
-    toXML(xml, this._rootid, 1, cid, trees, number);
+    toXML(xml, this._rootid, 1, cid, trees, number, new ArrayList<Long>());
     xml.closeElement();
   }
 
@@ -223,28 +228,39 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   private void collectReferences(DocumentTree t, List<Long> trees) {
     if (t == null || trees.contains(t.id())) return;
     trees.add(t.id());
+    int count = 0;
     for (Long ref : t.listReverseReferences()) {
-      collectReferences(tree(ref), trees);
+      DocumentTree r = tree(ref);
+      if (r != null) {
+        collectReferences(tree(ref), trees);
+        count++;
+      }
+      if (count >= MAX_REVERSE_FOLLOW) break;
     };
   }
 
   /**
    * Serialize a tree as XML.
    *
-   * @param xml     The XML writer
-   * @param id      The ID of the tree to serialize.
-   * @param level   The level that we are currently at
-   * @param cid     The ID of the content tree (leaf).
-   * @param trees   The IDs of trees that cid is a descendant of.
-   * @param number  The numbering generator
+   * @param xml       The XML writer
+   * @param id        The ID of the tree to serialize.
+   * @param level     The level that we are currently at
+   * @param cid       The ID of the content tree (leaf).
+   * @param trees     The IDs of trees that cid is a descendant of.
+   * @param number    The numbering generator
+   * @param ancestors List of the current ancestor tree IDs
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, long cid, List<Long> trees, NumberingGenerator number) throws IOException {
+  private void toXML(XMLWriter xml, long id, int level, long cid, List<Long> trees,
+      NumberingGenerator number, List<Long> ancestors) throws IOException {
+    if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
+    ancestors.add(id);
     DocumentTree current = tree(id);
     for (Part<?> part : current.parts()) {
-      toXML(xml, id, level, part, cid, trees, number);
+      toXML(xml, id, level, part, cid, trees, number, ancestors);
     }
+    ancestors.remove(id);
   }
 
   /**
@@ -260,7 +276,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, Part<?> part, long cid, List<Long> trees, NumberingGenerator number) throws IOException {
+  private void toXML(XMLWriter xml, long id, int level, Part<?> part, long cid, List<Long> trees,
+      NumberingGenerator number, List<Long> ancestors) throws IOException {
     Element element = part.element();
     boolean toNext = false;
     Long next = null;
@@ -288,12 +305,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, cid, trees, number);
+      toXML(xml, next, level+1, cid, trees, number, ancestors);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      toXML(xml, id, level+1, r, cid, trees, number);
+      toXML(xml, id, level+1, r, cid, trees, number, ancestors);
     }
     xml.closeElement();
   }
