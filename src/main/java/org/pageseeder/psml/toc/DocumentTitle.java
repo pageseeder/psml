@@ -50,15 +50,6 @@ public final class DocumentTitle extends Element {
   }
 
   @Override
-  public void attributes(XMLWriter xml, int level) throws IOException {
-    xml.attribute("from", "title");
-    xml.attribute("level", level);
-    if (!Element.NO_TITLE.equals(title())) {
-      xml.attribute("title", title());
-    }
-  }
-
-  @Override
   public void print(Appendable out) {
     try {
       out.append(title());

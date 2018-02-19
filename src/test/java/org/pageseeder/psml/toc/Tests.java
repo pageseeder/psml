@@ -60,6 +60,10 @@ public class Tests {
     return new Part<>(new Reference(level, title, uri), parts);
   }
 
+  public static Part<Reference> ref(int level, String title, long uri, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
+    return new Part<>(new Reference(level, title, uri, documenttype, targetfrag), parts);
+  }
+
   public static Part<Heading> h1(String title, String fragment, int index) {
     return heading(1, title, fragment, index);
   }
@@ -208,6 +212,7 @@ public class Tests {
     Assert.assertEquals("Reference titles don't match", e.title(), f.title());
     Assert.assertEquals("Reference types don't match", e.type(), f.type());
     Assert.assertEquals("Reference URIs don't match", e.uri(), f.uri());
+    Assert.assertEquals("Reference targetfragments don't match", e.targetfragment(), f.targetfragment());
   }
 
 
@@ -233,6 +238,8 @@ public class Tests {
       Assert.assertEquals(p.getClass(), q.getClass());
       Assert.assertEquals("Document titles don't match", p.title(), q.title());
       Assert.assertEquals("Document levels don't match", p.level(), q.level());
+      Assert.assertEquals("Document prefixes don't match", p.prefix(), q.prefix());
+      Assert.assertEquals("Document numbereds don't match", p.numbered(), q.numbered());
       Assert.assertEquals("Document parts size don't match", p.parts().size(), q.parts().size());
       Assert.assertEquals("Forward references don't match", p.listForwardReferences(), q.listForwardReferences());
       Assert.assertEquals("Reverse references don't match", p.listReverseReferences(), q.listReverseReferences());

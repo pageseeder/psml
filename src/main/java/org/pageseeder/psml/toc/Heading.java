@@ -187,20 +187,4 @@ public final class Heading extends Element implements Serializable {
     xml.closeElement();
   }
 
-  @Override
-  public void attributes(XMLWriter xml, int level) throws IOException {
-    xml.attribute("from", "heading");
-    xml.attribute("level", level);
-    if (!Element.NO_TITLE.equals(title())) {
-      xml.attribute("title", title());
-    }
-    xml.attribute("fragment", this._fragment);
-    xml.attribute("index", this._index);
-    if (this._numbered) {
-      xml.attribute("numbered", "true");
-    }
-    if (!NO_PREFIX.equals(this._prefix)) {
-      xml.attribute("prefix", this._prefix);
-    }
-  }
 }

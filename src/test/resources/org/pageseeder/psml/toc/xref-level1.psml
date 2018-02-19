@@ -12,7 +12,7 @@
   </documentinfo>
   <fragmentinfo>
     <locator id="136134" fragment="content" editid="651033"
-      modified="2018-01-24T09:41:15+11:00" />
+        modified="2018-01-24T09:41:15+11:00"/>
   </fragmentinfo>
   <metadata />
   <section id="title">
@@ -22,7 +22,7 @@
   </section>
   <section id="content">
     <xref-fragment id="content">
-      <blockxref id="651032" title="Test doc 1" frag="default"
+      <blockxref id="651032" title="Test doc 1" frag="2"
         reversefrag="content" reversetitle="" reverselink="true"
         reversetype="none" display="document" level="2" type="embed"
         uriid="199329" href="/ps/test/philipr2/documents/word3/Test%20doc%201-2.psml"

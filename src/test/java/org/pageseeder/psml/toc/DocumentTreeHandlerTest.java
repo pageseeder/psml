@@ -242,7 +242,7 @@ public final class DocumentTreeHandlerTest {
     Part<Heading> p = h1("Test doc 1", "1", 0,
       phantom(2,
         phantom(3,
-          ref(4, "Test doc 1", 199329)),
+          ref(4, "Test doc 1", 199329, Reference.DEFAULT_TYPE, "2")),
         ref(3, "Another heading 2", 199328,
           ref(4, "Another heading 2a", 199326))));
     List<Long> reverse = new ArrayList<>();
@@ -252,7 +252,7 @@ public final class DocumentTreeHandlerTest {
     Tests.print(tree);
     List<Part<?>> parts = Arrays.asList(
         phantom(1,
-          ref(2, "Test doc 1", 199329)),
+          ref(2, "Test doc 1", 199329, Reference.DEFAULT_TYPE, "2")),
         ref(1, "Another heading 2", 199328,
           ref(2, "Another heading 2a", 199326)));
     expected = new DocumentTree(4, "Test doc 1", reverse, parts);

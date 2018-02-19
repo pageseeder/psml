@@ -156,7 +156,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       int level = partLevel + getInt(attributes, "level", 0);
       String type = getString(attributes, "documenttype", Reference.DEFAULT_TYPE);
       String title = computeReferenceTitle(attributes);
-      Reference reference = new Reference(level, title, uriid, type);
+      Reference reference = new Reference(level, title, uriid, type, attributes.getValue("frag"));
       this._expander.add(reference);
     }
   }

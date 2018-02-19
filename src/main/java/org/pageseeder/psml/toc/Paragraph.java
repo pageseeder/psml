@@ -164,8 +164,4 @@ public final class Paragraph extends Element implements Serializable {
     // Not included in TOC
   }
 
-  @Override
-  public void attributes(XMLWriter xml, int level) throws IOException {
-    // Not included in TOC
-  }
 }

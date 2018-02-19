@@ -283,9 +283,13 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     Long next = null;
     DocumentTree nextTree = null;
     if (element instanceof Reference) {
-      next = ((Reference)element).uri();
-      nextTree = tree(next);
-      toNext = nextTree != null && (cid == -1 || trees.contains(next)) && id != cid;
+      Reference ref = (Reference)element;
+      // don't process embedded fragments
+      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
+        next = ref.uri();
+        nextTree = tree(next);
+        toNext = nextTree != null && (cid == -1 || trees.contains(next)) && id != cid;
+      }
     }
     xml.openElement("part", !part.parts().isEmpty() || toNext);
     xml.attribute("level", level);

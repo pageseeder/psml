@@ -80,8 +80,4 @@ public final class Phantom extends Element implements Serializable {
     xml.closeElement();
   }
 
-  @Override
-  public void attributes(XMLWriter xml, int level) throws IOException {
-    xml.attribute("level", level);
-  }
 }

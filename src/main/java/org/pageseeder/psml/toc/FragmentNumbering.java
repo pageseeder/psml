@@ -86,14 +86,17 @@ public final class FragmentNumbering implements Serializable {
     Integer nextcount = null;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      next = ref.uri();
-      nextTree = pub.tree(next);
-      // can only be numbered if the referenced tree exists
-      if (nextTree != null) {
-        nextcount = doccount.get(next);
-        nextcount = nextcount == null ? 1 : nextcount + 1;
-        doccount.put(next, nextcount);
-        processReference(ref, level, nextTree, number, nextcount);
+      // don't process embedded fragments
+      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
+        next = ref.uri();
+        nextTree = pub.tree(next);
+        // can only be numbered if the referenced tree exists
+        if (nextTree != null) {
+          nextcount = doccount.get(next);
+          nextcount = nextcount == null ? 1 : nextcount + 1;
+          doccount.put(next, nextcount);
+          processReference(ref, level, nextTree, number, nextcount);
+        }
       }
     } else if (element instanceof Heading) {
       processHeading((Heading)element, level, id, number, count);

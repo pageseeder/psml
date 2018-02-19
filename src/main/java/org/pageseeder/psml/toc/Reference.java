@@ -20,6 +20,9 @@ public final class Reference extends Element implements Serializable {
   /** When there is no document type. */
   public static final String DEFAULT_TYPE = "default";
 
+  /** When there is no specific fragment. */
+  public static final String DEFAULT_FRAGMENT = "default";
+
   /**
    * The URI ID of the target.
    */
@@ -31,17 +34,24 @@ public final class Reference extends Element implements Serializable {
   private final String _type;
 
   /**
+   * The target fragment ID.
+   */
+  private final String _targetfragment;
+
+  /**
    * Creates a new reference at the specified level for a given URI.
    *
-   * @param level The level.
-   * @param title The title of the reference.
-   * @param uri   The URI ID.
-   * @param type  The document type of the target.
+   * @param level       The level.
+   * @param title       The title of the reference.
+   * @param uri         The URI ID.
+   * @param type        The document type of the target.
+   * @param targetfrag  The target fragment ID.
    */
-  public Reference(int level, String title, Long uri, String type) {
+  public Reference(int level, String title, Long uri, String type, String targetfrag) {
     super(level, title);
     this._uri = uri;
     this._type = type;
+    this._targetfragment = DEFAULT_FRAGMENT.equals(targetfrag) ? DEFAULT_FRAGMENT : targetfrag;
   }
 
   /**
@@ -52,7 +62,7 @@ public final class Reference extends Element implements Serializable {
    * @param uri   The URI ID.
    */
   public Reference(int level, String title, Long uri) {
-    this(level, title, uri, DEFAULT_TYPE);
+    this(level, title, uri, DEFAULT_TYPE, DEFAULT_FRAGMENT);
   }
 
   /**
@@ -69,10 +79,17 @@ public final class Reference extends Element implements Serializable {
     return this._type;
   }
 
+  /**
+   * @return The target fragment ID.
+   */
+  public String targetfragment() {
+    return this._targetfragment;
+  }
+
   @Override
   public Reference adjustLevel(int delta) {
     if (delta == 0) return this;
-    return new Reference(level()+delta, title(), this._uri, this._type);
+    return new Reference(level()+delta, title(), this._uri, this._type, this._targetfragment);
   }
 
   @Override
@@ -104,6 +121,9 @@ public final class Reference extends Element implements Serializable {
     if (this._uri > 0) {
       xml.attribute("uri", Long.toString(this._uri));
     }
+    if (!DEFAULT_FRAGMENT.equals(this._targetfragment)) {
+      xml.attribute("targetfragment", this._targetfragment);
+    }
   }
 
   @Override
@@ -122,16 +142,4 @@ public final class Reference extends Element implements Serializable {
     xml.closeElement();
   }
 
-  @Override
-  public void attributes(XMLWriter xml, int level) throws IOException {
-    xml.attribute("from", "reference");
-    xml.attribute("level", level);
-    if (!Element.NO_TITLE.equals(title())) {
-      xml.attribute("title", title());
-    }
-    xml.attribute("type", this._type);
-    if (this._uri > 0) {
-      xml.attribute("uri", Long.toString(this._uri));
-    }
-  }
 }

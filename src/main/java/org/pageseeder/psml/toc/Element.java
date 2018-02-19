@@ -131,16 +131,6 @@ public abstract class Element implements Serializable, XMLWritable {
     toXML(xml, level, number);
   }
 
-  /**
-   * Prints the XML attributes associated with this element.
-   *
-   * @param xml   The XML output.
-   * @param level The level (if overridden)
-   *
-   * @throws IOException Should an I/O error occur
-   */
-  public abstract void attributes(XMLWriter xml, int level) throws IOException;
-
   @Override
   public void toXML(XMLWriter xml) throws IOException {
     toXML(xml, level(), null);

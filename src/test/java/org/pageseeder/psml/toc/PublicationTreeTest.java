@@ -115,7 +115,7 @@ public final class PublicationTreeTest {
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(h1("BA", "1", 0, true, "",
               ref(1, "BX", 1000L),
-              ref(1, "BY", 1001L)))
+              ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 0, true, "x.x",
@@ -333,6 +333,7 @@ public final class PublicationTreeTest {
     Tests.print(tree);
     tree = tree.normalize(TitleCollapse.auto);
     Tests.print(tree);
+    System.out.println(tree.listReverseReferences());
     PublicationTree publication = new PublicationTree(tree);
     Tests.print(publication);
   }
