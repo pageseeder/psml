@@ -71,6 +71,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   private final String _title;
 
   /**
+   * The document labels (comma separated)
+   */
+  private final String _labels;
+
+  /**
    * List of URI ID of reverse cross-references to the document (not fragments).
    */
   private final List<Long> _reverse;
@@ -98,15 +103,17 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   /**
    * @param id               The URI ID of the document.
    * @param title            The title the document.
+   * @param labels  The document labels
    * @param reverse          The list of reverse references.
    * @param headingfragment  The fragment ID of first heading (only if numbered or prefixed)
    * @param numbered         Whether the heading is auto-numbered
    * @param prefix           Any prefix given to the title.
    * @param parts            The list of parts.
    */
-  private DocumentTree(long id, String title, List<Long> reverse, String headingfragment, boolean numbered, String prefix, List<Part<?>> parts) {
+  private DocumentTree(long id, String title, String labels, List<Long> reverse, String headingfragment, boolean numbered, String prefix, List<Part<?>> parts) {
     this._id = id;
     this._title = title;
+    this._labels = labels;
     this._reverse = Collections.unmodifiableList(reverse);
     this._parts = Collections.unmodifiableList(parts);
     this._level = computeActualLevel();
@@ -118,11 +125,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   /**
    * @param id      The URI ID of the document.
    * @param title   The title the document.
+   * @param labels  The document labels
    * @param reverse The list of reverse references.
    * @param parts   The list of parts.
    */
-  public DocumentTree(long id, String title, List<Long> reverse, List<Part<?>> parts) {
-    this(id, title,  reverse, NO_FRAGMENT, false, NO_PREFIX, parts);
+  public DocumentTree(long id, String title, String labels, List<Long> reverse, List<Part<?>> parts) {
+    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts);
   }
 
   @Override
@@ -133,6 +141,10 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   @Override
   public String title() {
     return this._title;
+  }
+
+  public String labels() {
+    return this._labels;
   }
 
   public int level() {
@@ -345,7 +357,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       for (Part<?> p : normalized.parts().get(0).parts()) {
         unwrapped.add(p.adjustLevel(-1));
       }
-      normalized = new DocumentTree(tree._id, tree._title, tree._reverse, unwrapped);
+      normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, unwrapped);
     }
     return normalized;
   }
@@ -392,7 +404,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       }
     }
     // Always move the numbered and prefix from the first heading to the tree
-    return new DocumentTree(tree._id, tree._title, tree._reverse,
+    return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse,
         firstHeading.fragment(), firstHeading.numbered(), firstHeading.prefix(), children);
   }
 
@@ -410,6 +422,9 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
     /** Title of the document. */
     private String title = "[untitled]";
+
+    /** Document labels (comma separated). */
+    private String labels = "";
 
     /** List of parts in this tree. */
     private final List<Part<?>> _parts = new ArrayList<>();
@@ -446,6 +461,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       return this;
     }
 
+    public Builder labels(String labels) {
+      this.labels = labels;
+      return this;
+    }
+
     public Builder parts(List<Part<?>> parts) {
       // XXX Should only be Level 1
       this._parts.addAll(parts);
@@ -474,7 +494,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       // New lists to ensure the builder no longer affects built tree
       List<Part<?>> parts = new ArrayList<>(this._parts);
       List<Long> reverse = new ArrayList<>(this._reverse);
-      return new DocumentTree(this._id, this.title, reverse, parts);
+      return new DocumentTree(this._id, this.title, this.labels, reverse, parts);
     }
 
   }

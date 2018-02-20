@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.pageseeder.psml.process.NumberingConfig;
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.toc.DocumentTree.Builder;
 import org.xml.sax.SAXException;
@@ -95,7 +94,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumbering() throws SAXException, ProcessException {
+  public void testAutoNumbering() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 0,
             phantom(2,
@@ -141,10 +140,10 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-    NumberingConfig number = Tests.parseNumbering("numbering-config.xml");
-    Tests.print(publication, -1, number);
+    PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    Tests.print(publication, -1, config);
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, number);
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
@@ -153,7 +152,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingParas() throws SAXException, ProcessException {
+  public void testAutoNumberingParas() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 0,
             phantom(2,
@@ -207,11 +206,11 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-    NumberingConfig number = Tests.parseNumbering("numbering-config.xml");
-    Tests.print(publication, -1, number);
+    PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    Tests.print(publication, -1, config);
     tree.print(System.out);
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, number);
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
@@ -220,7 +219,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingPerformance() throws SAXException, ProcessException {
+  public void testAutoNumberingPerformance() throws SAXException, IOException {
     Builder builder = new DocumentTree.Builder(1).title("T");
     for(int i = 0; i < 500; i++) {
       builder = builder.part(ref(2, "A", 1000L + i));
@@ -253,10 +252,10 @@ public final class PublicationTreeTest {
       publication = publication.add(tree);
     }
     // Generate fragment numbering
-    NumberingConfig number = Tests.parseNumbering("numbering-config.xml");
+    PublicationConfig config = Tests.parseConfig("publication-config.xml");
     //Tests.print(publication, -1, number);
     long start = System.currentTimeMillis();
-    FragmentNumbering numbering = new FragmentNumbering(publication, number);
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
     long end = System.currentTimeMillis();
     Map<String,String> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -290,7 +289,7 @@ public final class PublicationTreeTest {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testLoopDetectionAutonumber() throws SAXException, ProcessException {
+  public void testLoopDetectionAutonumber() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 0,
             phantom(2,
@@ -308,8 +307,8 @@ public final class PublicationTreeTest {
     publication = publication.add(inter);
     publication = publication.add(inter2);
     // Generate fragment numbering
-    NumberingConfig number = Tests.parseNumbering("numbering-config.xml");
-    new FragmentNumbering(publication, number);
+    PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    new FragmentNumbering(publication, config);
   }
 
   @Test
@@ -337,6 +336,7 @@ public final class PublicationTreeTest {
     PublicationTree publication = new PublicationTree(tree);
     Tests.print(publication);
   }
+
 
   private static void assertValidPublication(PublicationTree publication) {
     try {

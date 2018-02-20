@@ -6,6 +6,7 @@ package org.pageseeder.psml.toc;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
 
@@ -114,7 +115,7 @@ public abstract class Element implements Serializable, XMLWritable {
    *
    * @throws IOException Should an I/O error occur
    */
-  public abstract void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException;
+  public abstract void toXML(XMLWriter xml, int level, @Nullable NumberingGenerator number) throws IOException;
 
   /**
    * Writes this element as XML.
@@ -127,7 +128,7 @@ public abstract class Element implements Serializable, XMLWritable {
    *
    * @throws IOException Should an I/O error occur
    */
-  public void toXML(XMLWriter xml, int level, NumberingGenerator number, boolean numbered, String prefix) throws IOException {
+  public void toXML(XMLWriter xml, int level, @Nullable NumberingGenerator number, boolean numbered, String prefix) throws IOException {
     toXML(xml, level, number);
   }
 

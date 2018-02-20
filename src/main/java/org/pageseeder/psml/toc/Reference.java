@@ -133,7 +133,7 @@ public final class Reference extends Element implements Serializable {
       xml.attribute("numbered", "true");
     }
     if (numbered && number != null) {
-      number.generateHeadingNumbering(level, xml);
+      number.generateNumbering(level, xml);
     } else {
       if (!DocumentTree.NO_PREFIX.equals(prefix)) {
         xml.attribute("prefix", prefix);

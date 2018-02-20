@@ -136,10 +136,10 @@ public final class Paragraph extends Element implements Serializable {
    * @return a new paragraph with a adjusted level or this paragraph if the delta is 0.
    */
   @Override
-  public Paragraph adjustLevel(int delta) {
-    // Paragraph levels are not adjusted
-    return this;
-  }
+ public Paragraph adjustLevel(int delta) {
+   if (delta == 0) return this;
+   return new Paragraph(level()+delta, title(), this._fragment, this._index, this._numbered, this._prefix);
+ }
 
   @Override
   public void print(Appendable out) {

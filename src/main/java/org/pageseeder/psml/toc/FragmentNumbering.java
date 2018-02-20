@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.pageseeder.psml.process.NumberingConfig;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Generates fragment numbering for a publication.
@@ -38,10 +38,9 @@ public final class FragmentNumbering implements Serializable {
    * @param pub          The publication tree
    * @param numbering    The numbering config
    */
-  public FragmentNumbering(PublicationTree pub, NumberingConfig numbering) {
-    NumberingGenerator number = new NumberingGenerator(numbering);
+  public FragmentNumbering(PublicationTree pub, PublicationConfig config) {
     Map<Long,Integer> doccount = new HashMap<>();
-    processTree(pub, pub.root().id(), 1, number, doccount, 1, new ArrayList<Long>());
+    processTree(pub, pub.root().id(), 1, config, null, doccount, 1, new ArrayList<Long>());
   }
 
   /**
@@ -50,18 +49,26 @@ public final class FragmentNumbering implements Serializable {
    * @param pub       The publication tree
    * @param id        The ID of the tree to serialize.
    * @param level     The level that we are currently at
-   * @param number    The numbering generator
+   * @param config    The publication config to get numbering config
+   * @param number    The numbering generator (optional)
    * @param doccount  Map of [uriid], [number of uses]
    * @param count     No. of times ID has been used.
    * @param ancestors List of the current ancestor tree IDs
    */
-  private void processTree(PublicationTree pub, long id, int level, NumberingGenerator number,
-      Map<Long,Integer> doccount, Integer count, List<Long> ancestors) {
+  private void processTree(PublicationTree pub, long id, int level, PublicationConfig config,
+      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors) {
     if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(id);
     DocumentTree current = pub.tree(id);
+    PublicationNumbering numbering = config.getPublicationNumbering(current.labels());
+    if (numbering == null) {
+      number = null;
+    // if numbering config has changed then create new numbering generator
+    } else if (number == null || !numbering.getLabel().equals(number.getPublicationNumbering().getLabel())) {
+      number = new NumberingGenerator(numbering);
+    }
     for (Part<?> part : current.parts()) {
-      processPart(pub, id, level, part, number, doccount, count, ancestors);
+      processPart(pub, id, level, part, config, number, doccount, count, ancestors);
     }
     ancestors.remove(id);
   }
@@ -73,13 +80,14 @@ public final class FragmentNumbering implements Serializable {
    * @param level     The level that we are currently at
    * @param id        The ID of the tree to process.
    * @param part      The part to process
-   * @param number    The numbering generator
+   * @param config    The publication config to get numbering config
+   * @param number    The numbering generator (optional)
    * @param doccount  Map of [uriid], [number of uses]
    * @param count     No. of times ID has been used.
    * @param ancestors List of the current ancestor tree IDs
    */
-  private void processPart(PublicationTree pub, long id, int level, Part<?> part, NumberingGenerator number,
-      Map<Long,Integer> doccount, Integer count, List<Long> ancestors) {
+  private void processPart(PublicationTree pub, long id, int level, Part<?> part, PublicationConfig config,
+      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors) {
     Element element = part.element();
     Long next = null;
     DocumentTree nextTree = null;
@@ -101,18 +109,18 @@ public final class FragmentNumbering implements Serializable {
     } else if (element instanceof Heading) {
       processHeading((Heading)element, level, id, number, count);
     } else if (element instanceof Paragraph) {
-      processParagraph((Paragraph)element, id, number, count);
+      processParagraph((Paragraph)element, level, id, number, count);
     }
 
     // Expand found reference
     if (nextTree != null) {
       // Moving to the next tree (increase the level by 1)
-      processTree(pub, next, level+1, number, doccount, nextcount, ancestors);
+      processTree(pub, next, level+1, config, number, doccount, nextcount, ancestors);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      processPart(pub, id, level+1, r, number, doccount, count, ancestors);
+      processPart(pub, id, level+1, r, config, number, doccount, count, ancestors);
     }
   }
 
@@ -127,8 +135,8 @@ public final class FragmentNumbering implements Serializable {
    */
   public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, Integer count) {
     String p = target.prefix();
-    if (target.numbered()) {
-      p = number.generateHeadingNumbering(level);
+    if (target.numbered() && number != null) {
+      p = number.generateNumbering(level);
     }
     if (p == null || NO_PREFIX.equals(p)) return;
     // store prefix on default fragment
@@ -144,11 +152,12 @@ public final class FragmentNumbering implements Serializable {
    * @param level    The level that we are currently at
    * @param id       The ID of the tree containing the heading.
    * @param number   The numbering generator
+   * @param count    No. of times tree ID has been used.
    */
   public void processHeading(Heading h, int level, long id, NumberingGenerator number, Integer count) {
     String p = h.prefix();
-    if (h.numbered()) {
-      p = number.generateHeadingNumbering(level);
+    if (h.numbered() && number != null) {
+      p = number.generateNumbering(level);
     }
     if (p == null || NO_PREFIX.equals(p)) return;
     String key = id + "-" + count + "-" + h.fragment();
@@ -167,11 +176,12 @@ public final class FragmentNumbering implements Serializable {
    * @param level    The level that we are currently at
    * @param id       The ID of the tree containing the heading.
    * @param number   The numbering generator
+   * @param count    No. of times tree ID has been used.
    */
-  public void processParagraph(Paragraph para, long id, NumberingGenerator number, Integer count) {
+  public void processParagraph(Paragraph para, int level, long id, NumberingGenerator number, Integer count) {
     String p = para.prefix();
-    if (para.numbered()) {
-      p = number.generateParaNumbering(para.level());
+    if (para.numbered() && number != null) {
+      p = number.generateNumbering(level + para.level());
     }
     if (p == null || NO_PREFIX.equals(p)) return;
     String key = id + "-" + count + "-" + para.fragment();

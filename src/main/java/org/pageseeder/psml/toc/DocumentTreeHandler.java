@@ -85,6 +85,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startReverseRef(attributes);
     } else if (isElement("displaytitle") && !hasAncestor("blockxref")) {
       newBuffer();
+    } else if (isElement("labels") && !hasAncestor("blockxref")) {
+      newBuffer();
     }
   }
 
@@ -192,6 +194,12 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       String title = buffer(true);
       if (title != null) {
         this._tree.title(title);
+      }
+
+    } else if ("labels".equals(element) && !hasAncestor("blockxref")) {
+      String labels = buffer(true);
+      if (labels != null) {
+        this._tree.labels(labels);
       }
 
     } else if ("blockxref".equals(element) && !hasAncestor("blockxref")) {

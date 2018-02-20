@@ -178,7 +178,7 @@ public final class Heading extends Element implements Serializable {
       xml.attribute("numbered", "true");
     }
     if (this._numbered && number != null) {
-      number.generateHeadingNumbering(level, xml);
+      number.generateNumbering(level, xml);
     } else {
       if (!NO_PREFIX.equals(this._prefix)) {
         xml.attribute("prefix", this._prefix);

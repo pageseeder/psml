@@ -23,8 +23,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Assert;
-import org.pageseeder.psml.process.NumberingConfig;
-import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWritable;
@@ -261,9 +259,9 @@ public class Tests {
     return parse(id, in);
   }
 
-  public static NumberingConfig parseNumbering(String filename) throws ProcessException {
+  public static PublicationConfig parseConfig(String filename) throws IOException {
     InputStream in = DocumentTreeHandlerTest.class.getResourceAsStream("/org/pageseeder/psml/toc/"+filename);
-    return NumberingConfig.loadNumberingConfig(in);
+    return PublicationConfig.loadPublicationConfig(in);
   }
 
   public static DocumentTree parse(long id, @Nullable InputStream in) throws SAXException {
@@ -357,11 +355,11 @@ public class Tests {
     System.out.println(xml.toString());
   }
 
-  public static void print(PublicationTree o, long contentid, NumberingConfig number) {
+  public static void print(PublicationTree o, long contentid, PublicationConfig config) {
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
     xml.setIndentChars("  ");
     try {
-      o.toXML(xml, contentid, number);
+      o.toXML(xml, contentid, config);
     } catch (IOException ex) {
       // Won't happen
     }
