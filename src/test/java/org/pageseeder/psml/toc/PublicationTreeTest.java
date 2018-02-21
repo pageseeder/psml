@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.toc.DocumentTree.Builder;
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.xml.sax.SAXException;
 
 public final class PublicationTreeTest {
@@ -145,6 +146,37 @@ public final class PublicationTreeTest {
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     String result = numbering.getAllPrefixes().entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+  }
+
+  @Test
+  public void testAutoNumberingBlank() throws SAXException, IOException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 0,
+            phantom(2,
+            ref(3, "A", 1000L)))).build().normalize(TitleCollapse.auto);
+    DocumentTree tree = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 0, true, "x.x",
+            h2("a", "2", 0, true, "x.x.x"),
+            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
+            h2("c", "4", 3, false, ""),
+            h2("d", "4", 4, true, "", h3("xc", "5", 5, false, "x.x.x.x"))))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(tree);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-blank.xml");
+    Tests.print(publication, -1, config);
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
@@ -309,7 +341,7 @@ public final class PublicationTreeTest {
     long start = System.currentTimeMillis();
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     long end = System.currentTimeMillis();
-    Map<String,String> prefixes = numbering.getAllPrefixes();
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())

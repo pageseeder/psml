@@ -27,9 +27,16 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * <pre>{@code
  * <publication-config>
- *   <numbering strip-zeros="true"  [label="xyz"]>
+ *   <toc title-collapse="[always#|auto|never]">
+ *
+ *   <levels xrefs="[auto#|manual]"
+ *       para-relative-to="[heading#|document]"
+ *       para-adjust="[numbering#|content]"
+ *       heading-adjust="[numbering#|content]" />
+ *
+ *   <numbering strip-zeros="[true#|false]" [label="xyz"]>
  *     <schemes>
- *       <scheme level="1" type="[decimal|upperalpha|loweralpha|upperroman|lowerroman]" format="[1]" />
+ *       <scheme level="1" type="[decimal#|upperalpha|loweralpha|upperroman|lowerroman]" format="[1]" />
  *       <scheme level="2" type="decimal" format="[1.][2]" />
  *       <scheme level="3" type="loweralpha" format="[(3)]" />
  *       <scheme level="4" type="lowerroman" format="[(4)]" />
@@ -43,6 +50,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * </publication-config>
  * }</pre>
  *
+ * The # indicates the default value if the attribute is omitted.
  * Each level format is defined by the picture [*(level)*] where:
  * - (level) is a digit which defines the level of numbering. Currently levels 1 to 9 are supported by PageSeeder.
  * - * is any other content.

@@ -6,6 +6,7 @@ package org.pageseeder.psml.toc;
 import java.io.IOException;
 import java.util.Stack;
 
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
@@ -58,10 +59,10 @@ public final class NumberingGenerator {
       // compute canonical label
       String canonical = canonicalLabel(this.numberingLevels);
       // compute numbered label
-      String label = this.numberConfig.getHeadingLabel(canonical);
+      Prefix prefix = this.numberConfig.getPrefix(canonical);
       // add attributes to XML
       xml.attribute("canonical", canonical);
-      xml.attribute("prefix", label);
+      xml.attribute("prefix", prefix.value);
     }
   }
 
@@ -70,16 +71,16 @@ public final class NumberingGenerator {
    *
    * @param level         the level of the object
    *
-   * @return the numbering
+   * @return the numbering prefix
    */
-  public String generateNumbering(int level) {
+  public Prefix generateNumbering(int level) {
     if (this.numberConfig != null) {
       // add it to current levels
       addNewLevel(this.numberingLevels, level);
       // compute canonical label
       String canonical = canonicalLabel(this.numberingLevels);
       // compute numbered label
-      return this.numberConfig.getHeadingLabel(canonical);
+      return this.numberConfig.getPrefix(canonical);
     }
     return null;
   }

@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+
 /**
  * Publication numbering configuration
  *
@@ -107,60 +109,79 @@ public final class PublicationNumbering {
   }
 
   /**
-   * Get the computed label for a heading.
+   * Compute the numbering prefix from the canonical label
    *
    * @param canonical the canonical label
    *
-   * @return the computed label
+   * @return the prefix
    */
-  public String getHeadingLabel(String canonical) {
+  public Prefix getPrefix(String canonical) {
     // make sure it always ends with dot
     String toParse = !canonical.matches("^.*\\.$") ? canonical + '.' : canonical;
     // find level
     int level = toParse.split("\\.").length;
-    // compute label
-    return getPrefix(toParse, this.formats.get(level));
+    // compute prefix
+    StringBuilder prefix = new StringBuilder();
+    boolean levelone = buildPrefix(prefix, toParse, this.formats.get(level));
+    if (levelone) return new Prefix(prefix.toString(), null);
+    // compute parent number
+    StringBuilder parentNumber = new StringBuilder();
+    int i = toParse.lastIndexOf('.', toParse.length() - 2);
+    while (i != -1 && !levelone) {
+      toParse = toParse.substring(0, i + 1);
+      StringBuilder parent = new StringBuilder();
+      level--;
+      levelone = buildPrefix(parent, toParse, this.formats.get(level));
+      parentNumber.insert(0, parent);
+      i = toParse.lastIndexOf('.', toParse.length() - 2);
+    }
+    return new Prefix(prefix.toString(), parentNumber.toString());
   }
 
   /**
-   * Compute the numbering prefix from the canonical label and the scheme.
+   * Build the numbering prefix from the canonical label and the scheme.
    *
+   * @param prefix    for appending the prefix
    * @param canonical the canonical label
    * @param scheme    the scheme to apply
    *
-   * @return the new prefix
+   * @return whether level one was included in prefix
    */
-  private String getPrefix(String canonical, String scheme) {
+  private boolean buildPrefix(StringBuilder prefix, String canonical, String scheme) {
     // no scheme, return canonical value then
     if (scheme == null) {
       // no zeros or we don't strip them, return as is
-      if (this.stripZeros)
-        return canonical.replaceFirst("^(0\\.)+", "").replaceAll("(\\.0\\.)", ".");
-      return canonical;
+      if (this.stripZeros) {
+        prefix.append(canonical.replaceFirst("^(0\\.)+", "").replaceAll("(\\.0\\.)", "."));
+      } else {
+        prefix.append(canonical);
+      }
+      return true;
     }
     // find the values for each level
     Matcher canonicalMatcher = CANONICAL_PATTERN.matcher(canonical);
-    Map<String, Integer> levels = new HashMap<>();
+    Map<Integer, Integer> levels = new HashMap<>();
     int currentLevel = 1;
     while (canonicalMatcher.find()) {
-      levels.put(String.valueOf(currentLevel++),
+      levels.put(currentLevel++,
           Integer.parseInt(canonicalMatcher.group(1)));
     }
-    // build label now
-    StringBuilder label = new StringBuilder();
+    // build prefix
     Matcher schemeMatcher = SCHEME_PATTERN.matcher(scheme);
+    boolean levelone = false;
     while (schemeMatcher.find()) {
-      String level = schemeMatcher.group(2);
+      int level = Integer.parseInt(schemeMatcher.group(2));
+      if (level == 1) levelone = true;
       Integer value = levels.get(level);
       // make sure level is good
       if (value == null) continue;
       if (value.intValue() == 0 && this.stripZeros) continue;
       // ok append it then
-      label.append(schemeMatcher.group(1));
-      label.append(numbering(value, this.types.get(Integer.parseInt(level))));
-      label.append(schemeMatcher.group(3));
+      prefix.append(schemeMatcher.group(1));
+      prefix.append(numbering(value, this.types.get(level)));
+      prefix.append(schemeMatcher.group(3));
     }
-    return label.toString();
+    return levelone;
   }
 
   /**

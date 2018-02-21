@@ -30,7 +30,7 @@ public final class FragmentNumbering implements Serializable {
    * where position is the number of times the document has been used (>=1)
    * and index is the index of the heading/para in the document (>=0).
    */
-  private final Map<String,String> numbering = new HashMap<>();
+  private final Map<String,Prefix> numbering = new HashMap<>();
 
   /**
    * Constructor
@@ -138,14 +138,17 @@ public final class FragmentNumbering implements Serializable {
    */
   public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, Integer count) {
     String p = target.prefix();
+    String parent = null;
     if (target.numbered() && number != null) {
-      p = number.generateNumbering(level);
+      Prefix pref = number.generateNumbering(level);
+      p = pref.value;
+      parent = pref.parentNumber;
     }
     if (p == null || NO_PREFIX.equals(p)) return;
     // store prefix on default fragment
-    this.numbering.put(target.id() + "-" + count + "-default", p);
+    this.numbering.put(target.id() + "-" + count + "-default", new Prefix(p, parent));
     // store prefix on first heading fragment
-    this.numbering.put(target.id() + "-" + count + "-" + target.headingfragment(), p);
+    this.numbering.put(target.id() + "-" + count + "-" + target.headingfragment(), new Prefix(p, parent));
   }
 
   /**
@@ -159,8 +162,11 @@ public final class FragmentNumbering implements Serializable {
    */
   public void processHeading(Heading h, int level, long id, NumberingGenerator number, Integer count) {
     String p = h.prefix();
+    String parent = null;
     if (h.numbered() && number != null) {
-      p = number.generateNumbering(level);
+      Prefix pref = number.generateNumbering(level);
+      p = pref.value;
+      parent = pref.parentNumber;
     }
     if (p == null || NO_PREFIX.equals(p)) return;
     String key = id + "-" + count + "-" + h.fragment();
@@ -169,7 +175,7 @@ public final class FragmentNumbering implements Serializable {
       key = id + "-" + count + "~" + h.index() + "-" + h.fragment();
     };
     // store prefix on fragment
-    this.numbering.put(key, p);
+    this.numbering.put(key, new Prefix(p, parent));
   }
 
   /**
@@ -183,8 +189,11 @@ public final class FragmentNumbering implements Serializable {
    */
   public void processParagraph(Paragraph para, int level, long id, NumberingGenerator number, Integer count) {
     String p = para.prefix();
+    String parent = null;
     if (para.numbered() && number != null) {
-      p = number.generateNumbering(level + para.level());
+      Prefix pref = number.generateNumbering(level + para.level());
+      p = pref.value;
+      parent = pref.parentNumber;
     }
     if (p == null || NO_PREFIX.equals(p)) return;
     String key = id + "-" + count + "-" + para.fragment();
@@ -193,27 +202,62 @@ public final class FragmentNumbering implements Serializable {
       key = id + "-" + count + "~" + para.index() + "-" + para.fragment();
     }
     // store prefix on fragment
-    this.numbering.put(key, p);
+    this.numbering.put(key, new Prefix(p, parent));
   }
 
   /**
-   * Get prefix for the first heading/para in a fragment.
+   * Get prefix (and parent number if it exists) for the first heading/para in a fragment.
    *
    * @param uriid     the URI ID of the document
    * @param fragment  the fragment ID
+   *
+   * @return an array [0]=prefix, [1]=parent number(optional)
    */
-  public String getPrefix(String uriid, String fragment) {
+  public Prefix getPrefix(String uriid, String fragment) {
     return this.numbering.get(uriid + "-" + fragment);
   }
 
   /**
-   * Get all prefixes as a map with key [uriid]-[position][~[index]][-[fragment]].
+   * Get all prefixes (and parent number if it exists) as a map with key [uriid]-[position][~[index]][-[fragment]].
    *
-   * @return  the unmodifiable map
+   * @return  the unmodifiable map an array [0]=prefix, [1]=parent number(optional)
    *
    */
-  public Map<String,String> getAllPrefixes() {
+  public Map<String,Prefix> getAllPrefixes() {
     return Collections.unmodifiableMap(this.numbering);
   }
 
+  /**
+   * Container for prefix (and parent number if it exists) for the first heading/para in a fragment.
+   *
+   * @author Philip Rutherford
+   *
+   */
+  public static final class Prefix implements Serializable {
+
+    /**
+     * For serialisation
+     */
+    private static final long serialVersionUID = 8704232243442685176L;
+
+    public final String value;
+
+    public final @Nullable String parentNumber;
+
+    /**
+     * Constructor
+     *
+     * @param val    the prefix value
+     * @param parent the parent number (optional)
+     */
+    public Prefix(String val, @Nullable String parent) {
+      this.value = val;
+      this.parentNumber = parent;
+    }
+
+    @Override
+    public String toString() {
+      return (this.parentNumber != null ? this.parentNumber + ">" : "") + this.value;
+    }
+  }
 }
