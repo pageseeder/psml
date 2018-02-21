@@ -40,7 +40,8 @@ public final class FragmentNumbering implements Serializable {
    */
   public FragmentNumbering(PublicationTree pub, PublicationConfig config) {
     Map<Long,Integer> doccount = new HashMap<>();
-    processTree(pub, pub.root().id(), 1, config, null, doccount, 1, new ArrayList<Long>());
+    DocumentTree root = pub.root();
+    processTree(pub, root.id(), 1, config, pub.getNumberingGenerator(config, null, root), doccount, 1, new ArrayList<Long>());
   }
 
   /**
@@ -92,6 +93,7 @@ public final class FragmentNumbering implements Serializable {
     Long next = null;
     DocumentTree nextTree = null;
     Integer nextcount = null;
+    NumberingGenerator nextNumber = number;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
       // don't process embedded fragments
@@ -100,10 +102,11 @@ public final class FragmentNumbering implements Serializable {
         nextTree = pub.tree(next);
         // can only be numbered if the referenced tree exists
         if (nextTree != null) {
+          nextNumber = pub.getNumberingGenerator(config, nextNumber, nextTree);
           nextcount = doccount.get(next);
           nextcount = nextcount == null ? 1 : nextcount + 1;
           doccount.put(next, nextcount);
-          processReference(ref, level, nextTree, number, nextcount);
+          processReference(ref, level, nextTree, nextNumber, nextcount);
         }
       }
     } else if (element instanceof Heading) {
@@ -115,7 +118,7 @@ public final class FragmentNumbering implements Serializable {
     // Expand found reference
     if (nextTree != null) {
       // Moving to the next tree (increase the level by 1)
-      processTree(pub, next, level+1, config, number, doccount, nextcount, ancestors);
+      processTree(pub, next, level+1, config, nextNumber, doccount, nextcount, ancestors);
     }
 
     // Process all child parts

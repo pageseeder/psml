@@ -297,6 +297,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     xml.attribute("id", Long.toString(this._id));
     xml.attribute("level", this._level);
     xml.attribute("title", this._title);
+    if (this.numbered()) {
+      xml.attribute("numbered", "true");
+    }
+    if (!DocumentTree.NO_PREFIX.equals(this.prefix())) {
+      xml.attribute("prefix", this.prefix());
+    }
     if (reverse.length() > 0) {
       xml.attribute("reverse-references", reverse);
     }
@@ -357,7 +363,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       for (Part<?> p : normalized.parts().get(0).parts()) {
         unwrapped.add(p.adjustLevel(-1));
       }
-      normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, unwrapped);
+      normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, tree._headingfragment, tree._numbered, tree._prefix, unwrapped);
     }
     return normalized;
   }

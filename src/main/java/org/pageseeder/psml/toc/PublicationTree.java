@@ -210,7 +210,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (cid != -1) {
       collectReferences(tree(cid), trees);
     }
-    toXML(xml, this._rootid, 1, cid, trees, config, null, new ArrayList<Long>());
+    toXML(xml, this._rootid, 1, cid, trees, config, getNumberingGenerator(config, null, tree(this._rootid)), new ArrayList<Long>());
     xml.closeElement();
   }
 
@@ -253,17 +253,32 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(id);
     DocumentTree current = tree(id);
-    PublicationNumbering numbering = config == null ? null : config.getPublicationNumbering(current.labels());
+    for (Part<?> part : current.parts()) {
+      toXML(xml, id, level, part, cid, trees, config, number, ancestors);
+    }
+    ancestors.remove(id);
+  }
+
+  /**
+   * Get the new numbering generator for the document tree specified.
+   * If labels haven't changed then returns the current numbering generator.
+   *
+   * @param config   the publication config
+   * @param number   the current numbering generator
+   * @param tree     the document tree
+   *
+   * @return
+   */
+  public NumberingGenerator getNumberingGenerator(PublicationConfig config,
+      NumberingGenerator number, DocumentTree tree) {
+    PublicationNumbering numbering = config == null ? null : config.getPublicationNumbering(tree.labels());
     if (numbering == null) {
       number = null;
     // if numbering config has changed then create new numbering generator
     } else if (number == null || !numbering.getLabel().equals(number.getPublicationNumbering().getLabel())) {
       number = new NumberingGenerator(numbering);
     }
-    for (Part<?> part : current.parts()) {
-      toXML(xml, id, level, part, cid, trees, config, number, ancestors);
-    }
-    ancestors.remove(id);
+    return number;
   }
 
   /**
@@ -305,8 +320,10 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     }
 
     // Output the element
+    NumberingGenerator nextNumber = number;
     if (nextTree != null) {
-      element.toXML(xml, level, number, nextTree.numbered(), nextTree.prefix());
+      nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
+      element.toXML(xml, level, nextNumber, nextTree.numbered(), nextTree.prefix());
     } else {
       element.toXML(xml, level, number);
     }
@@ -314,7 +331,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, cid, trees, config, number, ancestors);
+      toXML(xml, next, level+1, cid, trees, config, nextNumber, ancestors);
     }
 
     // Process all child parts
