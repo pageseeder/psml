@@ -142,9 +142,10 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
-    Tests.print(publication, -1, config);
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering);
+    Tests.print(publication, 1000, 2, numbering);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
@@ -172,9 +173,9 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-blank.xml");
-    Tests.print(publication, -1, config);
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -225,9 +226,9 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(root, publication.root());
     //assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
-    Tests.print(publication, -1, config);
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
@@ -291,10 +292,10 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
-    Tests.print(publication, -1, config);
-    tree.print(System.out);
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering);
+    tree.print(System.out);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
@@ -369,7 +370,7 @@ public final class PublicationTreeTest {
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(inter2);
-    Tests.print(publication, -1, null);
+    Tests.print(publication, -1, -1, null);
   }
 
   @Test(expected = IllegalStateException.class)
@@ -419,6 +420,7 @@ public final class PublicationTreeTest {
     System.out.println(tree.listReverseReferences());
     PublicationTree publication = new PublicationTree(tree);
     Tests.print(publication);
+    tree.print(System.out);
   }
 
 

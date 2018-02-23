@@ -3,6 +3,8 @@ package org.pageseeder.psml.toc;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.eclipse.jdt.annotation.Nullable;
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
@@ -166,7 +168,7 @@ public final class Heading extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
+  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     xml.openElement("heading", false);
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(title())) {
@@ -178,7 +180,11 @@ public final class Heading extends Element implements Serializable {
       xml.attribute("numbered", "true");
     }
     if (this._numbered && number != null) {
-      number.generateNumbering(level, xml);
+      Prefix pref = number.getPrefix(treeid, count, this._fragment, this._index);
+      if (pref != null) {
+        xml.attribute("prefix", pref.value);
+        xml.attribute("canonical", pref.canonical);
+      }
     } else {
       if (!NO_PREFIX.equals(this._prefix)) {
         xml.attribute("prefix", this._prefix);

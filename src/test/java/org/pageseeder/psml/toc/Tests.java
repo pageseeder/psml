@@ -355,11 +355,11 @@ public class Tests {
     System.out.println(xml.toString());
   }
 
-  public static void print(PublicationTree o, long contentid, PublicationConfig config) {
+  public static void print(PublicationTree o, long cid, int cposition, @Nullable FragmentNumbering number) {
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
     xml.setIndentChars("  ");
     try {
-      o.toXML(xml, contentid, config);
+      o.toXML(xml, cid, cposition, number);
     } catch (IOException ex) {
       // Won't happen
     }

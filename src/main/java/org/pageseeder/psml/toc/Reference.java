@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
@@ -106,7 +108,7 @@ public final class Reference extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(@NonNull XMLWriter xml, int level, NumberingGenerator number) throws IOException {
+  public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     toXMLNoClose(xml, level);
     xml.closeElement();
   }
@@ -127,13 +129,17 @@ public final class Reference extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(@NonNull XMLWriter xml, int level, NumberingGenerator number, boolean numbered, String prefix) throws IOException {
+  public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count, boolean numbered, String prefix) throws IOException {
     toXMLNoClose(xml, level);
     if (numbered) {
       xml.attribute("numbered", "true");
     }
     if (numbered && number != null) {
-      number.generateNumbering(level, xml);
+      Prefix pref = number.getPrefix(treeid, count);
+      if (pref != null) {
+        xml.attribute("prefix", pref.value);
+        xml.attribute("canonical", pref.canonical);
+      }
     } else {
       if (!DocumentTree.NO_PREFIX.equals(prefix)) {
         xml.attribute("prefix", prefix);

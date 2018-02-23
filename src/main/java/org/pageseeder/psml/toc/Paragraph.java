@@ -3,6 +3,7 @@ package org.pageseeder.psml.toc;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
@@ -160,8 +161,18 @@ public final class Paragraph extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
-    // Not included in TOC
+  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
+    xml.openElement("para", false);
+    xml.attribute("level", level);
+    xml.attribute("fragment", this._fragment);
+    xml.attribute("index", this._index);
+    if (this._numbered) {
+      xml.attribute("numbered", "true");
+    }
+    if (!NO_PREFIX.equals(this._prefix)) {
+      xml.attribute("prefix", this._prefix);
+    }
+    xml.closeElement();
   }
 
 }

@@ -109,32 +109,36 @@ public abstract class Element implements Serializable, XMLWritable {
   /**
    * Writes this element as XML.
    *
-   * @param xml     The XML output.
-   * @param level   The level (if overridden)
-   * @param number  The numbering generator
+   * @param xml      The XML output.
+   * @param level    The level (if overridden)
+   * @param number   The fragment numbering for the publication.
+   * @param treeid   The ID of the current document tree.
+   * @param count    The position (occurrence number) of the document in the publication.
    *
    * @throws IOException Should an I/O error occur
    */
-  public abstract void toXML(XMLWriter xml, int level, @Nullable NumberingGenerator number) throws IOException;
+  public abstract void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException;
 
   /**
    * Writes this element as XML.
    *
    * @param xml      The XML output.
    * @param level    The level (if overridden)
-   * @param number   The numbering generator
+   * @param number   The fragment numbering for the publication.
+   * @param treeid   The ID of the current document tree.
+   * @param count    The position (occurrence number) of the document in the publication.
    * @param numbered Whether the heading is auto-numbered
    * @param prefix   Any prefix given to the title.
    *
    * @throws IOException Should an I/O error occur
    */
-  public void toXML(XMLWriter xml, int level, @Nullable NumberingGenerator number, boolean numbered, String prefix) throws IOException {
-    toXML(xml, level, number);
+  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count, boolean numbered, String prefix) throws IOException {
+    toXML(xml, level, number, treeid, count);
   }
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    toXML(xml, level(), null);
+    toXML(xml, level(), null, -1, -1);
   }
 
 }

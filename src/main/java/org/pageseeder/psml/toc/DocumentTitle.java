@@ -5,6 +5,7 @@ package org.pageseeder.psml.toc;
 
 import java.io.IOException;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 public final class DocumentTitle extends Element {
@@ -40,7 +41,7 @@ public final class DocumentTitle extends Element {
   }
 
   @Override
-  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
+  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     xml.openElement("title", false);
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(title())) {

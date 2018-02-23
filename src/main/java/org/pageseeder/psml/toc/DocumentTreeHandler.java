@@ -47,14 +47,14 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private String fragment = "default";
 
   /**
-   * We count the headings to use as index in TOC.
+   * We count the headings/paras to use as index in TOC.
    */
-  private int counter = 0;
+  private int counter = 1;
 
   /**
-   * We count the paras to use as index.
+   * We count the sections to use as index.
    */
-  private int paracounter = 0;
+  private int sectioncounter = 1;
 
   /**
    * The level to adjust headings with if updated by transclusion.
@@ -96,20 +96,24 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    * @param attributes The attributes
    */
   private void startHeading(Attributes attributes) {
-    int level = this.transclusionLevel + (isParent("section")? SECTION_TITLE_LEVEL : getInt(attributes, "level"));
-    String prefix = attributes.getValue("prefix");
-    Heading heading = Heading.untitled(level, this.fragment, this.counter);
-    if ("true".equals(attributes.getValue("numbered"))) {
-      heading = heading.numbered(true);
-    }
-    if (prefix != null) {
-      heading = heading.prefix(prefix);
+    Heading heading;
+    if (isParent("section")) {
+      heading = Heading.untitled(this.transclusionLevel + SECTION_TITLE_LEVEL, "default", this.sectioncounter);
+      this.sectioncounter++;
+    } else {
+      heading = Heading.untitled(this.transclusionLevel + getInt(attributes, "level"), this.fragment, this.counter);
+      if ("true".equals(attributes.getValue("numbered"))) {
+        heading = heading.numbered(true);
+      }
+      String prefix = attributes.getValue("prefix");
+      if (prefix != null) {
+        heading = heading.prefix(prefix);
+      }
+      this.counter++;
     }
 
     newBuffer();
-
     this.currentHeading = heading;
-    this.counter++;
   }
 
   /**
@@ -120,7 +124,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private void startPara(Attributes attributes) {
     int level = getInt(attributes, "indent");
     String prefix = attributes.getValue("prefix");
-    Paragraph para = new Paragraph(level, this.fragment, this.paracounter);
+    Paragraph para = new Paragraph(level, this.fragment, this.counter);
     if ("true".equals(attributes.getValue("numbered"))) {
       para = para.numbered(true);
     }
@@ -128,8 +132,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       para = para.prefix(prefix);
     }
 
-    this._expander.add(para);
-    this.paracounter++;
+    this._expander.addParagraph(para);
+    this.counter++;
   }
 
   /**
@@ -141,6 +145,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     // Only if not within a transclusion
     if (!hasAncestor("blockxref")) {
       this.fragment = getString(attributes, "id");
+      this.counter = 1;
     }
   }
 

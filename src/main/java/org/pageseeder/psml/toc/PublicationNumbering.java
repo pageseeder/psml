@@ -123,19 +123,20 @@ public final class PublicationNumbering {
     // compute prefix
     StringBuilder prefix = new StringBuilder();
     boolean levelone = buildPrefix(prefix, toParse, this.formats.get(level));
-    if (levelone) return new Prefix(prefix.toString(), null);
+    if (levelone) return new Prefix(prefix.toString(), canonical, level, null);
     // compute parent number
     StringBuilder parentNumber = new StringBuilder();
     int i = toParse.lastIndexOf('.', toParse.length() - 2);
+    int prevlevel = level;
     while (i != -1 && !levelone) {
       toParse = toParse.substring(0, i + 1);
       StringBuilder parent = new StringBuilder();
-      level--;
-      levelone = buildPrefix(parent, toParse, this.formats.get(level));
+      prevlevel--;
+      levelone = buildPrefix(parent, toParse, this.formats.get(prevlevel));
       parentNumber.insert(0, parent);
       i = toParse.lastIndexOf('.', toParse.length() - 2);
     }
-    return new Prefix(prefix.toString(), parentNumber.toString());
+    return new Prefix(prefix.toString(), canonical, level, parentNumber.toString());
   }
 
   /**

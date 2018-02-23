@@ -23,6 +23,21 @@ public final class TreeExpander {
   }
 
   /**
+   * Add a new paragraph to the list (it should not affect heading structure)
+   *
+   * @param element The new element to add
+   */
+  public TreeExpander addParagraph(Paragraph element) {
+    MutablePart current = this._parts.peek();
+    // Add the element to the current part
+    MutablePart mutable = new MutablePart(element);
+    if (current != null) {
+      current.add(mutable);
+    }
+    return this;
+  }
+
+    /**
    * Add a new element to the list.
    *
    * @param element The new element to add

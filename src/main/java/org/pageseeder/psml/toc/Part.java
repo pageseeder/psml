@@ -236,15 +236,15 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    toXML(xml, level(), null);
+    toXML(xml, level(), null, -1, -1);
   }
 
-  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
+  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     xml.openElement("part", parts().size() > 0);
     xml.attribute("level", level);
-    element().toXML(xml, level, number);
+    element().toXML(xml, level, number, treeid, count);
     for (Part<?> p : parts()) {
-      p.toXML(xml, level+1, number);
+      p.toXML(xml, level+1, number, treeid, count);
     }
     xml.closeElement();
   }

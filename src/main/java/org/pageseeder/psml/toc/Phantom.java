@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
@@ -74,7 +75,7 @@ public final class Phantom extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(XMLWriter xml, int level, NumberingGenerator number) throws IOException {
+  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     xml.openElement("phantom", false);
     xml.attribute("level", level);
     xml.closeElement();
