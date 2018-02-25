@@ -17,13 +17,7 @@
   <metadata />
   <section id="title">
     <fragment id="1">
-      <para indent="1" numbered="true">First para</para>
-      <para indent="2" numbered="true">Second para</para>
-      <para indent="3" numbered="true">Third para</para>
-      <heading level="1" numbered="true">Test doc 1</heading>
-      <heading level="2" numbered="true">Test doc 1.1</heading>
-      <para indent="4" numbered="true">Fourth para</para>
-      <heading level="3" numbered="true">Test doc 1.2</heading>
+      <heading level="1">Test doc 1</heading>
     </fragment>
   </section>
   <section id="content">

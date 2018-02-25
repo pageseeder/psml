@@ -97,7 +97,7 @@ public final class PublicationTreeTest {
   @Test
   public void testAutoNumbering() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 0,
+        .part(h1("T", "1", 1,
             phantom(2,
             ref(3, "A", 100L),
             ref(3, "B", 101L)))).build();
@@ -105,7 +105,7 @@ public final class PublicationTreeTest {
     root = root.normalize(TitleCollapse.auto);
     //Tests.print(root);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 0, true, "",
+        .part(h1("A", "1", 1, true, "",
             ref(2, "X", 1000L),
             ref(2, "Y", 1001L)))
         .addReverseReference(1L).build();
@@ -113,23 +113,23 @@ public final class PublicationTreeTest {
     inter = inter.normalize(TitleCollapse.auto);
     //Tests.print(inter);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 0, true, "",
+        .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
               ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
-        .part(h1("X", "1", 0, true, "x.x",
-            h2("a", "2", 0, true, "x.x.x"),
-            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
-            h2("c", "4", 3, false, ""),
-            h2("d", "4", 4, true, "", h3("xc", "5", 5, false, "x.x.x.x"))))
+        .part(h1("X", "1", 1, true, "x.x",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
-        .part(h1("Y", "1", 0, true, "x.x",
-            h2("a", "2", 0, true, "x.x.x"),
-            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
-            h2("c", "4", 3, false, ""),
-            phantom(3, h4("d", "4", 4, true, "", h5("xc", "5", 5, false, "x.x.x.x")))))
+        .part(h1("Y", "1", 1, true, "x.x",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
@@ -156,15 +156,15 @@ public final class PublicationTreeTest {
   @Test
   public void testAutoNumberingBlank() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 0,
+        .part(h1("T", "1", 1,
             phantom(2,
             ref(3, "A", 1000L)))).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
-        .part(h1("X", "1", 0, true, "x.x",
-            h2("a", "2", 0, true, "x.x.x"),
-            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
-            h2("c", "4", 3, false, ""),
-            h2("d", "4", 4, true, "", h3("xc", "5", 5, false, "x.x.x.x"))))
+        .part(h1("X", "1", 1, true, "x.x",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(tree);
@@ -187,33 +187,33 @@ public final class PublicationTreeTest {
   @Test
   public void testAutoNumberingLabels() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 0, true, "",
+        .part(h1("T", "1", 1, true, "",
             phantom(2,
             ref(3, "A", 100L),
             ref(3, "B", 101L)))).build().normalize(TitleCollapse.auto);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 0, true, "",
+        .part(h1("A", "1", 1, true, "",
             ref(2, "X", 1000L),
             ref(2, "Y", 1001L)))
         .addReverseReference(1L).labels("autonumber2,autonumber1").build().normalize(TitleCollapse.auto);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 0, true, "",
+        .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
               ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
-        .part(h1("X", "1", 0, true, "x.x",
-            h2("a", "2", 0, true, "x.x.x"),
-            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
-            h2("c", "4", 3, false, ""),
-            h2("d", "4", 4, true, "", h3("xc", "5", 5, false, "x.x.x.x"))))
+        .part(h1("X", "1", 1, true, "x.x",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
         .addReverseReference(100L).addReverseReference(101L).labels("autonumber1").build().normalize(TitleCollapse.auto);
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
-        .part(h1("Y", "1", 0, true, "x.x",
-            h2("a", "2", 0, true, "x.x.x"),
-            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
-            h2("c", "4", 3, false, ""),
-            phantom(3, h4("d", "4", 4, true, "", h5("xc", "5", 5, false, "x.x.x.x")))))
+        .part(h1("Y", "1", 1, true, "x.x",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
         .addReverseReference(100L).addReverseReference(101L).labels("autonumber2").build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
@@ -239,7 +239,7 @@ public final class PublicationTreeTest {
   @Test
   public void testAutoNumberingParas() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 0,
+        .part(h1("T", "1", 1,
             phantom(2,
             ref(3, "A", 100L),
             ref(3, "B", 101L)))).build();
@@ -247,7 +247,7 @@ public final class PublicationTreeTest {
     root = root.normalize(TitleCollapse.auto);
     //Tests.print(root);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 0, true, "",
+        .part(h1("A", "1", 1, true, "",
             ref(2, "X", 1000L),
             ref(2, "Y", 1001L)))
         .addReverseReference(1L).build();
@@ -255,31 +255,31 @@ public final class PublicationTreeTest {
     inter = inter.normalize(TitleCollapse.auto);
     //Tests.print(inter);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 0, true, "",
+        .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
               ref(1, "BY", 1001L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
-        .part(h1("X", "1", 0, true, "x.x",
-            p(1, "1a", 0, true, ""),
+        .part(h1("X", "1", 1, true, "x.x",
+            p(1, "1a", 1, true, ""),
             p(2, "1b", 1, true, ""),
-            p(1, "1c", 2, false, "x"),
-            h2("a", "2", 0, true, "x.x.x"),
+            p(1, "1c", 1, false, "x"),
+            h2("a", "2", 1, true, "x.x.x"),
             h2("b", "3", 1, true, "",
-                p(1, "3a", 3, true, ""),
-                p(2, "3a", 4, true, ""),
-                p(1, "3b", 5, true, "x.x")),
-            h2("c", "4", 3, false, ""),
-            h2("d", "4", 4, true, "", h3("xc", "5", 5, false, "x.x.x.x"))))
+                p(1, "3a", 1, true, ""),
+                p(2, "3a", 2, true, ""),
+                p(1, "3b", 1, true, "x.x")),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
-        .part(h1("Y", "1", 0, true, "x.x",
-                p(1, "1a", 0, true, ""),
+        .part(h1("Y", "1", 1, true, "x.x",
+                p(1, "1a", 1, true, ""),
                 p(3, "1b", 1, true, ""),
-            h2("a", "2", 0, true, "x.x.x"),
-            h2("b", "2", 1, true, "", h3("x", "3", 2, true, "")),
-            h2("c", "4", 3, false, ""),
-            phantom(3, h4("d", "4", 4, true, "", h5("xc", "5", 5, false, "x.x.x.x")))))
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
@@ -313,26 +313,26 @@ public final class PublicationTreeTest {
     PublicationTree publication = new PublicationTree(root);
     for(int i = 0; i < 500; i++) {
       DocumentTree tree = new DocumentTree.Builder(1000 + i).title("X")
-          .part(h1("X", "0", 0, true, "",
+          .part(h1("X", "0", 1, true, "",
               h2("a", "1", 1, true, ""),
-              h2("b", "2", 2, true, ""),
-              h2("c", "3", 3, true, ""),
-              h2("d", "4", 4, true, ""),
-              h2("e", "5", 5, true, ""),
-              h2("f", "6", 6, true, ""),
-              h2("g", "7", 7, true, ""),
-              h2("h", "8", 8, true, ""),
-              h2("i", "9", 9, true, ""),
-              p(1, "9a", 0, true, ""),
+              h2("b", "2", 1, true, ""),
+              h2("c", "3", 1, true, ""),
+              h2("d", "4", 1, true, ""),
+              h2("e", "5", 1, true, ""),
+              h2("f", "6", 1, true, ""),
+              h2("g", "7", 1, true, ""),
+              h2("h", "8", 1, true, ""),
+              h2("i", "9", 1, true, ""),
+              p(1, "9a", 1, true, ""),
               p(2, "9b", 1, true, ""),
-              p(3, "9c", 2, true, ""),
-              p(4, "9d", 3, true, ""),
-              p(5, "9e", 4, true, ""),
-              p(6, "9f", 5, true, ""),
-              p(1, "9g", 6, true, ""),
-              p(2, "9h", 7, true, ""),
-              p(3, "9i", 8, true, ""),
-              p(4, "9j", 9, true, "")))
+              p(3, "9c", 1, true, ""),
+              p(4, "9d", 1, true, ""),
+              p(5, "9e", 1, true, ""),
+              p(6, "9f", 1, true, ""),
+              p(1, "9g", 1, true, ""),
+              p(2, "9h", 1, true, ""),
+              p(3, "9i", 1, true, ""),
+              p(4, "9j", 1, true, "")))
           .addReverseReference(1L).build().normalize(TitleCollapse.auto);
       publication = publication.add(tree);
     }
@@ -355,16 +355,16 @@ public final class PublicationTreeTest {
   @Test(expected = IllegalStateException.class)
   public void testLoopDetection() throws SAXException, ProcessException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 0,
+        .part(h1("T", "1", 1,
             phantom(2,
             ref(3, "A", 100L))))
         .addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 0, true, "",
+        .part(h1("A", "1", 1, true, "",
             ref(2, "B", 101L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 0, true, "",
+        .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1L)))
         .addReverseReference(100L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
@@ -376,16 +376,16 @@ public final class PublicationTreeTest {
   @Test(expected = IllegalStateException.class)
   public void testLoopDetectionAutonumber() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 0,
+        .part(h1("T", "1", 1,
             phantom(2,
             ref(3, "A", 100L))))
         .addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 0, true, "",
+        .part(h1("A", "1", 1, true, "",
             ref(2, "B", 101L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 0, true, "",
+        .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1L)))
         .addReverseReference(100L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
