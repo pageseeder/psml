@@ -27,6 +27,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private static final int SECTION_TITLE_LEVEL = 2;
 
   /**
+   * The default fragment.
+   */
+  private static final String DEFAULT_FRAGMENT = "default";
+
+  /**
    * Takes a list of elements and generate the tree.
    */
   private final TreeExpander _expander = new TreeExpander();
@@ -35,6 +40,12 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    * The last heading being processed
    */
   private @Nullable Heading currentHeading = null;
+  
+  /**
+   * Whether this is the first heading in fragment (not preceded by para)
+   */
+  private boolean firstHeading = false;
+
 
   /**
    * The content tree being built.
@@ -44,7 +55,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   /**
    * Current fragment ID
    */
-  private String fragment = "default";
+  private String fragment = DEFAULT_FRAGMENT;
 
   /**
    * We count the headings/paras to use as index in TOC.
@@ -72,8 +83,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   public void startElement(String element, Attributes attributes) {
     if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
-    } else if (isElement("para") && ("true".equals(attributes.getValue("numbered")) ||
-        (!Paragraph.NO_PREFIX.equals(attributes.getValue("prefix")) && attributes.getValue("prefix") != null))) {
+    } else if (isElement("para")) {
       startPara(attributes);
     } else if (isAny("fragment", "xref-fragment", "properties-fragment", "media-fragment")) {
       startFragment(attributes);
@@ -98,7 +108,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private void startHeading(Attributes attributes) {
     Heading heading;
     if (isParent("section")) {
-      heading = Heading.untitled(this.transclusionLevel + SECTION_TITLE_LEVEL, "default", this.sectioncounter);
+      heading = Heading.untitled(this.transclusionLevel + SECTION_TITLE_LEVEL, DEFAULT_FRAGMENT, this.sectioncounter);
       this.sectioncounter++;
     } else {
       heading = Heading.untitled(this.transclusionLevel + getInt(attributes, "level"), this.fragment, this.counter);
@@ -117,27 +127,30 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   }
 
   /**
-   * Found `para` element with `@numbered="true"`.
+   * Found `para` element
    *
    * @param attributes The attributes
    */
   private void startPara(Attributes attributes) {
-    int level = getInt(attributes, "indent");
     String prefix = attributes.getValue("prefix");
-    Paragraph para = new Paragraph(level, this.fragment, this.counter);
-    if ("true".equals(attributes.getValue("numbered"))) {
-      para = para.numbered(true);
+    String numbered = attributes.getValue("numbered");
+    if ("true".equals(numbered) || (!Paragraph.NO_PREFIX.equals(prefix) && prefix != null)) {
+      String level = attributes.getValue("indent");
+      Paragraph para = new Paragraph(level == null ? 0 : Integer.parseInt(level), this.fragment, this.counter);
+      if ("true".equals(numbered)) {
+        para = para.numbered(true);
+      }
+      if (prefix != null) {
+        para = para.prefix(prefix);
+      }
+      this._expander.addParagraph(para);
     }
-    if (prefix != null) {
-      para = para.prefix(prefix);
-    }
-
-    this._expander.addParagraph(para);
+    this.firstHeading = false;
     this.counter++;
   }
 
   /**
-   * Record the ID pof the fragment
+   * Record the ID of the fragment
    *
    * @param attributes The attributes
    */
@@ -146,6 +159,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     if (!hasAncestor("blockxref")) {
       this.fragment = getString(attributes, "id");
       this.counter = 1;
+      this.firstHeading = true;
     }
   }
 
@@ -191,6 +205,10 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
         String title = buffer(true);
         if (title != null) {
           heading = heading.title(title);
+          if (firstHeading) {
+            this._tree.putFragmentHeading(this.fragment, title);
+            this.firstHeading = false;
+          }
         }
         this._expander.add(heading);
       }

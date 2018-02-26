@@ -265,7 +265,8 @@ public final class PublicationTreeTest {
             p(2, "1b", 1, true, ""),
             p(1, "1c", 1, false, "x"),
             h2("a", "2", 1, true, "x.x.x"),
-            h2("b", "3", 1, true, "",
+            p(0, "3", 1, false, ""),
+            h2("b", "3", 2, true, "",
                 p(1, "3a", 1, true, ""),
                 p(2, "3a", 2, true, ""),
                 p(1, "3b", 1, true, "x.x")),
@@ -418,9 +419,23 @@ public final class PublicationTreeTest {
     tree = tree.normalize(TitleCollapse.auto);
     Tests.print(tree);
     System.out.println(tree.listReverseReferences());
+    String headings = tree.fragmentheadings().entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println("HEADINGS\n" + headings);
     PublicationTree publication = new PublicationTree(tree);
-    Tests.print(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering);
     tree.print(System.out);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
   }
 
 

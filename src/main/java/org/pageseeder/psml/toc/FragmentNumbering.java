@@ -176,7 +176,7 @@ public final class FragmentNumbering implements Serializable {
     // store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);
     // store prefix on first heading fragment (must have index=1 for reference to have a prefix)
-    this.numbering.put(target.id() + "-" + count + "-1-" + target.headingfragment(), pref);
+    this.numbering.put(target.id() + "-" + count + "-1-" + target.titlefragment(), pref);
   }
 
   /**
@@ -215,11 +215,12 @@ public final class FragmentNumbering implements Serializable {
     String p = para.prefix();
     Prefix pref;
     if (para.numbered() && number != null) {
-      pref = number.generateNumbering(level + para.level());
+      // level minus 1 as level is already incremented
+      pref = number.generateNumbering(level + para.level() - 1);
     } else if (p == null || NO_PREFIX.equals(p)) {
       return;
     } else {
-      pref = new Prefix(p, null, level + para.level(), null);
+      pref = new Prefix(p, null, level + para.level() - 1, null);
     }
     // store prefix on fragment
     this.numbering.put(id + "-" + count + "-" + para.index() + "-" + para.fragment(), pref);

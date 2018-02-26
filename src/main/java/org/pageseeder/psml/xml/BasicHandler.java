@@ -398,7 +398,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
    *
    * @return The corresponding value.
    *
-   * @throws MissingAttributeException If the attribute is missing or could not be parsed as a long.
+   * @throws MissingAttributeException If the attribute is missing or could not be parsed as an int.
    */
   public static int getInt(Attributes atts, String name) {
     String value = atts.getValue(name);

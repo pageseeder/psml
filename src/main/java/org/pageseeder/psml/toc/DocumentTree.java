@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.pageseeder.xmlwriter.XMLWritable;
@@ -86,9 +88,9 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   private final List<Part<?>> _parts;
 
   /**
-   * The fragment ID of first heading
+   * The fragment ID of first (title) heading
    */
-  private final String _headingfragment;
+  private final String _titlefragment;
 
   /**
    * Whether the title is numbered
@@ -101,36 +103,47 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   private final String _prefix;
 
   /**
-   * @param id               The URI ID of the document.
-   * @param title            The title the document.
-   * @param labels  The document labels
-   * @param reverse          The list of reverse references.
-   * @param headingfragment  The fragment ID of first heading (only if numbered or prefixed)
-   * @param numbered         Whether the heading is auto-numbered
-   * @param prefix           Any prefix given to the title.
-   * @param parts            The list of parts.
+   * Map of fragment ID to the first heading in the fragment,
+   * otherwise the first preceding heading or section title (within the current section).
    */
-  private DocumentTree(long id, String title, String labels, List<Long> reverse, String headingfragment, boolean numbered, String prefix, List<Part<?>> parts) {
+  private final Map<String,String> _fragmentheadings;
+
+  /**
+   * @param id                The URI ID of the document.
+   * @param title             The title the document.
+   * @param labels            The document labels
+   * @param reverse           The list of reverse references.
+   * @param titlefragment     The fragment ID of first (title) heading (only if numbered or prefixed)
+   * @param numbered          Whether the heading is auto-numbered
+   * @param prefix            Any prefix given to the title.
+   * @param parts             The list of parts.
+   * @param fragmentheadings  Map of fragment ID to the heading for the fragment
+   */
+  private DocumentTree(long id, String title, String labels, List<Long> reverse, String titlefragment,
+      boolean numbered, String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings) {
     this._id = id;
     this._title = title;
     this._labels = labels;
     this._reverse = Collections.unmodifiableList(reverse);
     this._parts = Collections.unmodifiableList(parts);
     this._level = computeActualLevel();
-    this._headingfragment = headingfragment;
+    this._titlefragment = titlefragment;
     this._numbered = numbered;
     this._prefix = prefix;
+    this._fragmentheadings = fragmentheadings;
   }
 
   /**
-   * @param id      The URI ID of the document.
-   * @param title   The title the document.
-   * @param labels  The document labels
-   * @param reverse The list of reverse references.
-   * @param parts   The list of parts.
+   * @param id                The URI ID of the document.
+   * @param title             The title the document.
+   * @param labels            The document labels
+   * @param reverse           The list of reverse references.
+   * @param parts             The list of parts.
+   * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    */
-  public DocumentTree(long id, String title, String labels, List<Long> reverse, List<Part<?>> parts) {
-    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts);
+  public DocumentTree(long id, String title, String labels, List<Long> reverse,
+      List<Part<?>> parts, Map<String,String> fragmentheadings) {
+    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings);
   }
 
   @Override
@@ -159,10 +172,10 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * @return The fragment ID of first heading (only if numbered or prefixed).
+   * @return The fragment ID of first (title) heading (only if numbered or prefixed).
    */
-  public String headingfragment() {
-    return this._headingfragment;
+  public String titlefragment() {
+    return this._titlefragment;
   }
 
   /**
@@ -177,6 +190,13 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public boolean numbered() {
     return this._numbered;
+  }
+
+  /**
+   * @return Map of fragment ID to the heading for the fragment
+   */
+  public Map<String,String> fragmentheadings() {
+    return Collections.unmodifiableMap(this._fragmentheadings);
   }
 
   /**
@@ -363,7 +383,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       for (Part<?> p : normalized.parts().get(0).parts()) {
         unwrapped.add(p.adjustLevel(-1));
       }
-      normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, tree._headingfragment, tree._numbered, tree._prefix, unwrapped);
+      normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, tree._titlefragment,
+          tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings);
     }
     return normalized;
   }
@@ -411,7 +432,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     }
     // Always move the numbered and prefix from the first heading to the tree
     return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse,
-        firstHeading.fragment(), firstHeading.numbered(), firstHeading.prefix(), children);
+        firstHeading.fragment(), firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings);
   }
 
 
@@ -437,6 +458,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
     /** List of URI ID of reverse cross-references. */
     private final List<Long> _reverse = new ArrayList<>();
+
+    /**
+     * Map of fragment ID to the first heading in the fragment,
+     * otherwise the first preceding heading or section title (within the current section).
+     */
+    private final Map<String,String> _fragmentheadings = new HashMap<>();
 
     /**
      * Creates a new builder for this content tree.
@@ -496,11 +523,17 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       return this;
     }
 
+    public Builder putFragmentHeading(String fragment, String heading) {
+      this._fragmentheadings.put(fragment, heading);
+      return this;
+    }
+
     public DocumentTree build() {
       // New lists to ensure the builder no longer affects built tree
       List<Part<?>> parts = new ArrayList<>(this._parts);
       List<Long> reverse = new ArrayList<>(this._reverse);
-      return new DocumentTree(this._id, this.title, this.labels, reverse, parts);
+      Map<String,String> fragmentheadings = new HashMap<>(this._fragmentheadings);
+      return new DocumentTree(this._id, this.title, this.labels, reverse, parts, fragmentheadings);
     }
 
   }

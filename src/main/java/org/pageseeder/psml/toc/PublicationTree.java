@@ -111,6 +111,21 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
+   * Get's the text of the first heading in the fragment,
+   * otherwise the first preceding heading or section title (within the current section).
+   *
+   * @param id        the URI ID for the document tree
+   * @param fragment  the fragment ID.
+   *
+   * @return the heading text or <code>null</code> if none found
+   */
+  public @Nullable String getFragmentHeading(long treeid, String fragment) {
+    DocumentTree t = tree(treeid);
+    if (t == null) return null;
+    return t.fragmentheadings().get(fragment);
+  }
+
+  /**
    * @return The title of the root.
    */
   @Override
