@@ -83,6 +83,26 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
+   * Creates a new publication from an existing publication by first removing trees with specified IDs,
+   * then adding new trees provided.
+   *
+   * <p>Note: the trees should have at least one reference from the existing publication.
+   *
+   * @param pub         The existing publication
+   * @param removeIds   The IDs of trees to remove
+   * @param trees       The map of new document trees to add
+   */
+  private PublicationTree(PublicationTree pub, List<Long> removeIds, Map<Long, DocumentTree> trees) {
+    Map<Long, DocumentTree> map = new HashMap<>(pub._map);
+    for (Long id : removeIds) {
+      map.remove(id);
+    }
+    map.putAll(trees);
+    this._map = Collections.unmodifiableMap(map);
+    this._rootid = pub._rootid;
+  }
+
+  /**
    * @return The URI ID of the root
    */
   @Override
@@ -165,6 +185,19 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    */
   public PublicationTree add(DocumentTree tree) {
     return new PublicationTree(this, tree);
+  }
+
+  /**
+   * Creates a new publication tree by first removing trees with the specified IDs,
+   * then adding the new trees provided.
+   *
+   * <p>Note: the trees should have at least one reference from the existing publication.
+   *
+   * @param removeIds   The IDs of trees to remove
+   * @param trees       The map of new document trees to add
+   */
+  public PublicationTree modify(List<Long> removeIds, Map<Long, DocumentTree> trees) {
+    return new PublicationTree(this, removeIds, trees);
   }
 
   /**
@@ -347,7 +380,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * @return list of tree IDs
    */
-  private Set<Long> ids() {
+  public Set<Long> ids() {
     return this._map.keySet();
   }
 

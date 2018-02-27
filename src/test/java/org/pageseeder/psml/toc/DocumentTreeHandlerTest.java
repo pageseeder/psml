@@ -81,9 +81,9 @@ public final class DocumentTreeHandlerTest {
         h1("B", "3", 1,
             phantom(2,
                 h3("B.0.a", "3", 2),
-                h3("B.0.b", "3", 3)),
-            h2("B.1", "3", 4,
-                h3("B.1.a", "3", 5)),
+                h3("B.0.b", "3", 4)),
+            h2("B.1", "3", 6,
+                h3("B.1.a", "3", 7)),
             h2("B.2", "4", 1)));
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(2, "test_2.html", "", reverse, parts, Collections.emptyMap());
@@ -153,8 +153,8 @@ public final class DocumentTreeHandlerTest {
   public void testParseReferences1() throws SAXException, IOException {
     DocumentTree tree = parse(1, "references1.psml");
     Part<Heading> p = h1("A", "1", 1,
-        ref(2, "B", 101),
-        ref(2, "C", 102));
+        ref(0, "B", 101),
+        ref(0, "C", 102));
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, "A", "", reverse, Collections.singletonList(p), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
@@ -163,7 +163,7 @@ public final class DocumentTreeHandlerTest {
   @Test
   public void testParseReferences1_normalizeAuto() throws SAXException, IOException {
     DocumentTree tree = parse(1, "references1.psml");
-    List<Part<?>> parts = Arrays.asList(ref(1, "B", 101), ref(1, "C", 102));
+    List<Part<?>> parts = Arrays.asList(ref(0, "B", 101), ref(0, "C", 102));
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, "A", "", reverse, parts, Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
@@ -173,14 +173,14 @@ public final class DocumentTreeHandlerTest {
   public void testParseReferences2() throws SAXException, IOException {
     DocumentTree tree = parse(1, "references2.psml");
     Part<Heading> p = h1("Test References #2", "1", 1,
-        ref(2, "Alpha", 101),
-        ref(2, "Bravo", 102,
-            ref(3, "Bravo 1", 103),
-            ref(3, "Bravo 2", 104)),
-        ref(2, "Charlie", 105,
-            ref(3, "Charlie 1", 106,
-                ref(4, "Charlie 1A", 107),
-                ref(4, "Charlie 1B", 108))));
+        ref(0, "Alpha", 101),
+        ref(0, "Bravo", 102,
+            ref(1, "Bravo 1", 103),
+            ref(1, "Bravo 2", 104)),
+        ref(0, "Charlie", 105,
+            ref(1, "Charlie 1", 106,
+                ref(2, "Charlie 1A", 107),
+                ref(2, "Charlie 1B", 108))));
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, "A", "", reverse, Collections.singletonList(p), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
@@ -202,8 +202,8 @@ public final class DocumentTreeHandlerTest {
     List<Part<?>> p = Arrays.asList(
         h1("Assembly", "1", 1),
         h1("Part A", "2", 1,
-            h2("Sub-part 1", "2", 2,
-                h3("Division a", "2", 3))));
+            h2("Sub-part 1", "2", 3,
+                h3("Division a", "2", 5))));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", Collections.emptyList(), p, Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
@@ -214,8 +214,8 @@ public final class DocumentTreeHandlerTest {
     DocumentTree tree = parse(1, "transclusions.psml");
     List<Part<?>> p = Arrays.asList(
         h1("Part A", "2", 1,
-            h2("Sub-part 1", "2", 2,
-                h3("Division a", "2", 3))));
+            h2("Sub-part 1", "2", 3,
+                h3("Division a", "2", 5))));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", Collections.emptyList(), p, Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
@@ -242,9 +242,9 @@ public final class DocumentTreeHandlerTest {
     Part<Heading> p = h1("Test doc 1", "1", 1,
       phantom(2,
         phantom(3,
-          ref(4, "Test doc 1", 199329, Reference.DEFAULT_TYPE, "2")),
-        ref(3, "Another heading 2", 199328,
-          ref(4, "Another heading 2a", 199326))));
+          ref(2, "Test doc 1", 199329, Reference.DEFAULT_TYPE, "2")),
+        ref(1, "Another heading 2", 199328,
+          ref(2, "Another heading 2a", 199326))));
     List<Long> reverse = new ArrayList<>();
     DocumentTree expected = new DocumentTree(4, "Test doc 1", "", reverse, Collections.singletonList(p), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);

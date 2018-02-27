@@ -42,11 +42,16 @@ public final class FragmentNumbering implements Serializable {
    *
    * @param pub          The publication tree
    * @param numbering    The numbering config
+   * @param unusedIds    Any tree IDs that are unreachable will be added to this list
    */
-  public FragmentNumbering(PublicationTree pub, PublicationConfig config) {
+  public FragmentNumbering(PublicationTree pub, PublicationConfig config, List<Long> unusedIds) {
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root), doccount, 1, new ArrayList<Long>());
+    List<Long> allIds = new ArrayList<>(pub.ids());
+    allIds.remove(root.id());
+    allIds.removeAll(doccount.keySet());
+    unusedIds.addAll(allIds);
   }
 
   /**
