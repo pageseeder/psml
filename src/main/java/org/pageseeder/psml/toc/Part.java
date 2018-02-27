@@ -135,8 +135,6 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * Indicates whether the level of this part is consistent with the level of
    * its defining element and each sub-part.
    *
-   * @param level The expected level
-   *
    * @return <code>true</code> if the levels are consistent;
    *         <code>false</code> otherwise.
    */

@@ -41,7 +41,7 @@ public final class FragmentNumbering implements Serializable {
    * Constructor
    *
    * @param pub          The publication tree
-   * @param numbering    The numbering config
+   * @param config       The publication config
    * @param unusedIds    Any tree IDs that are unreachable will be added to this list
    */
   public FragmentNumbering(PublicationTree pub, PublicationConfig config, List<Long> unusedIds) {
@@ -201,7 +201,6 @@ public final class FragmentNumbering implements Serializable {
    *
    * @param h         The heading element
    * @param level     The level that we are currently at
-   * @param treelevel The level of the current tree
    * @param id        The ID of the tree containing the heading.
    * @param number    The numbering generator
    * @param count     No. of times tree ID has been used.
@@ -249,7 +248,7 @@ public final class FragmentNumbering implements Serializable {
    * Get prefix for a first heading in a document.
    *
    * @param uriid     the URI ID of the document
-   * @param fragment  the fragment ID
+   * @param position  the document position (occurrence number) in the tree
    *
    * @return the prefix
    */
@@ -266,7 +265,9 @@ public final class FragmentNumbering implements Serializable {
    * Get prefix for a heading/para in a fragment.
    *
    * @param uriid     the URI ID of the document
+   * @param position  the document position (occurrence number) in the tree
    * @param fragment  the fragment ID
+   * @param index     the heading/para number within the fragment
    *
    * @return the prefix
    */

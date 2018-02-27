@@ -134,7 +134,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * Get's the text of the first heading in the fragment,
    * otherwise the first preceding heading or section title (within the current section).
    *
-   * @param id        the URI ID for the document tree
+   * @param treeid    the URI ID for the document tree
    * @param fragment  the fragment ID.
    *
    * @return the heading text or <code>null</code> if none found
@@ -168,7 +168,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * @id     the tree ID
+   * @param id  the tree ID
    *
    * @return the a tree in the publication.
    */
