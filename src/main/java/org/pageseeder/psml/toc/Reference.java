@@ -90,8 +90,8 @@ public final class Reference extends Element implements Serializable {
 
   @Override
   public Reference adjustLevel(int delta) {
-    if (delta == 0) return this;
-    return new Reference(level()+delta, title(), this._uri, this._type, this._targetfragment);
+    // xref levels are not adjusted
+    return this;
   }
 
   @Override
@@ -115,7 +115,7 @@ public final class Reference extends Element implements Serializable {
 
   public void toXMLNoClose(@NonNull XMLWriter xml, int level) throws IOException {
     xml.openElement("ref");
-    xml.attribute("level", level);
+    xml.attribute("level", this.level());
     if (!Element.NO_TITLE.equals(title())) {
       xml.attribute("title", title());
     }

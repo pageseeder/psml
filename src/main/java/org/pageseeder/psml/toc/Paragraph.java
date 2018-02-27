@@ -162,7 +162,7 @@ public final class Paragraph extends Element implements Serializable {
   @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     xml.openElement("para", false);
-    xml.attribute("level", level);
+    xml.attribute("level", this.level());
     xml.attribute("fragment", this._fragment);
     xml.attribute("index", this._index);
     if (this._numbered) {

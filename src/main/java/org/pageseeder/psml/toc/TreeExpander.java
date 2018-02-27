@@ -37,12 +37,22 @@ public final class TreeExpander {
     return this;
   }
 
-    /**
+  /**
    * Add a new element to the list.
    *
    * @param element The new element to add
    */
   public TreeExpander add(Element element) {
+    return add(element, element.level());
+  }
+
+  /**
+   * Add a new element to the list.
+   *
+   * @param element      The new element to add
+   * @param elementlevel The level for the element
+   */
+  public TreeExpander add(Element element, int elementlevel) {
     // level = size(parts) = level(current) + 1;
     int level = this._parts.size();
     MutablePart current = this._parts.peek();
@@ -52,7 +62,7 @@ public final class TreeExpander {
     }
 
     // Insert phantom parts when we jumps levels (e.g. h1 -> h4)
-    while (element.level() > level) {
+    while (elementlevel > level) {
       Element phantom = Phantom.of(level++);
       MutablePart mutable = new MutablePart(phantom);
       current.add(mutable);
@@ -61,7 +71,7 @@ public final class TreeExpander {
     }
 
     // Remove other parts of deeper levels (e.g. h4 -> h1)
-    while (element.level() < level) {
+    while (elementlevel < level) {
       this._parts.pop();
       current = this._parts.peek();
       level--;

@@ -154,13 +154,66 @@ public final class PublicationTreeTest {
   }
 
   @Test
+  public void testAutoNumberingXRefsRelative() throws SAXException, IOException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+            phantom(2,
+            ref(0, "A", 100L),
+            ref(0, "B", 101L)))).build().normalize(TitleCollapse.auto);
+    DocumentTree inter = new DocumentTree.Builder(100).title("A")
+        .part(h1("A", "1", 1, true, "",
+            ref(0, "X", 1000L),
+            ref(0, "Y", 1001L)))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
+        .part(h1("BA", "1", 1, true, "",
+              ref(1, "BX", 1000L),
+              ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2")))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 1, true, "x.x",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
+        .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
+        .part(h1("Y", "1", 1, true, "x.x",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
+        .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(inter);
+    publication = publication.add(inter2);
+    publication = publication.add(tree);
+    publication = publication.add(tree2);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-xrefs-relative.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering);
+    Tests.print(publication, 1000, 2, numbering);
+    String result = numbering.getAllPrefixes().entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+  }
+
+  @Test
   public void testAutoNumberingBlank() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
             ref(3, "A", 1000L)))).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
-        .part(h1("X", "1", 1, true, "x.x",
+        .part(h1("X", "1", 1, true, "",
             h2("a", "2", 1, true, "x.x.x"),
             h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
             h2("c", "4", 1, false, ""),
@@ -293,6 +346,74 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering);
+    tree.print(System.out);
+    String result = numbering.getAllPrefixes().entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+  }
+
+  @Test
+  public void testAutoNumberingParasRelative() throws SAXException, IOException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+            phantom(2,
+            ref(3, "A", 100L),
+            ref(3, "B", 101L)))).build();
+    //Tests.print(root);
+    root = root.normalize(TitleCollapse.auto);
+    //Tests.print(root);
+    DocumentTree inter = new DocumentTree.Builder(100).title("A")
+        .part(h1("A", "1", 1, true, "",
+            ref(2, "X", 1000L),
+            ref(2, "Y", 1001L)))
+        .addReverseReference(1L).build();
+    //Tests.print(inter);
+    inter = inter.normalize(TitleCollapse.auto);
+    //Tests.print(inter);
+    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
+        .part(h1("BA", "1", 1, true, "",
+              ref(1, "BX", 1000L),
+              ref(1, "BY", 1001L)))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 1, true, "x.x",
+            p(1, "1a", 1, true, ""),
+            p(2, "1b", 1, true, ""),
+            p(1, "1c", 1, false, "x"),
+            h2("a", "2", 1, true, "x.x.x"),
+            p(0, "3", 1, false, ""),
+            h2("b", "3", 2, true, "",
+                p(3, "3a", 1, true, ""),
+                p(4, "3a", 2, true, ""),
+                p(2, "3b", 1, true, "x.x")),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
+        .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
+        .part(h1("Y", "1", 1, true, "x.x",
+                p(1, "1a", 1, true, ""),
+                p(3, "1b", 1, true, ""),
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
+        .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(inter);
+    publication = publication.add(inter2);
+    publication = publication.add(tree);
+    publication = publication.add(tree2);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-paras-relative.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering);

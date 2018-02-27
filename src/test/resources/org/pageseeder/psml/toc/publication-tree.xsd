@@ -77,13 +77,13 @@
 
 <xs:simpleType name="index">
   <xs:restriction base="xs:int">
-    <xs:minInclusive value="0"/>
+    <xs:minInclusive value="1"/>
   </xs:restriction>
 </xs:simpleType>
 
 <xs:simpleType name="level">
   <xs:restriction base="xs:int">
-    <xs:minInclusive value="1"/>
+    <xs:minInclusive value="0"/>
     <xs:maxInclusive value="15"/>
   </xs:restriction>
 </xs:simpleType>

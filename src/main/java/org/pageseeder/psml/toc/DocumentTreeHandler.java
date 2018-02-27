@@ -40,7 +40,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    * The last heading being processed
    */
   private @Nullable Heading currentHeading = null;
-  
+
   /**
    * Whether this is the first heading in fragment (not preceded by para)
    */
@@ -135,8 +135,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     String prefix = attributes.getValue("prefix");
     String numbered = attributes.getValue("numbered");
     if ("true".equals(numbered) || (!Paragraph.NO_PREFIX.equals(prefix) && prefix != null)) {
-      String level = attributes.getValue("indent");
-      Paragraph para = new Paragraph(level == null ? 0 : Integer.parseInt(level), this.fragment, this.counter);
+      Paragraph para = new Paragraph(getInt(attributes, "indent", 0), this.fragment, this.counter);
       if ("true".equals(numbered)) {
         para = para.numbered(true);
       }
@@ -173,12 +172,13 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     // We eliminate unresolved cross-references
     if (uriid > 0) {
       // The level is based on the part that contains it
+      int level = getInt(attributes, "level", 0);
       int partLevel = getBaseLevel()+1;
-      int level = partLevel + getInt(attributes, "level", 0);
+      int newlevel = partLevel + level;
       String type = getString(attributes, "documenttype", Reference.DEFAULT_TYPE);
       String title = computeReferenceTitle(attributes);
       Reference reference = new Reference(level, title, uriid, type, attributes.getValue("frag"));
-      this._expander.add(reference);
+      this._expander.add(reference, newlevel);
     }
   }
 
@@ -205,7 +205,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
         String title = buffer(true);
         if (title != null) {
           heading = heading.title(title);
-          if (firstHeading) {
+          if (this.firstHeading) {
             this._tree.putFragmentHeading(this.fragment, title);
             this.firstHeading = false;
           }

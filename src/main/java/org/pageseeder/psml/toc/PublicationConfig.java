@@ -60,9 +60,132 @@ import org.xml.sax.helpers.DefaultHandler;
 public final class PublicationConfig {
 
   /**
+   * An enumeration for collapse of first heading and title
+   *
+   * @author Philip Rutherford
+   */
+  public enum TitleCollapse {
+
+    /** always collapse (default) **/
+    ALWAYS,
+
+    /** collapse only if heading matches title **/
+    AUTO,
+
+    /** never collapse **/
+    NEVER;
+
+    /**
+     * Create the title collapse from a string.
+     *
+     * @param value the string value
+     *
+     * @return the type
+     */
+    public static TitleCollapse fromString(String value) {
+      for (TitleCollapse n : values()) {
+        if (n.name().toLowerCase().equals(value)) return n;
+      }
+      return ALWAYS;
+    }
+
+    @Override
+    public String toString() {
+      return name().toLowerCase();
+    }
+  }
+
+  /**
+   * An enumeration for what xref/para level is relative to
+   *
+   * @author Philip Rutherford
+   */
+  public enum LevelRelativeTo {
+
+    /** relative to previous heading (default) **/
+    HEADING,
+
+    /** relative to containing document **/
+    DOCUMENT;
+
+    /**
+     * Create the title collapse from a string.
+     *
+     * @param value the string value
+     *
+     * @return the type
+     */
+    public static LevelRelativeTo fromString(String value) {
+      for (LevelRelativeTo n : values()) {
+        if (n.name().toLowerCase().equals(value)) return n;
+      }
+      return HEADING;
+    }
+
+  }
+
+  /**
+   * An enumeration for para/heading level adjustment
+   *
+   * @author Philip Rutherford
+   */
+  public enum LevelAdjust {
+
+    /** adjust for numbering only (default) **/
+    NUMBERING,
+
+    /** adjust for numbering and in document content **/
+    CONTENT;
+
+    /**
+     * Create the title collapse from a string.
+     *
+     * @param value the string value
+     *
+     * @return the type
+     */
+    public static LevelAdjust fromString(String value) {
+      for (LevelAdjust n : values()) {
+        if (n.name().toLowerCase().equals(value)) return n;
+      }
+      return NUMBERING;
+    }
+
+    @Override
+    public String toString() {
+      return name().toLowerCase();
+    }
+  }
+
+  /**
+   * An enumeration for collapse of first heading and title
+   */
+  private TitleCollapse tocTitleCollapse = TitleCollapse.ALWAYS;
+
+  /**
+   * An enumeration for what xref level is relative to
+   */
+  private LevelRelativeTo xrefLevelRelativeTo = LevelRelativeTo.HEADING;
+
+  /**
+   * An enumeration for what para level is relative to
+   */
+  private LevelRelativeTo paraLevelRelativeTo = LevelRelativeTo.HEADING;
+
+  /**
+   * An enumeration for para level adjustment
+   */
+  private LevelAdjust paraLevelAdjust = LevelAdjust.NUMBERING;
+
+  /**
+   * An enumeration for heading level adjustment
+   */
+  private LevelAdjust headingLevelAdjust = LevelAdjust.NUMBERING;
+
+  /**
    * List of numbering configs
    */
-  private final List<PublicationNumbering> numberingConfigs = new ArrayList<>();
+  private List<PublicationNumbering> numberingConfigs = new ArrayList<>();
 
   /**
    * Return the first numbering config with one of the specified labels.
@@ -180,7 +303,14 @@ public final class PublicationConfig {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      if ("numbering".equals(qName)) {
+      if ("toc".equals(qName)) {
+        this.config.tocTitleCollapse = TitleCollapse.fromString(attributes.getValue("title-collapse"));
+      } else if ("levels".equals(qName)) {
+        this.config.xrefLevelRelativeTo = LevelRelativeTo.fromString(attributes.getValue("xref-relative-to"));
+        this.config.paraLevelRelativeTo = LevelRelativeTo.fromString(attributes.getValue("para-relative-to"));
+        this.config.paraLevelAdjust = LevelAdjust.fromString(attributes.getValue("para-adjust"));
+        this.config.headingLevelAdjust = LevelAdjust.fromString(attributes.getValue("heading-adjust"));
+      } else if ("numbering".equals(qName)) {
         this.numbering = new PublicationNumbering();
         this.numbering.setStripZeros("true".equals(attributes.getValue("strip-zeros")));
         String label = attributes.getValue("label");
@@ -209,6 +339,41 @@ public final class PublicationConfig {
       }
     }
 
+  }
+
+  /**
+   * @return the tocTitleCollapse
+   */
+  public TitleCollapse getTocTitleCollapse() {
+    return this.tocTitleCollapse;
+  }
+
+  /**
+   * @return the xrefLevelRelativeTo
+   */
+  public LevelRelativeTo getXRefLevelRelativeTo() {
+    return this.xrefLevelRelativeTo;
+  }
+
+  /**
+   * @return the paraLevelRelativeTo
+   */
+  public LevelRelativeTo getParaLevelRelativeTo() {
+    return this.paraLevelRelativeTo;
+  }
+
+  /**
+   * @return the paraLevelAdjust
+   */
+  public LevelAdjust getParaLevelAdjust() {
+    return this.paraLevelAdjust;
+  }
+
+  /**
+   * @return the headingLevelAdjust
+   */
+  public LevelAdjust getHeadingLevelAdjust() {
+    return this.headingLevelAdjust;
   }
 
 }
