@@ -232,20 +232,21 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    toXML(xml, -1, -1, null);
+    toXML(xml, -1, -1, null, true);
   }
 
   /**
    * Serialize the partial tree down to content ID.
    *
-   * @param xml         The XML writer
-   * @param cid         The ID of the content tree (leaf). If -1 output all.
-   * @param cposition   If not -1 output content tree only at this position (occurrence number) in the tree.
-   * @param number      The fragment numbering for the publication (optional)
+   * @param xml           The XML writer
+   * @param cid           The ID of the content tree (leaf). If -1 output all.
+   * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
+   * @param number        The fragment numbering for the publication (optional)
+   * @param externalrefs  Whether to output references to IDs not in this publication tree.
    *
    * @throws IOException If thrown by XML writer
    */
-  public void toXML(XMLWriter xml, long cid, int cposition, @Nullable FragmentNumbering number) throws IOException {
+  public void toXML(XMLWriter xml, long cid, int cposition, @Nullable FragmentNumbering number, boolean externalrefs) throws IOException {
     xml.openElement("publication-tree", true);
     DocumentTree root = tree(cposition == -1 ? this._rootid : cid);
     if (root != null) {
@@ -261,7 +262,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
         collectReferences(tree(cid), trees);
       }
       Map<Long,Integer> doccount = new HashMap<>();
-      toXML(xml, root.id(), 1, cid, trees, number, doccount, (cid == -1 || cposition == -1) ? 1 : cposition, new ArrayList<Long>());
+      toXML(xml, root.id(), 1, cid, trees, number, doccount, (cid == -1 || cposition == -1) ? 1 : cposition,
+          new ArrayList<Long>(), externalrefs);
     }
     xml.closeElement();
   }
@@ -301,13 +303,13 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, long cid, @Nullable List<Long> trees,
-      @Nullable FragmentNumbering number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors) throws IOException {
+  private void toXML(XMLWriter xml, long id, int level, long cid, @Nullable List<Long> trees, @Nullable FragmentNumbering number,
+      Map<Long,Integer> doccount, Integer count, List<Long> ancestors, boolean externalrefs) throws IOException {
     if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(id);
     DocumentTree current = tree(id);
     for (Part<?> part : current.parts()) {
-      toXML(xml, id, level, part, cid, trees, number, doccount, count, ancestors);
+      toXML(xml, id, level, part, cid, trees, number, doccount, count, ancestors, externalrefs);
     }
     ancestors.remove(id);
   }
@@ -329,7 +331,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @throws IOException If thrown by XML writer
    */
   private void toXML(XMLWriter xml, long id, int level, Part<?> part, long cid,  @Nullable List<Long> trees,
-      @Nullable FragmentNumbering number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors) throws IOException {
+      @Nullable FragmentNumbering number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors, boolean externalrefs) throws IOException {
     Element element = part.element();
     // ignore paragraphs
     if (element instanceof Paragraph) return;
@@ -360,6 +362,10 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
       element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
+    } else if (element instanceof Reference && !externalrefs) {
+      // external reference not allowed so output phantom
+      xml.openElement("phantom", false);
+      xml.attribute("level", level);
     } else {
       element.toXML(xml, level, number, id, count);
     }
@@ -367,12 +373,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, cid, trees, number, doccount, nextcount, ancestors);
+      toXML(xml, next, level+1, cid, trees, number, doccount, nextcount, ancestors, externalrefs);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      toXML(xml, id, level+1, r, cid, trees, number, doccount, count, ancestors);
+      toXML(xml, id, level+1, r, cid, trees, number, doccount, count, ancestors, externalrefs);
     }
     xml.closeElement();
   }
