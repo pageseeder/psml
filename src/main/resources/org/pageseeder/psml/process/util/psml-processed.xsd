@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?stylesheet format="schema" xsl-rootelement="root"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="0.11">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="0.12">
 
   <xs:annotation>
     <xs:documentation>This is the XML schema for PSML document processed content.</xs:documentation>
@@ -754,7 +754,8 @@
             - alternate: An alternate representations of the current document;
             - embed: Replace this element's content with the document/fragment pointed to when publishing (only valid for blockxref);
             - transclude: Replace this element's content with the document/fragment pointed to when displaying (only valid for blockxref);
-            - image: Replace this element's src with the image pointed to when displaying (only valid for image).
+            - image: Replace this element's src with the image pointed to when displaying (only valid for image);
+            - math: Replace this element's content with a media-fragment containing the math content pointed to when displaying.
           </xs:documentation>
         </xs:annotation>
         <xs:simpleType>
@@ -764,6 +765,7 @@
             <xs:enumeration value="embed" />
             <xs:enumeration value="transclude" />
             <xs:enumeration value="image" />
+            <xs:enumeration value="math" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -1716,12 +1718,14 @@
             <xs:annotation>
               <xs:documentation>Type for link processing (default is 'none'). The following values are allowed:
                 - none: No link processing;
-                - alternate: An alternate representations of the current document.</xs:documentation>
+                - alternate: An alternate representations of the current document;
+                - math: Replace this element's content with a media-fragment containing the math content pointed to when displaying.</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:restriction base="xs:string">
                 <xs:enumeration value="none" />
                 <xs:enumeration value="alternate" />
+                <xs:enumeration value="math" />
               </xs:restriction>
             </xs:simpleType>
           </xs:attribute>
@@ -1763,6 +1767,11 @@
       <xs:annotation>
         <xs:documentation>When uploading this may be a path relative to the current document or an absolute path beginning with /
         and must be URL encoded (overrides docid and uriid).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="config" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The name of an XRef configuration used when creating/editing this XRef.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
     <xs:attribute name="uriid" type="xs:long">
