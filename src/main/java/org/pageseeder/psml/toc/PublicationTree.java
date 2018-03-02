@@ -33,7 +33,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   private static final int MAX_REVERSE_FOLLOW = 100;
 
   /**
-   * The ID of the root of the tree.
+   * The ID of the root of the tree (-1 for blank tree).
    */
   private final long _rootid;
 
@@ -41,6 +41,14 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * Map of trees that make up this tree.
    */
   private final Map<Long, DocumentTree> _map;
+
+  /**
+   * Creates a blank publication tree
+   */
+  public PublicationTree() {
+    this._map = Collections.emptyMap();
+    this._rootid = -1;
+  }
 
   /**
    * Creates a simple publication tree wrapping a document tree
@@ -91,15 +99,16 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param pub         The existing publication
    * @param removeIds   The IDs of trees to remove
    * @param trees       The map of new document trees to add
+   * @param rootid      The ID of the root tree for this publication
    */
-  private PublicationTree(PublicationTree pub, List<Long> removeIds, Map<Long, DocumentTree> trees) {
+  private PublicationTree(PublicationTree pub, List<Long> removeIds, Map<Long, DocumentTree> trees, long rootid) {
     Map<Long, DocumentTree> map = new HashMap<>(pub._map);
     for (Long id : removeIds) {
       map.remove(id);
     }
     map.putAll(trees);
     this._map = Collections.unmodifiableMap(map);
-    this._rootid = pub._rootid;
+    this._rootid = rootid;
   }
 
   /**
@@ -195,9 +204,10 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @param removeIds   The IDs of trees to remove
    * @param trees       The map of new document trees to add
+   * @param rootid      The ID of the root tree for this publication
    */
-  public PublicationTree modify(List<Long> removeIds, Map<Long, DocumentTree> trees) {
-    return new PublicationTree(this, removeIds, trees);
+  public PublicationTree modify(List<Long> removeIds, Map<Long, DocumentTree> trees, long rootid) {
+    return new PublicationTree(this, removeIds, trees, rootid);
   }
 
   /**
