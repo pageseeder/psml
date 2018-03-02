@@ -27,7 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * <pre>{@code
  * <publication-config>
- *   <toc title-collapse="[always*|auto|never]">
+ *   <toc title-collapse="[always*|auto|never]" />
  *
  *   <levels xref-relative-to="[heading*|document]"
  *       para-relative-to="[heading*|document]"
@@ -58,42 +58,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Philip Rutherford
  */
 public final class PublicationConfig {
-
-  /**
-   * An enumeration for collapse of first heading and title
-   *
-   * @author Philip Rutherford
-   */
-  public enum TitleCollapse {
-
-    /** always collapse (default) **/
-    ALWAYS,
-
-    /** collapse only if heading matches title **/
-    AUTO,
-
-    /** never collapse **/
-    NEVER;
-
-    /**
-     * Create the title collapse from a string.
-     *
-     * @param value the string value
-     *
-     * @return the type
-     */
-    public static TitleCollapse fromString(String value) {
-      for (TitleCollapse n : values()) {
-        if (n.name().toLowerCase().equals(value)) return n;
-      }
-      return ALWAYS;
-    }
-
-    @Override
-    public String toString() {
-      return name().toLowerCase();
-    }
-  }
 
   /**
    * An enumeration for what xref/para level is relative to
@@ -160,7 +124,7 @@ public final class PublicationConfig {
   /**
    * An enumeration for collapse of first heading and title
    */
-  private TitleCollapse tocTitleCollapse = TitleCollapse.ALWAYS;
+  private TitleCollapse tocTitleCollapse = TitleCollapse.always;
 
   /**
    * An enumeration for what xref level is relative to

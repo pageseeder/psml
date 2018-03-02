@@ -22,6 +22,20 @@ public enum TitleCollapse {
   /**
    * There are no title headings, all heading must be preserved.
    */
-  never
+  never;
+
+  /**
+   * Create the title collapse from a string.
+   *
+   * @param value the string value
+   *
+   * @return the type
+   */
+  public static TitleCollapse fromString(String value) {
+    for (TitleCollapse n : values()) {
+      if (n.name().equals(value)) return n;
+    }
+    return always;
+  }
 
 }

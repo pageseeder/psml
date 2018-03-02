@@ -47,7 +47,10 @@ public final class FragmentNumbering implements Serializable {
   public FragmentNumbering(PublicationTree pub, PublicationConfig config, List<Long> unusedIds) {
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
-    processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root), doccount, 1, new ArrayList<Long>());
+    if (root != null) {
+      processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
+          doccount, 1, new ArrayList<Long>());
+    }
     List<Long> allIds = new ArrayList<>(pub.ids());
     allIds.remove(root.id());
     allIds.removeAll(doccount.keySet());
