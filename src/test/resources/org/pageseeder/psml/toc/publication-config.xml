@@ -15,7 +15,7 @@
       <scheme level="9" type="loweralpha" format="[9]" />
     </schemes>
   </numbering>
-  <numbering strip-zeros="true" label="autonumber1">
+  <numbering strip-zeros="true" document-label="autonumber1">
     <schemes>
       <scheme level="1" type="loweralpha" format="[1.]" />
       <scheme level="2" type="loweralpha" format="[1.][2.]" />
@@ -28,7 +28,7 @@
       <scheme level="9" type="loweralpha" format="[9]" />
     </schemes>
   </numbering>
-  <numbering strip-zeros="false" label="autonumber2">
+  <numbering strip-zeros="false" document-label="autonumber2">
     <schemes>
       <scheme level="1" type="upperalpha" format="[1.]" />
       <scheme level="2" type="upperalpha" format="[1.][2.]" />

@@ -34,7 +34,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *       para-adjust="[numbering*|content]"
  *       heading-adjust="[numbering*|content]" />
  *
- *   <numbering strip-zeros="[true*|false]" [label="xyz"]>
+ *   <numbering strip-zeros="[true*|false]" [document-label="xyz"]>
  *     <schemes>
  *       <scheme level="1" type="[decimal*|upperalpha|loweralpha|upperroman|lowerroman]" format="[1]" />
  *       <scheme level="2" type="decimal" format="[1.][2]" />
@@ -277,7 +277,7 @@ public final class PublicationConfig {
       } else if ("numbering".equals(qName)) {
         this.numbering = new PublicationNumbering();
         this.numbering.setStripZeros("true".equals(attributes.getValue("strip-zeros")));
-        String label = attributes.getValue("label");
+        String label = attributes.getValue("document-label");
         if (label != null) {
           this.numbering.setLabel(label);
         }

@@ -32,6 +32,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private static final String DEFAULT_FRAGMENT = "default";
 
   /**
+   * The PSML mediatype
+   */
+  private static final String PSML_MEDIATYPE = "application/vnd.pageseeder.psml+xml";
+
+  /**
    * Takes a list of elements and generate the tree.
    */
   private final TreeExpander _expander = new TreeExpander();
@@ -87,7 +92,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startPara(attributes);
     } else if (isAny("fragment", "xref-fragment", "properties-fragment", "media-fragment")) {
       startFragment(attributes);
-    } else if ("blockxref".equals(element) && "embed".equals(attributes.getValue("type"))) {
+    } else if ("blockxref".equals(element) && "embed".equals(attributes.getValue("type")) &&
+        PSML_MEDIATYPE.equals(attributes.getValue("mediatype"))) {
       startEmbedRef(attributes);
     } else if ("blockxref".equals(element) && "transclude".equals(attributes.getValue("type"))) {
       this.transclusionLevel = getInt(attributes, "level", 0);
