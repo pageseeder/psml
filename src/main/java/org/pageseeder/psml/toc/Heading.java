@@ -169,7 +169,7 @@ public final class Heading extends Element implements Serializable {
 
   @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
-    xml.openElement("heading", false);
+    xml.openElement("heading-ref", false);
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(title())) {
       xml.attribute("title", title());

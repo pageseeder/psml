@@ -6,8 +6,8 @@
     <xs:sequence>
       <xs:element name="part" type="part" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
-    <xs:attribute name="id"    type="xs:integer" use="required"/>
-    <xs:attribute name="title" type="xs:string"  use="required"/>
+    <xs:attribute name="uriid"    type="xs:integer" use="required"/>
+    <xs:attribute name="title"    type="xs:string"  use="required"/>
     <xs:attribute name="content"  type="xs:boolean"/>
   </xs:complexType>
 </xs:element>
@@ -19,29 +19,29 @@
 <xs:complexType name="part">
   <xs:sequence>
     <xs:choice minOccurs="0" maxOccurs="1">
-      <xs:element name="ref"     type="ref"/>
-      <xs:element name="heading" type="heading"/>
-      <xs:element name="phantom" type="phantom"/>
+      <xs:element name="document-ref" type="document-ref"/>
+      <xs:element name="heading-ref"  type="heading-ref"/>
+      <xs:element name="phantom"      type="phantom"/>
     </xs:choice>
     <xs:element name="part" type="part" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
   <xs:attribute name="level"    type="level" use="required"/>
   <xs:attribute name="content"  type="xs:boolean"/>
-  <xs:attribute name="uri"      type="uri"/>
+  <xs:attribute name="uriid"    type="uriid"/>
 </xs:complexType>
 
-<xs:complexType name="ref">
-  <xs:attribute name="level"          type="level"     use="required"/>
-  <xs:attribute name="title"          type="xs:string" use="required"/>
-  <xs:attribute name="type"           type="xs:string" use="required"/>
-  <xs:attribute name="uri"            type="uri"       use="required"/>
-  <xs:attribute name="targetfragment" type="xs:string"/>  
+<xs:complexType name="document-ref">
+  <xs:attribute name="level"          type="level"        use="required"/>
+  <xs:attribute name="title"          type="xs:string"    use="required"/>
+  <xs:attribute name="documenttype"   type="documenttype" use="required"/>
+  <xs:attribute name="uriid"          type="uriid"        use="required"/>
+  <xs:attribute name="targetfragment" type="fragment"/>  
   <xs:attribute name="canonical"      type="xs:string"/>
   <xs:attribute name="prefix"         type="xs:string"/>  
   <xs:attribute name="numbered"       type="xs:boolean"/>
 </xs:complexType>
 
-<xs:complexType name="heading">
+<xs:complexType name="heading-ref">
   <xs:attribute name="level"      type="level"     use="required"/>
   <xs:attribute name="title"      type="xs:string" use="required"/>
   <xs:attribute name="fragment"   type="fragment"  use="required"/>
@@ -66,14 +66,12 @@
   </xs:restriction>
 </xs:simpleType>
 
-<xs:simpleType name="from">
+<xs:simpleType name="documenttype">
   <xs:restriction base="xs:string">
-    <xs:enumeration value="reference" />
-    <xs:enumeration value="heading" />
-    <xs:enumeration value="phantom" />
-    <xs:enumeration value="title" />
+    <xs:pattern value="[a-zA-Z0-9_]+"/>
   </xs:restriction>
 </xs:simpleType>
+
 
 <xs:simpleType name="index">
   <xs:restriction base="xs:int">
@@ -88,7 +86,7 @@
   </xs:restriction>
 </xs:simpleType>
 
-<xs:simpleType name="uri">
+<xs:simpleType name="uriid">
   <xs:restriction base="xs:long">
     <xs:minInclusive value="1"/>
   </xs:restriction>
