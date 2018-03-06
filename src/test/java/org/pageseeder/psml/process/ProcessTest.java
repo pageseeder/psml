@@ -448,6 +448,39 @@ public class ProcessTest {
   }
 
   @Test
+  public void testProcessXRefsMathml() throws IOException, ProcessException {
+    String filename = "ref_3.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("math");
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("count(//xref)",                          equalTo("4")));
+    Assert.assertThat(xml, hasXPath("count(//xref/media-fragment)",           equalTo("3")));
+    Assert.assertThat(xml, hasXPath("(//xref)[1]/@href",                      equalTo("content/equation_1.mathml")));
+    Assert.assertThat(xml, hasXPath("(//xref)[1]/media-fragment/@mediatype",  equalTo("application/mathml+xml")));
+    Assert.assertThat(xml, hasXPath("count((//xref)[1]/media-fragment/math)", equalTo("1")));
+    Assert.assertThat(xml, hasXPath("(//xref)[2]/@href",                      equalTo("content/equation_2.mml")));
+    Assert.assertThat(xml, hasXPath("(//xref)[2]/media-fragment/@mediatype",  equalTo("application/mathml+xml")));
+    Assert.assertThat(xml, hasXPath("count((//xref)[2]/media-fragment/math)", equalTo("1")));
+    Assert.assertThat(xml, hasXPath("(//xref)[3]/@href",                      equalTo("content/equation_3.psml")));
+    Assert.assertThat(xml, hasXPath("(//xref)[3]/@frag",                      equalTo("mathml")));
+    Assert.assertThat(xml, hasXPath("(//xref)[3]/media-fragment/@mediatype",  equalTo("application/mathml+xml")));
+    Assert.assertThat(xml, hasXPath("count((//xref)[3]/media-fragment/math)", equalTo("1")));
+  }
+
+  @Test
   public void testPostTransform() throws IOException, ProcessException {
     String filename = "content_2.psml";
     Process p = new Process();

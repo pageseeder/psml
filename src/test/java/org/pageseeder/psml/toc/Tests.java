@@ -283,7 +283,7 @@ public class Tests {
   /**
    * Generate the DOM Source instance from the response content.
    *
-   * @param response The response from PageSeeder
+   * @param o The writable object
    *
    * @return The corresponding DOM source
    */

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21937" schemaversion="0.12" version="current" level="portable">
+  <fragmentinfo/>
+  <metadata/>
+  <section id="mathml">
+    <media-fragment id="mathml" mediatype="application/mathml+xml">
+      <math>
+        <msup>
+          <mi>a</mi>
+          <mrow>
+            <mo>−</mo>
+            <mn>10</mn>
+          </mrow>
+        </msup>
+        <msup>
+          <mi>b</mi>
+          <mn>4</mn>
+        </msup>
+        <msup>
+          <mi>c</mi>
+          <mrow>
+            <mo>−</mo>
+            <mn>2</mn>
+          </mrow>
+        </msup>
+      </math>
+    </media-fragment>
+  </section>
+</document>

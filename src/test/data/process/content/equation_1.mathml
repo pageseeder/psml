@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<math style="font-family:Tahoma">
+  <mn mathcolor="#7F0000">123</mn>
+  <mo mathcolor="#00FF00">+</mo>
+  <mn mathcolor="#0000FF">45</mn>
+  <mi mathcolor="#0000FF">x</mi>
+  <mo mathcolor="#0000FF">+</mo>
+  <mi mathcolor="#007F00">ds</mi>
+  <mo mathcolor="#0000FF">+</mo>
+  <msub mathcolor="#FF0000">
+    <mo mathcolor="#FF0000">∫</mo>
+    <mo>¼</mo>
+  </msub>
+  <mi mathcolor="#FF00FF">f</mi>
+  <mo mathcolor="#FF00FF">(</mo>
+  <mi mathcolor="#FF00FF">x</mi>
+  <mo mathcolor="#FF00FF">)=∯</mo>
+  <mo mathcolor="#0000FF"></mo>
+  <munder mathcolor="#E5C304">
+    <mrow>
+      <mi>l</mi>
+      <mi>i</mi>
+      <mi>m</mi>
+    </mrow>
+    <mrow>
+      <mi>x</mi>
+      <mo>→</mo>
+      <mo>∞</mo>
+    </mrow>
+  </munder>
+</math>

@@ -5,6 +5,7 @@ package org.pageseeder.psml.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.Map;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import sun.misc.IOUtils;
 
 /**
  * @author Jean-Baptiste Reure
@@ -163,8 +166,10 @@ public final class XRefTranscluder {
       // make sure it's valid
       if (target == null || !target.exists() ||!target.isFile())
         throw new XRefNotFoundException();
-      // ensure PSML
-      if (!target.getName().endsWith(".psml"))
+      boolean mathTarget = "math".equalsIgnoreCase(atts.getValue("type")) && "default".equals(atts.getValue("frag"));
+      // ensure PSML or mathml for math xrefs
+      if ((!mathTarget && !target.getName().endsWith(".psml")) ||
+          (mathTarget  && !target.getName().endsWith(".mml") && !target.getName().endsWith(".mathml")))
         return false;
       // check for depth
       if (this.parentFiles.size() > MAX_DEPTH)
@@ -179,6 +184,18 @@ public final class XRefTranscluder {
           tgt = href;
         }
         this.parentHandler.getLogger().warn("Transclusion/embed depth is suspiciously high (> "+WARNING_DEPTH+") for XRef from "+src+" to "+tgt+".");
+      }
+      // check for math xref
+      if (mathTarget) {
+        try {
+          // read mathml target file and wrap it in media-fragment element
+          this.parentHandler.write("<media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
+          this.parentHandler.writeFileContents(target);
+          this.parentHandler.write("</media-fragment>");
+        } catch (SAXException ex) {
+          throw new ProcessException("Failed to write contents of file "+target.getName()+": "+ex.getMessage(), ex);
+        }
+        return true;
       }
       // loop?
       String fragment = image ? "default" : atts.getValue("frag");
@@ -218,6 +235,8 @@ public final class XRefTranscluder {
     File target;
     if (path.endsWith(".psml")) {
        target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
+    } else if (path.endsWith(".mml") || path.endsWith(".mathml")) {
+      target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
     } else {
       target = new File(this.parentHandler.getBinaryRepository(), "META-INF/" + dadPath + '/' + path + ".psml");
       try {
