@@ -36,10 +36,13 @@ Now we have a numbered list:
    (also part of the second item?)
  4. Third item
 
-> We're havin a some quoted content now
+> We're having a some quoted content now
 > Quoted line #2
 > Quoted line #3
+>
 > Quoted line #4
+break
+> Quoted line #5
 
 ```javascript
 function() {

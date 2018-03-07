@@ -206,16 +206,34 @@ public class HTMLBlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s+.*") && !state.isElement(Name.pre)) {
+    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.pre)) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (!state.isElement(Name.div)) {
-        state.commitUpto(Name.section);
-        HTMLElement block = new HTMLElement(Name.blockquote);
-        state.push(block, line.substring(line.indexOf('>')+2));
+      String text = line.substring(line.indexOf('>') + 1).replaceFirst("^\\s+", "");
+      // check if already in a blockquote
+      HTMLElement current = state.current();
+      if (current.isElement(Name.blockquote)) {
+        List<HTMLNode> children = current.getNodes();
+        HTMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
+        if (last instanceof HTMLElement) {
+          HTMLElement lastElement = (HTMLElement) last;
+          if (lastElement.isElement(Name.p)) {
+            if (text.matches("\\s*")) {
+              current.addNode(new HTMLElement(Name.p));
+            } else {
+              lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
+            }
+          }
+        }
       } else {
-        state.append(line.substring(line.indexOf('>')+2));
+        state.commitUpto(Name.section);
+        // create new blockquote
+        HTMLElement block = new HTMLElement(Name.blockquote);
+        HTMLElement p = new HTMLElement(Name.p);
+        p.setText(text);
+        block.addNode(p);
+        state.push(block);
       }
     }
 
@@ -239,12 +257,6 @@ public class HTMLBlockParser {
 
       // We're in a fenced code block
       if (state.isElement(Name.pre) || (state.isElement(Name.code) && state.isDescendantOf(Name.pre))) {
-
-        // Just add the line
-        state.append(line);
-
-        // We're in a fenced block label
-      } else if (state.isElement(Name.div)) {
 
         // Just add the line
         state.append(line);
