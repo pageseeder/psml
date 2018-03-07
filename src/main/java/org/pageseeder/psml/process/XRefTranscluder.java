@@ -5,7 +5,6 @@ package org.pageseeder.psml.process;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import sun.misc.IOUtils;
 
 /**
  * @author Jean-Baptiste Reure
