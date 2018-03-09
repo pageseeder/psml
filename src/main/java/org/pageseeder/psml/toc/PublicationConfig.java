@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1999-2012 weborganic systems pty. ltd.
+ * Copyright (c) 1999-2018 weborganic systems pty. ltd.
  */
 package org.pageseeder.psml.toc;
 
@@ -38,7 +38,8 @@ import org.xml.sax.helpers.DefaultHandler;
  *     <schemes>
  *       <scheme level="1" type="[decimal*|upperalpha|loweralpha|upperroman|lowerroman]" format="[1]" />
  *       <scheme level="2" type="decimal" format="[1.][2]" />
- *       <scheme level="3" type="loweralpha" format="[(3)]" />
+ *       <scheme level="3" type="loweralpha" format="[(3)]" [element="heading*|para|all"] /> <!-- "all" is not supported by docx -->
+ *       <scheme level="3" type="decimal" format="[1-][3]"  [block-label="abc"] /> <!-- format may require adjustment to match docx -->
  *       <scheme level="4" type="lowerroman" format="[(4)]" />
  *       <scheme level="5" type="upperalpha" format="[(5)]" />
  *       <scheme level="6" type="upperroman" format="[(6)]" />
@@ -54,6 +55,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Each level format is defined by the picture [x(level)x] where:
  * - (level) is a digit which defines the level of numbering. Currently levels 1 to 9 are supported by PageSeeder.
  * - x is any other content.
+ * The same level can only be repeated if it has a different block-label defined.
  *
  * @author Philip Rutherford
  */
@@ -285,8 +287,8 @@ public final class PublicationConfig {
         try {
           int level = Integer.parseInt(attributes.getValue("level"));
           if (level < 1 || level > 9) new SAXException("Invalid level: " + level);
-          this.numbering.addNumberType(level, attributes.getValue("type"));
-          this.numbering.addNumberFormat(level, attributes.getValue("format"));
+          this.numbering.addNumberType(level, attributes.getValue("block-label"), attributes.getValue("type"));
+          this.numbering.addNumberFormat(level, attributes.getValue("block-label"), attributes.getValue("format"));
         } catch (NumberFormatException ex) {
           throw new SAXException("Invalid level: " + attributes.getValue("level"));
         }

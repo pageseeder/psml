@@ -63,6 +63,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private String fragment = DEFAULT_FRAGMENT;
 
   /**
+   * The current block label being processed
+   */
+  private @Nullable String currentBlockLabel = null;
+
+  /**
    * We count the headings/paras to use as index in TOC.
    */
   private int counter = 1;
@@ -92,6 +97,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startPara(attributes);
     } else if (isAny("fragment", "xref-fragment", "properties-fragment", "media-fragment")) {
       startFragment(attributes);
+    } else if ("block".equals(element)) {
+      startBlock(attributes);
     } else if ("blockxref".equals(element) && "embed".equals(attributes.getValue("type")) &&
         PSML_MEDIATYPE.equals(attributes.getValue("mediatype"))) {
       startEmbedRef(attributes);
@@ -125,6 +132,9 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       if (prefix != null) {
         heading = heading.prefix(prefix);
       }
+      if (isParent("block") && this.currentBlockLabel != null) {
+        heading = heading.blocklabel(this.currentBlockLabel);
+      }
       this.counter++;
     }
 
@@ -148,6 +158,9 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       if (prefix != null) {
         para = para.prefix(prefix);
       }
+      if (isParent("block") && this.currentBlockLabel != null) {
+        para = para.blocklabel(this.currentBlockLabel);
+      }
       this._expander.addParagraph(para);
     }
     this.firstHeading = false;
@@ -166,6 +179,15 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       this.counter = 1;
       this.firstHeading = true;
     }
+  }
+
+  /**
+   * Record the label for a block
+   *
+   * @param attributes The attributes
+   */
+  private void startBlock(Attributes attributes) {
+      this.currentBlockLabel = getString(attributes, "label");
   }
 
   /**
@@ -230,6 +252,9 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       if (labels != null) {
         this._tree.labels(labels);
       }
+
+    } else if ("block".equals(element)) {
+      this.currentBlockLabel = null;
 
     } else if ("blockxref".equals(element) && !hasAncestor("blockxref")) {
       this.transclusionLevel = 0;

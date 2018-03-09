@@ -186,7 +186,7 @@ public final class FragmentNumbering implements Serializable {
     String p = target.prefix();
     Prefix pref;
     if (target.numbered() && number != null) {
-      pref = number.generateNumbering(level);
+      pref = number.generateNumbering(level, "heading", "");
     } else if (p == null) {
       return;
     } else {
@@ -212,7 +212,7 @@ public final class FragmentNumbering implements Serializable {
     String p = h.prefix();
     Prefix pref;
     if (h.numbered() && number != null) {
-      pref = number.generateNumbering(level);
+      pref = number.generateNumbering(level, "heading", h.blocklabel());
     } else if (p == null || NO_PREFIX.equals(p)) {
       return;
     } else {
@@ -237,7 +237,7 @@ public final class FragmentNumbering implements Serializable {
     // adjust level minus 1 as level is already incremented
     int adjusted_level = level + para.level() - 1;
     if (para.numbered() && number != null) {
-      pref = number.generateNumbering(adjusted_level);
+      pref = number.generateNumbering(adjusted_level, "para", para.blocklabel());
     } else if (p == null || NO_PREFIX.equals(p)) {
       return;
     } else {
