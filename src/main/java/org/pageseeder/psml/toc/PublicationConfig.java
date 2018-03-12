@@ -34,12 +34,12 @@ import org.xml.sax.helpers.DefaultHandler;
  *       para-adjust="[numbering*|content]"
  *       heading-adjust="[numbering*|content]" />
  *
- *   <numbering strip-zeros="[true*|false]" [document-label="xyz"]>
+ *   <numbering skipped-levels="[1*|0|strip]" [document-label="xyz"]> <!-- only "1" is supported by docx -->
  *     <schemes>
  *       <scheme level="1" type="[decimal*|upperalpha|loweralpha|upperroman|lowerroman]" format="[1]" />
  *       <scheme level="2" type="decimal" format="[1.][2]" />
- *       <scheme level="3" type="loweralpha" format="[(3)]" [element="heading*|para|all"] /> <!-- "all" is not supported by docx -->
- *       <scheme level="3" type="decimal" format="[1-][3]"  [block-label="abc"] /> <!-- format may require adjustment to match docx -->
+ *       [<scheme level="2" type="decimal" format="[Fig 1-][2]" block-label="fig" />] <!-- format may require adjustment to match docx -->
+ *       <scheme level="3" type="loweralpha" format="[(3)]" [element="heading*|para|any"] /> <!-- "any" is not supported by docx -->
  *       <scheme level="4" type="lowerroman" format="[(4)]" />
  *       <scheme level="5" type="upperalpha" format="[(5)]" />
  *       <scheme level="6" type="upperroman" format="[(6)]" />
@@ -278,7 +278,7 @@ public final class PublicationConfig {
         this.config.headingLevelAdjust = LevelAdjust.fromString(attributes.getValue("heading-adjust"));
       } else if ("numbering".equals(qName)) {
         this.numbering = new PublicationNumbering();
-        this.numbering.setStripZeros("true".equals(attributes.getValue("strip-zeros")));
+        this.numbering.setSkippedLevels(PublicationNumbering.SkippedLevels.fromString(attributes.getValue("skipped-levels")));
         String label = attributes.getValue("document-label");
         if (label != null) {
           this.numbering.setLabel(label);
@@ -289,6 +289,7 @@ public final class PublicationConfig {
           if (level < 1 || level > 9) new SAXException("Invalid level: " + level);
           this.numbering.addNumberType(level, attributes.getValue("block-label"), attributes.getValue("type"));
           this.numbering.addNumberFormat(level, attributes.getValue("block-label"), attributes.getValue("format"));
+          this.numbering.addElement(level, attributes.getValue("block-label"), attributes.getValue("element"));
         } catch (NumberFormatException ex) {
           throw new SAXException("Invalid level: " + attributes.getValue("level"));
         }

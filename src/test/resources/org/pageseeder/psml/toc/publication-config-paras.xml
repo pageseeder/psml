@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
-<publication-config >
-
-  <levels para-relative-to="document" />
-  
-  <numbering skipped-levels="strip">
+<publication-config>
+  <!-- <numbering [document-label="xyz"]> -->
+  <numbering skipped-levels="1">
     <schemes>
       <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
       <scheme level="1" type="decimal" format="[1.]" />

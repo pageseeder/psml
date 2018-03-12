@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 
 /**
@@ -59,6 +60,73 @@ public final class PublicationNumbering {
     }
   }
 
+  /**
+   * An enumeration for element names
+   *
+   * @author Philip Rutherford
+   */
+  public enum ElementName {
+
+    /** heading element **/
+    HEADING,
+
+    /** para element **/
+    PARA,
+
+    /** apply to any elements **/
+    ANY;
+
+    /**
+     * Create the ElementName from a string.
+     *
+     * @param value the string value
+     *
+     * @return the name
+     */
+    public static ElementName fromString(String value) {
+      for (ElementName n : values()) {
+        if (n.name().toLowerCase().equals(value)) return n;
+      }
+      return HEADING;
+    }
+
+    @Override
+    public String toString() {
+      return name().toLowerCase();
+    }
+  }
+
+  /**
+   * An enumeration for numbering of skipped levels
+   *
+   * @author Philip Rutherford
+   */
+  public enum SkippedLevels {
+
+    /** skipped levels will be numbered as 1 - e.g. 2.1.3 (default) **/
+    ONE,
+
+    /** skipped levels will be numbered as 0 - e.g. 2.0.3 **/
+    ZERO,
+
+    /** skipped levels will be stripped - e.g. 2.3 **/
+    STRIP;
+
+    /**
+     * Create the SkippedLevels from a string.
+     *
+     * @param value the string value
+     *
+     * @return the type
+     */
+    public static SkippedLevels fromString(String value) {
+      if ("1".equals(value)) return ONE;
+      if ("0".equals(value)) return ZERO;
+      if ("strip".equals(value)) return STRIP;
+      return ONE;
+    }
+  }
+
   /** A pattern for all schemes */
   private static final Pattern SCHEME_PATTERN = Pattern.compile("\\[(.*?)([1-9])(.*?)\\]");
   /** A pattern for canonical labels */
@@ -81,9 +149,9 @@ public final class PublicationNumbering {
       "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" };
 
   /**
-   * If enabled, '0' are stripped from labels.
+   * Numbering of skipped levels
    */
-  private boolean stripZeros = true;
+  private SkippedLevels skippedLevels = SkippedLevels.ONE;
 
   /**
    * Document label to apply numbering to
@@ -100,6 +168,11 @@ public final class PublicationNumbering {
    */
   private final Map<String, NumberType> types = new HashMap<>();
 
+  /**
+   * Map of element names for numbering keyed on [level]-[blocklabel]
+   */
+  private final Map<String, ElementName> elements = new HashMap<>();
+
 
   /**
    * @param label the document label to set
@@ -110,10 +183,10 @@ public final class PublicationNumbering {
   }
 
   /**
-   * @param stripzeros the stripZeros to set
+   * @param skippedLevels the numbering for skipped levels to set
    */
-  public void setStripZeros(boolean stripzeros) {
-    this.stripZeros = stripzeros;
+  public void setSkippedLevels(SkippedLevels skippedLevels) {
+    this.skippedLevels = skippedLevels;
   }
 
   /**
@@ -124,10 +197,10 @@ public final class PublicationNumbering {
   }
 
   /**
-   * @return the stripZeros
+   * @return the numbering for skipped levels
    */
-  public boolean shouldStripZeros() {
-    return this.stripZeros;
+  public SkippedLevels getSkippedLevels() {
+    return this.skippedLevels;
   }
 
   /**
@@ -137,7 +210,8 @@ public final class PublicationNumbering {
    * @param blocklabel the parent block label (optional)
    * @param scheme     the scheme pattern
    */
-  public void addNumberFormat(int level, String blocklabel, String scheme) {
+  public void addNumberFormat(int level, @Nullable String blocklabel, String scheme) {
+    if (blocklabel == null) blocklabel = "";
     this.formats.put(level + "-" + blocklabel, scheme);
   }
 
@@ -145,11 +219,24 @@ public final class PublicationNumbering {
    * Add a new numbering type.
    *
    * @param level      the level of the scheme
-   * @param blocklabel the parent block label name
+   * @param blocklabel the parent block label (optional)
    * @param type       the scheme type
    */
-  public void addNumberType(int level, String blocklabel, String type) {
-    this.types.put(level + blocklabel != null ? "-" + blocklabel : "", NumberType.fromString(type));
+  public void addNumberType(int level, @Nullable String blocklabel, String type) {
+    if (blocklabel == null) blocklabel = "";
+    this.types.put(level + "-" + blocklabel, NumberType.fromString(type));
+  }
+
+  /**
+   * Add a new element name.
+   *
+   * @param level      the level of the scheme
+   * @param blocklabel the parent block label (optional)
+   * @param type       the scheme element
+   */
+  public void addElement(int level, @Nullable String blocklabel, String element) {
+    if (blocklabel == null) blocklabel = "";
+    this.elements.put(level + "-" + blocklabel, ElementName.fromString(element));
   }
 
   /**
@@ -172,6 +259,19 @@ public final class PublicationNumbering {
     NumberType type = this.types.get(level + "-" + blocklabel);
     if (type == null) type = this.types.get(level + "-");
     return type;
+  }
+
+  /**
+   * Whether number for an element is defined. If none found for blocklabel returns result for no blocklabel.
+   *
+   * @param level      the level of the scheme
+   * @param blocklabel the parent block label name
+   * @param name       the element name
+   */
+  public boolean hasElement(int level, String blocklabel, String name) {
+    ElementName element = this.elements.get(level + "-" + blocklabel);
+    if (element == null) element = this.elements.get(level + "-");
+    return ElementName.ANY.equals(element) || (element != null && element.toString().equals(name));
   }
 
   /**
@@ -220,7 +320,7 @@ public final class PublicationNumbering {
     // no scheme, return canonical value then
     if (scheme == null) {
       // no zeros or we don't strip them, return as is
-      if (this.stripZeros) {
+      if (this.skippedLevels == SkippedLevels.STRIP) {
         prefix.append(canonical.replaceFirst("^(0\\.)+", "").replaceAll("(\\.0\\.)", "."));
       } else {
         prefix.append(canonical);
@@ -244,7 +344,7 @@ public final class PublicationNumbering {
       Integer value = levels.get(level);
       // make sure level is good
       if (value == null) continue;
-      if (value.intValue() == 0 && this.stripZeros) continue;
+      if (value.intValue() == 0 && this.skippedLevels == SkippedLevels.STRIP) continue;
       // ok append it then
       prefix.append(schemeMatcher.group(1));
       prefix.append(numbering(value, getNumberType(level, blocklabel)));

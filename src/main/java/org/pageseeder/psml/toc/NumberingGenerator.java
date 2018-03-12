@@ -6,6 +6,7 @@ package org.pageseeder.psml.toc;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,7 +58,7 @@ public final class NumberingGenerator {
    * @return the numbering prefix
    */
   public Prefix generateNumbering(int level, String element, String blocklabel) {
-    if (this.numberConfig != null) {
+    if (this.numberConfig != null && this.numberConfig.hasElement(level, blocklabel, element)) {
       // add it to current levels
       this.addNewLevel(level, blocklabel);
       // compute canonical label
@@ -95,7 +96,8 @@ public final class NumberingGenerator {
           levels.push(1);
         } else {
           while (levels.size() > level) levels.pop();
-          while (levels.size() < level) levels.push(0);
+          while (levels.size() < level) levels.push(
+              this.numberConfig.getSkippedLevels() == PublicationNumbering.SkippedLevels.ONE && levels.size() < level - 1 ? 1 : 0);
           levels.push(levels.pop() + 1);
         }
       }
@@ -112,8 +114,9 @@ public final class NumberingGenerator {
     // fall back on default numbering
     if (levels == null) levels = this.numberingLevels.get("");
     StringBuilder label = new StringBuilder();
-    for (Integer level : levels) {
-      label.append(level).append('.');
+    Iterator<Integer> leveli = levels.descendingIterator();
+    while (leveli.hasNext()) {
+      label.append(leveli.next()).append('.');
     }
     return label.toString();
   }
