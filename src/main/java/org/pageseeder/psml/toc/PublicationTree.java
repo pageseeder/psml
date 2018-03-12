@@ -373,10 +373,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       doccount.put(next, nextcount);
       element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
     } else if (element instanceof Reference && !externalrefs) {
-      // external reference not allowed so output phantom
-      xml.openElement("phantom", false);
-      xml.attribute("level", level);
-      xml.closeElement();
+      // external reference not allowed so don't output XML
     } else {
       element.toXML(xml, level, number, id, count);
     }

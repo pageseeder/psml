@@ -21,7 +21,6 @@
     <xs:choice minOccurs="0" maxOccurs="1">
       <xs:element name="document-ref" type="document-ref"/>
       <xs:element name="heading-ref"  type="heading-ref"/>
-      <xs:element name="phantom"      type="phantom"/>
     </xs:choice>
     <xs:element name="part" type="part" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
@@ -50,11 +49,6 @@
   <xs:attribute name="prefix"     type="xs:string"/>
   <xs:attribute name="numbered"   type="xs:boolean"/>
 </xs:complexType>
-
-<xs:complexType name="phantom">
-  <xs:attribute name="level"      type="level"     use="required"/>
-</xs:complexType>
-
 
 <!-- ====================================================================== -->
 <!-- Attribute types                                                        -->
