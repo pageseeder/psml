@@ -253,7 +253,7 @@
           <xs:documentation>The fragment's labels.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="mediatype" type="xs:string">
+      <xs:attribute name="mediatype" type="xs:string" use="required">
         <xs:annotation>
           <xs:documentation>A MIME type.</xs:documentation>
         </xs:annotation>
