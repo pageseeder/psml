@@ -305,8 +305,6 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     normalized = removePhantomParts(normalized);
     // collapse first heading
     normalized = removeTitleHeading(normalized, collapse);
-    // remove top phantom levels left after collapse
-    normalized = removePhantomParts(normalized);
     return normalized;
   }
 
