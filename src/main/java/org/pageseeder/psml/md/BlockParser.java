@@ -203,17 +203,36 @@ public class BlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s+.*") && !state.isElement(Name.Preformat)) {
+    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.Preformat)) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (!state.isElement(Name.Block)) {
+      // remove chevron and leading space
+      String text = line.substring(line.indexOf('>') + 1).replaceFirst("^\\s+", "");
+      // check if already in a blockquote
+      PSMLElement current = state.current();
+      if (current.isElement(Name.Block)) {
+        List<PSMLNode> children = current.getNodes();
+        PSMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
+        if (last instanceof PSMLElement) {
+          PSMLElement lastElement = (PSMLElement) last;
+          if (lastElement.isElement(Name.Para)) {
+            if (text.matches("\\s*")) {
+              current.addNode(new PSMLElement(Name.Para));
+            } else {
+              lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
+            }
+          }
+        }
+      } else {
         state.commitUpto(Name.Fragment);
+        // create new blockquote
         PSMLElement block = new PSMLElement(Name.Block);
         block.setAttribute("label", "quoted");
-        state.push(block, line.substring(line.indexOf('>')+2));
-      } else {
-        state.append(line.substring(line.indexOf('>')+2));
+        PSMLElement p = new PSMLElement(Name.Para);
+        p.setText(text);
+        block.addNode(p);
+        state.push(block);
       }
     }
 
@@ -240,12 +259,6 @@ public class BlockParser {
 
       // We're in a fenced code block
       if (state.isElement(Name.Preformat)) {
-
-        // Just add the line
-        state.append(line);
-
-        // We're in a fenced block label
-      } else if (state.isElement(Name.Block)) {
 
         // Just add the line
         state.append(line);
@@ -531,6 +544,7 @@ public class BlockParser {
      * Append text to the current text node preceded by a new line.
      */
     public void append(String text) {
+      if (this.text == null) throw new NullPointerException("Failed to add text "+text);
       this.text.append('\n').append(text);
     }
 

@@ -181,6 +181,10 @@ public class Tests {
     return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix));
   }
 
+  public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, String blocklabel) {
+    return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix).blocklabel(blocklabel));
+  }
+
   public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix), parts);
   }
@@ -283,7 +287,7 @@ public class Tests {
   /**
    * Generate the DOM Source instance from the response content.
    *
-   * @param response The response from PageSeeder
+   * @param o The writable object
    *
    * @return The corresponding DOM source
    */

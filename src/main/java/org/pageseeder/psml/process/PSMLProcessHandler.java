@@ -3,12 +3,10 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +36,6 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Jean-Baptiste Reure
  * @version 5.0002
- *
  */
 public final class PSMLProcessHandler extends DefaultHandler {
 
@@ -232,19 +229,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private String currentFragment = null;
 
   /**
-   * @param out
-   *          where the resulting XML should be written.
-   * @param file
-   *          the source file.
-   * @param root
-   *          the root folder of the PSML files (used to compute relative
-   *          paths).
-   * @param binariesFolder
-   *          the folder containing binary files (to resolve xrefs to binary
-   *          files and images).
+   * @param out            where the resulting XML should be written.
+   * @param file           the source file.
+   * @param root           the root folder of the PSML files (used to compute relative
+   *                       paths).
+   * @param binariesFolder the folder containing binary files (to resolve xrefs to binary
+   *                       files and images).
    */
   public PSMLProcessHandler(Writer out, PSMLProcessHandler parent, File file, File root,
-      File binariesFolder) {
+                            File binariesFolder) {
     this.xml = out;
     this.parent = parent;
     this.sourceFile = file;
@@ -256,16 +249,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param fragment
-   *          the fragment to load
+   * @param fragment the fragment to load
    */
   public void setFragment(String fragment) {
     this.fragmentToLoad = fragment;
   }
 
   /**
-   * @param uriIDs
-   *          the list of URI IDs
+   * @param uriIDs the list of URI IDs
    */
   public void setAllUriIDs(Map<String, Integer> uriIDs) {
     this.allUriIDs = uriIDs;
@@ -279,8 +270,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param uriFragIDs
-   *          Map of number of URI/frag IDs in the each document sub-hierarchy
+   * @param uriFragIDs Map of number of URI/frag IDs in the each document sub-hierarchy
    */
   public void setHierarchyUriFragIDs(Map<String, Map<String, Integer[]>> uriFragIDs) {
     this.hierarchyUriFragIDs = uriFragIDs;
@@ -294,91 +284,77 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param uriid
-   *          the URI ID.
+   * @param uriid the URI ID.
    */
   public void setURIID(String uriid) {
     this.uriID = uriid;
   }
 
   /**
-   * @param count
-   *          the Number of times this URI has appeared
+   * @param count the Number of times this URI has appeared
    */
   public void setURICount(Integer count) {
     this.uriCount = count;
   }
 
   /**
-   * @param log
-   *          the logger facade.
+   * @param log the logger facade.
    */
   public void setLogger(Logger log) {
     this.logger = log;
   }
 
   /**
-   * @param failonerror
-   *          if the first error should stop the parsing
+   * @param failonerror if the first error should stop the parsing
    */
   public void setFailOnError(boolean failonerror) {
     this.failOnError = failonerror;
   }
 
   /**
-   * @param processed
-   *          the processed value to set
+   * @param processed the processed value to set
    */
   public void setProcessed(boolean processed) {
     this.processed = processed;
   }
 
   /**
-   * @param convert
-   *          if markdown properties are converted to PSML
+   * @param convert if markdown properties are converted to PSML
    */
   public void setConvertMarkdown(boolean convert) {
     this.convertMarkdown = convert;
   }
 
   /**
-   * @param include
-   *          whether or not to output the XML declaration
+   * @param include whether or not to output the XML declaration
    */
   public void setIncludeXMLDeclaration(boolean include) {
     this.includeXMLDeclaration = include;
   }
 
   /**
-   * @param embed
-   *          if in hierarchy of all embed XRefs
+   * @param embed if in hierarchy of all embed XRefs
    */
   public void setInEmbedHierarchy(boolean embed) {
     this.inEmbedHierarchy = embed;
   }
 
   /**
-   * @param lvl
-   *          the level to increase the headings by (for transclusions).
+   * @param lvl the level to increase the headings by (for transclusions).
    */
   public void setLevel(int lvl) {
     this.level = lvl;
   }
 
   /**
-   * @param xrefTypes
-   *          List of XRefs types to transclude
-   * @param excludeXRefFragment
-   *          If the xrefs in an xref-fragment are ignored.
-   * @param onlyXRefFrament
-   *          If only the xrefs in an xref-fragment are included.
-   * @param logxrefnotfound
-   *          If an error is logged when an XRef's target is not resolved
-   * @param levels
-   *          Whether xref levels attribute should be processed
+   * @param xrefTypes           List of XRefs types to transclude
+   * @param excludeXRefFragment If the xrefs in an xref-fragment are ignored.
+   * @param onlyXRefFrament     If only the xrefs in an xref-fragment are included.
+   * @param logxrefnotfound     If an error is logged when an XRef's target is not resolved
+   * @param levels              Whether xref levels attribute should be processed
    */
   public void setXRefsHandling(List<String> xrefTypes, boolean excludeXRefFragment,
-      boolean onlyXRefFrament, boolean logxrefnotfound, boolean levels) {
+                               boolean onlyXRefFrament, boolean logxrefnotfound, boolean levels) {
     this.transcluder.addXRefsTypes(xrefTypes);
     this.transcluder.setXRefFragmentHandling(excludeXRefFragment, onlyXRefFrament);
     this.logXRefNotFound = logxrefnotfound;
@@ -388,12 +364,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Add URI or frag ID to this uri and above in hierarchy
    *
-   * @param uriid
-   *          the uri id
-   * @param fragid
-   *          the fragment id (may be null)
-   * @param embed
-   *          whether hierarchy has all embed XRefs
+   * @param uriid  the uri id
+   * @param fragid the fragment id (may be null)
+   * @param embed  whether hierarchy has all embed XRefs
    */
   public void addUriFragID(String uriid, String fragid, boolean embed) {
     // if not root add to parent
@@ -409,7 +382,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     } else
       counts = sub_hierarchy.get(uriid + (fragid == null ? "" : ("-" + fragid)));
     if (counts == null) {
-      counts = new Integer[] { global_count, 1, embed ? 1 : 0 };
+      counts = new Integer[]{global_count, 1, embed ? 1 : 0};
       sub_hierarchy.put(uriid + (fragid == null ? "" : ("-" + fragid)), counts);
     } else {
       counts[1] = counts[1] + 1;
@@ -431,16 +404,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param strp
-   *          Details of elements/attributes to strip
+   * @param strp Details of elements/attributes to strip
    */
   public void setStrip(Strip strp) {
     this.strip = strp;
   }
 
   /**
-   * @param generate
-   *          whether or not not to generate the TOC
+   * @param generate whether or not not to generate the TOC
    */
   public void setGenerateTOC(boolean generate) {
     if (this.numberingAndTOC == null && generate)
@@ -449,8 +420,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param numberConfig
-   *          the numberConfig to set
+   * @param numberConfig the numberConfig to set
    */
   public void setNumberConfig(NumberingConfig numberConfig) {
     if (this.numberingAndTOC == null)
@@ -476,21 +446,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * Set the image handling details. Note that if one of the flag is true, the
    * cache cannot be null and site prefix must be specified for permalinks.
    *
-   * @param cache
-   *          where URI details for images are loaded from.
-   * @param src
-   *          how image src should be rewritten
-   * @param pathsToPermalink
-   *          if the image paths should be rewritten using permalinks
-   * @param logNotFound
-   *          if the image not found should be logged as an error
-   * @param siteprefix
-   *          site prefix, used to rewrite images paths to permalink
-   * @param embedMetadata
-   *          if images are transcluded (metadata embedded)
+   * @param cache         where URI details for images are loaded from.
+   * @param src           how image src should be rewritten
+   * @param logNotFound   if the image not found should be logged as an error
+   * @param siteprefix    site prefix, used to rewrite images paths to permalink
+   * @param embedMetadata if images are transcluded (metadata embedded)
    */
   public void setImageHandling(ImageCache cache, ImageSrc src, boolean logNotFound,
-      String siteprefix, boolean embedMetadata) {
+                               String siteprefix, boolean embedMetadata) {
     // make sure the required bits are there
     if (src != ImageSrc.LOCATION && cache == null)
       throw new IllegalArgumentException("Required images metadata cache is missing");
@@ -566,8 +529,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * {@inheritDoc}
    */
   @Override
-  public void startElement(String uri, String localName, String qName, Attributes atts)
-      throws SAXException {
+  public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
     boolean noNamespace = uri == null || uri.isEmpty();
     // load URI ID of root document
     if (this.uriID == null && noNamespace && "document".equals(qName)) {
@@ -586,7 +548,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if ((isFragment && this.fragmentToLoad != null
           && this.fragmentToLoad.equals(atts.getValue("id")) && !this.elements.contains("compare"))
           || (noNamespace && this.fragmentToLoad != null && "locator".equals(qName)
-              && this.fragmentToLoad.equals(atts.getValue("fragment")))) {
+          && this.fragmentToLoad.equals(atts.getValue("fragment")))) {
         this.inRequiredFragment = true;
       } else {
         return;
@@ -812,23 +774,16 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Create a new handler using this one as parent.
    *
-   * @param toParse
-   *          the file to transclude
-   * @param uriid
-   *          the URI ID of the document to transclude
-   * @param fragment
-   *          the fragment to transclude
-   * @param lvl
-   *          the start level of numbering
-   * @param fromImage
-   *          whether transclusion is from an image
-   * @param embed
-   *          whether hierarchy has all embed XRefs
-   *
+   * @param toParse   the file to transclude
+   * @param uriid     the URI ID of the document to transclude
+   * @param fragment  the fragment to transclude
+   * @param lvl       the start level of numbering
+   * @param fromImage whether transclusion is from an image
+   * @param embed     whether hierarchy has all embed XRefs
    * @return the handler
    */
   protected PSMLProcessHandler cloneForTransclusion(File toParse, String uriid, String fragment,
-      int lvl, boolean fromImage, boolean embed) {
+                                                    int lvl, boolean fromImage, boolean embed) {
     // update uri count
     Integer count = this.allUriIDs.get(uriid);
     if (count == null)
@@ -874,19 +829,40 @@ public final class PSMLProcessHandler extends DefaultHandler {
     return handler;
   }
 
-  // --------------------------------- Private Helpers
-  // --------------------------------------------
+  /**
+   * Write the contents of the file provided to the current writer.
+   *
+   * @param f the file to load the contents from
+   * @throws SAXException if there was an error reading the file's contents
+   */
+  public void writeFileContents(File f) throws ProcessException {
+    try (FileInputStream in = new FileInputStream(f)) {
+      byte[] buffer = new byte[1024 * 4];
+      int read;
+      while ((read = in.read(buffer)) != -1) {
+        String s = new String(buffer, 0, read, StandardCharsets.UTF_8);
+        // check for BOM character
+        if (s.charAt(0) == '\uFEFF') s = s.substring(1);
+        // remove XML declaration if needed
+        if ("<?xml ".equals(s.substring(0, 6))) s = s.substring(s.indexOf(">") + 1);
+        this.xml.write(s);
+      }
+    } catch (IOException ex) {
+      // die or not?
+      if (this.failOnError)
+        throw new ProcessException("Failed to write contents of file " + f.getName() + ": " + ex.getMessage(), ex);
+      else
+        this.logger.warn("Failed to write contents of file " + f.getName() + ": " + ex.getMessage());
+    }
+  }
 
   /**
    * Write some text to the correct writer.
    *
-   * @param str
-   *          the text to write
-   *
-   * @throws SAXException
-   *           If writing failed
+   * @param str the text to write
+   * @throws SAXException If writing failed
    */
-  private void write(String str) throws SAXException {
+  public void write(String str) throws SAXException {
     try {
       this.xml.write(str);
     } catch (IOException e) {
@@ -894,17 +870,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
   }
 
+  // --------------------------------- Private Helpers
+  // --------------------------------------------
+
   /**
-   * @param qName
-   *          the name of the element
-   * @param atts
-   *          the attributes of the element
-   *
+   * @param qName the name of the element
+   * @param atts  the attributes of the element
    * @return <code>true</code> if the xref has been stripped (startElement
-   *         method should stop)
-   *
-   * @throws SAXException
-   *           if writing to the XML writer failed
+   * method should stop)
+   * @throws SAXException if writing to the XML writer failed
    */
   private boolean shouldStripXRef(String qName, Attributes atts) throws SAXException {
     if (this.strip.stripAllXRefs()
@@ -931,12 +905,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param atts
-   *          the attributes on the xref element
-   *
-   * @throws SAXException
-   *           if something went wrong
-   *
+   * @param atts the attributes on the xref element
+   * @throws SAXException if something went wrong
    */
   private void transcludeXRef(Attributes atts, boolean image) throws SAXException {
     String href = atts.getValue(image ? "src" : "href");
@@ -1016,9 +986,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param element
-   *          the name of the element to check
-   *
+   * @param element the name of the element to check
    * @return true if this element is a fragment
    */
   private boolean isFragment(String element) {
@@ -1027,11 +995,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param elemName
-   *          name of current element
-   *
+   * @param elemName name of current element
    * @return <code>true</code> if the element should be stripped,
-   *         <code>false</code> otherwise
+   * <code>false</code> otherwise
    */
   private boolean shouldStripElement(String elemName) {
     if (this.strip == null)
@@ -1063,13 +1029,10 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param elemName
-   *          name of current element
-   * @param attName
-   *          name of current attribute
-   *
+   * @param elemName name of current element
+   * @param attName  name of current attribute
    * @return <code>true</code> if the attribute should be stripped,
-   *         <code>false</code> otherwise
+   * <code>false</code> otherwise
    */
   private boolean shouldStripAttribute(String elemName, String attName) {
     if (this.strip == null)
@@ -1093,17 +1056,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Write the image src attribute to the XML (and an href attribute if needed).
    *
-   * @param src
-   *          the current image path
-   * @param uriid
-   *          the image's URI ID
-   * @param alternateXRef
-   *          if this is not an image tag but and xref tag
-   *
-   * @throws ProcessException
-   *           If the metadata file is invlaid or couldn't be parsed
-   * @throws SAXException
-   *           If writing the XML content failed
+   * @param src           the current image path
+   * @param uriid         the image's URI ID
+   * @param alternateXRef if this is not an image tag but and xref tag
+   * @throws ProcessException If the metadata file is invlaid or couldn't be parsed
+   * @throws SAXException     If writing the XML content failed
    */
   private void handleImage(String src, String uriid, boolean alternateXRef)
       throws ProcessException, SAXException {
@@ -1176,8 +1133,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Encode a file path as a valid URL
    *
-   * @param filepath
-   *          the path
+   * @param filepath the path
    * @return the encoded path
    */
   public String URLEncodeFilepath(String filepath) {
@@ -1200,9 +1156,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Convert markdown text to PSML content.
    *
-   * @param markdown
-   *          the markdown content
-   *
+   * @param markdown the markdown content
    * @return the PSML content
    */
   private String markdownToPSML(String markdown) {

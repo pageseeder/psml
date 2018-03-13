@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21954" schemaversion="0.12" version="current" level="portable">
+  <metadata/>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Ref 3</heading>
+    </fragment>
+  </section>
+  <toc/>
+  <section id="xrefs">
+    <fragment id="2">
+      <xref id="39215" frag="default" reversefrag="2" reversetitle="References" reverselink="true"
+            reversetype="none" display="document" type="math" uriid="21958" href="content/equation_1.mathml"
+            urititle="Equation 1" mediatype="application/mathml+xml">Equation 1</xref>
+      <xref id="39440" frag="default" reversefrag="2" reversetitle="References" reverselink="true"
+            reversetype="none" display="document" type="math" uriid="21959" href="content/equation_2.mml"
+            urititle="Equation 2" mediatype="application/mathml+xml">Equation 2</xref>
+      <xref id="39457" frag="mathml" reversefrag="2"
+            reversetitle="References" reverselink="true" reversetype="none"
+            display="document" type="math" uriid="21911" href="content/equation_3.psml"
+            urititle="Equation 3" mediatype="application/vnd.pageseeder.psml+xml">Equation 3</xref>
+      <xref id="39455" frag="default" reversefrag="2"
+            reversetitle="References" reverselink="true" reversetype="none"
+            display="document" type="math" uriid="21930" href="content/content_1.psml"
+            urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Content 1</xref>
+    </fragment>
+  </section>
+</document>

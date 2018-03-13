@@ -17,6 +17,9 @@ public final class Paragraph extends Element implements Serializable {
   /** When there is no prefix */
   public static final String NO_PREFIX = "";
 
+  /** When there is no block label */
+  public static final String NO_BLOCK_LABEL = "";
+
   /** Fragment ID this part starts in */
   private final String _fragment;
 
@@ -29,6 +32,9 @@ public final class Paragraph extends Element implements Serializable {
   /** Prefix of title if any */
   private final String _prefix;
 
+  /** Parent block label if any */
+  private final String _blocklabel;
+
   /**
    * Full constructor for a paragraph.
    *
@@ -38,13 +44,15 @@ public final class Paragraph extends Element implements Serializable {
    * @param index    The index of the paragraph in the current document.
    * @param numbered Whether the paragraph is auto-numbered
    * @param prefix   Any prefix given to this paragraph.
+   * @param blocklabel Parent block label.
    */
-  private Paragraph(int level, String title, String fragment, int index, boolean numbered, String prefix) {
+  private Paragraph(int level, String title, String fragment, int index, boolean numbered, String prefix, String blocklabel) {
     super(level, title);
     this._fragment = fragment;
     this._index = index;
     this._numbered = numbered;
     this._prefix = prefix;
+    this._blocklabel = blocklabel;
   }
 
   /**
@@ -55,7 +63,7 @@ public final class Paragraph extends Element implements Serializable {
    * @param index    The index of the paragraph in the current document.
    */
   public Paragraph(int level, String fragment, int index) {
-    this(level, NO_TITLE,  fragment, index, false, NO_PREFIX);
+    this(level, NO_TITLE,  fragment, index, false, NO_PREFIX, NO_BLOCK_LABEL);
   }
 
   /**
@@ -89,6 +97,13 @@ public final class Paragraph extends Element implements Serializable {
   }
 
   /**
+   * @return The blocklabel parent of this paragraph or empty if none.
+   */
+  public String blocklabel() {
+    return this._blocklabel;
+  }
+
+  /**
    * @return Whether the paragraph is automatically numbered
    */
   public boolean numbered() {
@@ -104,7 +119,7 @@ public final class Paragraph extends Element implements Serializable {
    */
   public Paragraph title(String title) {
     if (title.equals(title())) return this;
-    return new Paragraph(level(), title, this._fragment, this._index, this._numbered, this._prefix);
+    return new Paragraph(level(), title, this._fragment, this._index, this._numbered, this._prefix, this._blocklabel);
   }
 
   /**
@@ -115,7 +130,18 @@ public final class Paragraph extends Element implements Serializable {
    * @return A new paragraph instance.
    */
   public Paragraph prefix(String prefix) {
-    return new Paragraph(level(), title(), this._fragment, this._index, this._numbered, prefix);
+    return new Paragraph(level(), title(), this._fragment, this._index, this._numbered, prefix, this._blocklabel);
+  }
+
+  /**
+   * Create a new paragraph identical to this heading but with the specified prefix.
+   *
+   * @param blocklabel The different blocklabel
+   *
+   * @return A new paragraph instance.
+   */
+  public Paragraph blocklabel(String blocklabel) {
+    return new Paragraph(level(), title(), this._fragment, this._index, this._numbered, this._prefix, blocklabel);
   }
 
   /**
@@ -127,7 +153,7 @@ public final class Paragraph extends Element implements Serializable {
    */
   public Paragraph numbered(boolean numbered) {
     if (this._numbered == numbered) return this;
-    return new Paragraph(level(), title(), this._fragment, this._index, numbered, this._prefix);
+    return new Paragraph(level(), title(), this._fragment, this._index, numbered, this._prefix, this._blocklabel);
   }
 
   /**

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <publication-config>
-  <!-- <numbering [label="xyz"]> -->
-  <numbering strip-zeros="true">
+  <!-- <numbering [document-label="xyz"]> -->
+  <numbering skipped-levels="strip">
     <schemes>
       <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
       <scheme level="1" type="decimal" format="[1.]" />
@@ -15,7 +15,7 @@
       <scheme level="9" type="loweralpha" format="[9]" />
     </schemes>
   </numbering>
-  <numbering strip-zeros="true" document-label="autonumber1">
+  <numbering skipped-levels="strip" document-label="autonumber1">
     <schemes>
       <scheme level="1" type="loweralpha" format="[1.]" />
       <scheme level="2" type="loweralpha" format="[1.][2.]" />
@@ -28,7 +28,7 @@
       <scheme level="9" type="loweralpha" format="[9]" />
     </schemes>
   </numbering>
-  <numbering strip-zeros="false" document-label="autonumber2">
+  <numbering skipped-levels="strip" document-label="autonumber2">
     <schemes>
       <scheme level="1" type="upperalpha" format="[1.]" />
       <scheme level="2" type="upperalpha" format="[1.][2.]" />

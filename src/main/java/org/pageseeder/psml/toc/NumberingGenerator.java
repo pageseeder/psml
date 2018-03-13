@@ -3,11 +3,14 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.io.IOException;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
-import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
  * Generates numbering for a publication.
@@ -22,9 +25,9 @@ public final class NumberingGenerator {
   private PublicationNumbering numberConfig;
 
   /**
-   * List of current numbering levels.
+   * Map of current numbering levels keyed on blocklabel
    */
-  private Stack<Integer> numberingLevels = new Stack<>();
+  private Map<String,ArrayDeque<Integer>> numberingLevels = new HashMap<>();
 
   /**
    * Constructor
@@ -33,6 +36,7 @@ public final class NumberingGenerator {
    */
   public NumberingGenerator(PublicationNumbering cfg) {
     this.numberConfig = cfg;
+    this.numberingLevels.put("", new ArrayDeque<>(9));
   }
 
   /**
@@ -43,75 +47,76 @@ public final class NumberingGenerator {
   public PublicationNumbering getPublicationNumbering() {
     return this.numberConfig;
   }
-  /**
-   * Add the canonical and prefix attributes for generated numbering.
-   *
-   * @param level         the level of the object
-   * @param xml           the XML writer where the attributes are written to
-   *
-   * @throws IOException           if the writing the attributes to the XML failed
-   */
-  public void generateNumbering(int level, XMLWriter xml)
-      throws IOException {
-    if (this.numberConfig != null) {
-      // add it to current levels
-      addNewLevel(this.numberingLevels, level);
-      // compute canonical label
-      String canonical = canonicalLabel(this.numberingLevels);
-      // compute numbered label
-      Prefix prefix = this.numberConfig.getPrefix(canonical);
-      // add attributes to XML
-      xml.attribute("canonical", canonical);
-      xml.attribute("prefix", prefix.value);
-    }
-  }
 
   /**
    * Generate and return numbering
    *
    * @param level         the level of the object
+   * @param element       the name of the element being numbered (e.g. heading, para)
+   * @param blocklabel    the parent block label name
    *
    * @return the numbering prefix
    */
-  public Prefix generateNumbering(int level) {
-    if (this.numberConfig != null) {
+  public Prefix generateNumbering(int level, String element, String blocklabel) {
+    if (this.numberConfig != null && this.numberConfig.hasElement(level, blocklabel, element)) {
       // add it to current levels
-      addNewLevel(this.numberingLevels, level);
+      this.addNewLevel(level, blocklabel);
       // compute canonical label
-      String canonical = canonicalLabel(this.numberingLevels);
+      String canonical = canonicalLabel(blocklabel);
       // compute numbered label
-      return this.numberConfig.getPrefix(canonical);
+      return this.numberConfig.getPrefix(canonical, blocklabel);
     }
     return null;
   }
 
   /**
-   * @param levels  list of current levels
-   * @param level   the level to add to the list
+   * Increment current numbering levels.
+   *
+   * @param level         the level to add to the list
+   * @param blocklabel    the parent block label name
    */
-  private static void addNewLevel(Stack<Integer> levels, int level) {
-    if (levels.size() == level) {
-      levels.push(levels.pop() + 1);
-    } else if (levels.size() + 1 == level) {
-      levels.push(1);
-    } else if (levels.size() > level) {
-      levels.pop();
-      addNewLevel(levels, level);
-    } else if (levels.size() < level) {
-      levels.push(0);
-      addNewLevel(levels, level);
+  private void addNewLevel(int level, String blocklabel) {
+    // if block defined and has no levels, then create a separate levels stack
+    if (this.numberConfig.getNumberFormat(level, blocklabel) != null &&
+        !this.numberingLevels.containsKey(blocklabel)) {
+      ArrayDeque<Integer> blocklevels = this.numberingLevels.get("").clone();
+      while (blocklevels.size() >= level) blocklevels.pop();
+      this.numberingLevels.put(blocklabel, blocklevels);
+    }
+    Set<String> labels = this.numberingLevels.keySet();
+    // for each stack of levels
+    for (String label : labels) {
+      boolean blockdefined = this.numberConfig.getNumberFormat(level, label) != null;
+      // if block defined add to it's stack or if default block add to all undefined stacks
+      if ((blockdefined && label.equals(blocklabel)) || (!blockdefined && "".equals(blocklabel))) {
+        Deque<Integer> levels = this.numberingLevels.get(label);
+        if (levels.size() == level) {
+          levels.push(levels.pop() + 1);
+        } else if (levels.size() + 1 == level) {
+          levels.push(1);
+        } else {
+          while (levels.size() > level) levels.pop();
+          while (levels.size() < level) levels.push(
+              this.numberConfig.getSkippedLevels() == PublicationNumbering.SkippedLevels.ONE && levels.size() < level - 1 ? 1 : 0);
+          levels.push(levels.pop() + 1);
+        }
+      }
     }
   }
 
   /**
-   * @param levels  list of current levels
+   * @param blocklabel    the parent block label name
    *
    * @return the canonical level according to the list of levels provided
    */
-  private static String canonicalLabel(Stack<Integer> levels) {
+  private String canonicalLabel(String blocklabel) {
+    Deque<Integer> levels = this.numberingLevels.get(blocklabel);
+    // fall back on default numbering
+    if (levels == null) levels = this.numberingLevels.get("");
     StringBuilder label = new StringBuilder();
-    for (Integer level : levels) {
-      label.append(level).append('.');
+    Iterator<Integer> leveli = levels.descendingIterator();
+    while (leveli.hasNext()) {
+      label.append(leveli.next()).append('.');
     }
     return label.toString();
   }

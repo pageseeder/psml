@@ -260,7 +260,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     xml.openElement("publication-tree", true);
     DocumentTree root = tree(cposition == -1 ? this._rootid : cid);
     if (root != null) {
-      xml.attribute("id", Long.toString(root.id()));
+      xml.attribute("uriid", Long.toString(root.id()));
       xml.attribute("title", root.title());
       if (this._map.size() == 1 || cposition != -1) {
         xml.attribute("content", "true");
@@ -362,7 +362,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (toNext && cid == next) {
       xml.attribute("content", "true");
     } else if (element instanceof Heading) {
-      xml.attribute("uri", Long.toString(id));
+      xml.attribute("uriid", Long.toString(id));
     }
 
     // Output the element
@@ -373,10 +373,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       doccount.put(next, nextcount);
       element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
     } else if (element instanceof Reference && !externalrefs) {
-      // external reference not allowed so output phantom
-      xml.openElement("phantom", false);
-      xml.attribute("level", level);
-      xml.closeElement();
+      // external reference not allowed so don't output XML
     } else {
       element.toXML(xml, level, number, id, count);
     }

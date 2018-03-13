@@ -184,14 +184,14 @@ public final class FragmentNumbering implements Serializable {
    */
   public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, Integer count) {
     String p = target.prefix();
-    Prefix pref;
+    Prefix pref = null;
     if (target.numbered() && number != null) {
-      pref = number.generateNumbering(level);
-    } else if (p == null) {
-      return;
-    } else {
+      pref = number.generateNumbering(level, "heading", "");
+    }
+    if (pref == null) {
       pref = new Prefix(p, null, level, null);
     }
+
     // always store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);
     if (NO_PREFIX.equals(p)) return;
@@ -210,14 +210,13 @@ public final class FragmentNumbering implements Serializable {
    */
   public void processHeading(Heading h, int level, long id, NumberingGenerator number, Integer count) {
     String p = h.prefix();
-    Prefix pref;
+    Prefix pref = null;
     if (h.numbered() && number != null) {
-      pref = number.generateNumbering(level);
-    } else if (p == null || NO_PREFIX.equals(p)) {
-      return;
-    } else {
+      pref = number.generateNumbering(level, "heading", h.blocklabel());
+    } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, level, null);
     }
+    if (pref == null) return;
     // store prefix on fragment
     this.numbering.put(id + "-" + count + "-" + h.index() + "-" + h.fragment(), pref);
   }
@@ -233,16 +232,15 @@ public final class FragmentNumbering implements Serializable {
    */
   public void processParagraph(Paragraph para, int level, long id, NumberingGenerator number, Integer count) {
     String p = para.prefix();
-    Prefix pref;
+    Prefix pref = null;
     // adjust level minus 1 as level is already incremented
     int adjusted_level = level + para.level() - 1;
     if (para.numbered() && number != null) {
-      pref = number.generateNumbering(adjusted_level);
-    } else if (p == null || NO_PREFIX.equals(p)) {
-      return;
-    } else {
+      pref = number.generateNumbering(adjusted_level, "para", para.blocklabel());
+    } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, adjusted_level, null);
     }
+    if (pref == null) return;
     // store prefix on fragment
     this.numbering.put(id + "-" + count + "-" + para.index() + "-" + para.fragment(), pref);
   }

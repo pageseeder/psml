@@ -250,6 +250,83 @@ public final class PublicationTreeTest {
   }
 
   @Test
+  public void testAutoNumberingBlockLabels() throws SAXException, IOException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+            phantom(2,
+            ref(3, "X", 1000L),
+            ref(3, "Y", 1001L)))).build().normalize(TitleCollapse.auto);
+    DocumentTree inter = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 1, true, "",
+            p(1, "1a", 1, true, ""),
+            p(1, "1b", 1, true, "", "table-caption"),
+            p(1, "1c", 1, true, ""),
+            p(1, "1d", 1, true, "", "table-caption"),
+            p(1, "1e", 1, true, "", "figure-caption"),
+            p(1, "1f", 1, true, "", "table-caption")))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree = new DocumentTree.Builder(1001).title("Y")
+        .part(h1("Y", "1", 1, true, "",
+            p(1, "1a", 1, true, ""),
+            p(1, "1b", 1, true, "", "table-caption"),
+            p(1, "1c", 1, true, ""),
+            p(1, "1d", 1, true, "", "table-caption"),
+            p(1, "1e", 1, true, "", "figure-caption"),
+            p(1, "1f", 1, true, "", "table-caption")))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(inter);
+    publication = publication.add(tree);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-block-labels.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<>());
+    Tests.print(publication, -1, -1, numbering, false);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+  }
+
+  @Test
+  public void testAutoNumberingSkippedLevels() throws SAXException, IOException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("X", "1", 1, true, "",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "",
+                phantom(3, h4("x", "3", 1, true, ""))),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "",
+                phantom(3, h4("xc", "5", 1, true, "x.x.x.x"))),
+            ref(3, "X", 1000L))).build().normalize(TitleCollapse.auto);
+    DocumentTree tree = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 1, true, "",
+            h2("a", "2", 1, true, "x.x.x"),
+            h2("b", "2", 2, true, "",
+                phantom(3, h4("x", "3", 1, true, ""))),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "",
+                phantom(3, h4("xc", "5", 1, true, "x.x.x.x")))))
+        .addReverseReference(1L).labels("autonumber1").build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(tree);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-skipped-levels.xml");
+    // Generate fragment numbering
+    List<Long> unusedIds = new ArrayList<>();
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds);
+    Tests.print(publication, -1, -1, numbering, false);
+  }
+
+  @Test
   public void testAutoNumberingLabels() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1, true, "",
@@ -343,9 +420,9 @@ public final class PublicationTreeTest {
                 p(1, "1a", 1, true, ""),
                 p(3, "1b", 1, true, ""),
             h2("a", "2", 1, true, "x.x.x"),
-            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
-            h2("c", "4", 1, false, ""),
-            phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
+            h2("b", "2", 2, true, "",
+                h3("x", "3", 1, true, "")), // will not be numbered when adjusted to level 5
+            h2("c", "4", 1, false, "")))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
@@ -357,7 +434,7 @@ public final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-    PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    PublicationConfig config = Tests.parseConfig("publication-config-paras.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
@@ -411,9 +488,9 @@ public final class PublicationTreeTest {
                 p(1, "1a", 1, true, ""),
                 p(3, "1b", 1, true, ""),
             h2("a", "2", 1, true, "x.x.x"),
-            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
-            h2("c", "4", 1, false, ""),
-            phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
+            h2("b", "2", 2, true, "",
+                h3("x", "3", 1, true, "")), // will not be numbered when adjusted to level 5
+            h2("c", "4", 1, false, "")))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);

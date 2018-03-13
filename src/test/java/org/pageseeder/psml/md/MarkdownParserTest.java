@@ -15,9 +15,7 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -25,6 +23,7 @@ import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
@@ -32,12 +31,16 @@ import org.pageseeder.xmlwriter.XMLWriter;
 
 public class MarkdownParserTest {
 
+  private static final String SOURCE_FOLDER = "src/test/data/md";
+
   public MarkdownParserTest() {
   }
 
   @Test
   public void testProcess() throws Exception {
-    InputStream in = MarkdownParserTest.class.getResourceAsStream("/org/pageseeder/psml/md/test.md");
+    File md   = new File(SOURCE_FOLDER, "test.md");
+    File psml = new File(SOURCE_FOLDER, "test.psml");
+    FileInputStream in = new FileInputStream(md);
     Reader r = new InputStreamReader(in);
     MarkdownParser parser = new MarkdownParser();
     parser.getConfig().setFragmentMode(false);
@@ -51,12 +54,10 @@ public class MarkdownParserTest {
     System.out.println(result);
 
     // load expected
-    URL url = MarkdownParserTest.class.getResource("/org/pageseeder/psml/md/test.psml");
-    String expected = new String (Files.readAllBytes(Paths.get(url.toURI())), StandardCharsets.UTF_8);
+    String expected = new String (Files.readAllBytes(psml.toPath()), StandardCharsets.UTF_8);
     expected = expected.replaceAll("\r", "");
     Assert.assertEquals(expected, result);
     //Assert.assertThat(result, CompareMatcher.isIdenticalTo(expected));
   }
-
 
 }

@@ -1277,11 +1277,11 @@
         <xs:element ref="col" minOccurs="0" maxOccurs="unbounded" />
         <xs:element ref="row" maxOccurs="unbounded" />
       </xs:sequence>
-	    <xs:attribute name="role" type="role">
-	      <xs:annotation>
-	        <xs:documentation>Custom value that can be used for formatting.</xs:documentation>
-	      </xs:annotation>
-	    </xs:attribute>
+      <xs:attribute name="role" type="role">
+        <xs:annotation>
+          <xs:documentation>Custom value that can be used for formatting.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="width">
         <xs:annotation>
           <xs:documentation>Width of table in pixels or percent (pixels if no px or % suffix)</xs:documentation>
@@ -1335,11 +1335,11 @@
       <xs:documentation>For defining column properties (starting from left - not all columns need be defined)</xs:documentation>
     </xs:annotation>
     <xs:complexType>
-	    <xs:attribute name="role" type="role">
-	      <xs:annotation>
-	        <xs:documentation>Custom value that can be used for formatting.</xs:documentation>
-	      </xs:annotation>
-	    </xs:attribute>
+      <xs:attribute name="role" type="role">
+        <xs:annotation>
+          <xs:documentation>Custom value that can be used for formatting.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
        <xs:attribute name="span" type="xs:positiveInteger">
         <xs:annotation>
           <xs:documentation>Number of columns this applies to.</xs:documentation>
@@ -1394,11 +1394,11 @@
         <xs:element ref="cell" />
         <xs:element ref="hcell" />
       </xs:choice>
-	    <xs:attribute name="role" type="role">
-	      <xs:annotation>
-	        <xs:documentation>Custom value that can be used for formatting.</xs:documentation>
-	      </xs:annotation>
-	    </xs:attribute>
+      <xs:attribute name="role" type="role">
+        <xs:annotation>
+          <xs:documentation>Custom value that can be used for formatting.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="align">
         <xs:annotation>
           <xs:documentation>Horizontal alignment.</xs:documentation>
@@ -1767,6 +1767,11 @@
       <xs:annotation>
         <xs:documentation>When uploading this may be a path relative to the current document or an absolute path beginning with /
         and must be URL encoded (overrides docid and uriid).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="config" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The name of an XRef configuration used when creating/editing this XRef.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
     <xs:attribute name="config" type="xs:string">

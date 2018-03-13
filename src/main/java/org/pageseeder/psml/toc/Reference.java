@@ -114,14 +114,14 @@ public final class Reference extends Element implements Serializable {
   }
 
   public void toXMLNoClose(@NonNull XMLWriter xml, int level) throws IOException {
-    xml.openElement("ref");
+    xml.openElement("document-ref");
     xml.attribute("level", this.level());
     if (!Element.NO_TITLE.equals(title())) {
       xml.attribute("title", title());
     }
-    xml.attribute("type", this._type);
+    xml.attribute("documenttype", this._type);
     if (this._uri > 0) {
-      xml.attribute("uri", Long.toString(this._uri));
+      xml.attribute("uriid", Long.toString(this._uri));
     }
     if (!DEFAULT_FRAGMENT.equals(this._targetfragment)) {
       xml.attribute("targetfragment", this._targetfragment);
