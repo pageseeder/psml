@@ -15,14 +15,14 @@
  */
 package org.pageseeder.psml.md;
 
+import org.pageseeder.psml.html.HTMLElement;
+import org.pageseeder.psml.html.HTMLElement.Name;
+import org.pageseeder.psml.html.HTMLNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.pageseeder.psml.html.HTMLElement;
-import org.pageseeder.psml.html.HTMLElement.Name;
-import org.pageseeder.psml.html.HTMLNode;
 
 /**
  * The block parser parses Markdown and generates the block-level elements
@@ -213,7 +213,7 @@ public class HTMLBlockParser {
       String text = line.substring(line.indexOf('>') + 1).replaceFirst("^\\s+", "");
       // check if already in a blockquote
       HTMLElement current = state.current();
-      if (current.isElement(Name.blockquote)) {
+      if (current != null && current.isElement(Name.blockquote)) {
         List<HTMLNode> children = current.getNodes();
         HTMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
         if (last instanceof HTMLElement) {

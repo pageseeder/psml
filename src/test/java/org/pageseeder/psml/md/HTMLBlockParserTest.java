@@ -15,10 +15,6 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.html.HTMLElement;
@@ -26,6 +22,10 @@ import org.pageseeder.psml.html.HTMLElement.Name;
 import org.pageseeder.psml.md.HTMLBlockParser.State;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class HTMLBlockParserTest {
 
@@ -75,7 +75,7 @@ public class HTMLBlockParserTest {
   @Test
   public void testBlockquotes() throws Exception {
     List<String> q1 = Arrays.asList("> Hello");
-    Assert.assertEquals("<blockquote>Hello</blockquote>", toHTML(q1));
+    Assert.assertEquals("<blockquote><p>Hello</p></blockquote>", toHTML(q1));
   }
 
   @Test

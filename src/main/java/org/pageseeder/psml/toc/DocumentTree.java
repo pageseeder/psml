@@ -108,6 +108,13 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   private final Map<String,String> _fragmentheadings;
 
+
+  /**
+   * Map of fragment ID to the level of the fragment (level of closest preceding heading),
+   * used for adjusting para indents.
+   */
+  private final Map<String,Integer> _fragmentlevels;
+
   /**
    * @param id                The URI ID of the document.
    * @param title             The title the document.
@@ -118,9 +125,10 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param prefix            Any prefix given to the title.
    * @param parts             The list of parts.
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
+   * @param fragmentlevels    Map of fragment ID to the level of the fragment
    */
-  private DocumentTree(long id, String title, String labels, List<Long> reverse, String titlefragment,
-      boolean numbered, String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings) {
+  private DocumentTree(long id, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
+      String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
     this._id = id;
     this._title = title;
     this._labels = labels;
@@ -131,6 +139,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     this._numbered = numbered;
     this._prefix = prefix;
     this._fragmentheadings = fragmentheadings;
+    this._fragmentlevels = fragmentlevels;
   }
 
   /**
@@ -140,10 +149,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param reverse           The list of reverse references.
    * @param parts             The list of parts.
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
+   * @param fragmentlevels    Map of fragment ID to the level of the fragment
    */
   public DocumentTree(long id, String title, String labels, List<Long> reverse,
-      List<Part<?>> parts, Map<String,String> fragmentheadings) {
-    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings);
+      List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
+    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings, fragmentlevels);
   }
 
   @Override
@@ -197,6 +207,14 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public Map<String,String> fragmentheadings() {
     return Collections.unmodifiableMap(this._fragmentheadings);
+  }
+
+
+  /**
+   * @return Map of fragment ID to the level of the fragment
+   */
+  public Map<String,Integer> fragmentlevels() {
+    return Collections.unmodifiableMap(this._fragmentlevels);
   }
 
   /**
@@ -305,8 +323,6 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     normalized = removePhantomParts(normalized);
     // collapse first heading
     normalized = removeTitleHeading(normalized, collapse);
-    // remove top phantom levels left after collapse
-    normalized = removePhantomParts(normalized);
     return normalized;
   }
 
@@ -384,7 +400,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
         unwrapped.add(p.adjustLevel(-1));
       }
       normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, tree._titlefragment,
-          tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings);
+          tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings, tree._fragmentlevels);
     }
     return normalized;
   }
@@ -431,8 +447,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       }
     }
     // Always move the numbered and prefix from the first heading to the tree
-    return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse,
-        firstHeading.fragment(), firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings);
+    return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
+        firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
   }
 
 
@@ -464,6 +480,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
      * otherwise the first preceding heading or section title (within the current section).
      */
     private final Map<String,String> _fragmentheadings = new HashMap<>();
+
+    /**
+     * Map of fragment ID to the level of the fragment (level of closest preceding heading),
+     * used for adjusting para indents.
+     */
+    private final Map<String,Integer> _fragmentlevels = new HashMap<>();;
 
     /**
      * Creates a new builder for this content tree.
@@ -528,12 +550,18 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       return this;
     }
 
+    public Builder putFragmentLevel(String fragment, int level) {
+      this._fragmentlevels.put(fragment, level);
+      return this;
+    }
+
     public DocumentTree build() {
       // New lists to ensure the builder no longer affects built tree
       List<Part<?>> parts = new ArrayList<>(this._parts);
       List<Long> reverse = new ArrayList<>(this._reverse);
       Map<String,String> fragmentheadings = new HashMap<>(this._fragmentheadings);
-      return new DocumentTree(this._id, this.title, this.labels, reverse, parts, fragmentheadings);
+      Map<String,Integer> fragmentlevels = new HashMap<>(this._fragmentlevels);
+      return new DocumentTree(this._id, this.title, this.labels, reverse, parts, fragmentheadings, fragmentlevels);
     }
 
   }

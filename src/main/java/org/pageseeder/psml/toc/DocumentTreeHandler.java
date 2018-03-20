@@ -83,6 +83,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private int transclusionLevel = 0;
 
   /**
+   * The current fragment level (level of last preceding heading)
+   */
+  private int fragmentLevel = 0;
+
+  /**
    * @param uri content tree to generate
    */
   public DocumentTreeHandler(long uri) {
@@ -121,10 +126,13 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private void startHeading(Attributes attributes) {
     Heading heading;
     if (isParent("section")) {
+      this.fragmentLevel = 2;
       heading = Heading.untitled(this.transclusionLevel + SECTION_TITLE_LEVEL, DEFAULT_FRAGMENT, this.sectioncounter);
       this.sectioncounter++;
     } else {
-      heading = Heading.untitled(this.transclusionLevel + getInt(attributes, "level"), this.fragment, this.counter);
+      int level = getInt(attributes, "level");
+      this.fragmentLevel = getInt(attributes, "level");
+      heading = Heading.untitled(this.transclusionLevel + level, this.fragment, this.counter);
       if ("true".equals(attributes.getValue("numbered"))) {
         heading = heading.numbered(true);
       }
@@ -176,6 +184,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     // Only if not within a transclusion
     if (!hasAncestor("blockxref")) {
       this.fragment = getString(attributes, "id");
+      this._tree.putFragmentLevel(this.fragment, this.fragmentLevel);
       this.counter = 1;
       this.firstHeading = true;
     }

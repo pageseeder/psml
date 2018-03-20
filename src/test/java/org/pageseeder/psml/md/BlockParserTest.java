@@ -15,10 +15,6 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.md.BlockParser.State;
@@ -26,6 +22,10 @@ import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class BlockParserTest {
 
@@ -75,7 +75,7 @@ public class BlockParserTest {
   @Test
   public void testBlockquotes() throws Exception {
     List<String> q1 = Arrays.asList("> Hello");
-    Assert.assertEquals("<block label=\"quoted\">Hello</block>", toPSML(q1));
+    Assert.assertEquals("<block label=\"quoted\"><para>Hello</para></block>", toPSML(q1));
   }
 
   @Test
