@@ -133,23 +133,24 @@ public final class FragmentNumbering implements Serializable {
     NumberingGenerator nextNumber = number;
     int nextLevel = level + 1;
     int nextTreeLevel = treeLevel;
+    boolean embedded_fragment = false;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      // don't process embedded fragments
-      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
-        next = ref.uri();
-        nextTree = pub.tree(next);
-        // can only be numbered if the referenced tree exists
-        if (nextTree != null) {
-          nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
-          nextCount = doccount.get(next);
-          nextCount = nextCount == null ? 1 : nextCount + 1;
-          doccount.put(next, nextCount);
-          if (PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo())) {
-            nextTreeLevel = treeLevel + ref.level();
-            nextLevel = nextTreeLevel + 1;
-          }
-          // ref is always
+      embedded_fragment = !Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment());
+      next = ref.uri();
+      nextTree = pub.tree(next);
+      // can only be numbered if the referenced tree exists
+      if (nextTree != null) {
+        nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
+        nextCount = doccount.get(next);
+        nextCount = nextCount == null ? 1 : nextCount + 1;
+        doccount.put(next, nextCount);
+        if (PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo())) {
+          nextTreeLevel = treeLevel + ref.level();
+          nextLevel = nextTreeLevel + 1;
+        }
+        // don't number embedded fragments
+        if (!embedded_fragment) {
           processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
         }
       }
@@ -162,7 +163,7 @@ public final class FragmentNumbering implements Serializable {
     }
 
     // Expand found reference
-    if (nextTree != null) {
+    if (nextTree != null && !embedded_fragment) {
       // Moving to the next tree (use next level)
       processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors);
     }

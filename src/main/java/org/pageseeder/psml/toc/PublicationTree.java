@@ -301,15 +301,16 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * Serialize a tree as XML.
    *
-   * @param xml       The XML writer
-   * @param id        The ID of the tree to serialize.
-   * @param level     The level that we are currently at
-   * @param cid       The ID of the content tree (leaf).
-   * @param trees     The IDs of trees that cid is a descendant of (optional)
-   * @param number    The fragment numbering for the publication (optional)
-   * @param doccount  Map of [uriid], [number of uses]
-   * @param count     No. of times ID has been used.
-   * @param ancestors List of the current ancestor tree IDs
+   * @param xml           The XML writer
+   * @param id            The ID of the tree to serialize.
+   * @param level         The level that we are currently at
+   * @param cid           The ID of the content tree (leaf).
+   * @param trees         The IDs of trees that cid is a descendant of (optional)
+   * @param number        The fragment numbering for the publication (optional)
+   * @param doccount      Map of [uriid], [number of uses]
+   * @param count         No. of times ID has been used.
+   * @param ancestors     List of the current ancestor tree IDs
+   * @param externalrefs  Whether to output references to IDs not in this publication tree.
    *
    * @throws IOException If thrown by XML writer
    */
@@ -327,16 +328,17 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * Serialize a part as XML.
    *
-   * @param xml       The XML writer
-   * @param id        The ID of the tree to output.
-   * @param level     The level that we are currently at
-   * @param part      The part to serialize
-   * @param cid       The ID of the content tree (leaf).
-   * @param trees     The IDs of trees that cid is a descendant of (optional)
-   * @param number    The fragment numbering for the publication (optional)
-   * @param doccount  Map of [uriid], [number of uses]
-   * @param count     No. of times ID has been used.
-   * @param ancestors List of the current ancestor tree IDs
+   * @param xml           The XML writer
+   * @param id            The ID of the tree to output.
+   * @param level         The level that we are currently at
+   * @param part          The part to serialize
+   * @param cid           The ID of the content tree (leaf).
+   * @param trees         The IDs of trees that cid is a descendant of (optional)
+   * @param number        The fragment numbering for the publication (optional)
+   * @param doccount      Map of [uriid], [number of uses]
+   * @param count         No. of times ID has been used.
+   * @param ancestors     List of the current ancestor tree IDs
+   * @param externalrefs  Whether to output references to IDs not in this publication tree.
    *
    * @throws IOException If thrown by XML writer
    */
@@ -348,14 +350,16 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
+    boolean embedded_fragment = false;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      // don't process embedded fragments
-      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
-        next = ref.uri();
-        nextTree = tree(next);
-        toNext = nextTree != null && (trees == null || trees.contains(next)) && id != cid;
-      }
+      embedded_fragment = !Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment());
+      next = ref.uri();
+      nextTree = tree(next);
+      toNext = nextTree != null &&
+          (trees == null || trees.contains(next)) &&
+          id != cid &&
+          !embedded_fragment;
     }
     xml.openElement("part", !part.parts().isEmpty() || toNext);
     xml.attribute("level", level);
@@ -371,7 +375,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
+      if (embedded_fragment) {
+        element.toXML(xml, level, number, id, count);
+      } else {
+        element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
+      }
     } else if (element instanceof Reference && !externalrefs) {
       // external reference not allowed so don't output XML
     } else {
