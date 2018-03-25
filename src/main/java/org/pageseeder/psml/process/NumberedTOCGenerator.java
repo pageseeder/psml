@@ -210,7 +210,10 @@ public class NumberedTOCGenerator {
         xml.attribute("prefix", target.prefix());
       }
     }
-    xml.attribute("idref", treeid + "-" + count + "-" + target.titlefragment() + "-1");
+    // only output idref if there is a corresponding heading
+    if (!DocumentTree.NO_FRAGMENT.equals(target.titlefragment())) {
+      xml.attribute("idref", treeid + "-" + count + "-" + target.titlefragment() + "-1");
+    }
   }
 
   /**
