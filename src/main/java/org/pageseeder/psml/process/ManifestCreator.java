@@ -74,14 +74,14 @@ public final class ManifestCreator {
     if (this.manifestDoc == null) return null;
     String manifestFileName = this.manifestDoc.getFilename()+".psml";
     // log
-    logger.info("Manifest-Doc: Creating manifest file "+manifestFileName);
+    this.logger.info("Manifest-Doc: Creating manifest file "+manifestFileName);
     // finding files to include
     // check if there's any matching to do
     IncludesExcludesMatcher matcher = this.manifestDoc.buildMatcher();
     boolean matching = matcher != null && matcher.hasPatterns();
     List<String> toInclude;
     if (matching) {
-      toInclude = new ArrayList<String>();
+      toInclude = new ArrayList<>();
       // match paths
       for (String path : psmlFiles.keySet()) {
         if (matcher.matches(path)) {
@@ -89,11 +89,11 @@ public final class ManifestCreator {
         }
       }
     } else {
-      toInclude = new ArrayList<String>(psmlFiles.keySet());
+      toInclude = new ArrayList<>(psmlFiles.keySet());
     }
     // make sure there are file to include
     if (toInclude.isEmpty()) {
-      logger.warn("Manifest file is not created as there are no files to point to");
+      this.logger.warn("Manifest file is not created as there are no files to point to");
       return null;
     }
     // sort
@@ -116,7 +116,7 @@ public final class ManifestCreator {
       FileOutputStream manifestStream = new FileOutputStream(manifest);
       try {
         manifestStream.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n".getBytes(UTF8));
-        manifestStream.write("<document type=\"manifest\" level=\"portable\">\n".getBytes(UTF8));
+        manifestStream.write("<document id=\"0\" type=\"manifest\" level=\"portable\">\n".getBytes(UTF8));
         manifestStream.write("  <section id=\"xrefs\">\n".getBytes(UTF8));
         manifestStream.write("    <xref-fragment id=\"xrefs\">\n".getBytes(UTF8));
         // add all xrefs
@@ -135,11 +135,11 @@ public final class ManifestCreator {
         manifestStream.close();
       }
     } catch (IOException ex) {
-      logger.error("Failed to write manifest file", ex);
+      this.logger.error("Failed to write manifest file", ex);
       throw new ProcessException("Failed to write to manifest file: "+ex.getMessage(), ex);
     }
     // log
-    logger.info("Manifest-Doc: Complete");
+    this.logger.info("Manifest-Doc: Complete");
     return manifest;
   }
 
