@@ -64,7 +64,8 @@ public class NumberedTOCGeneratorTest {
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
-    NumberedTOCGenerator toc = new NumberedTOCGenerator(publication, numbering);
+    NumberedTOCGenerator toc = new NumberedTOCGenerator(publication);
+    toc.setFragmentNumbering(numbering);
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
     xml.setIndentChars("  ");
     try {

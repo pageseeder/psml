@@ -88,6 +88,16 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private int fragmentLevel = 0;
 
   /**
+   * Constructor (URI id set by handler)
+   *
+   */
+  public DocumentTreeHandler() {
+    this._tree = new DocumentTree.Builder();
+  }
+
+  /**
+   * Constructor
+   *
    * @param uri content tree to generate
    */
   public DocumentTreeHandler(long uri) {
@@ -96,7 +106,9 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void startElement(String element, Attributes attributes) {
-    if (isElement("heading") || (isElement("title") && isParent("section"))) {
+    if (isElement("document")) {
+      startDocument(attributes);
+    } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
     } else if (isElement("para")) {
       startPara(attributes);
@@ -176,6 +188,18 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   }
 
   /**
+   * Record the ID of the document
+   *
+   * @param attributes The attributes
+   */
+  private void startDocument(Attributes attributes) {
+    // Only if not already set
+    if (this._tree.id() < 0) {
+      this._tree.id(getLong(attributes, "id"));
+    }
+  }
+
+  /**
    * Record the ID of the fragment
    *
    * @param attributes The attributes
@@ -214,7 +238,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       int newlevel = partLevel + level;
       String type = getString(attributes, "documenttype", Reference.DEFAULT_TYPE);
       String title = computeReferenceTitle(attributes);
-      Reference reference = new Reference(level, title, uriid, type, attributes.getValue("frag"));
+      Reference reference = new Reference(level, title, this.fragment, uriid, type, attributes.getValue("frag"));
       this._expander.add(reference, newlevel);
     }
   }

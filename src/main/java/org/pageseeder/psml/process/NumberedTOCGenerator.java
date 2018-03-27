@@ -3,13 +3,22 @@
  */
 package org.pageseeder.psml.process;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.pageseeder.psml.toc.DocumentTree;
+import org.pageseeder.psml.toc.DocumentTreeHandler;
 import org.pageseeder.psml.toc.Element;
 import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
@@ -19,6 +28,7 @@ import org.pageseeder.psml.toc.Part;
 import org.pageseeder.psml.toc.PublicationTree;
 import org.pageseeder.psml.toc.Reference;
 import org.pageseeder.xmlwriter.XMLWriter;
+import org.xml.sax.SAXException;
 
 /**
  * Container for publication tree and fragment numbering.
@@ -36,7 +46,7 @@ public class NumberedTOCGenerator {
   /**
    * The numbering for the TOC
    */
-  private final FragmentNumbering _fragmentNumbering;
+  private FragmentNumbering _fragmentNumbering = null;
 
   /**
    * Constructor
@@ -44,22 +54,28 @@ public class NumberedTOCGenerator {
    * @param tree            The tree for the TOC
    * @param numbering       The numbering for the TOC
    */
-  public NumberedTOCGenerator(PublicationTree tree, FragmentNumbering numbering) {
+  public NumberedTOCGenerator(PublicationTree tree) {
     this._publicationTree = tree;
+  }
+
+  /**
+   * @param numbering       The numbering for the publication
+   */
+  public void setFragmentNumbering(FragmentNumbering numbering) {
     this._fragmentNumbering = numbering;
   }
 
   /**
    * @return the publicationTree
    */
-  public PublicationTree getPublicationTree() {
+  public PublicationTree publicationTree() {
     return this._publicationTree;
   }
 
   /**
    * @return the fragmentNumbering
    */
-  public FragmentNumbering getFragmentNumbering() {
+  public FragmentNumbering fragmentNumbering() {
     return this._fragmentNumbering;
   }
 
@@ -136,16 +152,14 @@ public class NumberedTOCGenerator {
 
     // Output the element
     Integer nextcount = null;
-    if (nextTree != null) {
+    if (embedded_fragment) {
+      partToXML(xml, level, false);
+    } else if (nextTree != null) {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      if (!embedded_fragment) {
-        referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
+      referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
             !part.parts().isEmpty() || toNext);
-      } else {
-        partToXML(xml, level, !part.parts().isEmpty() || toNext);
-      }
     } else if (element instanceof Heading) {
       headingToXML(xml, level, (Heading)element, id, count, !part.parts().isEmpty());
     } else {
@@ -246,6 +260,31 @@ public class NumberedTOCGenerator {
       }
     }
     xml.attribute("idref", treeid + "-" + count + "-" + head.fragment() + "-" + head.index());
+  }
+
+  /**
+   * Parse a PSML file.
+   *
+   * @param file  the PSML file
+   * @return the parsed document tree
+   *
+   * @throws SAXException           if problem parsing
+   * @throws FileNotFoundException  if file doesn't exist
+   */
+  public static DocumentTree parse(File file) throws SAXException, FileNotFoundException {
+    InputStream in = new FileInputStream(file);
+    DocumentTree tree = null;
+    try {
+      DocumentTreeHandler handler = new DocumentTreeHandler();
+      SAXParserFactory factory = SAXParserFactory.newInstance();
+      SAXParser parser = factory.newSAXParser();
+      parser.parse(in, handler);
+      tree = handler.get();
+    } catch (ParserConfigurationException | IOException ex) {
+      throw new SAXException(ex);
+    }
+    if (tree == null) throw new SAXException("Unable to generate tree instance from parse!");
+    return tree;
   }
 
 }

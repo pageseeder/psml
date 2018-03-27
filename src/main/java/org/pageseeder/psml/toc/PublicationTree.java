@@ -371,15 +371,13 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
     // Output the element
     Integer nextcount = null;
-    if (nextTree != null) {
+    if (embedded_fragment) {
+      element.toXML(xml, level, number, id, count);
+    } else if (nextTree != null) {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      if (embedded_fragment) {
-        element.toXML(xml, level, number, id, count);
-      } else {
-        element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
-      }
+      element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
     } else if (element instanceof Reference && !externalrefs) {
       // external reference not allowed so don't output XML
     } else {

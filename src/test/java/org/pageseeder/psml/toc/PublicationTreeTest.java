@@ -222,11 +222,6 @@ public final class PublicationTreeTest {
             ref(2, "X", 1000L),
             ref(2, "Y", 1001L)))
         .addReverseReference(1L).build();
-    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("B", "1", 1, true, "",
-            ref(2, "X", 1000L),
-            ref(2, "Y", 1001L)))
-        .addReverseReference(1L).build();
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "",
             h2("a", "2", 1, true, "x.x.x"),
@@ -236,7 +231,6 @@ public final class PublicationTreeTest {
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
-    publication = publication.add(inter2);
     publication = publication.add(tree);
     Assert.assertEquals(root.id(), publication.id());
     Assert.assertTrue(publication.listReverseReferences().isEmpty());

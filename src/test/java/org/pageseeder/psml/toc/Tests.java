@@ -51,15 +51,15 @@ public class Tests {
   }
 
   public static Part<Reference> ref(int level, String title, long uri) {
-    return new Part<>(new Reference(level, title, uri));
+    return new Part<>(new Reference(level, title, "", uri));
   }
 
   public static Part<Reference> ref(int level, String title, long uri, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, uri), parts);
+    return new Part<>(new Reference(level, title, "", uri), parts);
   }
 
   public static Part<Reference> ref(int level, String title, long uri, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, uri, documenttype, targetfrag), parts);
+    return new Part<>(new Reference(level, title, "", uri, documenttype, targetfrag), parts);
   }
 
   public static Part<Heading> h1(String title, String fragment, int index) {

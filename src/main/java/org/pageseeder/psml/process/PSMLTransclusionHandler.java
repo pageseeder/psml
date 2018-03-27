@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -68,6 +69,11 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   private Map<String, Map<String, Integer[]>> hierarchyUriFragIDs = new HashMap<>();
 
   /**
+   * Helper to compute numbering and TOC.
+   */
+  private NumberedTOCGenerator numberingAndTOC = null;
+
+  /**
    * Ancestor uriids of current node.
    */
   private Stack<String> ancestorUriIDs = new Stack<>();
@@ -86,6 +92,26 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
    * Current state.
    */
   private Stack<String> elements = new Stack<>();
+
+  /**
+   * Current URI ID
+   */
+  private long uriid = 0;
+
+  /**
+   * Current URI position (instance number in publication)
+   */
+  private int position = 0;
+
+  /**
+   * Current fragment
+   */
+  private String fragment = null;
+
+  /**
+   * Index (instance number) of heading/para in fragment
+   */
+  private int index = 0;
 
   /**
    * @param out            where the resulting XML should be written.
@@ -171,8 +197,26 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
                                          "media-fragment".equals(qName) ||
                                          "xref-fragment".equals(qName) ||
                                          "properties-fragment".equals(qName));
+    boolean isHeading  = noNamespace && "heading".equals(qName);
+    boolean isPara  = noNamespace && "para".equals(qName);
     if (isDocument && atts.getValue("id") == null)
       throw new SAXException("Document has no id attribute.");
+
+    // set heading/para prefix
+    String prefix = null;
+    if ((isHeading || isPara) && !this.elements.contains("compare")) {
+      this.index++;
+      prefix = atts.getValue("prefix");
+      if ("true".equals(atts.getValue("numbered"))) {
+        Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(
+            this.uriid, this.position, this.fragment, this.index);
+        if (pref != null) {
+          prefix = pref.value;
+        }
+      }
+    } else if (isFrag) {
+      this.index = 0;
+    }
 
     // if single transcluded fragment update uriids
     if ("document-fragment".equals(qName)) {
@@ -182,6 +226,8 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
       count++;
       this.uriIDsAlreadyFound.put(uriid, count);
       this.ancestorUriIDs.push(count + "_" + uriid);
+      this.uriid = Long.parseLong(uriid);
+      this.position = count;
       return;
     }
     // write start tag
@@ -245,6 +291,8 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
           value = count != 1 ? count + "_" + id : id;
           this.uriIDsAlreadyFound.put(id, count);
           this.ancestorUriIDs.push(count + "_" + id);
+          this.uriid = Long.parseLong(id);;
+          this.position = count;
           // don't modify fragment attribute on locator element
 //        } else if (isLocator && "fragment".equals(name)) {
 //          String id = atts.getValue(i);
@@ -258,6 +306,7 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
 //          }
         } else if (isFrag && "id".equals(name) && !this.elements.contains("compare")) {
           String id = atts.getValue(i);
+          this.fragment = id;
           // get uriid and make id unique
           int j = id.indexOf('-');
           if (j != -1) {
@@ -268,6 +317,8 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
           } else {
             value = id;
           }
+        } else if ((isHeading || isPara)  && "prefix".equals(name) && !this.elements.contains("compare")) {
+          value = prefix;
         } else {
           value = atts.getValue(i);
         }

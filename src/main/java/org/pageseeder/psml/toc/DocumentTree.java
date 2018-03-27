@@ -272,7 +272,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   private static void collectReferencesIds(Part<?> part, List<Long> uris) {
     Element element = part.element();
     if (element instanceof Reference) {
-      uris.add(((Reference)element).uri());
+      Reference ref = (Reference)element;
+      // don't collect embedded fragments
+      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
+        uris.add((ref.uri()));
+      }
     }
     for (Part<?> c : part.parts()) {
       collectReferencesIds(c, uris);
@@ -461,7 +465,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   public static class Builder {
 
     /** URI ID */
-    private final long _id;
+    private long _id = -1;
 
     /** Title of the document. */
     private String title = "[untitled]";
@@ -488,12 +492,18 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     private final Map<String,Integer> _fragmentlevels = new HashMap<>();;
 
     /**
+     * Creates a new builder for this content tree (id must be set before calling build).
+     */
+    public Builder() {
+    }
+
+    /**
      * Creates a new builder for this content tree.
      *
      * @param id The URI ID of the document.
      */
     public Builder(long id) {
-      if (id <= 0) throw new IllegalArgumentException("URI ID must be positive");
+      if (id < 0) throw new IllegalArgumentException("URI ID must be positive");
       this._id = id;
     }
 
@@ -509,6 +519,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
     public long id() {
       return this._id;
+    }
+
+    public Builder id(long id) {
+      if (id < 0) throw new IllegalArgumentException("URI ID must be positive");
+      this._id = id;
+      return this;
     }
 
     public Builder title(String title) {
@@ -556,6 +572,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     }
 
     public DocumentTree build() {
+      if (this._id < 0) throw new IllegalStateException("URI ID must be set");
       // New lists to ensure the builder no longer affects built tree
       List<Part<?>> parts = new ArrayList<>(this._parts);
       List<Long> reverse = new ArrayList<>(this._reverse);

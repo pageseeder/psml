@@ -139,8 +139,8 @@ public final class FragmentNumbering implements Serializable {
       embedded_fragment = !Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment());
       next = ref.uri();
       nextTree = pub.tree(next);
-      // can only be numbered if the referenced tree exists
-      if (nextTree != null) {
+      // can only be numbered if the referenced tree exists and not embedded fragment
+      if (nextTree != null && !embedded_fragment) {
         nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
         nextCount = doccount.get(next);
         nextCount = nextCount == null ? 1 : nextCount + 1;
@@ -149,10 +149,7 @@ public final class FragmentNumbering implements Serializable {
           nextTreeLevel = treeLevel + ref.level();
           nextLevel = nextTreeLevel + 1;
         }
-        // don't number embedded fragments
-        if (!embedded_fragment) {
-          processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
-        }
+        processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
       }
     } else if (element instanceof Heading) {
       processHeading((Heading)element, level, id, number, count);

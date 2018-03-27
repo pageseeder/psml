@@ -3,7 +3,11 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +26,9 @@ import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.psml.toc.DocumentTreeHandler;
+import org.pageseeder.psml.toc.PublicationConfig;
+import org.pageseeder.psml.toc.PublicationTree;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -112,7 +119,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Helper to compute numbering and TOC.
    */
-  private NumberingAndTOCGenerator numberingAndTOC = null;
+  private NumberedTOCGenerator numberingAndTOC = null;
 
   /**
    * Image cache where URI details for images are loaded from.
@@ -411,35 +418,18 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param generate whether or not not to generate the TOC
+   * @param config the publication config to set
+   * @param root   the publication root file
+   *
+   * @throws ProcessException  if problem parsing root file
    */
-  public void setGenerateTOC(boolean generate) {
-    if (this.numberingAndTOC == null && generate)
-      this.numberingAndTOC = new NumberingAndTOCGenerator();
-    this.generateTOC = generate;
-  }
-
-  /**
-   * @param numberConfig the numberConfig to set
-   */
-  public void setNumberConfig(NumberingConfig numberConfig) {
-    if (this.numberingAndTOC == null)
-      this.numberingAndTOC = new NumberingAndTOCGenerator();
-    this.numberingAndTOC.setNumberingConfig(numberConfig);
-  }
-
-  /**
-   * @return the list of sub TOCs created.
-   */
-  public Map<String, String> getSubTOCs() {
-    return this.numberingAndTOC == null ? null : this.numberingAndTOC.getSubTOCs();
-  }
-
-  /**
-   * @return the main TOC created.
-   */
-  public String getMainTOC() {
-    return this.numberingAndTOC == null ? null : this.numberingAndTOC.getTOC();
+  public void setPublicationConfig(PublicationConfig config, File root, boolean toc) throws ProcessException {
+    DocumentTreeHandler handler = new DocumentTreeHandler();
+    XMLUtils.parse(root, handler);
+    if (handler.get() != null) {
+      this.numberingAndTOC = new NumberedTOCGenerator(new PublicationTree(handler.get()));
+      this.generateTOC = toc;
+    }
   }
 
   /**
@@ -637,23 +627,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if (this.uriID != null && "document".equals(qName) && atts.getValue("id") == null) {
       write(" id=\"" + XMLUtils.escapeForAttribute(this.uriID) + '"');
     }
-    // generate numbering
-    if (this.numberingAndTOC != null && noNamespace && !this.elements.contains("compare")) {
-      try {
-        // heading or numbered para?
-        if (headingLevel > 0) {
-          this.numberingAndTOC.generateHeadingNumbering(headingLevel,
-              "true".equals(atts.getValue("numbered")), atts.getValue("prefix"), this.xml);
-        } else if ("para".equals(qName) && "true".equals(atts.getValue("numbered"))) {
-          this.numberingAndTOC.generateParaNumbering(atts.getValue("indent"), this.xml);
-        }
-      } catch (IOException ex) {
-        if (this.failOnError)
-          throw new SAXException("Failed to generate numbering for " + qName, ex);
-        else
-          this.logger.warn("Failed to generate numbering for " + qName + ": " + ex.getMessage());
-      }
-    }
     // add a full href path for xrefs, it will be stripped on second pass
     if (isXRef || isReverseXRef) {
       String relpath = this.transcluder.findXRefRelativePath(atts.getValue("href"));
@@ -689,20 +662,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.ignore = false;
       return;
     }
-    // toc?
-    if ("toc".equals(qName) && this.generateTOC) {
-      this.numberingAndTOC.setGenerateToc(true);
-    }
     // currently stripping?
     if (this.ignore)
       return;
     // reset flags
     if (this.inTranscludedXRef)
       this.inTranscludedXRef = false;
-    // close tag in toc if needed
-    if (this.numberingAndTOC != null && "heading".equals(qName)
-        && !this.elements.contains("compare"))
-      this.numberingAndTOC.endElement();
     // replace xref by its contents?
     boolean isXRef = (uri == null || uri.isEmpty())
         && ("blockxref".equals(qName) || "xref".equals(qName));
@@ -742,9 +707,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if (this.ignore || !this.inRequiredFragment || this.inTranscludedXRef) {
       return;
     }
-    // add text in toc if needed
-    if (this.numberingAndTOC != null)
-      this.numberingAndTOC.characters(ch, start, length);
     // markdown
     if (this.convertMarkdown && this.markdownContent != null)
       this.markdownContent.append(ch, start, length);
@@ -757,9 +719,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   @Override
   public void endDocument() throws SAXException {
-    // complete toc
-    if (this.numberingAndTOC != null)
-      this.numberingAndTOC.endDocument(this.uriID);
     // flush the thing
     try {
       this.xml.flush();
@@ -814,17 +773,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.setAllUriIDs(this.allUriIDs);
     handler.setHierarchyUriFragIDs(this.hierarchyUriFragIDs);
     handler.setInEmbedHierarchy(embed);
+    handler.numberingAndTOC = this.numberingAndTOC;
     // load only one fragment?
     if (fragment != null && !"default".equals(fragment)) {
       handler.setFragment(fragment);
       handler.addUriFragID(uriid, fragment, embed);
-      // create your own TOC, but use this as a parent to update our TOC too
-      handler.numberingAndTOC = new NumberingAndTOCGenerator(this.numberingAndTOC, true);
-
     } else {
       handler.addUriFragID(uriid, null, embed);
-      // create your own TOC, but use this as a parent to update our TOC too
-      handler.numberingAndTOC = new NumberingAndTOCGenerator(this.numberingAndTOC, false);
     }
     return handler;
   }
