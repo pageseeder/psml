@@ -26,6 +26,7 @@ import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.process.util.XSLTTransformer;
+import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -574,11 +575,19 @@ public final class Process {
         throw new ProcessException("Failed to create output file: "+e.getMessage(), e);
       }
       // create parser
-      PSMLTransclusionHandler handler2 = new PSMLTransclusionHandler(new OutputStreamWriter(fos, UTF8), relPath);
+      PSMLProcessHandler2 handler2 = new PSMLProcessHandler2(new OutputStreamWriter(fos, UTF8), relPath);
       handler2.setLogger(this.logger);
       handler2.setFailOnError(this.failOnError);
       handler2.setHierarchyUriFragIDs(handler1.getHierarchyUriFragIDs());
       handler2.setRelativiseImagePaths(imageSrc == ImageSrc.LOCATION);
+      // generate numbering
+      NumberedTOCGenerator numberingAndTOC = handler1.getNumberedTOCGenerator();
+      if (numberingAndTOC != null) {
+        numberingAndTOC.updatePublication();
+        numberingAndTOC.setFragmentNumbering(
+            new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig, new ArrayList<Long>()));
+        handler2.setPublicationConfig(this.publicationConfig, numberingAndTOC, this.generatetoc);
+      }
       // parse XML input
       try {
         XMLUtils.parse(tempOutput, handler2);

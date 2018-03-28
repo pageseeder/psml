@@ -2,6 +2,7 @@ package org.pageseeder.psml.toc;
 
 import static org.pageseeder.psml.toc.Tests.assertPartEquals;
 import static org.pageseeder.psml.toc.Tests.part;
+import static org.pageseeder.psml.toc.Tests.phantom;
 import static org.pageseeder.psml.toc.Tests.treeify;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public final class TreeExpanderTest {
   @Test
   public void testHeading2_single() {
     Heading heading = new Heading(2, "Hello", "title", 1);
-    Part<Phantom> expected = part(Phantom.of(1), part(heading));
+    Part<Phantom> expected = phantom(1, part(heading));
     List<Part<?>> top = treeify(heading);
     Assert.assertTrue(top.size() == 1);
     assertPartEquals(expected, top.get(0));
@@ -39,7 +40,7 @@ public final class TreeExpanderTest {
   @Test
   public void testHeading3_single() {
     Heading heading = new Heading(3, "Hello", "title", 1);
-    Part<Phantom> expected = part(Phantom.of(1), part(Phantom.of(2), part(heading)));
+    Part<Phantom> expected = phantom(1, phantom(2, part(heading)));
     List<Part<?>> top = treeify(heading);
     Assert.assertTrue(top.size() == 1);
     assertPartEquals(expected, top.get(0));
@@ -48,7 +49,7 @@ public final class TreeExpanderTest {
   @Test
   public void testHeading4_single() {
     Heading heading = new Heading(4, "Hello", "title", 1);
-    Part<Phantom> expected = part(Phantom.of(1), part(Phantom.of(2), part(Phantom.of(3), part(heading))));
+    Part<Phantom> expected = phantom(1, phantom(2, phantom(3, part(heading))));
     List<Part<?>> top = treeify(heading);
     Assert.assertTrue(top.size() == 1);
     assertPartEquals(expected, top.get(0));
@@ -74,7 +75,7 @@ public final class TreeExpanderTest {
     Heading ha = new Heading(2, "A", "title", 1);
     Heading hb = new Heading(2, "B", "content", 1);
     Heading hc = new Heading(2, "C", "content", 1);
-    Part<Phantom> expected = part(Phantom.of(1), part(ha), part(hb), part(hc));
+    Part<Phantom> expected = phantom(1, part(ha), part(hb), part(hc));
     List<Part<?>> top = treeify(ha, hb, hc);
     Assert.assertTrue(top.size() == 1);
     assertPartEquals(expected, top.get(0));

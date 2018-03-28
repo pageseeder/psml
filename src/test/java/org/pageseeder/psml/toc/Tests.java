@@ -119,7 +119,7 @@ public class Tests {
   }
 
   public static Part<Phantom> phantom(int level, @NonNull Part<?>... parts) {
-    return new Part<>(Phantom.of(level), parts);
+    return new Part<>(new Phantom(level, Phantom.NO_FRAGMENT), parts);
   }
 
   public static Part<Heading> h1(String title, String fragment, int index, boolean numbered, String prefix) {

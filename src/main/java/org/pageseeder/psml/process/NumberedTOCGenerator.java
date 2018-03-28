@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +42,17 @@ public class NumberedTOCGenerator {
   /**
    * The tree for the TOC
    */
-  private final PublicationTree _publicationTree;
+  private PublicationTree _publicationTree;
 
   /**
    * The numbering for the TOC
    */
   private FragmentNumbering _fragmentNumbering = null;
+
+  /**
+   * Trees to add to publication keyed on URIID
+   */
+  private Map<Long,DocumentTree> _addTrees = new HashMap<>();
 
   /**
    * Constructor
@@ -77,6 +83,23 @@ public class NumberedTOCGenerator {
    */
   public FragmentNumbering fragmentNumbering() {
     return this._fragmentNumbering;
+  }
+
+  /**
+   * Add a document tree to the publication
+   *
+   * @param tree  the tree to add
+   */
+  public void addTree(DocumentTree tree) {
+    this._addTrees.put(tree.id(), tree);
+  }
+
+  /**
+   * Update the publication with added trees.
+   */
+  public void updatePublication() {
+    this._publicationTree = this._publicationTree.modify(
+        Collections.emptyList(), this._addTrees, this._publicationTree.root().id());
   }
 
   /**

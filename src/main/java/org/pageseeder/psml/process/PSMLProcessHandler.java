@@ -26,6 +26,7 @@ import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.DocumentTreeHandler;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.PublicationTree;
@@ -39,10 +40,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 /**
- * Handle the resolving of the block XRefs with type="Transclude".
+ * Handle embedding and transcluding content and other processes.
  *
  * @author Jean-Baptiste Reure
- * @version 5.0002
+ * @author Philip Rutherford
  */
 public final class PSMLProcessHandler extends DefaultHandler {
 
@@ -120,6 +121,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * Helper to compute numbering and TOC.
    */
   private NumberedTOCGenerator numberingAndTOC = null;
+
+  /**
+   * Config for publication.
+   */
+  private PublicationConfig publicationConfig = null;
 
   /**
    * Image cache where URI details for images are loaded from.
@@ -291,6 +297,20 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
+   * @return Numbered TOC Generator
+   */
+  public NumberedTOCGenerator getNumberedTOCGenerator() {
+    return this.numberingAndTOC;
+  }
+
+  /**
+   * @return Publication config
+   */
+  public PublicationConfig getPublicationConfig() {
+    return this.publicationConfig;
+  }
+
+  /**
    * @param uriid the URI ID.
    */
   public void setURIID(String uriid) {
@@ -426,8 +446,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
   public void setPublicationConfig(PublicationConfig config, File root, boolean toc) throws ProcessException {
     DocumentTreeHandler handler = new DocumentTreeHandler();
     XMLUtils.parse(root, handler);
-    if (handler.get() != null) {
-      this.numberingAndTOC = new NumberedTOCGenerator(new PublicationTree(handler.get()));
+    DocumentTree tree = handler.get();
+    if (tree != null) {
+      tree = tree.normalize(config.getTocTitleCollapse());
+      this.numberingAndTOC = new NumberedTOCGenerator(new PublicationTree(tree));
+      this.publicationConfig = config;
       this.generateTOC = toc;
     }
   }
@@ -566,8 +589,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.currentFragment = atts.getValue("id");
     // write start tag
     write('<' + qName);
-    if (noNamespace && "toc".equals(qName) && this.uriID != null)
-      write(" uriid=\"" + XMLUtils.escapeForAttribute(this.uriID) + '"');
     // level of heading if it is one
     int headingLevel = -1;
     // attributes
@@ -774,6 +795,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.setHierarchyUriFragIDs(this.hierarchyUriFragIDs);
     handler.setInEmbedHierarchy(embed);
     handler.numberingAndTOC = this.numberingAndTOC;
+    handler.publicationConfig = this.publicationConfig;
     // load only one fragment?
     if (fragment != null && !"default".equals(fragment)) {
       handler.setFragment(fragment);
