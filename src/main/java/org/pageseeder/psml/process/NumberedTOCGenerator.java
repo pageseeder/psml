@@ -28,6 +28,7 @@ import org.pageseeder.psml.toc.Paragraph;
 import org.pageseeder.psml.toc.Part;
 import org.pageseeder.psml.toc.PublicationTree;
 import org.pageseeder.psml.toc.Reference;
+import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.xml.sax.SAXException;
 
@@ -115,7 +116,7 @@ public class NumberedTOCGenerator {
     if (root != null) {
       xml.attribute("title", root.title());
       Map<Long,Integer> doccount = new HashMap<>();
-      toXML(xml, root.id(), 1, doccount, 1, new ArrayList<Long>());
+      toXML(xml, root.id(), 1, doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT);
     }
     xml.closeElement();
   }
@@ -129,18 +130,24 @@ public class NumberedTOCGenerator {
    * @param doccount  Map of [uriid], [number of uses]
    * @param count     No. of times ID has been used.
    * @param ancestors List of the current ancestor tree IDs
+   * @param fragment  The document fragment to serialize.
    *
    * @throws IOException If thrown by XML writer
    */
   private void toXML(XMLWriter xml, long id, int level,
-      Map<Long,Integer> doccount, Integer count, List<Long> ancestors) throws IOException {
-    if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
-    ancestors.add(id);
+      Map<Long,Integer> doccount, Integer count, List<String> ancestors, String fragment) throws IOException {
+    String key = id + "-" + fragment;
+    if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID-fragment " + key);
+    ancestors.add(key);
     DocumentTree current = this._publicationTree.tree(id);
+    if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
+      current = current.singleFragmentTree(fragment);
+      Tests.print(current);
+    }
     for (Part<?> part : current.parts()) {
       toXML(xml, id, level, part, doccount, count, ancestors);
     }
-    ancestors.remove(id);
+    ancestors.remove(key);
   }
 
   /**
@@ -157,32 +164,34 @@ public class NumberedTOCGenerator {
    * @throws IOException If thrown by XML writer
    */
   private void toXML(XMLWriter xml, long id, int level, Part<?> part,
-      Map<Long,Integer> doccount, Integer count, List<Long> ancestors) throws IOException {
+      Map<Long,Integer> doccount, Integer count, List<String> ancestors) throws IOException {
     Element element = part.element();
     // ignore paragraphs
     if (element instanceof Paragraph) return;
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
-    boolean embedded_fragment = false;
+    String target_fragment = Reference.DEFAULT_FRAGMENT;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      embedded_fragment = !Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment());
+      target_fragment = ref.targetfragment();
       next = ref.uri();
       nextTree = this._publicationTree.tree(next);
-      toNext = nextTree != null && !embedded_fragment;
+      toNext = nextTree != null;
     }
 
     // Output the element
     Integer nextcount = null;
-    if (embedded_fragment) {
-      partToXML(xml, level, false);
-    } else if (nextTree != null) {
+    if (toNext) {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
+      if (Reference.DEFAULT_FRAGMENT.equals(target_fragment)) {
+        referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
             !part.parts().isEmpty() || toNext);
+      } else {
+        partToXML(xml, level, !part.parts().isEmpty() || toNext);
+      }
     } else if (element instanceof Heading) {
       headingToXML(xml, level, (Heading)element, id, count, !part.parts().isEmpty());
     } else {
@@ -190,9 +199,9 @@ public class NumberedTOCGenerator {
     }
 
     // Expand found reference
-    if (toNext && !embedded_fragment) {
+    if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, doccount, nextcount, ancestors);
+      toXML(xml, next, level+1, doccount, nextcount, ancestors, target_fragment);
     }
 
     // Process all child parts

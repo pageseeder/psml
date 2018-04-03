@@ -68,7 +68,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @param element The element starting this part
    * @param parts   The sub-parts
    */
-  private Part(T element, List<Part<?>> parts) {
+  public Part(T element, List<Part<?>> parts) {
     this._element = element;
     this._parts = parts;
   }

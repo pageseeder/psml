@@ -54,6 +54,10 @@ public class Tests {
     return new Part<>(new Reference(level, title, "", uri));
   }
 
+  public static Part<Reference> ref(int level, String title, String fragment, long uri) {
+    return new Part<>(new Reference(level, title, fragment, uri));
+  }
+
   public static Part<Reference> ref(int level, String title, long uri, @NonNull Part<?>... parts) {
     return new Part<>(new Reference(level, title, "", uri), parts);
   }
@@ -120,6 +124,10 @@ public class Tests {
 
   public static Part<Phantom> phantom(int level, @NonNull Part<?>... parts) {
     return new Part<>(new Phantom(level, Phantom.NO_FRAGMENT), parts);
+  }
+
+  public static Part<Phantom> phantom(int level, String fragment, @NonNull Part<?>... parts) {
+    return new Part<>(new Phantom(level, fragment), parts);
   }
 
   public static Part<Heading> h1(String title, String fragment, int index, boolean numbered, String prefix) {

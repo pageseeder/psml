@@ -138,8 +138,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     this._titlefragment = titlefragment;
     this._numbered = numbered;
     this._prefix = prefix;
-    this._fragmentheadings = fragmentheadings;
-    this._fragmentlevels = fragmentlevels;
+    this._fragmentheadings = Collections.unmodifiableMap(fragmentheadings);
+    this._fragmentlevels = Collections.unmodifiableMap(fragmentlevels);
   }
 
   /**
@@ -309,6 +309,24 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
+   * Remove the parts from this tree that are not from the specified fragment.
+   * Preserves hierarchy by changing non-fragment ancestor parts to phantoms
+   * and removing the top phantoms.
+   *
+   * @param tree     The tree to process
+   * @param fragment The fragment ID to preserve
+   *
+   * @return a new tree with other fragments removed
+   */
+  public DocumentTree singleFragmentTree(String fragment) {
+    List<Part<?>> parts = removeOtherFragments(this.parts(), fragment, false);
+    if (parts == null) parts = new ArrayList<>();
+    DocumentTree tree = new DocumentTree(this._id, this._title, this._labels, this._reverse,
+        NO_FRAGMENT, false, NO_PREFIX, parts, this._fragmentheadings, this._fragmentlevels);
+    return removePhantomParts(tree);
+  }
+
+  /**
    * Normalize the content tree and return a new content tree.
    *
    * <p>This methods checks normalization is required by comparing the title
@@ -455,6 +473,34 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
         firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
   }
 
+  /**
+   * Remove the parts from the tree that are not from the specified fragment.
+   *
+   * @param parts    The existing parts
+   * @param fragment The fragment ID to preserve
+   * @param found    Whether the fragment has been found
+   *
+   * @return the modified parts or <code>null</code> if fragment not found
+   */
+  public static List<Part<?>> removeOtherFragments(List<Part<?>> parts, String fragment, boolean found) {
+    List<Part<?>> modified = new ArrayList<>();
+    if (!parts.isEmpty()) {
+      for (Part<?> part : parts) {
+        Element el = part.element();
+        if (fragment.equals(el.fragment())) {
+          modified.add(new Part<>(el,
+              removeOtherFragments(part.parts(), fragment, true)));
+        } else if (!found) {
+          List<Part<?>> branch = removeOtherFragments(part.parts(), fragment, false);
+          // if found in branch change this element to a phantom
+          if (branch != null) {
+            modified.add(new Part<>(new Phantom(el.level(), el.fragment()), branch));
+          }
+        }
+      }
+    }
+    return modified.isEmpty() && !found ? null : modified;
+  }
 
   // Inner class
   // ----------------------------------------------------------------------------------------------

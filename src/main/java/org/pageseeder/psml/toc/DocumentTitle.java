@@ -29,7 +29,7 @@ public final class DocumentTitle extends Element {
    * @param title The title for the document.
    */
   public DocumentTitle(String title) {
-    super(0, title);
+    super(0, title, NO_FRAGMENT);
   }
 
   /**

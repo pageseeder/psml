@@ -26,11 +26,6 @@ public final class Reference extends Element implements Serializable {
   public static final String DEFAULT_FRAGMENT = "default";
 
   /**
-   * Fragment ID this part starts in
-   */
-  private final String _fragment;
-
-  /**
    * The URI ID of the target.
    */
   private final long _uri;
@@ -56,8 +51,7 @@ public final class Reference extends Element implements Serializable {
    * @param targetfrag  The target fragment ID.
    */
   public Reference(int level, String title, String fragment, Long uri, String type, String targetfrag) {
-    super(level, title);
-    this._fragment = fragment;
+    super(level, title, fragment);
     this._uri = uri;
     this._type = type;
     this._targetfragment = DEFAULT_FRAGMENT.equals(targetfrag) ? DEFAULT_FRAGMENT : targetfrag;
@@ -71,15 +65,8 @@ public final class Reference extends Element implements Serializable {
    * @param fragment   The Fragment identifier where the heading was found.
    * @param uri        The URI ID.
    */
-  public Reference(int level, String fragment, String title, Long uri) {
+  public Reference(int level, String title, String fragment, Long uri) {
     this(level, title, fragment, uri, DEFAULT_TYPE, DEFAULT_FRAGMENT);
-  }
-
-  /**
-   * @return Fragment ID that this reference is defined in
-   */
-  public String fragment() {
-    return this._fragment;
   }
 
   /**

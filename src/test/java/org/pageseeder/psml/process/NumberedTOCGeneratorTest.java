@@ -52,15 +52,19 @@ public class NumberedTOCGeneratorTest {
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 1, true, "x.x",
             h2("a", "2", 1, true, "x.x.x"),
-            h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
+            h2("b", "2", 2, true, "", ref(3, "Z", "2", 1002)),
             h2("c", "4", 1, false, ""),
             phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
+        .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree3 = new DocumentTree.Builder(1002).title("Z")
+        .part(h1("Z", "1", 1, true, "x.x"))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(inter2);
     publication = publication.add(tree);
     publication = publication.add(tree2);
+    publication = publication.add(tree3);
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
