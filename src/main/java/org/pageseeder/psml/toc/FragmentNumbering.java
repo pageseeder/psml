@@ -106,6 +106,9 @@ public final class FragmentNumbering implements Serializable {
     if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(key);
     DocumentTree current = pub.tree(id);
+    if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
+      current = current.singleFragmentTree(fragment);
+    }
     PublicationNumbering numbering = config.getPublicationNumbering(current.labels());
     if (numbering == null) {
       number = null;
@@ -199,7 +202,7 @@ public final class FragmentNumbering implements Serializable {
   public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, Integer count) {
     String p = target.prefix();
     Prefix pref = null;
-    if (target.numbered() && number != null) {
+    if (target.numbered() && number != null && Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
       pref = number.generateNumbering(level, "heading", "");
     }
     if (pref == null) {
