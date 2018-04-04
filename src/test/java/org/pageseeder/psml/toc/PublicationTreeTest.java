@@ -117,7 +117,8 @@ public final class PublicationTreeTest {
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
-              ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2")))
+              ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2"),
+              ref(1, "BY", 1002L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
@@ -134,11 +135,15 @@ public final class PublicationTreeTest {
             h2("c", "4", 1, false, ""),
             phantom(3, h4("d", "4", 2, true, "", h5("xc", "5", 1, false, "x.x.x.x")))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree3 = new DocumentTree.Builder(1002).title("Z")
+        .part(h1("Z", "1", 1, true, "x.x"))
+        .addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(inter2);
     publication = publication.add(tree);
     publication = publication.add(tree2);
+    publication = publication.add(tree3);
     Assert.assertEquals(root.id(), publication.id());
     Assert.assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
@@ -149,6 +154,7 @@ public final class PublicationTreeTest {
     FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
     Tests.print(publication, 1000, 2, numbering, true);
+    Tests.print(publication, 1002, -1, numbering, true);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
@@ -563,6 +569,10 @@ public final class PublicationTreeTest {
     System.out.println(result);
     System.out.println("Number of prefixes: " + prefixes.size());
     System.out.println("Generation time: " + (end - start));
+    start = System.currentTimeMillis();
+    Tests.print(publication, 1499, -1, numbering, true);
+    end = System.currentTimeMillis();
+    System.out.println("Print time: " + (end - start));
   }
 
   @Test(expected = IllegalStateException.class)

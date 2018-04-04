@@ -194,6 +194,7 @@ public final class Reference extends Element implements Serializable {
         xml.attribute("prefix", prefix);
       }
     }
+    xml.attribute("position", count);
     xml.closeElement();
   }
 

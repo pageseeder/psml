@@ -347,6 +347,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     Element element = part.element();
     // ignore paragraphs
     if (element instanceof Paragraph) return;
+    boolean output = trees == null || trees.contains(id);
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
@@ -357,31 +358,33 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       next = ref.uri();
       nextTree = tree(next);
       toNext = nextTree != null &&
-          (trees == null || trees.contains(next)) &&
           id != cid &&
           !embedded_fragment;
     }
-    xml.openElement("part", !part.parts().isEmpty() || toNext);
-    xml.attribute("level", level);
-    if (toNext && cid == next) {
-      xml.attribute("content", "true");
-    } else if (element instanceof Heading) {
-      xml.attribute("uriid", Long.toString(id));
+    if (output) {
+      xml.openElement("part", !part.parts().isEmpty() ||
+          (toNext && (trees == null || trees.contains(next))));
+      xml.attribute("level", level);
+      if (toNext && cid == next) {
+        xml.attribute("content", "true");
+      } else if (element instanceof Heading) {
+        xml.attribute("uriid", Long.toString(id));
+      }
     }
 
     // Output the element
     Integer nextcount = null;
     if (embedded_fragment) {
-      element.toXML(xml, level, number, id, count);
+      if (output) element.toXML(xml, level, number, id, count);
     } else if (nextTree != null) {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
+      if (output) element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
     } else if (element instanceof Reference && !externalrefs) {
       // external reference not allowed so don't output XML
     } else {
-      element.toXML(xml, level, number, id, count);
+      if (output) element.toXML(xml, level, number, id, count);
     }
 
     // Expand found reference
@@ -394,7 +397,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     for (Part<?> r : part.parts()) {
       toXML(xml, id, level+1, r, cid, trees, number, doccount, count, ancestors, externalrefs);
     }
-    xml.closeElement();
+    if (output) xml.closeElement();
   }
 
   /**
