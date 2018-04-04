@@ -63,7 +63,14 @@ public final class TreeExpander {
 
     // Insert phantom parts when we jumps levels (e.g. h1 -> h4)
     while (elementlevel > level) {
-      Element phantom = Phantom.of(level++);
+      Element phantom;
+      if (element instanceof Reference) {
+        phantom = new Phantom(level++, ((Reference)element).fragment());
+      } else if (element instanceof Heading) {
+        phantom = new Phantom(level++, ((Heading)element).fragment());
+      } else {
+        phantom = new Phantom(level++, Phantom.NO_FRAGMENT);
+      }
       MutablePart mutable = new MutablePart(phantom);
       current.add(mutable);
       this._parts.push(mutable);

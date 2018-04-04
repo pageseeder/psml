@@ -138,8 +138,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     this._titlefragment = titlefragment;
     this._numbered = numbered;
     this._prefix = prefix;
-    this._fragmentheadings = fragmentheadings;
-    this._fragmentlevels = fragmentlevels;
+    this._fragmentheadings = Collections.unmodifiableMap(fragmentheadings);
+    this._fragmentlevels = Collections.unmodifiableMap(fragmentlevels);
   }
 
   /**
@@ -272,7 +272,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   private static void collectReferencesIds(Part<?> part, List<Long> uris) {
     Element element = part.element();
     if (element instanceof Reference) {
-      uris.add(((Reference)element).uri());
+      Reference ref = (Reference)element;
+      // don't collect embedded fragments
+      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
+        uris.add((ref.uri()));
+      }
     }
     for (Part<?> c : part.parts()) {
       collectReferencesIds(c, uris);
@@ -302,6 +306,24 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public boolean isEmpty() {
     return this._parts.isEmpty();
+  }
+
+  /**
+   * Remove the parts from this tree that are not from the specified fragment.
+   * Preserves hierarchy by changing non-fragment ancestor parts to phantoms
+   * and removing the top phantoms.
+   *
+   * @param tree     The tree to process
+   * @param fragment The fragment ID to preserve
+   *
+   * @return a new tree with other fragments removed
+   */
+  public DocumentTree singleFragmentTree(String fragment) {
+    List<Part<?>> parts = removeOtherFragments(this.parts(), fragment, false);
+    if (parts == null) parts = new ArrayList<>();
+    DocumentTree tree = new DocumentTree(this._id, this._title, this._labels, this._reverse,
+        NO_FRAGMENT, false, NO_PREFIX, parts, this._fragmentheadings, this._fragmentlevels);
+    return removePhantomParts(tree);
   }
 
   /**
@@ -425,10 +447,15 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     String prefixedTitle = firstHeading.getPrefixedTitle();
     String documentTitle = tree._title;
     List<Part<?>> children = new ArrayList<>();
-    // The first heading 1 matches the document title and all other headings appear under it
+    // The first heading 1 matches the document title or always collapse
     if ((headingTitle.equals(documentTitle) || prefixedTitle.equals(documentTitle) || collapse == TitleCollapse.always)
         && collapse != TitleCollapse.never) {
       if (parts.size() > 1) {
+        // if first heading has children add it as a phantom
+        if (firstPart.size() > 0) {
+          children.add(new Part<>(
+              new Phantom(firstHeading.level(), firstHeading.fragment()), firstPart.parts()));
+        }
         // Copy the other parts
         children.addAll(parts.subList(1, parts.size()));
       } else {
@@ -451,6 +478,34 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
         firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
   }
 
+  /**
+   * Remove the parts from the tree that are not from the specified fragment.
+   *
+   * @param parts    The existing parts
+   * @param fragment The fragment ID to preserve
+   * @param found    Whether the fragment has been found
+   *
+   * @return the modified parts or <code>null</code> if fragment not found
+   */
+  public static List<Part<?>> removeOtherFragments(List<Part<?>> parts, String fragment, boolean found) {
+    List<Part<?>> modified = new ArrayList<>();
+    if (!parts.isEmpty()) {
+      for (Part<?> part : parts) {
+        Element el = part.element();
+        if (fragment.equals(el.fragment())) {
+          modified.add(new Part<>(el,
+              removeOtherFragments(part.parts(), fragment, true)));
+        } else if (!found) {
+          List<Part<?>> branch = removeOtherFragments(part.parts(), fragment, false);
+          // if found in branch change this element to a phantom
+          if (branch != null) {
+            modified.add(new Part<>(new Phantom(el.level(), el.fragment()), branch));
+          }
+        }
+      }
+    }
+    return modified.isEmpty() && !found ? null : modified;
+  }
 
   // Inner class
   // ----------------------------------------------------------------------------------------------
@@ -461,7 +516,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   public static class Builder {
 
     /** URI ID */
-    private final long _id;
+    private long _id = -1;
 
     /** Title of the document. */
     private String title = "[untitled]";
@@ -488,12 +543,18 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     private final Map<String,Integer> _fragmentlevels = new HashMap<>();;
 
     /**
+     * Creates a new builder for this content tree (id must be set before calling build).
+     */
+    public Builder() {
+    }
+
+    /**
      * Creates a new builder for this content tree.
      *
      * @param id The URI ID of the document.
      */
     public Builder(long id) {
-      if (id <= 0) throw new IllegalArgumentException("URI ID must be positive");
+      if (id < 0) throw new IllegalArgumentException("URI ID must be positive");
       this._id = id;
     }
 
@@ -509,6 +570,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
     public long id() {
       return this._id;
+    }
+
+    public Builder id(long id) {
+      if (id < 0) throw new IllegalArgumentException("URI ID must be positive");
+      this._id = id;
+      return this;
     }
 
     public Builder title(String title) {
@@ -556,6 +623,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     }
 
     public DocumentTree build() {
+      if (this._id < 0) throw new IllegalStateException("URI ID must be set");
       // New lists to ensure the builder no longer affects built tree
       List<Part<?>> parts = new ArrayList<>(this._parts);
       List<Long> reverse = new ArrayList<>(this._reverse);

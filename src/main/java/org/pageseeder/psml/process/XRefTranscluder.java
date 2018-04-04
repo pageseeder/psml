@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.psml.toc.DocumentTree;
+import org.pageseeder.psml.toc.DocumentTreeHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -210,6 +212,18 @@ public final class XRefTranscluder {
       handler.getTranscluder().parentFiles.putAll(this.parentFiles);
       // parse now
       XMLUtils.parse(target, handler);
+      // if publication then parse TOC
+      NumberedTOCGenerator numberingAndTOC = this.parentHandler.getNumberedTOCGenerator();
+      if (numberingAndTOC != null) {
+        DocumentTreeHandler tochandler = new DocumentTreeHandler();
+        tochandler.setTransclusions(true);
+        XMLUtils.parse(target, tochandler);
+        DocumentTree tree = tochandler.get();
+        if (tree != null) {
+          tree = tree.normalize(this.parentHandler.getPublicationConfig().getTocTitleCollapse());
+          numberingAndTOC.addTree(tree);
+        }
+      }
       return true;
     }
     return false;

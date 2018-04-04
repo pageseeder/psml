@@ -26,16 +26,17 @@ import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.process.util.XSLTTransformer;
+import org.pageseeder.psml.toc.FragmentNumbering;
+import org.pageseeder.psml.toc.PublicationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Perform the process task.
  * For more info, see {@link
- * http://dev.pageseeder.com/api/ant/tasks/Task_process.html}
+ * https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_process.html}
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
  *
  */
 public final class Process {
@@ -127,12 +128,12 @@ public final class Process {
   /**
    * Defines the numbering
    */
-  private NumberingConfig numbering = null;
+  private PublicationConfig publicationConfig = null;
 
   /**
    * Defines the numbering
    */
-  private IncludesExcludesMatcher numberingMatcher = null;
+  private String publicationRoot = null;
 
   /**
    * The posttransform details.
@@ -143,14 +144,6 @@ public final class Process {
    * The error handling details
    */
   private ErrorHandling error = null;
-
-  /**
-   * @param generate the generateTOC to set
-   */
-  public void setGenerateTOC(boolean generate) {
-    this.generatetoc = generate;
-    if (this.generatetoc) this.processXML = true;
-  }
 
   /**
    * @param fail the failOnError to set
@@ -226,19 +219,17 @@ public final class Process {
   }
 
   /**
-   * @param cfg the numbering details
+   * @param cfg   the publication config
+   * @param root  the root file path
+   * @param toc   whether to generate TOC
    */
-  public void setNumberingConfig(NumberingConfig cfg) {
-    if (cfg == null) return;
-    this.numbering = cfg;
+  public void setPublicationConfig(PublicationConfig cfg, String root, boolean toc) {
+    if (cfg == null || root == null)
+      throw new IllegalArgumentException("Publication config and root cannot be null");
+    this.publicationConfig = cfg;
+    this.publicationRoot = root;
+    this.generatetoc = toc;
     this.processXML = true;
-  }
-
-  /**
-   * @param matcher the numberingMatcher to set
-   */
-  public void setNumberingMatcher(IncludesExcludesMatcher matcher) {
-    this.numberingMatcher = matcher;
   }
 
   /**
@@ -505,8 +496,6 @@ public final class Process {
       handler1.setFailOnError(this.failOnError);
       handler1.setProcessed(this.processed);
       handler1.setConvertMarkdown(this.convertMarkdown);
-      // set TOC creation
-      handler1.setGenerateTOC(this.generatetoc);
       // add xrefs handling details
       List<String> xrefsTypes = null;
       boolean excludeXRefFrag = false;
@@ -540,16 +529,14 @@ public final class Process {
         embedMetadata     = this.imageHandling.isMetadataEmbedded();
       }
       handler1.setImageHandling(thecache, imageSrc, logImagesNotFound, siteprefix, embedMetadata);
-      // add numbering config
-      if (this.numbering != null && (this.numberingMatcher == null ||
-                                    !this.numberingMatcher.hasPatterns() ||
-                                     this.numberingMatcher.matches(relPath))) {
-          handler1.setNumberConfig(this.numbering);
-      }
-      // add elements stripping details
-      handler1.setStrip(this.strip);
-      // parse XML input
+      // add publication config
       try {
+        if (this.publicationConfig != null && this.publicationRoot.equals(relPath)) {
+            handler1.setPublicationConfig(this.publicationConfig, psml, this.generatetoc);
+        }
+        // add elements stripping details
+        handler1.setStrip(this.strip);
+        // parse XML input
         XMLUtils.parse(psml, handler1);
       } catch (ProcessException e) {
         if (this.failOnError) throw e;
@@ -588,15 +575,19 @@ public final class Process {
         throw new ProcessException("Failed to create output file: "+e.getMessage(), e);
       }
       // create parser
-      PSMLTransclusionHandler handler2 = new PSMLTransclusionHandler(new OutputStreamWriter(fos, UTF8), relPath);
+      PSMLProcessHandler2 handler2 = new PSMLProcessHandler2(new OutputStreamWriter(fos, UTF8), relPath);
       handler2.setLogger(this.logger);
       handler2.setFailOnError(this.failOnError);
       handler2.setHierarchyUriFragIDs(handler1.getHierarchyUriFragIDs());
-      if (this.generatetoc) {
-        handler2.setSubTOCs(handler1.getSubTOCs());
-        handler2.setMainTOC(handler1.getMainTOC());
-      }
       handler2.setRelativiseImagePaths(imageSrc == ImageSrc.LOCATION);
+      // generate numbering
+      NumberedTOCGenerator numberingAndTOC = handler1.getNumberedTOCGenerator();
+      if (numberingAndTOC != null) {
+        numberingAndTOC.updatePublication();
+        numberingAndTOC.setFragmentNumbering(
+            new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig, true, new ArrayList<Long>()));
+        handler2.setPublicationConfig(this.publicationConfig, numberingAndTOC, this.generatetoc);
+      }
       // parse XML input
       try {
         XMLUtils.parse(tempOutput, handler2);

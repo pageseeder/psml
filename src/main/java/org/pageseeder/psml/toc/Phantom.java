@@ -5,8 +5,6 @@ package org.pageseeder.psml.toc;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -20,41 +18,16 @@ import org.pageseeder.xmlwriter.XMLWriter;
  */
 public final class Phantom extends Element implements Serializable {
 
-  /** */
+  /** For serialization */
   private static final long serialVersionUID = 1L;
 
-  private static final Phantom P1 = new Phantom(1);
-  private static final Phantom P2 = new Phantom(2);
-  private static final Phantom P3 = new Phantom(3);
-  private static final Phantom P4 = new Phantom(4);
-  private static final Phantom P5 = new Phantom(5);
-  private static final Phantom P6 = new Phantom(6);
-
   /**
-   * Commonly used instances are cached.
-   */
-  private static final Map<Integer, Phantom> PHANTOMS = new HashMap<>();
-  static {
-    PHANTOMS.put(1, P1);
-    PHANTOMS.put(2, P2);
-    PHANTOMS.put(3, P3);
-    PHANTOMS.put(4, P4);
-    PHANTOMS.put(5, P5);
-    PHANTOMS.put(6, P6);
-  }
-
-  /**
-   * Keep this constructor private and use static instantiator instead.
+   * Constructor
    *
    * @param level The level of the phantom element.
    */
-  private Phantom(int level) {
-    super(level);
-  }
-
-  public static Phantom of(int level) {
-    Phantom phantom = PHANTOMS.get(level);
-    return phantom != null? phantom : new Phantom(level);
+  public Phantom(int level, String fragment) {
+    super(level, NO_TITLE, fragment);
   }
 
   @Override
@@ -71,7 +44,7 @@ public final class Phantom extends Element implements Serializable {
   @Override
   public Phantom adjustLevel(int delta) {
     if (delta == 0) return this;
-    return Phantom.of(level()+delta);
+    return new Phantom(level()+delta, fragment());
   }
 
   @Override

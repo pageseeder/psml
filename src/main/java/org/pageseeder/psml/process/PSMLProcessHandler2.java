@@ -12,19 +12,55 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+import org.pageseeder.psml.toc.PublicationConfig;
+import org.pageseeder.xmlwriter.XMLWriter;
+import org.pageseeder.xmlwriter.XMLWriterImpl;
 import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Handle the resolving of the block XRefs with type="Transclude".
+ * Handle inserting TOC and other processes.
  *
  * @author Jean-Baptiste Reure
- * @version 5.0002
+ * @author Philip Rutherford
  *
  */
-public final class PSMLTransclusionHandler extends DefaultHandler {
+public final class PSMLProcessHandler2 extends DefaultHandler {
+
+  private final class Location {
+
+    /**
+     * Current URI ID
+     */
+    private long uriid;
+
+    /**
+     * Current URI position (instance number in publication)
+     */
+    private int position;
+
+    /**
+     * Current fragment
+     */
+    private String fragment = null;
+
+    /**
+     * Index (instance number) of heading/para in fragment
+     */
+    private int index = 0;
+
+    /**
+     * Constructor
+     */
+    private Location(long uriid, int position) {
+      this.uriid = uriid;
+      this.position = position;
+    }
+
+  }
 
   /**
    * The href attribute
@@ -52,20 +88,30 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   private boolean relativiseImagePaths = true;
 
   /**
-   * Image cache where URI details for images are loaded from.
-   */
-  private String toc = null;
-
-  /**
    * The relative path of the parent folder (used to compute relative paths).
    */
   private final String sourceRelativePath;
+
+  /**
+   * If the TOC should be generated
+   */
+  private boolean generateTOC = false;
 
   /**
    * Number of URI/frag IDs in the each document sub-hierarchy <root n_uriid,
    * <uriid[_fragid], [global count, local count, embed count]>
    */
   private Map<String, Map<String, Integer[]>> hierarchyUriFragIDs = new HashMap<>();
+
+  /**
+   * Config for publication.
+   */
+  private PublicationConfig publicationConfig = null;
+
+  /**
+   * Helper to compute numbering and TOC.
+   */
+  private NumberedTOCGenerator numberingAndTOC = null;
 
   /**
    * Ancestor uriids of current node.
@@ -78,20 +124,25 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   private Map<String, Integer> uriIDsAlreadyFound = new HashMap<>();
 
   /**
-   * List of TOCs.
-   */
-  private Map<String, String> subtocs = new HashMap<>();
-
-  /**
    * Current state.
    */
   private Stack<String> elements = new Stack<>();
 
   /**
+   * Ancestor locations
+   */
+  private Stack<Location> locations = new Stack<>();
+
+  /**
+   * Unadjusted level of previous heading
+   */
+  private int previousheadingLevel = 0;
+
+  /**
    * @param out            where the resulting XML should be written.
    * @param relativePath   the source's file relative path (used to compute relative paths).
    */
-  public PSMLTransclusionHandler(Writer out, String relativePath) {
+  public PSMLProcessHandler2(Writer out, String relativePath) {
     this.xml = out;
     this.sourceRelativePath = relativePath;
   }
@@ -111,13 +162,6 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   }
 
   /**
-   * @param tableofcontents The Table of Contents for the main document.
-   */
-  public void setMainTOC(String tableofcontents) {
-    this.toc = tableofcontents;
-  }
-
-  /**
    * @param uriFragIDs  Map of number of URI/frag IDs in the each document sub-hierarchy
    */
   public void setHierarchyUriFragIDs(Map<String, Map<String, Integer[]>> uriFragIDs) {
@@ -125,17 +169,21 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
   }
 
   /**
+   * @param config     Publication config
+   * @param generator  Numbered TOC Generator
+   * @param toc        Whether to generate TOC
+   */
+  public void setPublicationConfig(PublicationConfig config, NumberedTOCGenerator generator, boolean toc) {
+    this.publicationConfig = config;
+    this.numberingAndTOC = generator;
+    this.generateTOC = toc;
+  }
+
+  /**
    * @param relativise if the image paths should be relativised.
    */
   public void setRelativiseImagePaths(boolean relativise) {
     this.relativiseImagePaths = relativise;
-  }
-
-  /**
-   * @param tocs The Table of Contents for the sub documents
-   */
-  public void setSubTOCs(Map<String, String> tocs) {
-    this.subtocs = tocs;
   }
 
   // --------------------------------- Content Handler methods --------------------------------------------
@@ -171,8 +219,30 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
                                          "media-fragment".equals(qName) ||
                                          "xref-fragment".equals(qName) ||
                                          "properties-fragment".equals(qName));
+    boolean isHeading  = noNamespace && "heading".equals(qName);
+    boolean isPara  = noNamespace && "para".equals(qName);
     if (isDocument && atts.getValue("id") == null)
       throw new SAXException("Document has no id attribute.");
+
+    // set heading/para prefix
+    String prefix = null;
+    Location location = this.locations.isEmpty() ? null : this.locations.peek();
+    if ((isHeading || isPara) && !this.elements.contains("compare") && this.numberingAndTOC != null) {
+      if (isHeading) {
+        this.previousheadingLevel = Integer.parseInt(atts.getValue("level"));
+      }
+      location.index++;
+      prefix = atts.getValue("prefix");
+      if ("true".equals(atts.getValue("numbered"))) {
+        Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(
+            location.uriid, location.position, location.fragment, location.index);
+        if (pref != null) {
+          prefix = pref.value;
+        }
+      }
+    } else if (isFrag) {
+      location.index = 0;
+    }
 
     // if single transcluded fragment update uriids
     if ("document-fragment".equals(qName)) {
@@ -182,8 +252,10 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
       count++;
       this.uriIDsAlreadyFound.put(uriid, count);
       this.ancestorUriIDs.push(count + "_" + uriid);
+      this.locations.push(new Location(Long.parseLong(uriid), count));
       return;
     }
+
     // write start tag
     this.elements.push(qName);
     try {
@@ -192,60 +264,60 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
       throw new SAXException("Failed to open element "+qName, ex);
     }
     // attributes
-    if (!isTOC) {
-      String xhref = atts.getValue("xhref");
-      for (int i = 0; i < atts.getLength(); i++) {
-        String name = atts.getQName(i);
-        // check for image path rewrite
-        String value;
-        if ((isImage && HREF_ATTRIBUTE.equals(name)) ||
-            (isXRef && "xhref".equals(name))) {
-          continue;
-        } else if ((isImage && "src".equals(name)) || (isXRef && HREF_ATTRIBUTE.equals(name) && xhref != null)) {
-          try {
-            value = handleImage(atts.getValue(i), isImage ? atts.getValue(HREF_ATTRIBUTE) : xhref);
-          } catch (ProcessException ex) {
-            // die or not?
-            if (this.failOnError)
-              throw new SAXException("Failed to rewrite src attribute "+atts.getValue(i)+": "+ex.getMessage(), ex);
-            else if (this.logger != null)
-              this.logger.warn("Failed to rewrite image src attribute "+atts.getValue(i)+": "+ex.getMessage());
-            value = atts.getValue(i);
-          }
-        } else if ((isXRef || isReverseXRef) && "relpath".equals(name)) {
-          continue;
-        } else if (isReverseXRef && HREF_ATTRIBUTE.equals(name)) {
-          // make it relative
-          String relpath = atts.getValue("relpath");
-          if (relpath == null) value = atts.getValue(i);
-          else value = relativisePath(relpath, this.sourceRelativePath);
-        } else if (isXRef && HREF_ATTRIBUTE.equals(name)) {
-          try {
-            value = handleXRef(atts);
-          } catch (ProcessException e) {
-            throw new SAXException(e.getMessage(), e);
-          }
-        } else if (isSection && "id".equals(name)) {
-          String id = atts.getValue(i);
-          // get uriid and make id unique
-          int j = id.indexOf('-');
-          if (j != -1) {
-            String uriid = id.substring(0, j);
-            Integer count = this.uriIDsAlreadyFound.get(uriid);
-            value = count != 1 ? count + "_" + id : id;
-          // shouldn't happen
-          } else {
-            value = id;
-          }
-        } else if (isDocument && "id".equals(name)) {
-          String id = atts.getValue(i);
-          Integer count = this.uriIDsAlreadyFound.get(id);
-          if (count == null) count = 0;
-          count++;
+    String xhref = atts.getValue("xhref");
+    for (int i = 0; i < atts.getLength(); i++) {
+      String name = atts.getQName(i);
+      // check for image path rewrite
+      String value;
+      if ((isImage && HREF_ATTRIBUTE.equals(name)) ||
+          (isXRef && "xhref".equals(name))) {
+        continue;
+      } else if ((isImage && "src".equals(name)) || (isXRef && HREF_ATTRIBUTE.equals(name) && xhref != null)) {
+        try {
+          value = handleImage(atts.getValue(i), isImage ? atts.getValue(HREF_ATTRIBUTE) : xhref);
+        } catch (ProcessException ex) {
+          // die or not?
+          if (this.failOnError)
+            throw new SAXException("Failed to rewrite src attribute "+atts.getValue(i)+": "+ex.getMessage(), ex);
+          else if (this.logger != null)
+            this.logger.warn("Failed to rewrite image src attribute "+atts.getValue(i)+": "+ex.getMessage());
+          value = atts.getValue(i);
+        }
+      } else if ((isXRef || isReverseXRef) && "relpath".equals(name)) {
+        continue;
+      } else if (isReverseXRef && HREF_ATTRIBUTE.equals(name)) {
+        // make it relative
+        String relpath = atts.getValue("relpath");
+        if (relpath == null) value = atts.getValue(i);
+        else value = relativisePath(relpath, this.sourceRelativePath);
+      } else if (isXRef && HREF_ATTRIBUTE.equals(name)) {
+        try {
+          value = handleXRef(atts);
+        } catch (ProcessException e) {
+          throw new SAXException(e.getMessage(), e);
+        }
+      } else if (isSection && "id".equals(name)) {
+        String id = atts.getValue(i);
+        // get uriid and make id unique
+        int j = id.indexOf('-');
+        if (j != -1) {
+          String uriid = id.substring(0, j);
+          Integer count = this.uriIDsAlreadyFound.get(uriid);
           value = count != 1 ? count + "_" + id : id;
-          this.uriIDsAlreadyFound.put(id, count);
-          this.ancestorUriIDs.push(count + "_" + id);
-          // don't modify fragment attribute on locator element
+        // shouldn't happen
+        } else {
+          value = id;
+        }
+      } else if (isDocument && "id".equals(name)) {
+        String id = atts.getValue(i);
+        Integer count = this.uriIDsAlreadyFound.get(id);
+        if (count == null) count = 0;
+        count++;
+        value = count != 1 ? count + "_" + id : id;
+        this.uriIDsAlreadyFound.put(id, count);
+        this.ancestorUriIDs.push(count + "_" + id);
+        this.locations.push(new Location(Long.parseLong(id), count));
+        // don't modify fragment attribute on locator element
 //        } else if (isLocator && "fragment".equals(name)) {
 //          String id = atts.getValue(i);
 //          Integer nb = this.allFragIDs.get(id);
@@ -256,26 +328,57 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
 //          } else {
 //            value = atts.getValue(i);
 //          }
-        } else if (isFrag && "id".equals(name) && !this.elements.contains("compare")) {
+      } else if (!this.elements.contains("compare")) {
+        if (isFrag && "id".equals(name)) {
           String id = atts.getValue(i);
           // get uriid and make id unique
           int j = id.indexOf('-');
           if (j != -1) {
+            location.fragment = id.substring(j + 1);
             String uriid = id.substring(0, j);
             Integer count = this.uriIDsAlreadyFound.get(uriid);
             value = count != 1 ? count + "_" + id : id;
           // shouldn't happen
           } else {
+            location.fragment = id;
             value = id;
           }
+        } else if ((isHeading || isPara)  && "prefix".equals(name) && this.numberingAndTOC != null) {
+          value = prefix;
+        } else if (isHeading && "level".equals(name) && this.numberingAndTOC != null &&
+            this.publicationConfig.getHeadingLevelAdjust() == PublicationConfig.LevelAdjust.CONTENT) {
+          int headingLevel = Integer.parseInt(atts.getValue(name));
+          int base = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position).level;
+          headingLevel += base - 1;
+          value = String.valueOf(headingLevel);
+        } else if (isPara && "indent".equals(name) && this.numberingAndTOC != null &&
+            this.publicationConfig.getParaLevelAdjust() == PublicationConfig.LevelAdjust.CONTENT) {
+          int paraLevel = Integer.parseInt(atts.getValue(name));
+          int base = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position).level;
+          paraLevel += base - 1;
+          if (this.publicationConfig.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.HEADING) {
+            paraLevel += this.previousheadingLevel;
+          }
+          value = String.valueOf(paraLevel);
         } else {
           value = atts.getValue(i);
         }
-        try {
-          this.xml.write(" "+name+"=\""+XMLUtils.escapeForAttribute(value)+"\"");
-        } catch (IOException ex) {
-          throw new SAXException("Failed to add attribute \""+atts.getQName(i)+"\" to element "+qName, ex);
-        }
+      } else {
+        value = atts.getValue(i);
+      }
+      try {
+        this.xml.write(" "+name+"=\""+XMLUtils.escapeForAttribute(value)+"\"");
+      } catch (IOException ex) {
+        throw new SAXException("Failed to add attribute \""+atts.getQName(i)+"\" to element "+qName, ex);
+      }
+    }
+    // write toc ids if needed
+    if (isHeading && this.generateTOC && !this.elements.contains("compare")) {
+      try {
+        this.xml.write(" id=\""+XMLUtils.escapeForAttribute(
+            location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index)+"\"");
+      } catch (IOException ex) {
+        throw new SAXException("Failed to add id attribute: " + ex.getMessage(), ex);
       }
     }
     try {
@@ -284,13 +387,13 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
       throw new SAXException("Failed to open element "+qName, ex);
     }
     // write toc if needed
-    if (isTOC) {
-      String uriid = atts.getValue("uriid");
-      String thistoc = uriid == null ? this.toc : this.subtocs.get(uriid);
-      if (thistoc != null) try {
-        this.xml.write(thistoc);
+    if (isTOC && this.generateTOC) {
+      XMLWriter xmlwriter = new XMLWriterImpl(this.xml);
+      try {
+        this.numberingAndTOC.toXML(xmlwriter);
+        xmlwriter.flush();
       } catch (IOException ex) {
-        throw new SAXException("Failed to write TOC contents", ex);
+        throw new SAXException("Unable to write TOC: " + ex.getMessage(), ex);
       }
     }
   }
@@ -303,9 +406,13 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
     // if transcluded document/fragment update uriids
     if ("document-fragment".equals(qName)) {
       this.ancestorUriIDs.pop();
+      this.locations.pop();
       return;
     }
-    if ("document".equals(qName)) this.ancestorUriIDs.pop();
+    if ("document".equals(qName)) {
+      this.ancestorUriIDs.pop();
+      this.locations.pop();
+    }
     this.elements.pop();
     try {
       this.xml.write("</"+qName+">");
@@ -443,5 +550,4 @@ public final class PSMLTransclusionHandler extends DefaultHandler {
     }
     return relative.length() == 0 ? "" : relative.substring(1);
   }
-
 }

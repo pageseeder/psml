@@ -160,43 +160,65 @@
   -->
   <xs:element name="toc">
     <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="tocref" />
-      </xs:choice>
+      <xs:sequence minOccurs="0" maxOccurs="1">
+        <xs:element ref="toc-tree" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
 
   <!--
    =================================================================
-       tocref elements (for TOC)
+       toc-tree element (for TOC)
    =================================================================
   -->
-  <xs:element name="tocref">
+  <xs:element name="toc-tree">
     <xs:complexType>
-      <xs:simpleContent>
-        <xs:extension base="xs:string">
-          <xs:attribute name="level" type="xs:integer" use="required">
-            <xs:annotation>
-              <xs:documentation>The value of this level.</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="idref" type="xs:string" use="required">
-            <xs:annotation>
-              <xs:documentation>The ref ID in the TOC (the headings will have a corresponding tocid attribute added).</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="canonical" type="xs:string">
-            <xs:annotation>
-              <xs:documentation>The canonical value of the numbered prefix (e.g. 1.0.3 or 1.1.4).</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="prefix" type="xs:string">
-            <xs:annotation>
-              <xs:documentation>The value of the numbered prefix with the scheme applied (e.g. 1.3 or 1.a.iv).</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:simpleContent>
+      <xs:sequence>
+        <xs:element name="toc-part"  minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="title" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The title of the root document.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <!--
+   =================================================================
+       toc-part elements (for TOC)
+   =================================================================
+  -->
+  <xs:element name="toc-part">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="toc-part"  minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="level" type="xs:integer" use="required">
+        <xs:annotation>
+          <xs:documentation>The value of this level.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="title" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The title of the TOC item.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="idref" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The ref ID in the TOC (the headings will have a corresponding tocid attribute added).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="canonical" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The canonical value of the numbered prefix (e.g. 1.0.3 or 1.1.4).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="prefix" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The value of the numbered prefix with the scheme applied (e.g. 1.3 or 1.a.iv).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 

@@ -16,6 +16,39 @@ import org.pageseeder.xmlwriter.XMLWriter;
  */
 public final class Reference extends Element implements Serializable {
 
+  /**
+   * An enumeration for XRef types (only embed and transclude supported in TOC)
+   *
+   * @author Philip Rutherford
+   */
+  public enum Type {
+
+    /** embed **/
+    EMBED,
+
+    /** transclude **/
+    TRANSCLUDE;
+
+    /**
+     * Create the XRef type from a string.
+     *
+     * @param value the string value
+     *
+     * @return the type
+     */
+    public static Type fromString(String value) {
+      for (Type n : values()) {
+        if (n.name().toLowerCase().equals(value)) return n;
+      }
+      return EMBED;
+    }
+
+    @Override
+    public String toString() {
+      return name().toLowerCase();
+    }
+  }
+
   /** Required for caching */
   private static final long serialVersionUID = 2L;
 
@@ -31,9 +64,14 @@ public final class Reference extends Element implements Serializable {
   private final long _uri;
 
   /**
+   * The XRef type.
+   */
+  private final Type _type;
+
+  /**
    * The document type of the target.
    */
-  private final String _type;
+  private final String _documenttype;
 
   /**
    * The target fragment ID.
@@ -43,28 +81,32 @@ public final class Reference extends Element implements Serializable {
   /**
    * Creates a new reference at the specified level for a given URI.
    *
-   * @param level       The level.
-   * @param title       The title of the reference.
-   * @param uri         The URI ID.
-   * @param type        The document type of the target.
-   * @param targetfrag  The target fragment ID.
+   * @param level         The level.
+   * @param title         The title of the reference.
+   * @param fragment      The Fragment identifier where the heading was found.
+   * @param uri           The URI ID.
+   * @param type          The XRef type.
+   * @param documenttype  The document type of the target.
+   * @param targetfrag    The target fragment ID.
    */
-  public Reference(int level, String title, Long uri, String type, String targetfrag) {
-    super(level, title);
+  public Reference(int level, String title, String fragment, Long uri, Type type, String documenttype, String targetfrag) {
+    super(level, title, fragment);
     this._uri = uri;
     this._type = type;
+    this._documenttype = documenttype;
     this._targetfragment = DEFAULT_FRAGMENT.equals(targetfrag) ? DEFAULT_FRAGMENT : targetfrag;
   }
 
   /**
    * Creates a new reference at the specified level for a given URI.
    *
-   * @param level The level.
-   * @param title The title of the reference.
-   * @param uri   The URI ID.
+   * @param level      The level.
+   * @param title      The title of the reference.
+   * @param fragment   The Fragment identifier where the heading was found.
+   * @param uri        The URI ID.
    */
-  public Reference(int level, String title, Long uri) {
-    this(level, title, uri, DEFAULT_TYPE, DEFAULT_FRAGMENT);
+  public Reference(int level, String title, String fragment, Long uri) {
+    this(level, title, fragment, uri, Type.EMBED, DEFAULT_TYPE, DEFAULT_FRAGMENT);
   }
 
   /**
@@ -75,10 +117,17 @@ public final class Reference extends Element implements Serializable {
   }
 
   /**
+   * @return The XRef type.
+   */
+  public Type type() {
+    return this._type;
+  }
+
+  /**
    * @return The document type of the target.
    */
-  public String type() {
-    return this._type;
+  public String documenttype() {
+    return this._documenttype;
   }
 
   /**
@@ -119,7 +168,7 @@ public final class Reference extends Element implements Serializable {
     if (!Element.NO_TITLE.equals(title())) {
       xml.attribute("title", title());
     }
-    xml.attribute("documenttype", this._type);
+    xml.attribute("documenttype", this._documenttype);
     if (this._uri > 0) {
       xml.attribute("uriid", Long.toString(this._uri));
     }
@@ -145,6 +194,7 @@ public final class Reference extends Element implements Serializable {
         xml.attribute("prefix", prefix);
       }
     }
+    xml.attribute("position", count);
     xml.closeElement();
   }
 

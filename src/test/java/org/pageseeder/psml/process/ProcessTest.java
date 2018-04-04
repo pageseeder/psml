@@ -29,6 +29,8 @@ import org.junit.Test;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.config.XRefsTransclude;
 import org.pageseeder.psml.process.config.XSLTTransformation;
+import org.pageseeder.psml.toc.PublicationConfig;
+import org.pageseeder.psml.toc.Tests;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
 
 public class ProcessTest {
@@ -301,6 +303,42 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
     Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@title)", equalTo("true")));
     Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/displaytitle)", equalTo("true")));
+  }
+
+  @Test
+  public void testGenerateTOC() throws IOException, ProcessException {
+    String filename = "toc.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
+    p.setPublicationConfig(config, filename, true);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_2.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
+    Assert.assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
   }
 
   @Test

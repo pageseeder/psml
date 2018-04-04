@@ -23,20 +23,29 @@ public abstract class Element implements Serializable, XMLWritable {
    */
   public static final String NO_TITLE = "";
 
+  /**
+   * When there is no fragment
+   */
+  public static final String NO_FRAGMENT = "";
+
   /** Level of this element */
   private final int _level;
 
   /** Text of the element */
   private final String _title;
 
+  /** Fragment ID this element starts in */
+  private final String _fragment;
+
   /**
-   * Creates a new element with an empty title
+   * Creates a new element with an empty title and fragment
    *
    * @param level The level.
    */
   public Element(int level) {
     this._level = level;
     this._title = NO_TITLE;
+    this._fragment = NO_FRAGMENT;
   }
 
   /**
@@ -47,10 +56,11 @@ public abstract class Element implements Serializable, XMLWritable {
    *
    * @throws IllegalArgumentException If the level is less than zero.
    */
-  public Element(int level, String title) {
+  public Element(int level, String title, String fragment) {
     if (level < 0) throw new IllegalArgumentException("Level must be > 0 but was "+level);
     this._level = level;
     this._title = title;
+    this._fragment = fragment;
   }
 
   /**
@@ -69,6 +79,13 @@ public abstract class Element implements Serializable, XMLWritable {
    */
   public final String title() {
     return this._title;
+  }
+
+  /**
+   * @return Fragment ID that this element is defined in
+   */
+  public String fragment() {
+    return this._fragment;
   }
 
   /**

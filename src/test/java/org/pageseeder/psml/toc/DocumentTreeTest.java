@@ -288,9 +288,64 @@ public final class DocumentTreeTest {
     Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.always));
   }
 
+  @Test
+  public void testSingleFragmentTree() throws IOException {
+    DocumentTree tree = new DocumentTree.Builder(1).title("Y")
+      .part(
+        h1("Y", "1", 1,
+          h2("a", "1", 2,
+              h3("x", "1", 3)),
+          h2("b", "1", 4,
+              phantom(3, "2",
+                h4("c", "2", 1))),
+          h2("d", "2", 1,
+              phantom(3, "2",
+                h4("e", "2", 2),
+                h4("f", "3", 1)))))
+      .build();
+    DocumentTree tree2 = new DocumentTree.Builder(1).title("Y")
+        .part(
+            phantom(1, "1",
+                phantom(2, "2",
+                  h3("c", "2", 1))))
+        .part(
+            h1("d", "2", 1,
+                phantom(2, "2",
+                  h3("e", "2", 2))))
+        .build();
+    //Tests.print(tree.singleFragmentTree("2"));
+    //Tests.print(tree2);
+    Tests.assertDocumentTreeEquals(tree2, tree.singleFragmentTree("2"));
+  }
 
-
-
+  @Test
+  public void testSingleFragmentTree2() throws IOException {
+    DocumentTree tree = new DocumentTree.Builder(1).title("Y")
+      .part(
+          h1("a", "1", 2,
+              h2("x", "1", 3)))
+      .part(
+          h1("b", "1", 4,
+              phantom(2, "2",
+                h3("c", "2", 1))))
+      .part(
+          h1("d", "2", 1,
+              phantom(2, "2",
+                h3("e", "2", 2),
+                h3("f", "3", 1))))
+      .build();
+    DocumentTree tree2 = new DocumentTree.Builder(1).title("Y")
+        .part(
+            phantom(1, "1",
+                phantom(2, "2",
+                  h3("c", "2", 1))))
+        .part(
+            h1("d", "2", 1,
+                phantom(2, "2",
+                  h3("e", "2", 2))))
+        .build();
+    Tests.assertDocumentTreeEquals(tree2, tree.singleFragmentTree("2"));
+  }
 
   @Test
   public void testNormalize_none() throws IOException {

@@ -38,18 +38,25 @@ public final class FragmentNumbering implements Serializable {
   private final Map<String,Prefix> numbering = new HashMap<>();
 
   /**
+   * Whether references to single fragments should be processed
+   */
+  private final boolean singleFragments;
+
+  /**
    * Constructor
    *
-   * @param pub          The publication tree
-   * @param config       The publication config
-   * @param unusedIds    Any tree IDs that are unreachable will be added to this list
+   * @param pub              The publication tree
+   * @param config           The publication config
+   * @param singleFragments  Whether references to single fragments should be processed
+   * @param unusedIds        Any tree IDs that are unreachable will be added to this list
    */
-  public FragmentNumbering(PublicationTree pub, PublicationConfig config, List<Long> unusedIds) {
+  public FragmentNumbering(PublicationTree pub, PublicationConfig config, boolean singleFragments, List<Long> unusedIds) {
+    this.singleFragments = singleFragments;
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     if (root != null) {
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
-          doccount, 1, new ArrayList<Long>());
+          doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT);
     }
     List<Long> allIds = new ArrayList<>(pub.ids());
     allIds.remove(root.id());
@@ -91,11 +98,13 @@ public final class FragmentNumbering implements Serializable {
    * @param doccount  Map of [uriid], [number of uses]
    * @param count     No. of times ID has been used.
    * @param ancestors List of the current ancestor tree IDs
+   * @param fragment  The document fragment to serialize.
    */
   private void processTree(PublicationTree pub, long id, int level, int treelevel, PublicationConfig config,
-      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors) {
-    if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
-    ancestors.add(id);
+      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors, String fragment) {
+    String key = id + "-" + fragment;
+    if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID " + id);
+    ancestors.add(key);
     DocumentTree current = pub.tree(id);
     PublicationNumbering numbering = config.getPublicationNumbering(current.labels());
     if (numbering == null) {
@@ -107,7 +116,7 @@ public final class FragmentNumbering implements Serializable {
     for (Part<?> part : current.parts()) {
       processPart(pub, id, level, treelevel, part, config, number, doccount, count, ancestors);
     }
-    ancestors.remove(id);
+    ancestors.remove(key);
   }
 
   /**
@@ -125,7 +134,7 @@ public final class FragmentNumbering implements Serializable {
    * @param ancestors List of the current ancestor tree IDs
    */
   private void processPart(PublicationTree pub, long id, int level, int treeLevel, Part<?> part, PublicationConfig config,
-      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors) {
+      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors) {
     Element element = part.element();
     Long next = null;
     DocumentTree nextTree = null;
@@ -133,24 +142,29 @@ public final class FragmentNumbering implements Serializable {
     NumberingGenerator nextNumber = number;
     int nextLevel = level + 1;
     int nextTreeLevel = treeLevel;
+    String targetFragment = Reference.DEFAULT_FRAGMENT;
+    Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      // don't process embedded fragments
-      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
-        next = ref.uri();
-        nextTree = pub.tree(next);
-        // can only be numbered if the referenced tree exists
-        if (nextTree != null) {
-          nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
-          nextCount = doccount.get(next);
-          nextCount = nextCount == null ? 1 : nextCount + 1;
-          doccount.put(next, nextCount);
+      targetFragment = ref.targetfragment();
+      refType = ref.type();
+      next = ref.uri();
+      nextTree = pub.tree(next);
+      // can only be numbered if the referenced tree exists and not embedded fragment
+      if (nextTree != null && (Reference.DEFAULT_FRAGMENT.equals(targetFragment) || this.singleFragments)) {
+        nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
+        nextCount = doccount.get(next);
+        nextCount = nextCount == null ? 1 : nextCount + 1;
+        doccount.put(next, nextCount);
+        if (Reference.Type.EMBED.equals(refType)) {
           if (PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo())) {
             nextTreeLevel = treeLevel + ref.level();
             nextLevel = nextTreeLevel + 1;
           }
-          // ref is always
           processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
+        } else {
+          // transclusions are at the same level
+          nextLevel = level;
         }
       }
     } else if (element instanceof Heading) {
@@ -162,9 +176,9 @@ public final class FragmentNumbering implements Serializable {
     }
 
     // Expand found reference
-    if (nextTree != null) {
+    if (nextTree != null && (Reference.DEFAULT_FRAGMENT.equals(targetFragment) || this.singleFragments)) {
       // Moving to the next tree (use next level)
-      processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors);
+      processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors, targetFragment);
     }
 
     // Process all child parts
