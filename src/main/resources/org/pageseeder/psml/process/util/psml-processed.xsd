@@ -1796,11 +1796,6 @@
         <xs:documentation>The name of an XRef configuration used when creating/editing this XRef.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
-    <xs:attribute name="config" type="xs:string">
-      <xs:annotation>
-        <xs:documentation>The name of an XRef configuration used when creating/editing this XRef.</xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
     <xs:attribute name="uriid" type="xs:long">
       <xs:annotation>
         <xs:documentation>The URI Id of the target document (ignored if uploading to different PS server).</xs:documentation>
