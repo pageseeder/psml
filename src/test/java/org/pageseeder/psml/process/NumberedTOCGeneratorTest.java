@@ -10,6 +10,8 @@ import static org.pageseeder.psml.toc.Tests.ref;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.pageseeder.psml.toc.DocumentTree;
@@ -81,6 +83,11 @@ public class NumberedTOCGeneratorTest {
     }
     xml.flush();
     System.out.println(xml.toString());
+    String result = numbering.getAllPrefixes().entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
   }
 
 }

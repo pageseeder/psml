@@ -28,7 +28,6 @@ import org.pageseeder.psml.toc.Paragraph;
 import org.pageseeder.psml.toc.Part;
 import org.pageseeder.psml.toc.PublicationTree;
 import org.pageseeder.psml.toc.Reference;
-import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.xml.sax.SAXException;
 
@@ -142,7 +141,6 @@ public class NumberedTOCGenerator {
     DocumentTree current = this._publicationTree.tree(id);
     if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
       current = current.singleFragmentTree(fragment);
-      Tests.print(current);
     }
     for (Part<?> part : current.parts()) {
       toXML(xml, id, level, part, doccount, count, ancestors);
