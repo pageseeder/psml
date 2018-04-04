@@ -171,10 +171,12 @@ public class NumberedTOCGenerator {
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
-    String target_fragment = Reference.DEFAULT_FRAGMENT;
+    String targetFragment = Reference.DEFAULT_FRAGMENT;
+    Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      target_fragment = ref.targetfragment();
+      targetFragment = ref.targetfragment();
+      refType = ref.type();
       next = ref.uri();
       nextTree = this._publicationTree.tree(next);
       toNext = nextTree != null;
@@ -186,11 +188,13 @@ public class NumberedTOCGenerator {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      if (Reference.DEFAULT_FRAGMENT.equals(target_fragment)) {
-        referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
-            !part.parts().isEmpty() || toNext);
-      } else {
-        partToXML(xml, level, !part.parts().isEmpty() || toNext);
+      if (Reference.Type.EMBED.equals(refType)) {
+        if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
+          referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
+              !part.parts().isEmpty() || toNext);
+        } else {
+          partToXML(xml, level, !part.parts().isEmpty() || toNext);
+        }
       }
     } else if (element instanceof Heading) {
       headingToXML(xml, level, (Heading)element, id, count, !part.parts().isEmpty());
@@ -200,15 +204,18 @@ public class NumberedTOCGenerator {
 
     // Expand found reference
     if (toNext) {
-      // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, doccount, nextcount, ancestors, target_fragment);
+      // Moving to the next tree (increase the level by 1 unless transclude)
+      toXML(xml, next, level + (Reference.Type.EMBED.equals(refType) ? 1 : 0),
+          doccount, nextcount, ancestors, targetFragment);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
       toXML(xml, id, level+1, r, doccount, count, ancestors);
     }
-    xml.closeElement();
+    if (!toNext || Reference.Type.EMBED.equals(refType)) {
+      xml.closeElement();
+    }
   }
 
   /**

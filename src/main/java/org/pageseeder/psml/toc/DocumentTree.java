@@ -447,10 +447,15 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     String prefixedTitle = firstHeading.getPrefixedTitle();
     String documentTitle = tree._title;
     List<Part<?>> children = new ArrayList<>();
-    // The first heading 1 matches the document title and all other headings appear under it
+    // The first heading 1 matches the document title or always collapse
     if ((headingTitle.equals(documentTitle) || prefixedTitle.equals(documentTitle) || collapse == TitleCollapse.always)
         && collapse != TitleCollapse.never) {
       if (parts.size() > 1) {
+        // if first heading has children add it as a phantom
+        if (firstPart.size() > 0) {
+          children.add(new Part<>(
+              new Phantom(firstHeading.level(), firstHeading.fragment()), firstPart.parts()));
+        }
         // Copy the other parts
         children.addAll(parts.subList(1, parts.size()));
       } else {

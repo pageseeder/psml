@@ -585,7 +585,7 @@ public final class Process {
       if (numberingAndTOC != null) {
         numberingAndTOC.updatePublication();
         numberingAndTOC.setFragmentNumbering(
-            new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig, new ArrayList<Long>()));
+            new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig, true, new ArrayList<Long>()));
         handler2.setPublicationConfig(this.publicationConfig, numberingAndTOC, this.generatetoc);
       }
       // parse XML input

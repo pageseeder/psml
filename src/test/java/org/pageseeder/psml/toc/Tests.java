@@ -63,7 +63,11 @@ public class Tests {
   }
 
   public static Part<Reference> ref(int level, String title, long uri, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, "", uri, documenttype, targetfrag), parts);
+    return new Part<>(new Reference(level, title, "", uri, Reference.Type.EMBED, documenttype, targetfrag), parts);
+  }
+
+  public static Part<Reference> ref(int level, String title, long uri, Reference.Type type, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
+    return new Part<>(new Reference(level, title, "", uri, type, documenttype, targetfrag), parts);
   }
 
   public static Part<Heading> h1(String title, String fragment, int index) {
@@ -220,7 +224,7 @@ public class Tests {
   public static void assertEmbedEquals(Reference e, Reference f) {
     Assert.assertEquals("Reference levels don't match", e.level(), f.level());
     Assert.assertEquals("Reference titles don't match", e.title(), f.title());
-    Assert.assertEquals("Reference types don't match", e.type(), f.type());
+    Assert.assertEquals("Reference types don't match", e.documenttype(), f.documenttype());
     Assert.assertEquals("Reference URIs don't match", e.uri(), f.uri());
     Assert.assertEquals("Reference targetfragments don't match", e.targetfragment(), f.targetfragment());
   }

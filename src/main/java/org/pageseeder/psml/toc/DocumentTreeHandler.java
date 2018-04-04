@@ -37,6 +37,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private static final String PSML_MEDIATYPE = "application/vnd.pageseeder.psml+xml";
 
   /**
+   * Whether to create references for transclusions
+   */
+  private boolean _transclusions = false;
+
+  /**
    * Takes a list of elements and generate the tree.
    */
   private final TreeExpander _expander = new TreeExpander();
@@ -50,7 +55,6 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    * Whether this is the first heading in fragment (not preceded by para)
    */
   private boolean firstHeading = false;
-
 
   /**
    * The content tree being built.
@@ -104,6 +108,13 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     this._tree = new DocumentTree.Builder(uri);
   }
 
+  /**
+   * @param transclusions  whether to create references for transclusions.
+   */
+  public void setTransclusions(boolean transclusions) {
+    this._transclusions = transclusions;
+  }
+
   @Override
   public void startElement(String element, Attributes attributes) {
     if (isElement("document")) {
@@ -116,9 +127,9 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startFragment(attributes);
     } else if ("block".equals(element)) {
       startBlock(attributes);
-    } else if ("blockxref".equals(element) && "embed".equals(attributes.getValue("type")) &&
-        PSML_MEDIATYPE.equals(attributes.getValue("mediatype"))) {
-      startEmbedRef(attributes);
+    } else if ("blockxref".equals(element) && PSML_MEDIATYPE.equals(attributes.getValue("mediatype")) &&
+        ("embed".equals(attributes.getValue("type")) || ("transclude".equals(attributes.getValue("type")) && this._transclusions))) {
+      startReference(attributes);
     } else if ("blockxref".equals(element) && "transclude".equals(attributes.getValue("type"))) {
       this.transclusionLevel = getInt(attributes, "level", 0);
     } else if ("reversexref".equals(element) && hasAncestor("documentinfo") && !hasAncestor("blockxref")) {
@@ -224,11 +235,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   }
 
   /**
-   * Found `reversexref` element
+   * Found `blockxref` element
    *
    * @param attributes The attributes
    */
-  private void startEmbedRef(Attributes attributes) {
+  private void startReference(Attributes attributes) {
     long uriid = getLong(attributes, "uriid", -1L).longValue();
     // We eliminate unresolved cross-references
     if (uriid > 0) {
@@ -236,9 +247,10 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       int level = getInt(attributes, "level", 0);
       int partLevel = getBaseLevel()+1;
       int newlevel = partLevel + level;
-      String type = getString(attributes, "documenttype", Reference.DEFAULT_TYPE);
+      String documenttype = getString(attributes, "documenttype", Reference.DEFAULT_TYPE);
+      Reference.Type type = Reference.Type.fromString(attributes.getValue("type"));
       String title = computeReferenceTitle(attributes);
-      Reference reference = new Reference(level, title, this.fragment, uriid, type, attributes.getValue("frag"));
+      Reference reference = new Reference(level, title, this.fragment, uriid, type, documenttype, attributes.getValue("frag"));
       this._expander.add(reference, newlevel);
     }
   }
