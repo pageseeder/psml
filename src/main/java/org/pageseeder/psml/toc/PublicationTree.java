@@ -267,12 +267,16 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       }
       List<Long> trees = null;
       // Collect partial tree nodes
-      if (cid != -1 && cposition == -1) {
+      if (cid != -1) {
         trees = new ArrayList<>();
-        collectReferences(tree(cid), trees);
+        if (cposition != -1) {
+          trees.add(cid);
+        } else {
+          collectReferences(tree(cid), trees);
+        }
       }
       Map<Long,Integer> doccount = new HashMap<>();
-      toXML(xml, root.id(), 1, cid, trees, number, doccount, (cid == -1 || cposition == -1) ? 1 : cposition,
+      toXML(xml, this._rootid, 1, cid, cposition, trees, number, doccount, 1,
           new ArrayList<Long>(), externalrefs);
     }
     xml.closeElement();
@@ -305,6 +309,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param id            The ID of the tree to serialize.
    * @param level         The level that we are currently at
    * @param cid           The ID of the content tree (leaf).
+   * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
    * @param trees         The IDs of trees that cid is a descendant of (optional)
    * @param number        The fragment numbering for the publication (optional)
    * @param doccount      Map of [uriid], [number of uses]
@@ -314,13 +319,13 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, long cid, @Nullable List<Long> trees, @Nullable FragmentNumbering number,
+  private void toXML(XMLWriter xml, long id, int level, long cid, int cposition, @Nullable List<Long> trees, @Nullable FragmentNumbering number,
       Map<Long,Integer> doccount, Integer count, List<Long> ancestors, boolean externalrefs) throws IOException {
     if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(id);
     DocumentTree current = tree(id);
     for (Part<?> part : current.parts()) {
-      toXML(xml, id, level, part, cid, trees, number, doccount, count, ancestors, externalrefs);
+      toXML(xml, id, level, part, cid, cposition, trees, number, doccount, count, ancestors, externalrefs);
     }
     ancestors.remove(id);
   }
@@ -333,6 +338,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param level         The level that we are currently at
    * @param part          The part to serialize
    * @param cid           The ID of the content tree (leaf).
+   * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
    * @param trees         The IDs of trees that cid is a descendant of (optional)
    * @param number        The fragment numbering for the publication (optional)
    * @param doccount      Map of [uriid], [number of uses]
@@ -342,12 +348,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, Part<?> part, long cid,  @Nullable List<Long> trees,
+  private void toXML(XMLWriter xml, long id, int level, Part<?> part, long cid, int cposition,  @Nullable List<Long> trees,
       @Nullable FragmentNumbering number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors, boolean externalrefs) throws IOException {
     Element element = part.element();
     // ignore paragraphs
     if (element instanceof Paragraph) return;
-    boolean output = trees == null || trees.contains(id);
+    boolean output = (trees == null || trees.contains(id)) && (cposition == -1 || cposition == count);
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
@@ -390,12 +396,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, cid, trees, number, doccount, nextcount, ancestors, externalrefs);
+      toXML(xml, next, level+1, cid, cposition, trees, number, doccount, nextcount, ancestors, externalrefs);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      toXML(xml, id, level+1, r, cid, trees, number, doccount, count, ancestors, externalrefs);
+      toXML(xml, id, level+1, r, cid, cposition, trees, number, doccount, count, ancestors, externalrefs);
     }
     if (output) xml.closeElement();
   }

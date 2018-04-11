@@ -118,7 +118,7 @@ public final class PublicationTreeTest {
         .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
               ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2"),
-              ref(1, "BY", 1002L)))
+              ref(1, "BZ", 1002L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
@@ -126,7 +126,8 @@ public final class PublicationTreeTest {
             h2("b", "2", 2, true, "", h3("x", "3", 1, true, "")),
             h2("c", "4", 1, false, ""),
             h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
-        .part(h1("X2", "6", 1))
+        .part(h1("X2", "6", 1,
+            ref(1, "Z2", 1003L)))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 1, true, "x.x",
@@ -138,12 +139,16 @@ public final class PublicationTreeTest {
     DocumentTree tree3 = new DocumentTree.Builder(1002).title("Z")
         .part(h1("Z", "1", 1, true, "x.x"))
         .addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree4 = new DocumentTree.Builder(1003).title("Z2")
+        .part(h1("Z2", "1", 1, true, "x.x"))
+        .addReverseReference(1000L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(inter2);
     publication = publication.add(tree);
     publication = publication.add(tree2);
     publication = publication.add(tree3);
+    publication = publication.add(tree4);
     Assert.assertEquals(root.id(), publication.id());
     Assert.assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
