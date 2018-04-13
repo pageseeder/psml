@@ -8,8 +8,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.pageseeder.xmlwriter.XMLWritable;
@@ -108,12 +110,17 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   private final Map<String,String> _fragmentheadings;
 
-
   /**
    * Map of fragment ID to the level of the fragment (level of closest preceding heading),
    * used for adjusting para indents.
    */
   private final Map<String,Integer> _fragmentlevels;
+
+  /**
+   * List of URI IDs for content that has been transcluded,
+   * used for updating cache.
+   */
+  private final Set<Long> _transcludeduris;
 
   /**
    * @param id                The URI ID of the document.
@@ -126,9 +133,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param parts             The list of parts.
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    * @param fragmentlevels    Map of fragment ID to the level of the fragment
+   * @param transcludeduris   List of URI IDs for content that has been transcluded
    */
   private DocumentTree(long id, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
-      String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
+      String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels,
+      Set<Long> transcludeduris) {
     this._id = id;
     this._title = title;
     this._labels = labels;
@@ -140,6 +149,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     this._prefix = prefix;
     this._fragmentheadings = Collections.unmodifiableMap(fragmentheadings);
     this._fragmentlevels = Collections.unmodifiableMap(fragmentlevels);
+    this._transcludeduris = Collections.unmodifiableSet(transcludeduris);
   }
 
   /**
@@ -150,10 +160,13 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param parts             The list of parts.
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    * @param fragmentlevels    Map of fragment ID to the level of the fragment
+   * @param transcludeduris   List of URI IDs for content that has been transcluded
    */
   public DocumentTree(long id, String title, String labels, List<Long> reverse,
-      List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
-    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings, fragmentlevels);
+      List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels,
+      Set<Long> transcludeduris) {
+    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings, fragmentlevels,
+        transcludeduris);
   }
 
   @Override
@@ -209,12 +222,18 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     return Collections.unmodifiableMap(this._fragmentheadings);
   }
 
-
   /**
    * @return Map of fragment ID to the level of the fragment
    */
   public Map<String,Integer> fragmentlevels() {
     return Collections.unmodifiableMap(this._fragmentlevels);
+  }
+
+  /**
+   * @return List of URI IDs for content that has been transcluded
+   */
+  public Set<Long> transcludeduris() {
+    return Collections.unmodifiableSet(this._transcludeduris);
   }
 
   /**
@@ -322,7 +341,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     List<Part<?>> parts = removeOtherFragments(this.parts(), fragment, false);
     if (parts == null) parts = new ArrayList<>();
     DocumentTree tree = new DocumentTree(this._id, this._title, this._labels, this._reverse,
-        NO_FRAGMENT, false, NO_PREFIX, parts, this._fragmentheadings, this._fragmentlevels);
+        NO_FRAGMENT, false, NO_PREFIX, parts, this._fragmentheadings, this._fragmentlevels, this._transcludeduris);
     return removePhantomParts(tree);
   }
 
@@ -422,7 +441,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
         unwrapped.add(p.adjustLevel(-1));
       }
       normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, tree._titlefragment,
-          tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings, tree._fragmentlevels);
+          tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings, tree._fragmentlevels, tree._transcludeduris);
     }
     return normalized;
   }
@@ -475,7 +494,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     }
     // Always move the numbered and prefix from the first heading to the tree
     return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
-        firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
+        firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels,
+        tree._transcludeduris);
   }
 
   /**
@@ -540,7 +560,13 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
      * Map of fragment ID to the level of the fragment (level of closest preceding heading),
      * used for adjusting para indents.
      */
-    private final Map<String,Integer> _fragmentlevels = new HashMap<>();;
+    private final Map<String,Integer> _fragmentlevels = new HashMap<>();
+
+    /**
+     * List of URI IDs for content that has been transcluded,
+     * used for updating cache.
+     */
+    private final Set<Long> _transcludeduris = new HashSet<>();
 
     /**
      * Creates a new builder for this content tree (id must be set before calling build).
@@ -605,6 +631,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       return this;
     }
 
+    public Builder addTranscludedURI(Long uriid) {
+      this._transcludeduris.add(uriid);
+      return this;
+    }
+
     public Builder addReverseReferenceIfNew(Long ref) {
       if (!this._reverse.contains(ref)) {
         this._reverse.add(ref);
@@ -627,9 +658,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       // New lists to ensure the builder no longer affects built tree
       List<Part<?>> parts = new ArrayList<>(this._parts);
       List<Long> reverse = new ArrayList<>(this._reverse);
+      Set<Long> transcludeduris = new HashSet<>(this._transcludeduris);
       Map<String,String> fragmentheadings = new HashMap<>(this._fragmentheadings);
       Map<String,Integer> fragmentlevels = new HashMap<>(this._fragmentlevels);
-      return new DocumentTree(this._id, this.title, this.labels, reverse, parts, fragmentheadings, fragmentlevels);
+      return new DocumentTree(this._id, this.title, this.labels, reverse, parts, fragmentheadings, fragmentlevels,
+          transcludeduris);
     }
 
   }

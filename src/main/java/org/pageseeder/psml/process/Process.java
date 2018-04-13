@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -585,7 +586,8 @@ public final class Process {
       if (numberingAndTOC != null) {
         numberingAndTOC.updatePublication();
         numberingAndTOC.setFragmentNumbering(
-            new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig, true, new ArrayList<Long>()));
+            new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig, true,
+                new ArrayList<Long>(), new HashSet<Long>()));
         handler2.setPublicationConfig(this.publicationConfig, numberingAndTOC, this.generatetoc);
       }
       // parse XML input
