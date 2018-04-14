@@ -211,7 +211,7 @@ public final class FragmentNumbering implements Serializable {
 
     // always store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);
-    if (NO_PREFIX.equals(p)) return;
+    if (NO_PREFIX.equals(pref.value)) return;
     // store prefix on first heading fragment (must have index=1 for reference to have a prefix)
     this.numbering.put(target.id() + "-" + count + "-1-" + target.titlefragment(), pref);
   }
