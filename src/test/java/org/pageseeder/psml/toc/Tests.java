@@ -62,12 +62,12 @@ public class Tests {
     return new Part<>(new Reference(level, title, "", uri), parts);
   }
 
-  public static Part<Reference> ref(int level, String title, long uri, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, "", uri, Reference.Type.EMBED, documenttype, targetfrag), parts);
+  public static Part<Reference> ref(int level, String title, String fragment, long uri, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
+    return new Part<>(new Reference(level, title, fragment, uri, Reference.Type.EMBED, documenttype, targetfrag), parts);
   }
 
-  public static Part<Reference> ref(int level, String title, long uri, Reference.Type type, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, "", uri, type, documenttype, targetfrag), parts);
+  public static Part<Reference> ref(int level, String title, String fragment, long uri, Reference.Type type, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
+    return new Part<>(new Reference(level, title, fragment, uri, type, documenttype, targetfrag), parts);
   }
 
   public static Part<Heading> h1(String title, String fragment, int index) {

@@ -117,7 +117,7 @@ public final class PublicationTreeTest {
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
-              ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2"),
+              ref(1, "BY", "2", 1001L, Reference.DEFAULT_TYPE, "2"),
               ref(1, "BZ", 1002L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
@@ -156,7 +156,7 @@ public final class PublicationTreeTest {
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
     Tests.print(publication, 1000, 2, numbering, true);
     Tests.print(publication, 1002, -1, numbering, true);
@@ -182,7 +182,7 @@ public final class PublicationTreeTest {
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
-              ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2")))
+              ref(1, "BY", "2", 1001L, Reference.DEFAULT_TYPE, "2")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
@@ -210,7 +210,7 @@ public final class PublicationTreeTest {
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-xrefs-relative.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
     Tests.print(publication, 1000, 2, numbering, true);
     String result = numbering.getAllPrefixes().entrySet()
@@ -227,7 +227,7 @@ public final class PublicationTreeTest {
             phantom(2,
             ref(3, "X", 1000L),
             ref(3, "Y", 1001L),
-            ref(3, "Z", 101L, Reference.DEFAULT_TYPE, "2")))).build().normalize(TitleCollapse.auto);
+            ref(3, "Z", "2", 101L, Reference.DEFAULT_TYPE, "2")))).build().normalize(TitleCollapse.auto);
     // not referenced
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
         .part(h1("A", "1", 1, true, "",
@@ -251,7 +251,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-blank.xml");
     // Generate fragment numbering
     List<Long> unusedIds = new ArrayList<>();
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, unusedIds);
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds);
     Tests.print(publication, -1, -1, numbering, false);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -296,7 +296,7 @@ public final class PublicationTreeTest {
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-block-labels.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<>());
     Tests.print(publication, -1, -1, numbering, false);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -335,7 +335,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-skipped-levels.xml");
     // Generate fragment numbering
     List<Long> unusedIds = new ArrayList<>();
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, unusedIds);
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds);
     Tests.print(publication, -1, -1, numbering, false);
   }
 
@@ -354,7 +354,7 @@ public final class PublicationTreeTest {
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(h1("BA", "1", 1, true, "",
               ref(1, "BX", 1000L),
-              ref(1, "BY", 1001L, Reference.DEFAULT_TYPE, "2")))
+              ref(1, "BY", "2", 1001L, Reference.DEFAULT_TYPE, "2")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
@@ -382,7 +382,7 @@ public final class PublicationTreeTest {
     //assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -449,7 +449,7 @@ public final class PublicationTreeTest {
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-paras.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
     tree.print(System.out);
     String result = numbering.getAllPrefixes().entrySet()
@@ -517,7 +517,7 @@ public final class PublicationTreeTest {
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-paras-relative.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
     tree.print(System.out);
     String result = numbering.getAllPrefixes().entrySet()
@@ -564,7 +564,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     //Tests.print(publication, -1, number);
     long start = System.currentTimeMillis();
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     long end = System.currentTimeMillis();
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -621,7 +621,7 @@ public final class PublicationTreeTest {
     publication = publication.add(inter2);
     // Generate fragment numbering
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
-    new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    new FragmentNumbering(publication, config, new ArrayList<Long>());
   }
 
   @Test
@@ -659,7 +659,7 @@ public final class PublicationTreeTest {
     PublicationTree publication = new PublicationTree(tree);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, false, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     Tests.print(publication, -1, -1, numbering, true);
     tree.print(System.out);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();

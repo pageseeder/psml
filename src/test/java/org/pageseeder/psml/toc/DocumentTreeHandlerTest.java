@@ -255,7 +255,7 @@ public final class DocumentTreeHandlerTest {
     Part<Heading> p = h1("Test doc 1", "1", 1,
       phantom(2,
         phantom(3,
-          ref(2, "Test doc 1", 199329, Reference.DEFAULT_TYPE, "2")),
+          ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
         ref(1, "Another heading 2", 199328,
           ref(2, "Another heading 2a", 199326))),
       h2("Related", "default", 1));
@@ -268,7 +268,7 @@ public final class DocumentTreeHandlerTest {
     List<Part<?>> parts = Arrays.asList(
         phantom(1,
           phantom(2,
-          ref(2, "Test doc 1", 199329, Reference.DEFAULT_TYPE, "2")),
+          ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
         ref(1, "Another heading 2", 199328,
           ref(2, "Another heading 2a", 199326))),
         h1("Related", "default", 1));

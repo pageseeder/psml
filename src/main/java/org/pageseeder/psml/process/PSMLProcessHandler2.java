@@ -30,6 +30,10 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public final class PSMLProcessHandler2 extends DefaultHandler {
 
+  /**
+   * Specifies a heading/para location within a publication.
+   *
+   */
   private final class Location {
 
     /**

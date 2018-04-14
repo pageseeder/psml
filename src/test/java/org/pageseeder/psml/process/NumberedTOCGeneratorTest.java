@@ -42,9 +42,10 @@ public class NumberedTOCGeneratorTest {
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(phantom(1,
               ref(0, "BX", 1000L),
-              ref(0, "BY", 1001L, Reference.DEFAULT_TYPE, "2"),
-              ref(0, "BZ", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "2"),
-              ref(0, "BZ2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, Reference.DEFAULT_FRAGMENT)))
+              ref(0, "BY", "2", 1001L, Reference.DEFAULT_TYPE, "2"),
+              ref(0, "BZ", "2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "2"),
+              ref(0, "BZ2", "2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, Reference.DEFAULT_FRAGMENT),
+              h2("c", "2", 1, true, "x.x.x")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
@@ -71,7 +72,7 @@ public class NumberedTOCGeneratorTest {
     publication = publication.add(tree3);
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, true, new ArrayList<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>());
     NumberedTOCGenerator toc = new NumberedTOCGenerator(publication);
     toc.setFragmentNumbering(numbering);
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
@@ -88,6 +89,11 @@ public class NumberedTOCGeneratorTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    String tresult = numbering.getAllTranscludedPrefixes().entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println("Transcluded:\n" + tresult);
   }
 
 }
