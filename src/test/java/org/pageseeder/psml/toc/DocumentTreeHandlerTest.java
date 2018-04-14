@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
@@ -43,7 +42,7 @@ public final class DocumentTreeHandlerTest {
             h3("B.3", "2", 15)),
         h2("C", "2", 16));
     DocumentTree expected = new DocumentTree(1, "Test", "", Collections.emptyList(), Collections.singletonList(p),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
@@ -68,7 +67,7 @@ public final class DocumentTreeHandlerTest {
             h2("B.3", "2", 15)),
         h1("C", "2", 16));
     DocumentTree expected = new DocumentTree(1, "Test", "", Collections.emptyList(), parts,
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
 
@@ -90,7 +89,7 @@ public final class DocumentTreeHandlerTest {
             h2("B.2", "4", 1)));
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(2, "test_2.html", "", reverse, parts,
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     // This tree cannot be normalised
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
@@ -112,7 +111,7 @@ public final class DocumentTreeHandlerTest {
         h2("A", "1.2", 5));
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(4, "Test 3", "", reverse, Collections.singletonList(p1),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
@@ -131,7 +130,7 @@ public final class DocumentTreeHandlerTest {
     Part<Heading> p2 = h1("A", "1.2", 5);
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(4, "Test 3", "", reverse, Arrays.asList(p1, p2),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
@@ -144,7 +143,7 @@ public final class DocumentTreeHandlerTest {
           h3("Test 4", "1", 1,
             h4("Another heading", "2", 1))));
     DocumentTree expected = new DocumentTree(4, "Test 4", "", Collections.emptyList(), Collections.singletonList(p1),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
@@ -153,7 +152,7 @@ public final class DocumentTreeHandlerTest {
     DocumentTree tree = parse(4, "content4.psml").normalize(TitleCollapse.auto);
     Part<Heading> p1 = h1("Another heading", "2", 1);
     DocumentTree expected = new DocumentTree(4, "Test 4", "", Collections.emptyList(), Collections.singletonList(p1),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
@@ -165,7 +164,7 @@ public final class DocumentTreeHandlerTest {
         ref(0, "C", 102));
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, "A", "", reverse, Collections.singletonList(p),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
@@ -175,7 +174,7 @@ public final class DocumentTreeHandlerTest {
     List<Part<?>> parts = Arrays.asList(ref(0, "B", 101), ref(0, "C", 102));
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, "A", "", reverse, parts,
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
 
@@ -193,7 +192,7 @@ public final class DocumentTreeHandlerTest {
                 ref(2, "Charlie 1B", 108))));
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, "A", "", reverse, Collections.singletonList(p),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
@@ -202,7 +201,7 @@ public final class DocumentTreeHandlerTest {
   public void testParseMedia() throws SAXException, IOException {
     DocumentTree tree = parse(1, "media.psml");
     DocumentTree expected = new DocumentTree(5, "Clipboard01.jpg", "", Collections.emptyList(), Collections.emptyList(),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
@@ -218,8 +217,7 @@ public final class DocumentTreeHandlerTest {
                 h3("Division a", "2", 5))));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", Collections.emptyList(), p,
-        Collections.emptyMap(), Collections.emptyMap(),
-        new HashSet<>(Arrays.asList(new Long[]{186250L, 186251L, 186252L})));
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
@@ -232,8 +230,7 @@ public final class DocumentTreeHandlerTest {
                 h3("Division a", "2", 5))));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", Collections.emptyList(), p,
-        Collections.emptyMap(), Collections.emptyMap(),
-        new HashSet<>(Arrays.asList(new Long[]{186250L, 186251L, 186252L})));
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
 
@@ -264,7 +261,7 @@ public final class DocumentTreeHandlerTest {
       h2("Related", "default", 1));
     List<Long> reverse = new ArrayList<>();
     DocumentTree expected = new DocumentTree(4, "Test doc 1", "", reverse, Collections.singletonList(p),
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     tree = tree.normalize(TitleCollapse.auto);
     Tests.print(tree);
@@ -276,7 +273,7 @@ public final class DocumentTreeHandlerTest {
           ref(2, "Another heading 2a", 199326))),
         h1("Related", "default", 1));
     expected = new DocumentTree(4, "Test doc 1", "", reverse, parts,
-        Collections.emptyMap(), Collections.emptyMap(), Collections.emptySet());
+        Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 

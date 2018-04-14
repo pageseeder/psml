@@ -257,7 +257,6 @@ public class Tests {
       Assert.assertEquals("Document parts size don't match", p.parts().size(), q.parts().size());
       Assert.assertEquals("Forward references don't match", p.listForwardReferences(), q.listForwardReferences());
       Assert.assertEquals("Reverse references don't match", p.listReverseReferences(), q.listReverseReferences());
-      Assert.assertEquals("Transcluded URIs don't match", p.transcludeduris(), q.transcludeduris());
       for (int i=0; i < p.parts().size(); i++) {
         assertPartEquals(p.parts().get(i), q.parts().get(i));
       }

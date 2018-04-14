@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
@@ -50,16 +49,14 @@ public final class FragmentNumbering implements Serializable {
    * @param config           The publication config
    * @param singleFragments  Whether references to single fragments should be processed
    * @param unusedIds        Any tree IDs that are unreachable will be added to this list
-   * @param transcludedIds   Any URI IDs for content that has been transcluded
    */
-  public FragmentNumbering(PublicationTree pub, PublicationConfig config, boolean singleFragments,
-      List<Long> unusedIds, Set<Long> transcludedIds) {
+  public FragmentNumbering(PublicationTree pub, PublicationConfig config, boolean singleFragments, List<Long> unusedIds) {
     this.singleFragments = singleFragments;
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     if (root != null) {
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
-          doccount, 1, new ArrayList<String>(), transcludedIds, Reference.DEFAULT_FRAGMENT);
+          doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT);
     }
     List<Long> allIds = new ArrayList<>(pub.ids());
     allIds.remove(root.id());
@@ -92,26 +89,23 @@ public final class FragmentNumbering implements Serializable {
   /**
    * Process numbering for a tree.
    *
-   * @param pub            The publication tree
-   * @param id             The ID of the tree to serialize.
-   * @param level          The heading level that we are currently at
-   * @param treelevel      The level of the current tree
-   * @param config         The publication config to get numbering config
-   * @param number         The numbering generator (optional)
-   * @param doccount       Map of [uriid], [number of uses]
-   * @param count          No. of times ID has been used.
-   * @param ancestors      List of the current ancestor tree IDs
-   * @param transcludedIds Any URI IDs for content that has been transcluded
-   * @param fragment       The document fragment to serialize.
+   * @param pub       The publication tree
+   * @param id        The ID of the tree to serialize.
+   * @param level     The heading level that we are currently at
+   * @param treelevel The level of the current tree
+   * @param config    The publication config to get numbering config
+   * @param number    The numbering generator (optional)
+   * @param doccount  Map of [uriid], [number of uses]
+   * @param count     No. of times ID has been used.
+   * @param ancestors List of the current ancestor tree IDs
+   * @param fragment  The document fragment to serialize.
    */
   private void processTree(PublicationTree pub, long id, int level, int treelevel, PublicationConfig config,
-      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
-      Set<Long> transcludedIds, String fragment) {
+      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors, String fragment) {
     String key = id + "-" + fragment;
     if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(key);
     DocumentTree current = pub.tree(id);
-    transcludedIds.addAll(current.transcludeduris());
     if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
       current = current.singleFragmentTree(fragment);
     }
@@ -123,7 +117,7 @@ public final class FragmentNumbering implements Serializable {
       number = new NumberingGenerator(numbering);
     }
     for (Part<?> part : current.parts()) {
-      processPart(pub, id, level, treelevel, part, config, number, doccount, count, ancestors, transcludedIds);
+      processPart(pub, id, level, treelevel, part, config, number, doccount, count, ancestors);
     }
     ancestors.remove(key);
   }
@@ -141,11 +135,9 @@ public final class FragmentNumbering implements Serializable {
    * @param doccount  Map of [uriid], [number of uses]
    * @param count     No. of times ID has been used.
    * @param ancestors List of the current ancestor tree IDs
-   * @param transcludedIds Any URI IDs for content that has been transcluded
    */
   private void processPart(PublicationTree pub, long id, int level, int treeLevel, Part<?> part, PublicationConfig config,
-      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
-      Set<Long> transcludedIds) {
+      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors) {
     Element element = part.element();
     Long next = null;
     DocumentTree nextTree = null;
@@ -189,13 +181,12 @@ public final class FragmentNumbering implements Serializable {
     // Expand found reference
     if (nextTree != null && (Reference.DEFAULT_FRAGMENT.equals(targetFragment) || this.singleFragments)) {
       // Moving to the next tree (use next level)
-      processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors,
-          transcludedIds, targetFragment);
+      processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors, targetFragment);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      processPart(pub, id, level + 1, treeLevel, r, config, number, doccount, count, ancestors, transcludedIds);
+      processPart(pub, id, level + 1, treeLevel, r, config, number, doccount, count, ancestors);
     }
   }
 
@@ -220,7 +211,7 @@ public final class FragmentNumbering implements Serializable {
 
     // always store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);
-    if (NO_PREFIX.equals(pref.value)) return;
+    if (NO_PREFIX.equals(p)) return;
     // store prefix on first heading fragment (must have index=1 for reference to have a prefix)
     this.numbering.put(target.id() + "-" + count + "-1-" + target.titlefragment(), pref);
   }

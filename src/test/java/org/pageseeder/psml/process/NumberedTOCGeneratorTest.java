@@ -10,7 +10,6 @@ import static org.pageseeder.psml.toc.Tests.ref;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -72,7 +71,7 @@ public class NumberedTOCGeneratorTest {
     publication = publication.add(tree3);
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
     // Generate fragment numbering
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, true, new ArrayList<Long>(), new HashSet<Long>());
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, true, new ArrayList<Long>());
     NumberedTOCGenerator toc = new NumberedTOCGenerator(publication);
     toc.setFragmentNumbering(numbering);
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
