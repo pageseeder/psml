@@ -295,13 +295,16 @@ public final class FragmentNumbering implements Serializable {
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, level, null);
     }
-    // if same fragment or transclusion (not nested)
-    if (location.fragment.equals(h.fragment()) || location.transclusions == 1) {
-      location.index++;
-    // else reset for different fragment
-    } else {
-      location.fragment = h.fragment();
-      location.index = 1;
+    // if not nested transclusion
+    if (location.transclusions <= 1) {
+      // if same fragment or transclusion
+      if (location.fragment.equals(h.fragment()) || location.transclusions == 1) {
+        location.index++;
+      // else reset for different fragment
+      } else {
+        location.fragment = h.fragment();
+        location.index = 1;
+      }
     }
     if (pref == null) return;
     // store prefix on fragment
@@ -334,13 +337,16 @@ public final class FragmentNumbering implements Serializable {
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, adjusted_level, null);
     }
-    // if same fragment or transclusion (not nested)
-    if (location.fragment.equals(para.fragment()) || location.transclusions == 1) {
-      location.index++;
-    // else reset for different fragment
-    } else {
-      location.fragment = para.fragment();
-      location.index = 1;
+    // if not nested transclusion
+    if (location.transclusions <= 1) {
+      // if same fragment or transclusion
+      if (location.fragment.equals(para.fragment()) || location.transclusions == 1) {
+        location.index++;
+      // else reset for different fragment
+      } else {
+        location.fragment = para.fragment();
+        location.index = 1;
+      }
     }
     if (pref == null) return;
     // store prefix on fragment
