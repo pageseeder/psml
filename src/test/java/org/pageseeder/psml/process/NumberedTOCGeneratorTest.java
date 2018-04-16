@@ -41,7 +41,7 @@ public class NumberedTOCGeneratorTest {
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(phantom(1,
-              ref(0, "BX", 1000L),
+              ref(0, "BX", "1", 1000L),
               ref(0, "BY", "2", 1001L, Reference.DEFAULT_TYPE, "2"),
               ref(0, "BZ", "2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "2"),
               ref(0, "BZ2", "2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, Reference.DEFAULT_FRAGMENT),

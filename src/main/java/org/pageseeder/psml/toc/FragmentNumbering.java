@@ -214,17 +214,22 @@ public final class FragmentNumbering implements Serializable {
           }
           // references to embedded single fragments are not numbered
           if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
-            processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
+            processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount, location);
           }
         } else {
           // transclusions are at the same level
-          nextLevel = level;
+          nextLevel = level + ref.level();
           // if different fragment, reset location
           if (!location.fragment.equals(ref.fragment()) && location.transclusions == 0) {
             location.fragment = ref.fragment();
             location.index = 0;
           }
           location.transclusions++;
+          // if document title has been collapsed process it now
+          if (!Element.NO_FRAGMENT.equals(nextTree.titlefragment())) {
+            processReference(ref, nextLevel, nextTree, nextNumber, nextCount, location);
+            nextLevel++;
+          }
         }
       }
     } else if (element instanceof Heading) {
@@ -259,8 +264,10 @@ public final class FragmentNumbering implements Serializable {
    * @param target    The target tree for the reference.
    * @param number    The numbering generator
    * @param count     No. of times target has been used.
+   * @param location  The current parent location for transcluded content
    */
-  public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, int count) {
+  public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, int count,
+      Location location) {
     String p = target.prefix();
     Prefix pref = null;
     if (target.numbered() && number != null && Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
@@ -269,12 +276,16 @@ public final class FragmentNumbering implements Serializable {
     if (pref == null) {
       pref = new Prefix(p, null, level, null);
     }
-
+    updateLocation(ref, location);
     // always store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);
     if (NO_PREFIX.equals(pref.value)) return;
     // store prefix on first heading fragment (must have index=1 for reference to have a prefix)
     this.numbering.put(target.id() + "-" + count + "-" + target.titlefragment()+ "-1", pref);
+    // if not a nested transclusion then store it on parent fragment
+    if (location.transclusions <= 1) {
+      this.transcludedNumbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
+    }
   }
 
   /**
@@ -295,25 +306,33 @@ public final class FragmentNumbering implements Serializable {
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, level, null);
     }
-    // if not nested transclusion
-    if (location.transclusions <= 1) {
-      // if same fragment or transclusion
-      if (location.fragment.equals(h.fragment()) || location.transclusions == 1) {
-        location.index++;
-      // else reset for different fragment
-      } else {
-        location.fragment = h.fragment();
-        location.index = 1;
-      }
-    }
+    updateLocation(h, location);
     if (pref == null) return;
     // store prefix on fragment
     this.numbering.put(id + "-" + count + "-" + h.fragment() + "-" + h.index(), pref);
-    // if transcluded location is different and not nested transclusion then store it
-    if ((location.uriid != id || location.position != count ||
-        !location.fragment.equals(h.fragment()) || location.index != h.index()) && location.transclusions <= 1) {
-      // store prefix on fragment
+    // if not a nested transclusion then store it on parent fragment
+    if (location.transclusions <= 1) {
       this.transcludedNumbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
+    }
+  }
+
+  /**
+   * Update the location for the current element.
+   *
+   * @param e        the current element
+   * @param location the current location
+   */
+  private static void updateLocation(Element e, Location location) {
+    // if not nested transclusion
+    if (location.transclusions <= 1) {
+      // if same fragment or transclusion
+      if (location.fragment.equals(e.fragment()) || location.transclusions == 1) {
+        location.index++;
+      // else reset for different fragment
+      } else {
+        location.fragment = e.fragment();
+        location.index = 1;
+      }
     }
   }
 
@@ -337,24 +356,12 @@ public final class FragmentNumbering implements Serializable {
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, adjusted_level, null);
     }
-    // if not nested transclusion
-    if (location.transclusions <= 1) {
-      // if same fragment or transclusion
-      if (location.fragment.equals(para.fragment()) || location.transclusions == 1) {
-        location.index++;
-      // else reset for different fragment
-      } else {
-        location.fragment = para.fragment();
-        location.index = 1;
-      }
-    }
+    updateLocation(para, location);
     if (pref == null) return;
     // store prefix on fragment
     this.numbering.put(id + "-" + count + "-" + para.fragment() + "-" + para.index(), pref);
-    // if transcluded location is different and not nested transclusion then store it
-    if ((location.uriid != id || location.position != count ||
-        !location.fragment.equals(para.fragment()) || location.index != para.index()) && location.transclusions <= 1) {
-      // store prefix on fragment
+    // if not a nested transclusion then store it on parent fragment
+    if (location.transclusions <= 1) {
       this.transcludedNumbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
     }
   }
@@ -396,7 +403,7 @@ public final class FragmentNumbering implements Serializable {
   }
 
   /**
-   * Get prefix for a heading/para in a fragment (using location in parent fragment).
+   * Get prefix for a heading/para in a fragment (for transcluded location where applicable).
    *
    * @param uriid     the URI ID of the document
    * @param position  the document position (occurrence number) in the tree
@@ -407,9 +414,6 @@ public final class FragmentNumbering implements Serializable {
    */
   public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index) {
     Prefix pref = this.transcludedNumbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
-    if (pref == null) {
-      pref = this.numbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
-    }
     if (pref == null) {
       LOGGER.warn("Numbering not found for uriid: {}, position: {}, fragment: {}, index: {}",
           uriid, position, fragment, index);
@@ -428,7 +432,7 @@ public final class FragmentNumbering implements Serializable {
   }
 
   /**
-   * Get all prefixes (where location is different when transcluding)
+   * Get all prefixes (for transcluded location where applicable)
    * as a map with key [uriid]-[position]-[fragment][-index]].
    *
    * @return  the unmodifiable map

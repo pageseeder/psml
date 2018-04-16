@@ -170,14 +170,16 @@ public class NumberedTOCGenerator {
     Long next = null;
     DocumentTree nextTree = null;
     String targetFragment = Reference.DEFAULT_FRAGMENT;
-    Reference.Type refType = Reference.Type.EMBED;
+    boolean outputRef = false;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
       targetFragment = ref.targetfragment();
-      refType = ref.type();
+      Reference.Type refType = ref.type();
       next = ref.uri();
       nextTree = this._publicationTree.tree(next);
       toNext = nextTree != null;
+      outputRef = toNext &&
+          (Reference.Type.EMBED.equals(refType) || !Element.NO_FRAGMENT.equals(nextTree.titlefragment()));
     }
 
     // Output the element
@@ -186,7 +188,7 @@ public class NumberedTOCGenerator {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      if (Reference.Type.EMBED.equals(refType)) {
+      if (outputRef) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
               !part.parts().isEmpty() || toNext);
@@ -203,7 +205,7 @@ public class NumberedTOCGenerator {
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1 unless transclude)
-      toXML(xml, next, level + (Reference.Type.EMBED.equals(refType) ? 1 : 0),
+      toXML(xml, next, level + (outputRef ? 1 : 0),
           doccount, nextcount, ancestors, targetFragment);
     }
 
@@ -211,7 +213,7 @@ public class NumberedTOCGenerator {
     for (Part<?> r : part.parts()) {
       toXML(xml, id, level+1, r, doccount, count, ancestors);
     }
-    if (!toNext || Reference.Type.EMBED.equals(refType)) {
+    if (!toNext || outputRef) {
       xml.closeElement();
     }
   }
