@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Allette Systems
+ * Copyright (c) 2017-2018 Allette Systems
  */
 package org.pageseeder.psml.toc;
 
@@ -21,6 +21,7 @@ import org.pageseeder.xmlwriter.XMLWriter;
  * deep table of contents.
  *
  * @author Christophe Lauret
+ * @author Philip Rutherford
  */
 public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
@@ -31,6 +32,66 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * Maximum number of reverse references to follow when serializing to XML
    */
   private static final int MAX_REVERSE_FOLLOW = 100;
+
+  /**
+   * Stores the state of the TOC as it is being serialized.
+   *
+   */
+  private final class TOCState {
+
+    /**
+     * The ID of the content tree (leaf).
+     */
+    private long cid;
+
+    /**
+     * If not -1 output content tree only at this position (occurrence number) in the tree.
+     */
+    private int cposition;
+
+    /**
+     * The IDs of trees that cid is a descendant of (optional)
+     */
+    private @Nullable List<Long> trees;
+
+    /**
+     * The fragment numbering for the publication (optional)
+     */
+    private @Nullable FragmentNumbering number;
+
+    /**
+     * Map of [uriid], [number of uses]
+     */
+    private Map<Long,Integer> doccount = new HashMap<>();
+
+    /**
+     * List of the current ancestor tree ID-fragment
+     */
+    private List<String> ancestors = new ArrayList<>();
+
+    /**
+     * Whether to output references to IDs not in this publication tree.
+     */
+    private boolean externalrefs;
+
+    /**
+     * Constructor
+     *
+     * @param cid           The ID of the content tree (leaf).
+     * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
+     * @param trees         The IDs of trees that cid is a descendant of (optional)
+     * @param number        The fragment numbering for the publication (optional)
+     * @param externalrefs  Whether to output references to IDs not in this publication tree.
+     */
+    private TOCState(long cid, int cposition, @Nullable List<Long> trees, @Nullable FragmentNumbering number,
+        boolean externalrefs) {
+      this.cid = cid;
+      this.cposition = cposition;
+      this.trees = trees;
+      this.number = number;
+      this.externalrefs = externalrefs;
+    }
+  }
 
   /**
    * The ID of the root of the tree (-1 for blank tree).
@@ -275,9 +336,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
           collectReferences(tree(cid), trees);
         }
       }
-      Map<Long,Integer> doccount = new HashMap<>();
-      toXML(xml, this._rootid, 1, cid, cposition, trees, number, doccount, 1,
-          new ArrayList<Long>(), externalrefs);
+      toXML(xml, this._rootid, 1, 1, Reference.DEFAULT_FRAGMENT, false,
+          new TOCState(cid, cposition, trees, number, externalrefs));
     }
     xml.closeElement();
   }
@@ -305,73 +365,74 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * Serialize a tree as XML.
    *
-   * @param xml           The XML writer
-   * @param id            The ID of the tree to serialize.
-   * @param level         The level that we are currently at
-   * @param cid           The ID of the content tree (leaf).
-   * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
-   * @param trees         The IDs of trees that cid is a descendant of (optional)
-   * @param number        The fragment numbering for the publication (optional)
-   * @param doccount      Map of [uriid], [number of uses]
-   * @param count         No. of times ID has been used.
-   * @param ancestors     List of the current ancestor tree IDs
-   * @param externalrefs  Whether to output references to IDs not in this publication tree.
+   * @param xml         The XML writer
+   * @param id          The ID of the tree to serialize.
+   * @param level       The level that we are currently at
+   * @param count       No. of times ID has been used.
+   * @param fragment    The document fragment to serialize.
+   * @param transcluded Whether this tree is being transcluded from content tree
+   * @param state       The current state of the TOC
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, long cid, int cposition, @Nullable List<Long> trees, @Nullable FragmentNumbering number,
-      Map<Long,Integer> doccount, Integer count, List<Long> ancestors, boolean externalrefs) throws IOException {
-    if (ancestors.contains(id)) throw new IllegalStateException("XRef loop detected on URIID " + id);
-    ancestors.add(id);
+  private void toXML(XMLWriter xml, long id, int level, Integer count, String fragment, boolean transcluded,
+      TOCState state) throws IOException {
+    String key = id + "-" + fragment;
+    if (state.ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID-fragment " + id);
+    state.ancestors.add(key);
     DocumentTree current = tree(id);
-    for (Part<?> part : current.parts()) {
-      toXML(xml, id, level, part, cid, cposition, trees, number, doccount, count, ancestors, externalrefs);
+    if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
+      current = current.singleFragmentTree(fragment);
     }
-    ancestors.remove(id);
+    for (Part<?> part : current.parts()) {
+      toXML(xml, id, level, part, count, transcluded, state);
+    }
+    state.ancestors.remove(key);
   }
 
   /**
    * Serialize a part as XML.
    *
-   * @param xml           The XML writer
-   * @param id            The ID of the tree to output.
-   * @param level         The level that we are currently at
-   * @param part          The part to serialize
-   * @param cid           The ID of the content tree (leaf).
-   * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
-   * @param trees         The IDs of trees that cid is a descendant of (optional)
-   * @param number        The fragment numbering for the publication (optional)
-   * @param doccount      Map of [uriid], [number of uses]
-   * @param count         No. of times ID has been used.
-   * @param ancestors     List of the current ancestor tree IDs
-   * @param externalrefs  Whether to output references to IDs not in this publication tree.
+   * @param xml         The XML writer
+   * @param id          The ID of the tree to output.
+   * @param level       The level that we are currently at
+   * @param part        The part to serialize
+   * @param count       No. of times ID has been used.
+   * @param transcluded Whether this tree is being transcluded from content tree
+   * @param state       The current state of the TOC
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, Part<?> part, long cid, int cposition,  @Nullable List<Long> trees,
-      @Nullable FragmentNumbering number, Map<Long,Integer> doccount, Integer count, List<Long> ancestors, boolean externalrefs) throws IOException {
+  private void toXML(XMLWriter xml, long id, int level, Part<?> part, Integer count, boolean transcluded,
+      TOCState state) throws IOException {
     Element element = part.element();
     // ignore paragraphs
     if (element instanceof Paragraph) return;
-    boolean output = (trees == null || trees.contains(id)) && (cposition == -1 || cposition == count);
+    boolean output = ((state.trees == null || state.trees.contains(id)) &&
+        (state.cposition == -1 || state.cposition == count)) || transcluded;
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
-    boolean embedded_fragment = false;
+    String targetFragment = Reference.DEFAULT_FRAGMENT;
+    boolean outputRef = false;
+    Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      embedded_fragment = !Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment());
+      targetFragment = ref.targetfragment();
+      refType = ref.type();
       next = ref.uri();
       nextTree = tree(next);
-      toNext = nextTree != null &&
-          id != cid &&
-          !embedded_fragment;
+      toNext = nextTree != null;
+      // output reference if embedded or document title has been collapsed
+      outputRef = nextTree != null && (Reference.Type.EMBED.equals(refType) ||
+          (Reference.DEFAULT_FRAGMENT.equals(targetFragment) &&
+              !Element.NO_FRAGMENT.equals(nextTree.titlefragment())));
     }
-    if (output) {
+    if (output && (nextTree == null || outputRef)) {
       xml.openElement("part", !part.parts().isEmpty() ||
-          (toNext && (trees == null || trees.contains(next))));
+          (toNext && (state.trees == null || state.trees.contains(next) || state.cid == id)));
       xml.attribute("level", level);
-      if (toNext && cid == next) {
+      if (toNext && state.cid == next) {
         xml.attribute("content", "true");
       } else if (element instanceof Heading) {
         xml.attribute("uriid", Long.toString(id));
@@ -380,30 +441,36 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
     // Output the element
     Integer nextcount = null;
-    if (embedded_fragment) {
-      if (output) element.toXML(xml, level, number, id, count);
-    } else if (nextTree != null) {
-      nextcount = doccount.get(next);
+    if (nextTree != null) {
+      nextcount = state.doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
-      doccount.put(next, nextcount);
-      if (output) element.toXML(xml, level, number, next, nextcount, nextTree.numbered(), nextTree.prefix());
-    } else if (element instanceof Reference && !externalrefs) {
+      state.doccount.put(next, nextcount);
+      if (outputRef) {
+        if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
+          if (output) element.toXML(xml, level, state.number, next, nextcount, nextTree.numbered(), nextTree.prefix());
+        } else {
+          // single embedded fragments can't be numbered
+          if (output) element.toXML(xml, level, state.number, id, count);
+        }
+      }
+    } else if (element instanceof Reference && !state.externalrefs) {
       // external reference not allowed so don't output XML
     } else {
-      if (output) element.toXML(xml, level, number, id, count);
+      if (output) element.toXML(xml, level, state.number, id, count);
     }
 
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level+1, cid, cposition, trees, number, doccount, nextcount, ancestors, externalrefs);
+      toXML(xml, next, level + (outputRef ? 1 : 0), nextcount, targetFragment,
+          id == state.cid && !Reference.Type.EMBED.equals(refType), state);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      toXML(xml, id, level+1, r, cid, cposition, trees, number, doccount, count, ancestors, externalrefs);
+      toXML(xml, id, level+1, r, count, transcluded, state);
     }
-    if (output) xml.closeElement();
+    if (output && (nextTree == null || outputRef)) xml.closeElement();
   }
 
   /**

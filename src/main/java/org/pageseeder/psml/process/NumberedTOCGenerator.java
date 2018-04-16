@@ -178,8 +178,10 @@ public class NumberedTOCGenerator {
       next = ref.uri();
       nextTree = this._publicationTree.tree(next);
       toNext = nextTree != null;
-      outputRef = toNext &&
-          (Reference.Type.EMBED.equals(refType) || !Element.NO_FRAGMENT.equals(nextTree.titlefragment()));
+      // output reference if embedded or document title has been collapsed
+      outputRef = toNext && (Reference.Type.EMBED.equals(refType) ||
+          (Reference.DEFAULT_FRAGMENT.equals(targetFragment) &&
+              !Element.NO_FRAGMENT.equals(nextTree.titlefragment())));
     }
 
     // Output the element
@@ -193,6 +195,7 @@ public class NumberedTOCGenerator {
           referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
               !part.parts().isEmpty() || toNext);
         } else {
+          // single embedded fragments can't be numbered
           partToXML(xml, level, !part.parts().isEmpty() || toNext);
         }
       }

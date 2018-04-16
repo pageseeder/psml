@@ -21,6 +21,15 @@ import org.slf4j.LoggerFactory;
  */
 public final class FragmentNumbering implements Serializable {
 
+  /** Logger for this class. */
+  private static final Logger LOGGER = LoggerFactory.getLogger(FragmentNumbering.class);
+
+  /** As per requirement for Serialization*/
+  private static final long serialVersionUID = 20180213L;
+
+  /** When there is no prefix */
+  public static final String NO_PREFIX = "";
+
   /**
    * Specifies a heading/para location within a publication.
    *
@@ -59,17 +68,7 @@ public final class FragmentNumbering implements Serializable {
       this.uriid = uriid;
       this.position = position;
     }
-
   }
-
-  /** Logger for this class. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(FragmentNumbering.class);
-
-  /** As per requirement for Serialization*/
-  private static final long serialVersionUID = 20180213L;
-
-  /** When there is no prefix */
-  public static final String NO_PREFIX = "";
 
   /**
    * Map of [uriid]-[position]-[fragment][-index]], [prefix]
