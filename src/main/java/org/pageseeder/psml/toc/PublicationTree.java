@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -193,11 +194,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    */
   @Override
   public List<Long> listForwardReferences() {
-    List<Long> uris = new ArrayList<>();
+    Set<Long> uris = new HashSet<>();
     for (DocumentTree tree : this._map.values()) {
       uris.addAll(tree.listForwardReferences());
     }
-    return uris;
+    return new ArrayList<>(uris);
   }
 
   /**
