@@ -132,7 +132,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startReference(attributes);
     } else if ("blockxref".equals(element) && "transclude".equals(attributes.getValue("type"))) {
       this.transclusionLevel = getInt(attributes, "level", 0);
-    } else if ("reversexref".equals(element) && hasAncestor("documentinfo") && !hasAncestor("blockxref")) {
+    } else if ("reversexref".equals(element) && !hasAncestor("blockxref")) {
       startReverseRef(attributes);
     } else if (isElement("displaytitle") && !hasAncestor("blockxref")) {
       newBuffer();

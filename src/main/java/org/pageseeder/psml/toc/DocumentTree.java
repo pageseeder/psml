@@ -252,7 +252,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * List of URI ID of forward cross-references to the document (not fragments).
+   * List of URI ID of forward cross-references to documents and document fragments.
    */
   @Override
   public List<Long> listForwardReferences() {
@@ -273,9 +273,9 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     Element element = part.element();
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
-      // don't collect embedded fragments
-      if (Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
-        uris.add((ref.uri()));
+      // don't add references already added
+      if (!uris.contains(ref.uri())) {
+        uris.add(ref.uri());
       }
     }
     for (Part<?> c : part.parts()) {
