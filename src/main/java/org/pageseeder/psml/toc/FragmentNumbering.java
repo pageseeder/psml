@@ -192,6 +192,7 @@ public final class FragmentNumbering implements Serializable {
     NumberingGenerator nextNumber = number;
     int nextLevel = level + 1;
     int nextTreeLevel = treeLevel;
+    Location nextLocation = location;
     String targetFragment = Reference.DEFAULT_FRAGMENT;
     Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
@@ -211,9 +212,10 @@ public final class FragmentNumbering implements Serializable {
             nextTreeLevel = treeLevel + ref.level();
             nextLevel = nextTreeLevel + 1;
           }
+          nextLocation = new Location(next, nextCount);
           // references to embedded single fragments are not numbered
           if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
-            processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount, location);
+            processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount, nextLocation);
           }
         } else {
           // transclusions are at the same level
@@ -243,7 +245,7 @@ public final class FragmentNumbering implements Serializable {
     if (nextTree != null) {
       // Moving to the next tree (use next level)
       processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors,
-          targetFragment, Reference.Type.EMBED.equals(refType) ? new Location(next, nextCount) : location);
+          targetFragment, nextLocation);
       if (!Reference.Type.EMBED.equals(refType)) {
         location.transclusions--;
       }
@@ -275,7 +277,14 @@ public final class FragmentNumbering implements Serializable {
     if (pref == null) {
       pref = new Prefix(p, null, level, null);
     }
-    updateLocation(ref, location);
+    // if title collapsed with reference then increment heading count
+    if (!Element.NO_FRAGMENT.equals(target.titlefragment())) {
+      // if embed update location to title fragment
+      if (Reference.Type.EMBED.equals(ref.type())) {
+        location.fragment = target.titlefragment();
+      }
+      location.index++;
+    }
     // always store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);
     if (NO_PREFIX.equals(pref.value)) return;

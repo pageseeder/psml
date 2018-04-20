@@ -172,12 +172,12 @@ public final class PublicationTreeTest {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
-            ref(3, "A", 100L),
-            ref(3, "B", 101L)))).build().normalize(TitleCollapse.auto);
+            ref(3, "A", "2", 100L),
+            ref(3, "B", "2", 101L)))).build().normalize(TitleCollapse.auto);
     DocumentTree inter = new DocumentTree.Builder(100).title("A")
         .part(h1("A", "1", 1, true, "",
-            ref(2, "X", 1000L),
-            ref(2, "Y", 1001L)))
+            ref(2, "X", "2", 1000L),
+            ref(2, "Y", "2", 1001L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
         .part(phantom(1,
