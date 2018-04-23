@@ -51,23 +51,23 @@ public class Tests {
   }
 
   public static Part<Reference> ref(int level, String title, long uri) {
-    return new Part<>(new Reference(level, title, "", uri));
+    return new Part<>(new Reference(level, title, "", "", uri));
   }
 
   public static Part<Reference> ref(int level, String title, String fragment, long uri) {
-    return new Part<>(new Reference(level, title, fragment, uri));
+    return new Part<>(new Reference(level, title, fragment, fragment, uri));
   }
 
   public static Part<Reference> ref(int level, String title, long uri, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, "", uri), parts);
+    return new Part<>(new Reference(level, title, "", "", uri), parts);
   }
 
   public static Part<Reference> ref(int level, String title, String fragment, long uri, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, fragment, uri, Reference.Type.EMBED, documenttype, targetfrag), parts);
+    return new Part<>(new Reference(level, title, fragment, fragment, uri, Reference.Type.EMBED, documenttype, targetfrag), parts);
   }
 
   public static Part<Reference> ref(int level, String title, String fragment, long uri, Reference.Type type, String documenttype, String targetfrag, @NonNull Part<?>... parts) {
-    return new Part<>(new Reference(level, title, fragment, uri, type, documenttype, targetfrag), parts);
+    return new Part<>(new Reference(level, title, fragment, fragment, uri, type, documenttype, targetfrag), parts);
   }
 
   public static Part<Heading> h1(String title, String fragment, int index) {
@@ -119,34 +119,51 @@ public class Tests {
   }
 
   public static Part<Heading> heading(int level,  String title, String fragment, int index) {
-    return new Part<>(new Heading(level, title, fragment, index));
+    return new Part<>(new Heading(level, title, fragment, fragment, index));
   }
 
   public static Part<Heading> heading(int level,  String title, String fragment, int index, @NonNull Part<?>... parts) {
-    return new Part<>(new Heading(level, title, fragment, index), parts);
+    return new Part<>(new Heading(level, title, fragment, fragment, index), parts);
   }
 
   public static Part<Phantom> phantom(int level, @NonNull Part<?>... parts) {
-    return new Part<>(new Phantom(level, Phantom.NO_FRAGMENT), parts);
+    return new Part<>(new Phantom(level, Phantom.NO_FRAGMENT, Phantom.NO_FRAGMENT), parts);
   }
 
   public static Part<Phantom> phantom(int level, String fragment, @NonNull Part<?>... parts) {
-    return new Part<>(new Phantom(level, fragment), parts);
+    return new Part<>(new Phantom(level, fragment, fragment), parts);
+  }
+
+  public static Part<TransclusionEnd> tend(String fragment) {
+    return new Part<>(new TransclusionEnd(fragment, fragment));
   }
 
   public static Part<Heading> h1(String title, String fragment, int index, boolean numbered, String prefix) {
     return heading(1, title, fragment, index, numbered, prefix);
   }
+
   public static Part<Heading> h1(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return heading(1, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h1(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(1, title, fragment, origfrag, index, numbered, prefix, parts);
   }
 
   public static Part<Heading> h2(String title, String fragment, int index, boolean numbered, String prefix) {
     return heading(2, title, fragment, index, numbered, prefix);
   }
 
+  public static Part<Heading> h2(String title, String fragment, String origfrag, int index, boolean numbered, String prefix) {
+    return heading(2, title, fragment, origfrag, index, numbered, prefix);
+  }
+
   public static Part<Heading> h2(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return heading(2, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h2(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(2, title, fragment, origfrag, index, numbered, prefix, parts);
   }
 
   public static Part<Heading> h3(String title, String fragment, int index, boolean numbered, String prefix) {
@@ -157,6 +174,10 @@ public class Tests {
     return heading(3, title, fragment, index, numbered, prefix, parts);
   }
 
+  public static Part<Heading> h3(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(3, title, fragment, origfrag, index, numbered, prefix, parts);
+  }
+
   public static Part<Heading> h4(String title, String fragment, int index, boolean numbered, String prefix) {
     return heading(4, title, fragment, index, numbered, prefix);
   }
@@ -165,12 +186,20 @@ public class Tests {
     return heading(4, title, fragment, index, numbered, prefix, parts);
   }
 
+  public static Part<Heading> h4(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return heading(4, title, fragment, origfrag, index, numbered, prefix, parts);
+  }
+
   public static Part<Heading> h5(String title, String fragment, int index, boolean numbered, String prefix) {
     return heading(5, title, fragment, index, numbered, prefix);
   }
 
   public static Part<Heading> h5(String title, String fragment, int index, boolean numbered, String prefix,  @NonNull Part<?>... parts) {
     return heading(5, title, fragment, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h5(String title, String fragment, String origfrag, int index, boolean numbered, String prefix,  @NonNull Part<?>... parts) {
+    return heading(5, title, fragment, origfrag, index, numbered, prefix, parts);
   }
 
   public static Part<Heading> h6(String title, String fragment, int index, boolean numbered, String prefix) {
@@ -182,23 +211,27 @@ public class Tests {
   }
 
   public static Part<Heading> heading(int level,  String title, String fragment, int index, boolean numbered, String prefix) {
-    return new Part<>(new Heading(level, title, fragment, index).numbered(numbered).prefix(prefix));
+    return new Part<>(new Heading(level, title, fragment, fragment, index).numbered(numbered).prefix(prefix));
   }
 
   public static Part<Heading> heading(int level,  String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
-    return new Part<>(new Heading(level, title, fragment, index).numbered(numbered).prefix(prefix), parts);
+    return new Part<>(new Heading(level, title, fragment, fragment, index).numbered(numbered).prefix(prefix), parts);
+  }
+
+  public static Part<Heading> heading(int level,  String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+    return new Part<>(new Heading(level, title, fragment, origfrag, index).numbered(numbered).prefix(prefix), parts);
   }
 
   public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix) {
-    return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix));
+    return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix));
   }
 
   public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, String blocklabel) {
-    return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix).blocklabel(blocklabel));
+    return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix).blocklabel(blocklabel));
   }
 
   public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
-    return new Part<>(new Paragraph(level, fragment, index).numbered(numbered).prefix(prefix), parts);
+    return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix), parts);
   }
 
   public static void assertElementEquals(Element e, Element f) {

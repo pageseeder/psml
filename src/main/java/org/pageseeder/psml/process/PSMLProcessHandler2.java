@@ -238,7 +238,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       location.index++;
       prefix = atts.getValue("prefix");
       if ("true".equals(atts.getValue("numbered"))) {
-        Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(
+        Prefix pref = this.numberingAndTOC.fragmentNumbering().getTranscludedPrefix(
             location.uriid, location.position, location.fragment, location.index);
         if (pref != null) {
           prefix = pref.value;

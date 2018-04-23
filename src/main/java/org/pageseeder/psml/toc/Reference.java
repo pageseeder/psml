@@ -84,13 +84,15 @@ public final class Reference extends Element implements Serializable {
    * @param level         The level.
    * @param title         The title of the reference.
    * @param fragment      The Fragment identifier where the reference was found.
+   * @param originalfrag  The original (untranscluded) fragment.
    * @param uri           The URI ID.
    * @param type          The XRef type.
    * @param documenttype  The document type of the target.
    * @param targetfrag    The target fragment ID.
    */
-  public Reference(int level, String title, String fragment, Long uri, Type type, String documenttype, String targetfrag) {
-    super(level, title, fragment);
+  public Reference(int level, String title, String fragment, String originalfrag,
+      Long uri, Type type, String documenttype, String targetfrag) {
+    super(level, title, fragment, originalfrag);
     this._uri = uri;
     this._type = type;
     this._documenttype = documenttype;
@@ -103,10 +105,11 @@ public final class Reference extends Element implements Serializable {
    * @param level      The level.
    * @param title      The title of the reference.
    * @param fragment   The Fragment identifier where the reference was found.
+   * @param originalfrag  The original (untranscluded) fragment.
    * @param uri        The URI ID.
    */
-  public Reference(int level, String title, String fragment, Long uri) {
-    this(level, title, fragment, uri, Type.EMBED, DEFAULT_TYPE, DEFAULT_FRAGMENT);
+  public Reference(int level, String title, String fragment, String originalfrag, Long uri) {
+    this(level, title, fragment, originalfrag, uri, Type.EMBED, DEFAULT_TYPE, DEFAULT_FRAGMENT);
   }
 
   /**
@@ -141,6 +144,19 @@ public final class Reference extends Element implements Serializable {
   public Reference adjustLevel(int delta) {
     // xref levels are not adjusted
     return this;
+  }
+
+  /**
+   * Create a new reference identical to this reference but with the specified title
+   *
+   * @param title The different title
+   *
+   * @return A new reference instance unless the title is equal to the title of current reference.
+   */
+  public Reference title(String title) {
+    if (title.equals(title())) return this;
+    return new Reference(level(), title, fragment(), originalFragment(), this._uri, this._type,
+        this._documenttype, this._targetfragment);
   }
 
   @Override

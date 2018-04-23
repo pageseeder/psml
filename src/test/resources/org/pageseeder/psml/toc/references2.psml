@@ -21,14 +21,14 @@
   <toc />
   <section id="xrefs">
     <xref-fragment id="2">
-      <blockxref uriid="101" title="" frag="default" display="document" type="embed" urititle="Alpha" mediatype="application/vnd.pageseeder.psml+xml">A</blockxref>
-      <blockxref uriid="102" title="" frag="default" display="document" type="embed" urititle="Bravo" mediatype="application/vnd.pageseeder.psml+xml">B</blockxref>
-      <blockxref uriid="103" title="" level="1" frag="default" display="document" type="embed" urititle="Bravo 1" mediatype="application/vnd.pageseeder.psml+xml">B-1</blockxref>
-      <blockxref uriid="104" title="" level="1" frag="default" display="document" type="embed" urititle="Bravo 2" mediatype="application/vnd.pageseeder.psml+xml">B-2</blockxref>
-      <blockxref uriid="105" title="" frag="default" display="document" type="embed" urititle="Charlie" mediatype="application/vnd.pageseeder.psml+xml">C</blockxref>
-      <blockxref uriid="106" title="" level="1" frag="default" display="document" type="embed" urititle="Charlie 1" mediatype="application/vnd.pageseeder.psml+xml">C-1</blockxref>
-      <blockxref uriid="107" title="" level="2" frag="default" display="document" type="embed" urititle="Charlie 1A" mediatype="application/vnd.pageseeder.psml+xml">C-1A</blockxref>
-      <blockxref uriid="108" title="" level="2" frag="default" display="document" type="embed" urititle="Charlie 1B" mediatype="application/vnd.pageseeder.psml+xml">C-1B</blockxref>
+      <blockxref uriid="101" title="" frag="default" display="document" type="embed" urititle="Alpha" mediatype="application/vnd.pageseeder.psml+xml">Alpha</blockxref>
+      <blockxref uriid="102" title="" frag="default" display="document" type="embed" urititle="Bravo" mediatype="application/vnd.pageseeder.psml+xml">Bravo</blockxref>
+      <blockxref uriid="103" title="" level="1" frag="default" display="document" type="embed" urititle="Bravo 1" mediatype="application/vnd.pageseeder.psml+xml">Bravo 1</blockxref>
+      <blockxref uriid="104" title="" level="1" frag="default" display="document" type="embed" urititle="Bravo 2" mediatype="application/vnd.pageseeder.psml+xml">Bravo 2</blockxref>
+      <blockxref uriid="105" title="" frag="default" display="document" type="embed" urititle="Charlie" mediatype="application/vnd.pageseeder.psml+xml">Charlie</blockxref>
+      <blockxref uriid="106" title="" level="1" frag="default" display="document" type="embed" urititle="Charlie 1" mediatype="application/vnd.pageseeder.psml+xml">Charlie 1</blockxref>
+      <blockxref uriid="107" title="" level="2" frag="default" display="document" type="embed" urititle="Charlie 1A" mediatype="application/vnd.pageseeder.psml+xml">Charlie 1A</blockxref>
+      <blockxref uriid="108" title="" level="2" frag="default" display="document" type="embed" urititle="Charlie 1B" mediatype="application/vnd.pageseeder.psml+xml">Charlie 1B</blockxref>
     </xref-fragment>
   </section>
 </document>

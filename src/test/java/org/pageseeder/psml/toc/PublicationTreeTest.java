@@ -9,6 +9,7 @@ import static org.pageseeder.psml.toc.Tests.p;
 import static org.pageseeder.psml.toc.Tests.parse;
 import static org.pageseeder.psml.toc.Tests.phantom;
 import static org.pageseeder.psml.toc.Tests.ref;
+import static org.pageseeder.psml.toc.Tests.tend;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -168,7 +169,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingUntranscluded() throws SAXException, IOException {
+  public void testAutoNumberingTranscluded() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -180,12 +181,19 @@ public final class PublicationTreeTest {
             ref(2, "Y", "2", 1001L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(phantom(1,
+        .part(h1("B2", "1", 1,
               ref(0, "BX", "1", 1000L),
               ref(0, "BY", "2", 1001L, Reference.DEFAULT_TYPE, "2"),
               ref(0, "BZ", "2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "2"),
-              ref(0, "BZ2", "2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, Reference.DEFAULT_FRAGMENT),
-              h2("c", "2", 1, true, "x.x.x")))
+              h2("a", "2", 1, true, "x.x.x"),
+              h2("b", "2", 2, true, "", ref(3, "Z", "2", 1002), tend("2")),
+              ref(0, "BZ2", "2", 1001L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, Reference.DEFAULT_FRAGMENT)))
+        .part(h1("Y", "2", "1", 3, true, "x.x",
+              h2("a", "2", "2", 4, true, "x.x.x"),
+              h2("b", "2", "2", 5, true, "", ref(3, "Z", "2", 1002)),
+              h2("c", "2", "4", 6, false, ""),
+                phantom(3, h4("d", "2", "4", 7, true, "", h5("xc", "2", "5", 8, false, "x.x.x.x", tend("2")))),
+              h2("c2", "2", 9, true, "x.x.x")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",

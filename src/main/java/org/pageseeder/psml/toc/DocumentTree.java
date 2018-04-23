@@ -451,10 +451,21 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     if ((headingTitle.equals(documentTitle) || prefixedTitle.equals(documentTitle) || collapse == TitleCollapse.always)
         && collapse != TitleCollapse.never) {
       if (parts.size() > 1) {
-        // if first heading has children add it as a phantom
+        // if first heading has children
         if (firstPart.size() > 0) {
-          children.add(new Part<>(
-              new Phantom(firstHeading.level(), firstHeading.fragment()), firstPart.parts()));
+          boolean transclusion = false;
+          Part<?> firstChild = firstPart.parts().get(0);
+          if (firstChild.element() instanceof Reference) {
+            transclusion = Reference.Type.TRANSCLUDE.equals(((Reference)firstChild.element()).type());
+          }
+          // if first heading only contains a transclusion, just add the transclusion
+          if (firstPart.size() == 1 && transclusion) {
+            children.add(firstChild);
+          // else add first heading as a phantom
+          } else {
+            children.add(new Part<>(
+              new Phantom(firstHeading.level(), firstHeading.fragment(), firstHeading.originalFragment()), firstPart.parts()));
+          }
         }
         // Copy the other parts
         children.addAll(parts.subList(1, parts.size()));
@@ -499,7 +510,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
           List<Part<?>> branch = removeOtherFragments(part.parts(), fragment, false);
           // if found in branch change this element to a phantom
           if (branch != null) {
-            modified.add(new Part<>(new Phantom(el.level(), el.fragment()), branch));
+            modified.add(new Part<>(new Phantom(el.level(), el.fragment(), el.originalFragment()), branch));
           }
         }
       }

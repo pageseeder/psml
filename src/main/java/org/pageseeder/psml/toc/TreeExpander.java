@@ -23,11 +23,12 @@ public final class TreeExpander {
   }
 
   /**
-   * Add a new paragraph to the list (it should not affect heading structure)
+   * Add a new leaf to the list (it should not affect heading structure).
+   * Used for paragraphs end transclusion start/end.
    *
    * @param element The new element to add
    */
-  public TreeExpander addParagraph(Paragraph element) {
+  public TreeExpander addLeaf(Element element) {
     MutablePart current = this._parts.peek();
     // Add the element to the current part
     MutablePart mutable = new MutablePart(element);
@@ -63,14 +64,7 @@ public final class TreeExpander {
 
     // Insert phantom parts when we jumps levels (e.g. h1 -> h4)
     while (elementlevel > level) {
-      Element phantom;
-      if (element instanceof Reference) {
-        phantom = new Phantom(level++, ((Reference)element).fragment());
-      } else if (element instanceof Heading) {
-        phantom = new Phantom(level++, ((Heading)element).fragment());
-      } else {
-        phantom = new Phantom(level++, Phantom.NO_FRAGMENT);
-      }
+      Element phantom= new Phantom(level++, element.fragment(), element.originalFragment());
       MutablePart mutable = new MutablePart(phantom);
       current.add(mutable);
       this._parts.push(mutable);

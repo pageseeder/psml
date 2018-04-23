@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.toc;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -37,19 +39,29 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private static final String PSML_MEDIATYPE = "application/vnd.pageseeder.psml+xml";
 
   /**
-   * Whether to create references for transclusions
-   */
-  private boolean _transclusions = false;
-
-  /**
    * Takes a list of elements and generate the tree.
    */
   private final TreeExpander _expander = new TreeExpander();
 
   /**
+   * Stack of nested blockxrefs with true for each transclusion.
+   */
+  private final Deque<Boolean> _blockxrefs = new ArrayDeque<>();
+
+  /**
+   * Stack of nested original (untranscluded) fragment IDs.
+   */
+  private final Deque<String> _fragmentIDs = new ArrayDeque<>();
+
+  /**
    * The last heading being processed
    */
   private @Nullable Heading currentHeading = null;
+
+  /**
+   * The last reference being processed
+   */
+  private @Nullable Reference currentReference = null;
 
   /**
    * Whether this is the first heading in fragment (not preceded by para)
@@ -97,6 +109,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    */
   public DocumentTreeHandler() {
     this._tree = new DocumentTree.Builder();
+    this._fragmentIDs.push(DEFAULT_FRAGMENT);
   }
 
   /**
@@ -106,17 +119,14 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    */
   public DocumentTreeHandler(long uri) {
     this._tree = new DocumentTree.Builder(uri);
-  }
-
-  /**
-   * @param transclusions  whether to create references for transclusions.
-   */
-  public void setTransclusions(boolean transclusions) {
-    this._transclusions = transclusions;
+    this._fragmentIDs.push(DEFAULT_FRAGMENT);
   }
 
   @Override
   public void startElement(String element, Attributes attributes) {
+    if ("blockxref".equals(element)) {
+      this._blockxrefs.push("transclude".equals(attributes.getValue("type")));
+    }
     if (isElement("document")) {
       startDocument(attributes);
     } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
@@ -128,10 +138,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     } else if ("block".equals(element)) {
       startBlock(attributes);
     } else if ("blockxref".equals(element) && PSML_MEDIATYPE.equals(attributes.getValue("mediatype")) &&
-        ("embed".equals(attributes.getValue("type")) || ("transclude".equals(attributes.getValue("type")) && this._transclusions))) {
+        ("embed".equals(attributes.getValue("type")) || "transclude".equals(attributes.getValue("type")))) {
       startReference(attributes);
-    } else if ("blockxref".equals(element) && "transclude".equals(attributes.getValue("type"))) {
-      this.transclusionLevel = getInt(attributes, "level", 0);
     } else if ("reversexref".equals(element) && !hasAncestor("blockxref")) {
       startReverseRef(attributes);
     } else if (isElement("displaytitle") && !hasAncestor("blockxref")) {
@@ -150,12 +158,13 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     Heading heading;
     if (isParent("section")) {
       this.fragmentLevel = 2;
-      heading = Heading.untitled(this.transclusionLevel + SECTION_TITLE_LEVEL, DEFAULT_FRAGMENT, this.sectioncounter);
+      heading = Heading.untitled(this.transclusionLevel + SECTION_TITLE_LEVEL, DEFAULT_FRAGMENT, DEFAULT_FRAGMENT,
+          this.sectioncounter);
       this.sectioncounter++;
     } else {
       int level = getInt(attributes, "level");
       this.fragmentLevel = getInt(attributes, "level");
-      heading = Heading.untitled(this.transclusionLevel + level, this.fragment, this.counter);
+      heading = Heading.untitled(this.transclusionLevel + level, this.fragment, this._fragmentIDs.peek(), this.counter);
       if ("true".equals(attributes.getValue("numbered"))) {
         heading = heading.numbered(true);
       }
@@ -182,7 +191,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     String prefix = attributes.getValue("prefix");
     String numbered = attributes.getValue("numbered");
     if ("true".equals(numbered) || (!Paragraph.NO_PREFIX.equals(prefix) && prefix != null)) {
-      Paragraph para = new Paragraph(getInt(attributes, "indent", 0), this.fragment, this.counter);
+      Paragraph para = new Paragraph(getInt(attributes, "indent", 0), this.fragment, this._fragmentIDs.peek(), this.counter);
       if ("true".equals(numbered)) {
         para = para.numbered(true);
       }
@@ -192,7 +201,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       if (isParent("block") && this.currentBlockLabel != null) {
         para = para.blocklabel(this.currentBlockLabel);
       }
-      this._expander.addParagraph(para);
+      this._expander.addLeaf(para);
     }
     this.firstHeading = false;
     this.counter++;
@@ -216,9 +225,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    * @param attributes The attributes
    */
   private void startFragment(Attributes attributes) {
+    String fragment = getString(attributes, "id");
+    this._fragmentIDs.push(fragment);
     // Only if not within a transclusion
     if (!hasAncestor("blockxref")) {
-      this.fragment = getString(attributes, "id");
+      this.fragment = fragment;
       this._tree.putFragmentLevel(this.fragment, this.fragmentLevel);
       this.counter = 1;
       this.firstHeading = true;
@@ -243,15 +254,20 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     long uriid = getLong(attributes, "uriid", -1L).longValue();
     // We eliminate unresolved cross-references
     if (uriid > 0) {
-      // The level is based on the part that contains it
       int level = getInt(attributes, "level", 0);
-      int partLevel = getBaseLevel()+1;
-      int newlevel = partLevel + level;
       String documenttype = getString(attributes, "documenttype", Reference.DEFAULT_TYPE);
       Reference.Type type = Reference.Type.fromString(attributes.getValue("type"));
       String title = computeReferenceTitle(attributes);
-      Reference reference = new Reference(level, title, this.fragment, uriid, type, documenttype, attributes.getValue("frag"));
-      this._expander.add(reference, newlevel);
+      Reference reference = new Reference(level, title, this.fragment, this._fragmentIDs.peek(),
+          uriid, type, documenttype, attributes.getValue("frag"));
+      if (Reference.Type.EMBED.equals(type)) {
+        // use PageSeeder generated title
+        newBuffer();
+        this.currentReference = reference;
+      } else {
+        this._expander.addLeaf(reference);
+        this.transclusionLevel = level;
+      }
     }
   }
 
@@ -301,9 +317,28 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     } else if ("block".equals(element)) {
       this.currentBlockLabel = null;
 
-    } else if ("blockxref".equals(element) && !hasAncestor("blockxref")) {
-      this.transclusionLevel = 0;
-
+    } else if ("blockxref".equals(element)) {
+      // Set the title of the current reference
+      Reference reference = this.currentReference;
+      if (reference != null) {
+        String title = buffer(true);
+        if (title != null) {
+          reference = reference.title(title);
+        }
+        int partLevel = getBaseLevel()+1;
+        int newlevel = partLevel + reference.level();
+        this._expander.add(reference, newlevel);
+        this.currentReference = null;
+      }
+      if (!hasAncestor("blockxref")) {
+        this.transclusionLevel = 0;
+      }
+      if (this._blockxrefs.peek()) {
+        this._expander.addLeaf(new TransclusionEnd(this.fragment, this._fragmentIDs.peek()));
+      }
+      this._blockxrefs.pop();
+    } else if ("fragment".equals(element)) {
+      this._fragmentIDs.pop();
     } else if ("document".equals(element) && !hasAncestor("blockxref")) {
       this._tree.parts(this._expander.parts());
       add(this._tree.build());

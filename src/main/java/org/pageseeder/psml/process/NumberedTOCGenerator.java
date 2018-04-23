@@ -291,7 +291,7 @@ public class NumberedTOCGenerator {
       xml.attribute("title", head.title());
     }
     if (head.numbered() && this._fragmentNumbering != null) {
-      Prefix pref = this._fragmentNumbering.getPrefix(treeid, count, head.fragment(), head.index());
+      Prefix pref = this._fragmentNumbering.getTranscludedPrefix(treeid, count, head.fragment(), head.index());
       if (pref != null) {
         xml.attribute("prefix", pref.value);
         xml.attribute("canonical", pref.canonical);

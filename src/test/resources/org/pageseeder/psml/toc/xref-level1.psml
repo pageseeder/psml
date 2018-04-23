@@ -31,8 +31,7 @@
         reversefrag="content" reversetitle="" reverselink="true"
         reversetype="none" display="document" level="1" type="embed"
         uriid="199328" href="/ps/test/philipr2/documents/word3/Test%20doc%201-3.psml"
-        urititle="Another heading 2" mediatype="application/vnd.pageseeder.psml+xml">Another heading 2
-      </blockxref>
+        urititle="Another heading 2" mediatype="application/vnd.pageseeder.psml+xml">Another heading 2</blockxref>
       <blockxref id="15240" frag="default" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="document" type="embed" uriid="6173"
@@ -42,8 +41,7 @@
         reversefrag="content" reversetitle="" reverselink="true"
         reversetype="none" display="manual" level="2" type="embed"
         uriid="199326" href="/ps/test/philipr2/documents/word3/Test%20doc%201-4.psml"
-        urititle="Another heading 2" mediatype="application/vnd.pageseeder.psml+xml">Another heading 2a
-      </blockxref>
+        urititle="Another heading 2" mediatype="application/vnd.pageseeder.psml+xml">Another heading 2a</blockxref>
     </xref-fragment>
   </section>
   <section>

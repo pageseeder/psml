@@ -40,8 +40,8 @@ public final class PartTest {
   public void testAdjustLevel_1() {
     Part<Heading> part = h1("Title", "1", 1);
     part = part.attach(Arrays.asList(
-      new Part<>(Heading.untitled(2, "1", 2)),
-      new Part<>(Heading.untitled(2, "1", 3))
+      new Part<>(Heading.untitled(2, "1", "1", 2)),
+      new Part<>(Heading.untitled(2, "1", "1", 3))
     ));
     Part<Heading> adjusted = part.adjustLevel(1);
     Assert.assertEquals(1, part.level());
@@ -55,8 +55,8 @@ public final class PartTest {
   public void testAdjustLevel_m1() {
     Part<Heading> part = h2("Title", "1", 1);
     part = part.attach(Arrays.asList(
-      new Part<>(Heading.untitled(3, "1", 1)),
-      new Part<>(Heading.untitled(3, "1", 1))
+      new Part<>(Heading.untitled(3, "1", "1", 1)),
+      new Part<>(Heading.untitled(3, "1", "1", 1))
     ));
     Part<Heading> adjusted = part.adjustLevel(-1);
     Assert.assertEquals(2, part.level());

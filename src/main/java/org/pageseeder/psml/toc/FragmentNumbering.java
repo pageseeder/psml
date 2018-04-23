@@ -99,7 +99,7 @@ public final class FragmentNumbering implements Serializable {
     DocumentTree root = pub.root();
     if (root != null) {
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
-          doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT, new Location(root.id(), 1));
+          doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT);
     }
     List<Long> allIds = new ArrayList<>(pub.ids());
     allIds.remove(root.id());
@@ -142,11 +142,10 @@ public final class FragmentNumbering implements Serializable {
    * @param count     No. of times ID has been used.
    * @param ancestors List of the current ancestor tree IDs
    * @param fragment  The document fragment to serialize.
-   * @param location  The current parent location for transcluded content
    */
   private void processTree(PublicationTree pub, long id, int level, int treelevel, PublicationConfig config,
       @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
-      String fragment, Location location) {
+      String fragment) {
     String key = id + "-" + fragment;
     if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(key);
@@ -161,6 +160,7 @@ public final class FragmentNumbering implements Serializable {
     } else if (number == null || !numbering.getLabel().equals(number.getPublicationNumbering().getLabel())) {
       number = new NumberingGenerator(numbering);
     }
+    Location location = new Location(id, count);
     for (Part<?> part : current.parts()) {
       processPart(pub, id, level, treelevel, part, config, number, doccount, count, ancestors, location);
     }
@@ -180,7 +180,7 @@ public final class FragmentNumbering implements Serializable {
    * @param doccount  Map of [uriid], [number of uses]
    * @param count     No. of times ID has been used.
    * @param ancestors List of the current ancestor tree IDs
-   * @param location  The current parent location for transcluded content
+   * @param location  The original location for transcluded content
    */
   private void processPart(PublicationTree pub, long id, int level, int treeLevel, Part<?> part, PublicationConfig config,
       @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
@@ -192,7 +192,6 @@ public final class FragmentNumbering implements Serializable {
     NumberingGenerator nextNumber = number;
     int nextLevel = level + 1;
     int nextTreeLevel = treeLevel;
-    Location nextLocation = location;
     String targetFragment = Reference.DEFAULT_FRAGMENT;
     Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
@@ -202,35 +201,29 @@ public final class FragmentNumbering implements Serializable {
       next = ref.uri();
       nextTree = pub.tree(next);
       // can only be numbered if the referenced tree exists
-      if (nextTree != null) {
-        nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
+      if (nextTree != null || Reference.Type.TRANSCLUDE.equals(refType)) {
         nextCount = doccount.get(next);
         nextCount = nextCount == null ? 1 : nextCount + 1;
         doccount.put(next, nextCount);
         if (Reference.Type.EMBED.equals(refType)) {
+          nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
           if (PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo())) {
             nextTreeLevel = treeLevel + ref.level();
             nextLevel = nextTreeLevel + 1;
           }
-          nextLocation = new Location(next, nextCount);
           // references to embedded single fragments are not numbered
           if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
-            processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount, nextLocation);
+            processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
           }
         } else {
-          // transclusions are at the same level
-          nextLevel = level + ref.level();
-          // if different fragment, reset location
-          if (!location.fragment.equals(ref.fragment()) && location.transclusions == 0) {
-            location.fragment = ref.fragment();
+          // ignore nested transclusion
+          if (location.transclusions == 0) {
+            location.uriid = ref.uri();
+            location.position = nextCount;
+            location.fragment = Element.NO_FRAGMENT;
             location.index = 0;
           }
           location.transclusions++;
-          // if document title has been collapsed process it now
-          if (!Element.NO_FRAGMENT.equals(nextTree.titlefragment())) {
-            processReference(ref, nextLevel, nextTree, nextNumber, nextCount, location);
-            nextLevel++;
-          }
         }
       }
     } else if (element instanceof Heading) {
@@ -239,16 +232,15 @@ public final class FragmentNumbering implements Serializable {
       int paralevel = PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getParaLevelRelativeTo()) ?
           treeLevel + 1 : level;
       processParagraph((Paragraph)element, paralevel, id, number, count, location);
+    } else if (element instanceof TransclusionEnd) {
+      location.transclusions--;
     }
 
     // Expand found reference
-    if (nextTree != null) {
+    if (nextTree != null && Reference.Type.EMBED.equals(refType)) {
       // Moving to the next tree (use next level)
       processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors,
-          targetFragment, nextLocation);
-      if (!Reference.Type.EMBED.equals(refType)) {
-        location.transclusions--;
-      }
+          targetFragment);
     }
 
     // Process all child parts
@@ -265,10 +257,8 @@ public final class FragmentNumbering implements Serializable {
    * @param target    The target tree for the reference.
    * @param number    The numbering generator
    * @param count     No. of times target has been used.
-   * @param location  The current parent location for transcluded content
    */
-  public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, int count,
-      Location location) {
+  public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, int count) {
     String p = target.prefix();
     Prefix pref = null;
     if (target.numbered() && number != null && Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
@@ -277,23 +267,11 @@ public final class FragmentNumbering implements Serializable {
     if (pref == null) {
       pref = new Prefix(p, null, level, null);
     }
-    // if title collapsed with reference then increment heading count
-    if (!Element.NO_FRAGMENT.equals(target.titlefragment())) {
-      // if embed update location to title fragment
-      if (Reference.Type.EMBED.equals(ref.type())) {
-        location.fragment = target.titlefragment();
-      }
-      location.index++;
-    }
     // always store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);
     if (NO_PREFIX.equals(pref.value)) return;
     // store prefix on first heading fragment (must have index=1 for reference to have a prefix)
     this.numbering.put(target.id() + "-" + count + "-" + target.titlefragment()+ "-1", pref);
-    // if not a nested transclusion then store it on parent fragment
-    if (location.transclusions <= 1) {
-      this.transcludedNumbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
-    }
   }
 
   /**
@@ -304,7 +282,7 @@ public final class FragmentNumbering implements Serializable {
    * @param id        The ID of the tree containing the heading.
    * @param number    The numbering generator
    * @param count     No. of times tree ID has been used.
-   * @param location  The current parent location for transcluded content
+   * @param location  The current original location for transcluded content
    */
   public void processHeading(Heading h, int level, long id, NumberingGenerator number, int count, Location location) {
     String p = h.prefix();
@@ -317,10 +295,10 @@ public final class FragmentNumbering implements Serializable {
     updateLocation(h, location);
     if (pref == null) return;
     // store prefix on fragment
-    this.numbering.put(id + "-" + count + "-" + h.fragment() + "-" + h.index(), pref);
-    // if not a nested transclusion then store it on parent fragment
+    this.transcludedNumbering.put(id + "-" + count + "-" + h.fragment() + "-" + h.index(), pref);
+    // if not a nested transclusion then store it on original fragment
     if (location.transclusions <= 1) {
-      this.transcludedNumbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
+      this.numbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
     }
   }
 
@@ -333,12 +311,12 @@ public final class FragmentNumbering implements Serializable {
   private static void updateLocation(Element e, Location location) {
     // if not nested transclusion
     if (location.transclusions <= 1) {
-      // if same fragment or transclusion
-      if (location.fragment.equals(e.fragment()) || location.transclusions == 1) {
+      // if same fragment increment index
+      if (location.fragment.equals(e.originalFragment())) {
         location.index++;
       // else reset for different fragment
       } else {
-        location.fragment = e.fragment();
+        location.fragment = e.originalFragment();
         location.index = 1;
       }
     }
@@ -352,7 +330,7 @@ public final class FragmentNumbering implements Serializable {
    * @param id        The ID of the tree containing the heading.
    * @param number    The numbering generator
    * @param count     No. of times tree ID has been used.
-   * @param location  The current parent location for transcluded content
+   * @param location  The current original location for transcluded content
    */
   public void processParagraph(Paragraph para, int level, long id, NumberingGenerator number, int count, Location location) {
     String p = para.prefix();
@@ -367,10 +345,10 @@ public final class FragmentNumbering implements Serializable {
     updateLocation(para, location);
     if (pref == null) return;
     // store prefix on fragment
-    this.numbering.put(id + "-" + count + "-" + para.fragment() + "-" + para.index(), pref);
-    // if not a nested transclusion then store it on parent fragment
+    this.transcludedNumbering.put(id + "-" + count + "-" + para.fragment() + "-" + para.index(), pref);
+    // if not a nested transclusion then store it on orginal fragment
     if (location.transclusions <= 1) {
-      this.transcludedNumbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
+      this.numbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
     }
   }
 

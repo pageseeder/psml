@@ -216,7 +216,6 @@ public final class XRefTranscluder {
       NumberedTOCGenerator numberingAndTOC = this.parentHandler.getNumberedTOCGenerator();
       if (numberingAndTOC != null) {
         DocumentTreeHandler tochandler = new DocumentTreeHandler();
-        tochandler.setTransclusions(true);
         XMLUtils.parse(target, tochandler);
         DocumentTree tree = tochandler.get();
         if (tree != null) {

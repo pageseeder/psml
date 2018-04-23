@@ -24,10 +24,12 @@ public final class Phantom extends Element implements Serializable {
   /**
    * Constructor
    *
-   * @param level The level of the phantom element.
+   * @param level    The level of the phantom element.
+   * @param fragment The fragment for the element.
+   * @param originalfrag  The original (untranscluded) fragment.
    */
-  public Phantom(int level, String fragment) {
-    super(level, NO_TITLE, fragment);
+  public Phantom(int level, String fragment, String originalfrag) {
+    super(level, NO_TITLE, fragment, originalfrag);
   }
 
   @Override
@@ -44,7 +46,7 @@ public final class Phantom extends Element implements Serializable {
   @Override
   public Phantom adjustLevel(int delta) {
     if (delta == 0) return this;
-    return new Phantom(level()+delta, fragment());
+    return new Phantom(level()+delta, fragment(), originalFragment());
   }
 
   @Override

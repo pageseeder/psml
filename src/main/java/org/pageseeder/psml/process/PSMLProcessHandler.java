@@ -445,7 +445,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   public void setPublicationConfig(PublicationConfig config, File root, boolean toc) throws ProcessException {
     DocumentTreeHandler handler = new DocumentTreeHandler();
-    handler.setTransclusions(true);
     XMLUtils.parse(root, handler);
     DocumentTree tree = handler.get();
     if (tree != null) {

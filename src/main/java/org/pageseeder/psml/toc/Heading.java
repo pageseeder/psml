@@ -36,37 +36,49 @@ public final class Heading extends Element implements Serializable {
   /**
    * Full constructor for a heading.
    *
-   * @param level      The level of this heading.
-   * @param title      The title (or text) for the heading.
-   * @param fragment   The Fragment identifier where the heading was found.
-   * @param index      The index of the heading in the current document.
-   * @param numbered   Whether the heading is auto-numbered
-   * @param prefix     Any prefix given to this heading.
-   * @param blocklabel Parent block label.
+   * @param level         The level of this heading.
+   * @param title         The title (or text) for the heading.
+   * @param fragment      The Fragment identifier where the heading was found.
+   * @param originalfrag  The original (untranscluded) fragment.
+   * @param index         The index of the heading in the current document.
+   * @param numbered      Whether the heading is auto-numbered
+   * @param prefix        Any prefix given to this heading.
+   * @param blocklabel    Parent block label.
    */
-  private Heading(int level, String title, String fragment, int index, boolean numbered, String prefix, String blocklabel) {
-    super(level, title, fragment);
+  private Heading(int level, String title, String fragment, String originalfrag,
+      int index, boolean numbered, String prefix, String blocklabel) {
+    super(level, title, fragment, originalfrag);
     this._index = index;
     this._numbered = numbered;
     this._prefix = prefix;
     this._blocklabel = blocklabel;
   }
 
-  public Heading(int level, String title, String fragment, int index) {
-    this(level, title,  fragment, index, false, NO_PREFIX, NO_BLOCK_LABEL);
+  /**
+   * Constructor for a heading.
+   *
+   * @param level         The level of this heading.
+   * @param title         The title (or text) for the heading.
+   * @param fragment      The Fragment identifier where the heading was found.
+   * @param originalfrag  The original (untranscluded) fragment.
+   * @param index         The index of the heading in the current document.
+   */
+  public Heading(int level, String title, String fragment, String originalfrag, int index) {
+    this(level, title,  fragment, originalfrag, index, false, NO_PREFIX, NO_BLOCK_LABEL);
   }
 
   /**
    * Create a new untitled heading.
    *
-   * @param level    The level of this heading.
-   * @param fragment The Fragment identifier where the heading was found.
-   * @param index    The index of the heading in the current document.
+   * @param level         The level of this heading.
+   * @param fragment      The Fragment identifier where the heading was found.
+   * @param originalfrag  The original (untranscluded) fragment.
+   * @param index         The index of the heading in the current document.
    *
    * @return A new heading instance.
    */
-  public static Heading untitled(int level, String fragment, int index) {
-    return new Heading(level, NO_TITLE, fragment, index, false, NO_PREFIX, NO_BLOCK_LABEL);
+  public static Heading untitled(int level, String fragment, String originalfrag, int index) {
+    return new Heading(level, NO_TITLE, fragment, originalfrag, index, false, NO_PREFIX, NO_BLOCK_LABEL);
   }
 
   /**
@@ -115,7 +127,7 @@ public final class Heading extends Element implements Serializable {
    */
   public Heading title(String title) {
     if (title.equals(title())) return this;
-    return new Heading(level(), title, fragment(), this._index, this._numbered, this._prefix, this._blocklabel);
+    return new Heading(level(), title, fragment(), originalFragment(), this._index, this._numbered, this._prefix, this._blocklabel);
   }
 
   /**
@@ -126,7 +138,7 @@ public final class Heading extends Element implements Serializable {
    * @return A new heading instance.
    */
   public Heading prefix(String prefix) {
-    return new Heading(level(), title(), fragment(), this._index, this._numbered, prefix, this._blocklabel);
+    return new Heading(level(), title(), fragment(), originalFragment(), this._index, this._numbered, prefix, this._blocklabel);
   }
 
   /**
@@ -137,7 +149,7 @@ public final class Heading extends Element implements Serializable {
    * @return A new heading instance.
    */
   public Heading blocklabel(String blocklabel) {
-    return new Heading(level(), title(), fragment(), this._index, this._numbered, this._prefix, blocklabel);
+    return new Heading(level(), title(), fragment(), originalFragment(), this._index, this._numbered, this._prefix, blocklabel);
   }
 
   /**
@@ -149,7 +161,7 @@ public final class Heading extends Element implements Serializable {
    */
   public Heading numbered(boolean numbered) {
     if (this._numbered == numbered) return this;
-    return new Heading(level(), title(), fragment(), this._index, numbered, this._prefix, this._blocklabel);
+    return new Heading(level(), title(), fragment(), originalFragment(), this._index, numbered, this._prefix, this._blocklabel);
   }
 
   /**
@@ -161,7 +173,7 @@ public final class Heading extends Element implements Serializable {
   @Override
   public Heading adjustLevel(int delta) {
     if (delta == 0) return this;
-    return new Heading(level()+delta, title(), fragment(), this._index, this._numbered, this._prefix, this._blocklabel);
+    return new Heading(level()+delta, title(), fragment(), originalFragment(), this._index, this._numbered, this._prefix, this._blocklabel);
   }
 
   @Override
@@ -195,7 +207,7 @@ public final class Heading extends Element implements Serializable {
       xml.attribute("numbered", "true");
     }
     if (this._numbered && number != null) {
-      Prefix pref = number.getPrefix(treeid, count, fragment(), this._index);
+      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index);
       if (pref != null) {
         xml.attribute("prefix", pref.value);
         xml.attribute("canonical", pref.canonical);

@@ -337,7 +337,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
           collectReferences(tree(cid), trees);
         }
       }
-      toXML(xml, this._rootid, 1, 1, Reference.DEFAULT_FRAGMENT, false,
+      toXML(xml, this._rootid, 1, 1, Reference.DEFAULT_FRAGMENT,
           new TOCState(cid, cposition, trees, number, externalrefs));
     }
     xml.closeElement();
@@ -371,13 +371,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param level       The level that we are currently at
    * @param count       No. of times ID has been used.
    * @param fragment    The document fragment to serialize.
-   * @param transcluded Whether this tree is being transcluded from content tree
    * @param state       The current state of the TOC
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, Integer count, String fragment, boolean transcluded,
-      TOCState state) throws IOException {
+  private void toXML(XMLWriter xml, long id, int level, Integer count, String fragment, TOCState state) throws IOException {
     String key = id + "-" + fragment;
     if (state.ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID-fragment " + id);
     state.ancestors.add(key);
@@ -386,7 +384,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       current = current.singleFragmentTree(fragment);
     }
     for (Part<?> part : current.parts()) {
-      toXML(xml, id, level, part, count, transcluded, state);
+      toXML(xml, id, level, part, count, state);
     }
     state.ancestors.remove(key);
   }
@@ -399,23 +397,20 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param level       The level that we are currently at
    * @param part        The part to serialize
    * @param count       No. of times ID has been used.
-   * @param transcluded Whether this tree is being transcluded from content tree
    * @param state       The current state of the TOC
    *
    * @throws IOException If thrown by XML writer
    */
-  private void toXML(XMLWriter xml, long id, int level, Part<?> part, Integer count, boolean transcluded,
-      TOCState state) throws IOException {
+  private void toXML(XMLWriter xml, long id, int level, Part<?> part, Integer count, TOCState state) throws IOException {
     Element element = part.element();
     // ignore paragraphs
-    if (element instanceof Paragraph) return;
-    boolean output = ((state.trees == null || state.trees.contains(id)) &&
-        (state.cposition == -1 || state.cposition == count)) || transcluded;
+    if (element instanceof Paragraph || element instanceof TransclusionEnd) return;
+    boolean output = (state.trees == null || state.trees.contains(id)) &&
+        (state.cposition == -1 || state.cposition == count);
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
     String targetFragment = Reference.DEFAULT_FRAGMENT;
-    boolean outputRef = false;
     Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
@@ -423,13 +418,9 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       refType = ref.type();
       next = ref.uri();
       nextTree = tree(next);
-      toNext = nextTree != null;
-      // output reference if embedded or document title has been collapsed
-      outputRef = nextTree != null && (Reference.Type.EMBED.equals(refType) ||
-          (Reference.DEFAULT_FRAGMENT.equals(targetFragment) &&
-              !Element.NO_FRAGMENT.equals(nextTree.titlefragment())));
+      toNext = nextTree != null && Reference.Type.EMBED.equals(refType);
     }
-    if (output && (nextTree == null || outputRef)) {
+    if (output && !Reference.Type.TRANSCLUDE.equals(refType)) {
       xml.openElement("part", !part.parts().isEmpty() ||
           (toNext && (state.trees == null || state.trees.contains(next) || state.cid == id)));
       xml.attribute("level", level);
@@ -442,11 +433,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
     // Output the element
     Integer nextcount = null;
-    if (nextTree != null) {
+    if (nextTree != null || Reference.Type.TRANSCLUDE.equals(refType)) {
       nextcount = state.doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       state.doccount.put(next, nextcount);
-      if (outputRef) {
+      if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           if (output) element.toXML(xml, level, state.number, next, nextcount, nextTree.numbered(), nextTree.prefix());
         } else {
@@ -463,15 +454,14 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1)
-      toXML(xml, next, level + (outputRef ? 1 : 0), nextcount, targetFragment,
-          id == state.cid && !Reference.Type.EMBED.equals(refType), state);
+      toXML(xml, next, level + 1, nextcount, targetFragment, state);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      toXML(xml, id, level+1, r, count, transcluded, state);
+      toXML(xml, id, level+1, r, count, state);
     }
-    if (output && (nextTree == null || outputRef)) xml.closeElement();
+    if (output && !Reference.Type.TRANSCLUDE.equals(refType)) xml.closeElement();
   }
 
   /**

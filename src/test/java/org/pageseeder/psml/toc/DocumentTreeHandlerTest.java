@@ -9,6 +9,7 @@ import static org.pageseeder.psml.toc.Tests.h6;
 import static org.pageseeder.psml.toc.Tests.parse;
 import static org.pageseeder.psml.toc.Tests.phantom;
 import static org.pageseeder.psml.toc.Tests.ref;
+import static org.pageseeder.psml.toc.Tests.tend;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -211,10 +212,15 @@ public final class DocumentTreeHandlerTest {
   public void testParseTransclusions() throws SAXException, IOException {
     DocumentTree tree = parse(1, "transclusions.psml");
     List<Part<?>> p = Arrays.asList(
-        h1("Assembly", "1", 1),
+        h1("Assembly", "1", 1,
+            ref(0, "Part A", "2", 186250L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default")),
         h1("Part A", "2", 1,
+            tend("2"),
+            ref(1, "Sub-part 1", "2", 186251L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
             h2("Sub-part 1", "2", 3,
-                h3("Division a", "2", 5))));
+                tend("2"),
+                ref(2, "Division a", "2", 186252L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
+                h3("Division a", "2", 5, tend("2")))));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", Collections.emptyList(), p,
         Collections.emptyMap(), Collections.emptyMap());
@@ -223,13 +229,18 @@ public final class DocumentTreeHandlerTest {
 
   @Test
   public void testParseTransclusions_normalizedAuto() throws SAXException, IOException {
-    DocumentTree tree = parse(1, "transclusions.psml");
+    DocumentTree tree = parse(6, "transclusions.psml");
     List<Part<?>> p = Arrays.asList(
+        ref(0, "Part A", "2", 186250L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
         h1("Part A", "2", 1,
+            tend("2"),
+            ref(1, "Sub-part 1", "2", 186251L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
             h2("Sub-part 1", "2", 3,
-                h3("Division a", "2", 5))));
+                tend("2"),
+                ref(2, "Division a", "2", 186252L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
+                h3("Division a", "2", 5, tend("2")))));
     tree.print(System.out);
-    DocumentTree expected = new DocumentTree(5, "Assembly", "", Collections.emptyList(), p,
+    DocumentTree expected = new DocumentTree(6, "Assembly", "", Collections.emptyList(), p,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }

@@ -38,13 +38,15 @@ public final class Paragraph extends Element implements Serializable {
    * @param level    The level of this paragraph.
    * @param title    The title (or text) for the paragraph.
    * @param fragment The Fragment identifier where the paragraph was found.
+   * @param originalfrag  The original (untranscluded) fragment.
    * @param index    The index of the paragraph in the current document.
    * @param numbered Whether the paragraph is auto-numbered
    * @param prefix   Any prefix given to this paragraph.
    * @param blocklabel Parent block label.
    */
-  private Paragraph(int level, String title, String fragment, int index, boolean numbered, String prefix, String blocklabel) {
-    super(level, title, fragment);
+  private Paragraph(int level, String title, String fragment, String originalfrag,
+      int index, boolean numbered, String prefix, String blocklabel) {
+    super(level, title, fragment, originalfrag);
     this._index = index;
     this._numbered = numbered;
     this._prefix = prefix;
@@ -56,10 +58,11 @@ public final class Paragraph extends Element implements Serializable {
    *
    * @param level    The level of this paragraph.
    * @param fragment The Fragment identifier where the paragraph was found.
+   * @param originalfrag  The original (untranscluded) fragment.
    * @param index    The index of the paragraph in the current document.
    */
-  public Paragraph(int level, String fragment, int index) {
-    this(level, NO_TITLE,  fragment, index, false, NO_PREFIX, NO_BLOCK_LABEL);
+  public Paragraph(int level, String fragment, String originalfrag, int index) {
+    this(level, NO_TITLE,  fragment, originalfrag, index, false, NO_PREFIX, NO_BLOCK_LABEL);
   }
 
   /**
@@ -108,7 +111,7 @@ public final class Paragraph extends Element implements Serializable {
    */
   public Paragraph title(String title) {
     if (title.equals(title())) return this;
-    return new Paragraph(level(), title, fragment(), this._index, this._numbered, this._prefix, this._blocklabel);
+    return new Paragraph(level(), title, fragment(), originalFragment(), this._index, this._numbered, this._prefix, this._blocklabel);
   }
 
   /**
@@ -119,7 +122,7 @@ public final class Paragraph extends Element implements Serializable {
    * @return A new paragraph instance.
    */
   public Paragraph prefix(String prefix) {
-    return new Paragraph(level(), title(), fragment(), this._index, this._numbered, prefix, this._blocklabel);
+    return new Paragraph(level(), title(), fragment(), originalFragment(), this._index, this._numbered, prefix, this._blocklabel);
   }
 
   /**
@@ -130,7 +133,7 @@ public final class Paragraph extends Element implements Serializable {
    * @return A new paragraph instance.
    */
   public Paragraph blocklabel(String blocklabel) {
-    return new Paragraph(level(), title(), fragment(), this._index, this._numbered, this._prefix, blocklabel);
+    return new Paragraph(level(), title(), fragment(), originalFragment(), this._index, this._numbered, this._prefix, blocklabel);
   }
 
   /**
@@ -142,7 +145,7 @@ public final class Paragraph extends Element implements Serializable {
    */
   public Paragraph numbered(boolean numbered) {
     if (this._numbered == numbered) return this;
-    return new Paragraph(level(), title(), fragment(), this._index, numbered, this._prefix, this._blocklabel);
+    return new Paragraph(level(), title(), fragment(), originalFragment(), this._index, numbered, this._prefix, this._blocklabel);
   }
 
   /**
