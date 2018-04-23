@@ -83,7 +83,7 @@ public final class Reference extends Element implements Serializable {
    *
    * @param level         The level.
    * @param title         The title of the reference.
-   * @param fragment      The Fragment identifier where the heading was found.
+   * @param fragment      The Fragment identifier where the reference was found.
    * @param uri           The URI ID.
    * @param type          The XRef type.
    * @param documenttype  The document type of the target.
@@ -102,7 +102,7 @@ public final class Reference extends Element implements Serializable {
    *
    * @param level      The level.
    * @param title      The title of the reference.
-   * @param fragment   The Fragment identifier where the heading was found.
+   * @param fragment   The Fragment identifier where the reference was found.
    * @param uri        The URI ID.
    */
   public Reference(int level, String title, String fragment, Long uri) {
@@ -158,11 +158,11 @@ public final class Reference extends Element implements Serializable {
 
   @Override
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
-    toXMLNoClose(xml, level);
+    toXMLNoClose(xml, level, count);
     xml.closeElement();
   }
 
-  public void toXMLNoClose(@NonNull XMLWriter xml, int level) throws IOException {
+  public void toXMLNoClose(@NonNull XMLWriter xml, int level, int count) throws IOException {
     xml.openElement("document-ref");
     xml.attribute("level", this.level());
     if (!Element.NO_TITLE.equals(title())) {
@@ -175,11 +175,12 @@ public final class Reference extends Element implements Serializable {
     if (!DEFAULT_FRAGMENT.equals(this._targetfragment)) {
       xml.attribute("targetfragment", this._targetfragment);
     }
+    xml.attribute("position", count);
   }
 
   @Override
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count, boolean numbered, String prefix) throws IOException {
-    toXMLNoClose(xml, level);
+    toXMLNoClose(xml, level, count);
     if (numbered) {
       xml.attribute("numbered", "true");
     }
@@ -194,7 +195,6 @@ public final class Reference extends Element implements Serializable {
         xml.attribute("prefix", prefix);
       }
     }
-    xml.attribute("position", count);
     xml.closeElement();
   }
 
