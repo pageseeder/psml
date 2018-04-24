@@ -264,6 +264,17 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
+   * List of all forward references to documents and document fragments.
+   */
+  public List<Reference> listReferences() {
+    List<Reference> refs = new ArrayList<>();
+    for (Part<?> c : this._parts) {
+      collectReferences(c, refs);
+    }
+    return refs;
+  }
+
+  /**
    * Collect the list of URI IDs from the references in this tree.
    *
    * @param part The part to collect from.
@@ -280,6 +291,23 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     }
     for (Part<?> c : part.parts()) {
       collectReferencesIds(c, uris);
+    }
+  }
+
+  /**
+   * Collect the list of references in this tree.
+   *
+   * @param part The part to collect from.
+   * @param refs The references
+   */
+  private static void collectReferences(Part<?> part, List<Reference> refs) {
+    Element element = part.element();
+    if (element instanceof Reference) {
+      Reference ref = (Reference)element;
+      refs.add(ref);
+    }
+    for (Part<?> c : part.parts()) {
+      collectReferences(c, refs);
     }
   }
 
