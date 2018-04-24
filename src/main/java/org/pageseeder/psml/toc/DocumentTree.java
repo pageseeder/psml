@@ -244,7 +244,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * List of URI ID of reverse cross-references to the document (not fragments).
+   * List of URI ID of reverse cross-references to the document and document fragments.
    */
   @Override
   public List<Long> listReverseReferences() {
@@ -252,7 +252,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * List of URI ID of forward cross-references to documents and document fragments.
+   * List of URI ID of forward cross-references to documents and document fragments (including transclusions).
    */
   @Override
   public List<Long> listForwardReferences() {
@@ -264,7 +264,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * List of all forward references to documents and document fragments.
+   * List of all forward references to documents and document fragments (including transclusions).
    */
   public List<Reference> listReferences() {
     List<Reference> refs = new ArrayList<>();
