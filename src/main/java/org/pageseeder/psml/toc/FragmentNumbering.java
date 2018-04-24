@@ -92,14 +92,26 @@ public final class FragmentNumbering implements Serializable {
    *
    * @param pub              The publication tree
    * @param config           The publication config
-   * @param unusedIds        Any tree IDs that are unreachable will be added to this list
    */
-  public FragmentNumbering(PublicationTree pub, PublicationConfig config, List<Long> unusedIds) {
+  public FragmentNumbering(PublicationTree pub, PublicationConfig config) {
+    this(pub, config, new ArrayList<Long>(), new HashMap<Long,List<Long>>());
+  }
+
+  /**
+   * Constructor returning unused IDs and transclusions.
+   *
+   * @param pub              The publication tree
+   * @param config           The publication config
+   * @param unusedIds        Any tree IDs that are unreachable will be added to this list (supply empty list)
+   * @param transclusions    Map of transcluded Id to a list of it's parent Ids (supply empty map).
+   */
+  public FragmentNumbering(PublicationTree pub, PublicationConfig config,
+      List<Long> unusedIds, Map<Long,List<Long>> transclusions) {
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     if (root != null) {
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
-          doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT);
+          doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT, transclusions);
     }
     List<Long> allIds = new ArrayList<>(pub.ids());
     allIds.remove(root.id());
@@ -132,20 +144,21 @@ public final class FragmentNumbering implements Serializable {
   /**
    * Process numbering for a tree.
    *
-   * @param pub       The publication tree
-   * @param id        The ID of the tree to serialize.
-   * @param level     The heading level that we are currently at
-   * @param treelevel The level of the current tree
-   * @param config    The publication config to get numbering config
-   * @param number    The numbering generator (optional)
-   * @param doccount  Map of [uriid], [number of uses]
-   * @param count     No. of times ID has been used.
-   * @param ancestors List of the current ancestor tree IDs
-   * @param fragment  The document fragment to serialize.
+   * @param pub           The publication tree
+   * @param id            The ID of the tree to serialize.
+   * @param level         The heading level that we are currently at
+   * @param treelevel     The level of the current tree
+   * @param config        The publication config to get numbering config
+   * @param number        The numbering generator (optional)
+   * @param doccount      Map of [uriid], [number of uses]
+   * @param count         No. of times ID has been used.
+   * @param ancestors     List of the current ancestor tree IDs
+   * @param fragment      The document fragment to serialize
+   * @param transclusions Map of transcluded Id to a list of it's parent Ids
    */
   private void processTree(PublicationTree pub, long id, int level, int treelevel, PublicationConfig config,
       @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
-      String fragment) {
+      String fragment, Map<Long,List<Long>> transclusions) {
     String key = id + "-" + fragment;
     if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID " + id);
     ancestors.add(key);
@@ -162,7 +175,7 @@ public final class FragmentNumbering implements Serializable {
     }
     Location location = new Location(id, count);
     for (Part<?> part : current.parts()) {
-      processPart(pub, id, level, treelevel, part, config, number, doccount, count, ancestors, location);
+      processPart(pub, id, level, treelevel, part, config, number, doccount, count, ancestors, location, transclusions);
     }
     ancestors.remove(key);
   }
@@ -170,21 +183,22 @@ public final class FragmentNumbering implements Serializable {
   /**
    * Process numbering for a part.
    *
-   * @param pub       The publication tree
-   * @param id        The ID of the tree to process.
-   * @param level     The level that we are currently at
-   * @param treeLevel The level of the current tree
-   * @param part      The part to process
-   * @param config    The publication config to get numbering config
-   * @param number    The numbering generator (optional)
-   * @param doccount  Map of [uriid], [number of uses]
-   * @param count     No. of times ID has been used.
-   * @param ancestors List of the current ancestor tree IDs
-   * @param location  The original location for transcluded content
+   * @param pub           The publication tree
+   * @param id            The ID of the tree to process.
+   * @param level         The level that we are currently at
+   * @param treeLevel     The level of the current tree
+   * @param part          The part to process
+   * @param config        The publication config to get numbering config
+   * @param number        The numbering generator (optional)
+   * @param doccount      Map of [uriid], [number of uses]
+   * @param count         No. of times ID has been used.
+   * @param ancestors     List of the current ancestor tree IDs
+   * @param location      The original location for transcluded content
+   * @param transclusions Map of transcluded Id to a list of it's parent Ids
    */
   private void processPart(PublicationTree pub, long id, int level, int treeLevel, Part<?> part, PublicationConfig config,
       @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
-      Location location) {
+      Location location, Map<Long,List<Long>> transclusions) {
     Element element = part.element();
     Long next = null;
     DocumentTree nextTree = null;
@@ -222,6 +236,13 @@ public final class FragmentNumbering implements Serializable {
             location.position = nextCount;
             location.fragment = Element.NO_FRAGMENT;
             location.index = 0;
+            // add to transclusion map
+            List<Long> parents = transclusions.get(ref.uri());
+            if (parents == null) {
+              parents = new ArrayList<>();
+              transclusions.put(ref.uri(), parents);
+            }
+            parents.add(id);
           }
           location.transclusions++;
         }
@@ -240,12 +261,12 @@ public final class FragmentNumbering implements Serializable {
     if (nextTree != null && Reference.Type.EMBED.equals(refType)) {
       // Moving to the next tree (use next level)
       processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors,
-          targetFragment);
+          targetFragment, transclusions);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      processPart(pub, id, level + 1, treeLevel, r, config, number, doccount, count, ancestors, location);
+      processPart(pub, id, level + 1, treeLevel, r, config, number, doccount, count, ancestors, location, transclusions);
     }
   }
 

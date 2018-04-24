@@ -28,6 +28,7 @@ import org.pageseeder.psml.toc.Paragraph;
 import org.pageseeder.psml.toc.Part;
 import org.pageseeder.psml.toc.PublicationTree;
 import org.pageseeder.psml.toc.Reference;
+import org.pageseeder.psml.toc.TransclusionEnd;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.xml.sax.SAXException;
 
@@ -165,32 +166,28 @@ public class NumberedTOCGenerator {
       Map<Long,Integer> doccount, Integer count, List<String> ancestors) throws IOException {
     Element element = part.element();
     // ignore paragraphs
-    if (element instanceof Paragraph) return;
+    if (element instanceof Paragraph || element instanceof TransclusionEnd) return;
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
     String targetFragment = Reference.DEFAULT_FRAGMENT;
-    boolean outputRef = false;
+    Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
       Reference ref = (Reference)element;
       targetFragment = ref.targetfragment();
-      Reference.Type refType = ref.type();
+      refType = ref.type();
       next = ref.uri();
       nextTree = this._publicationTree.tree(next);
-      toNext = nextTree != null;
-      // output reference if embedded or document title has been collapsed
-      outputRef = toNext && (Reference.Type.EMBED.equals(refType) ||
-          (Reference.DEFAULT_FRAGMENT.equals(targetFragment) &&
-              !Element.NO_FRAGMENT.equals(nextTree.titlefragment())));
+      toNext = nextTree != null && Reference.Type.EMBED.equals(refType);
     }
 
     // Output the element
     Integer nextcount = null;
-    if (toNext) {
+    if (toNext || Reference.Type.TRANSCLUDE.equals(refType)) {
       nextcount = doccount.get(next);
       nextcount = nextcount == null ? 1 : nextcount + 1;
       doccount.put(next, nextcount);
-      if (outputRef) {
+      if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,
               !part.parts().isEmpty() || toNext);
@@ -208,15 +205,14 @@ public class NumberedTOCGenerator {
     // Expand found reference
     if (toNext) {
       // Moving to the next tree (increase the level by 1 unless transclude)
-      toXML(xml, next, level + (outputRef ? 1 : 0),
-          doccount, nextcount, ancestors, targetFragment);
+      toXML(xml, next, level + 1, doccount, nextcount, ancestors, targetFragment);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
       toXML(xml, id, level+1, r, doccount, count, ancestors);
     }
-    if (!toNext || outputRef) {
+    if (!Reference.Type.TRANSCLUDE.equals(refType)) {
       xml.closeElement();
     }
   }
