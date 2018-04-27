@@ -5,6 +5,7 @@ package org.pageseeder.psml.process;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -16,7 +17,10 @@ import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.DocumentTreeHandler;
+import org.pageseeder.xmlwriter.XML.NamespaceAware;
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -212,11 +216,16 @@ public final class XRefTranscluder {
       handler.getTranscluder().parentFiles.putAll(this.parentFiles);
       // parse now
       XMLUtils.parse(target, handler);
-      // if publication then parse TOC
+      // if publication and not a transclusion then parse TOC
       NumberedTOCGenerator numberingAndTOC = this.parentHandler.getNumberedTOCGenerator();
-      if (numberingAndTOC != null) {
+      if (numberingAndTOC != null && !"transclude".equals(atts.getValue("type"))) {
+        // process transclussions
+        XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
+        TransclusionHandler thandler = new TransclusionHandler(out, "default", false, this.parentHandler);
+        XMLUtils.parse(target, thandler);
+        // parse document tree
         DocumentTreeHandler tochandler = new DocumentTreeHandler();
-        XMLUtils.parse(target, tochandler);
+        XMLUtils.parse(new InputSource(new StringReader(out.toString())), tochandler, null, null);
         DocumentTree tree = tochandler.get();
         if (tree != null) {
           tree = tree.normalize(this.parentHandler.getPublicationConfig().getTocTitleCollapse());
@@ -290,35 +299,35 @@ public final class XRefTranscluder {
   }
 
   /**
-   *
-   * @author Jean-Baptiste Reure
-   * @version 31/10/2012
-   *
-   */
-  public static class XRefNotFoundException extends ProcessException {
-    /** used for serialization */
-    private static final long serialVersionUID = 1L;
-  }
+  *
+  * @author Jean-Baptiste Reure
+  * @version 31/10/2012
+  *
+  */
+ public static class XRefNotFoundException extends ProcessException {
+   /** used for serialization */
+   private static final long serialVersionUID = 1L;
+ }
 
-  /**
-   *
-   * @author Jean-Baptiste Reure
-   * @version 31/10/2012
-   *
-   */
-  public static class InfiniteLoopException extends ProcessException {
-    /** used for serialization */
-    private static final long serialVersionUID = 1L;
-  }
+ /**
+  *
+  * @author Jean-Baptiste Reure
+  * @version 31/10/2012
+  *
+  */
+ public static class InfiniteLoopException extends ProcessException {
+   /** used for serialization */
+   private static final long serialVersionUID = 1L;
+ }
 
-  /**
-   *
-   * @author Jean-Baptiste Reure
-   * @version 31/10/2012
-   *
-   */
-  public static class TooDeepException extends ProcessException {
-    /** used for serialization */
-    private static final long serialVersionUID = 1L;
-  }
+ /**
+  *
+  * @author Jean-Baptiste Reure
+  * @version 31/10/2012
+  *
+  */
+ public static class TooDeepException extends ProcessException {
+   /** used for serialization */
+   private static final long serialVersionUID = 1L;
+ }
 }

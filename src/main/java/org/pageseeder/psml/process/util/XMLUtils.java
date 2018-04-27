@@ -24,6 +24,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.ProcessException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -305,6 +306,30 @@ public final class XMLUtils {
    */
   public static void parse(InputStream in, ContentHandler handler,
       List<String> errors, List<String> warnings) throws ProcessException {
+
+    try {
+      parse(new InputSource(in), handler, errors, warnings);
+    } finally {
+      try {
+        in.close();
+      } catch (IOException ex) {
+        throw new ProcessException("Failed to close PSML: " + ex.getMessage(), ex);
+      }
+    }
+}
+
+  /**
+   * Parse the XML input using the handler provided.
+   *
+   * @param in       the XML input
+   * @param handler  the XML handler
+   * @param errors   where errors are listed (optional)
+   * @param warnings where warnings are listed (optional)
+   *
+   * @throws ProcessException if the parsing failed
+   */
+  public static void parse(InputSource in, ContentHandler handler,
+      @Nullable List<String> errors, @Nullable List<String> warnings) throws ProcessException {
     try {
       // use the SAX parser factory to set features
       SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -318,11 +343,7 @@ public final class XMLUtils {
       XMLParserErrorHandler errorHandler = new XMLParserErrorHandler();
       reader.setErrorHandler(errorHandler);
       // parse
-      try {
-        reader.parse(new InputSource(in));
-      } finally {
-        in.close();
-      }
+      reader.parse(in);
       if (errors != null)
         errors.addAll(errorHandler.getErrors());
       else if (errorHandler.hasErrors()) {
@@ -333,7 +354,7 @@ public final class XMLUtils {
       if (warnings != null)
         warnings.addAll(errorHandler.getWarnings());
     } catch (IOException ex) {
-      throw new ProcessException("Failed to read/write PS Standard XML", ex);
+      throw new ProcessException("Failed to read/write PSML: " + ex.getMessage(), ex);
     } catch (SAXException ex) {
       throw new ProcessException(ex.getMessage(), ex);
     } catch (ParserConfigurationException ex) {

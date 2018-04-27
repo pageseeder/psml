@@ -3,23 +3,14 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.pageseeder.psml.toc.DocumentTree;
-import org.pageseeder.psml.toc.DocumentTreeHandler;
 import org.pageseeder.psml.toc.Element;
 import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
@@ -30,7 +21,6 @@ import org.pageseeder.psml.toc.PublicationTree;
 import org.pageseeder.psml.toc.Reference;
 import org.pageseeder.psml.toc.TransclusionEnd;
 import org.pageseeder.xmlwriter.XMLWriter;
-import org.xml.sax.SAXException;
 
 /**
  * Container for publication tree and fragment numbering.
@@ -298,31 +288,6 @@ public class NumberedTOCGenerator {
       }
     }
     xml.attribute("idref", treeid + "-" + count + "-" + head.fragment() + "-" + head.index());
-  }
-
-  /**
-   * Parse a PSML file.
-   *
-   * @param file  the PSML file
-   * @return the parsed document tree
-   *
-   * @throws SAXException           if problem parsing
-   * @throws FileNotFoundException  if file doesn't exist
-   */
-  public static DocumentTree parse(File file) throws SAXException, FileNotFoundException {
-    InputStream in = new FileInputStream(file);
-    DocumentTree tree = null;
-    try {
-      DocumentTreeHandler handler = new DocumentTreeHandler();
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser parser = factory.newSAXParser();
-      parser.parse(in, handler);
-      tree = handler.get();
-    } catch (ParserConfigurationException | IOException ex) {
-      throw new SAXException(ex);
-    }
-    if (tree == null) throw new SAXException("Unable to generate tree instance from parse!");
-    return tree;
   }
 
 }

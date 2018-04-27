@@ -6,6 +6,7 @@ package org.pageseeder.psml.process;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLDecoder;
@@ -35,6 +36,7 @@ import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.slf4j.Logger;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -444,9 +446,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @throws ProcessException  if problem parsing root file
    */
   public void setPublicationConfig(PublicationConfig config, File root, boolean toc) throws ProcessException {
-    DocumentTreeHandler handler = new DocumentTreeHandler();
-    XMLUtils.parse(root, handler);
-    DocumentTree tree = handler.get();
+    // process transclussions
+    XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
+    TransclusionHandler thandler = new TransclusionHandler(out, "default", false, this);
+    XMLUtils.parse(root, thandler);
+    // parse document tree
+    DocumentTreeHandler tochandler = new DocumentTreeHandler();
+    XMLUtils.parse(new InputSource(new StringReader(out.toString())), tochandler, null, null);
+    DocumentTree tree = tochandler.get();
     if (tree != null) {
       tree = tree.normalize(config.getTocTitleCollapse());
       this.numberingAndTOC = new NumberedTOCGenerator(new PublicationTree(tree));
@@ -966,7 +973,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param element the name of the element to check
    * @return true if this element is a fragment
    */
-  private boolean isFragment(String element) {
+  public boolean isFragment(String element) {
     return "fragment".equals(element) || "media-fragment".equals(element)
         || "xref-fragment".equals(element) || "properties-fragment".equals(element);
   }
