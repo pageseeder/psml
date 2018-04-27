@@ -7,8 +7,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
@@ -103,13 +105,16 @@ public final class FragmentNumbering implements Serializable {
    * @param pub              The publication tree
    * @param config           The publication config
    * @param unusedIds        Any tree IDs that are unreachable will be added to this list (supply empty list)
-   * @param transclusions    Map of transcluded Id to a list of it's parent Ids (supply empty map).
+   * @param transclusions    Map of transcluded Id to a list of it's parent Ids.
+   *                         If list contains -1 then Id is also embedded (supply empty map).
    */
   public FragmentNumbering(PublicationTree pub, PublicationConfig config,
       List<Long> unusedIds, Map<Long,List<Long>> transclusions) {
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     if (root != null) {
+      // mark root as embeded
+      addTransclusionParents(root.id(), -1, transclusions);
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
           doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT, transclusions);
     }
@@ -117,6 +122,15 @@ public final class FragmentNumbering implements Serializable {
     allIds.remove(root.id());
     allIds.removeAll(doccount.keySet());
     unusedIds.addAll(allIds);
+    // remove IDs that are not transcluded from transclusions map
+    Iterator<Entry<Long, List<Long>>> entryIt = transclusions.entrySet().iterator();
+    while (entryIt.hasNext()) {
+      Entry<Long, List<Long>> entry = entryIt.next();
+      List<Long> value = entry.getValue();
+      if (value.size() == 1 && value.get(0) == -1) {
+        entryIt.remove();
+      }
+    }
   }
 
   /**
@@ -229,6 +243,8 @@ public final class FragmentNumbering implements Serializable {
           if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
             processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
           }
+          // add -1 to transclusion map
+          addTransclusionParents(ref.uri(), -1, transclusions);
         } else {
           // ignore nested transclusion
           if (location.transclusions == 0) {
@@ -237,12 +253,7 @@ public final class FragmentNumbering implements Serializable {
             location.fragment = Element.NO_FRAGMENT;
             location.index = 0;
             // add to transclusion map
-            List<Long> parents = transclusions.get(ref.uri());
-            if (parents == null) {
-              parents = new ArrayList<>();
-              transclusions.put(ref.uri(), parents);
-            }
-            parents.add(id);
+            addTransclusionParents(ref.uri(), id, transclusions);
           }
           location.transclusions++;
         }
@@ -267,6 +278,25 @@ public final class FragmentNumbering implements Serializable {
     // Process all child parts
     for (Part<?> r : part.parts()) {
       processPart(pub, id, level + 1, treeLevel, r, config, number, doccount, count, ancestors, location, transclusions);
+    }
+  }
+
+  /**
+   * Add transclusion parent for an ID.
+   *
+   * @param id             the document ID
+   * @param parentid       the parent document ID
+   * @param transclusions  the map of transclusion parents
+   */
+  private static void addTransclusionParents(long id, long parentid, Map<Long,List<Long>> transclusions) {
+    List<Long> parents = transclusions.get(id);
+    if (parents == null) {
+      parents = new ArrayList<>();
+      transclusions.put(id, parents);
+    }
+    // if not already in list add it
+    if (!parents.contains(parentid)) {
+      parents.add(parentid);
     }
   }
 
