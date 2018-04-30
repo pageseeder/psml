@@ -94,10 +94,10 @@ public class TransclusionHandler extends DefaultHandler {
 
   @Override
   public final void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-    if ("compare".equals(localName)) {
+    if ("compare".equals(qName)) {
       this.inCompare = true;
     }
-    if (!this.inCompare && this.parentHandler.isFragment(localName) && this.fragment.equals(atts.getValue("id"))) {
+    if (!this.inCompare && this.parentHandler.isFragment(qName) && this.fragment.equals(atts.getValue("id"))) {
       this.ignoreElements = false;
       this.ignoreText = false;
     }
@@ -105,7 +105,7 @@ public class TransclusionHandler extends DefaultHandler {
     try {
       this.xml.openElement(qName, true);
     } catch (IOException ex) {
-      throw new SAXException("Failed to open element "+localName, ex);
+      throw new SAXException("Failed to open element "+qName, ex);
     }
     // Put the prefix mapping was reported BEFORE the startElement was reported...
     if (!this.namespaces.isEmpty()) {
@@ -128,11 +128,11 @@ public class TransclusionHandler extends DefaultHandler {
       try {
         this.xml.attribute(atts.getQName(i), atts.getValue(i));
       } catch (IOException ex) {
-        throw new SAXException("Failed to add attribute \""+atts.getLocalName(i)+"\" to element "+localName, ex);
+        throw new SAXException("Failed to add attribute \""+atts.getLocalName(i)+"\" to element "+qName, ex);
       }
     }
     // handle transclusions now
-    if ("blockxref".equalsIgnoreCase(localName) && "transclude".equalsIgnoreCase(atts.getValue("type"))) {
+    if ("blockxref".equalsIgnoreCase(qName) && "transclude".equalsIgnoreCase(atts.getValue("type"))) {
       try {
         // retrieve target document
         this.ignoreText = resolveTransclusion(atts.getValue("href"), atts.getValue("frag"));
@@ -145,19 +145,19 @@ public class TransclusionHandler extends DefaultHandler {
   }
 
   @Override
-  public final void endElement(String uri, String localName, String name) throws SAXException {
-    if ("compare".equals(localName)) {
+  public final void endElement(String uri, String localName, String qName) throws SAXException {
+    try {
+      if (!this.ignoreElements) this.xml.closeElement();
+    } catch (IOException ex) {
+      throw new SAXException("Failed to close element "+qName, ex);
+    }
+    if ("compare".equals(qName)) {
       this.inCompare = false;
     }
-    if (this.parentHandler.isFragment(localName) && !"default".equals(this.fragment)) {
+    if (this.parentHandler.isFragment(qName) && !"default".equals(this.fragment)) {
       this.ignoreElements = true;
     }
     this.ignoreText = this.ignoreElements;
-    try {
-      this.xml.closeElement();
-    } catch (IOException ex) {
-      throw new SAXException("Failed to close element "+localName, ex);
-    }
   }
 
   @Override

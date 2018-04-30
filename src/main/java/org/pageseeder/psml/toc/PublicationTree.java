@@ -434,9 +434,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     // Output the element
     Integer nextcount = null;
     if (nextTree != null || Reference.Type.TRANSCLUDE.equals(refType)) {
-      nextcount = state.doccount.get(next);
-      nextcount = nextcount == null ? 1 : nextcount + 1;
-      state.doccount.put(next, nextcount);
+      if (nextTree != null) {
+        nextcount = state.doccount.get(next);
+        nextcount = nextcount == null ? 1 : nextcount + 1;
+        state.doccount.put(next, nextcount);
+      }
       if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           if (output) element.toXML(xml, level, state.number, next, nextcount, nextTree.numbered(), nextTree.prefix());

@@ -174,9 +174,11 @@ public class NumberedTOCGenerator {
     // Output the element
     Integer nextcount = null;
     if (toNext || Reference.Type.TRANSCLUDE.equals(refType)) {
-      nextcount = doccount.get(next);
-      nextcount = nextcount == null ? 1 : nextcount + 1;
-      doccount.put(next, nextcount);
+      if (nextTree != null) {
+        nextcount = doccount.get(next);
+        nextcount = nextcount == null ? 1 : nextcount + 1;
+        doccount.put(next, nextcount);
+      }
       if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           referenceToXML(xml, level, (Reference)element, next, nextcount, nextTree,

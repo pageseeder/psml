@@ -218,10 +218,10 @@ public final class XRefTranscluder {
       XMLUtils.parse(target, handler);
       // if publication and not a transclusion then parse TOC
       NumberedTOCGenerator numberingAndTOC = this.parentHandler.getNumberedTOCGenerator();
-      if (numberingAndTOC != null && !"transclude".equals(atts.getValue("type"))) {
+      if (numberingAndTOC != null) {
         // process transclussions
         XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
-        TransclusionHandler thandler = new TransclusionHandler(out, "default", false, this.parentHandler);
+        TransclusionHandler thandler = new TransclusionHandler(out, "default", true, this.parentHandler);
         XMLUtils.parse(target, thandler);
         // parse document tree
         DocumentTreeHandler tochandler = new DocumentTreeHandler();

@@ -57,6 +57,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     private int index = 0;
 
     /**
+     * The number of nested blockxrefs
+     * (effectively number of nested transclusions as embeds have a new location object)
+     */
+    int blockxrefs = 0;
+
+    /**
      * Constructor
      */
     private Location(long uriid, int position) {
@@ -100,6 +106,16 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    * If the TOC should be generated
    */
   private boolean generateTOC = false;
+
+  /**
+   * If the TOC has been written yet
+   */
+  private boolean tocWritten = false;
+
+  /**
+   * Whether the last blockxref was a transclude.
+   */
+  boolean lastXRefTransclude = false;
 
   /**
    * Number of URI/frag IDs in the each document sub-hierarchy <root n_uriid,
@@ -244,8 +260,6 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           prefix = pref.value;
         }
       }
-    } else if (isFrag) {
-      location.index = 0;
     }
 
     // if single transcluded fragment update uriids
@@ -256,7 +270,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       count++;
       this.uriIDsAlreadyFound.put(uriid, count);
       this.ancestorUriIDs.push(count + "_" + uriid);
-      this.locations.push(new Location(Long.parseLong(uriid), count));
+      if (!this.lastXRefTransclude) {
+        this.locations.push(new Location(Long.parseLong(uriid), count));
+      }
       return;
     }
 
@@ -320,7 +336,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         value = count != 1 ? count + "_" + id : id;
         this.uriIDsAlreadyFound.put(id, count);
         this.ancestorUriIDs.push(count + "_" + id);
-        this.locations.push(new Location(Long.parseLong(id), count));
+        if (!this.lastXRefTransclude) {
+          this.locations.push(new Location(Long.parseLong(id), count));
+        }
         // don't modify fragment attribute on locator element
 //        } else if (isLocator && "fragment".equals(name)) {
 //          String id = atts.getValue(i);
@@ -338,13 +356,21 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           // get uriid and make id unique
           int j = id.indexOf('-');
           if (j != -1) {
-            location.fragment = id.substring(j + 1);
+            // if not inside a transclusion, update fragment ID
+            if (this.locations.peek().blockxrefs == 0) {
+              location.fragment = id.substring(j + 1);
+              location.index = 0;
+            }
             String uriid = id.substring(0, j);
             Integer count = this.uriIDsAlreadyFound.get(uriid);
             value = count != 1 ? count + "_" + id : id;
           // shouldn't happen
           } else {
-            location.fragment = id;
+            // if not inside a transclusion, update fragment ID
+            if (this.locations.peek().blockxrefs == 0) {
+              location.fragment = id;
+              location.index = 0;
+            }
             value = id;
           }
         } else if ((isHeading || isPara)  && "prefix".equals(name) && this.numberingAndTOC != null) {
@@ -391,7 +417,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       throw new SAXException("Failed to open element "+qName, ex);
     }
     // write toc if needed
-    if (isTOC && this.generateTOC) {
+    if (isTOC && this.generateTOC && !this.tocWritten) {
       XMLWriter xmlwriter = new XMLWriterImpl(this.xml);
       try {
         this.numberingAndTOC.toXML(xmlwriter);
@@ -399,6 +425,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       } catch (IOException ex) {
         throw new SAXException("Unable to write TOC: " + ex.getMessage(), ex);
       }
+      this.tocWritten = true;
+    }
+    // handle blockxref
+    if ("blockxref".equals(qName) && !this.elements.contains("compare")) {
+      this.locations.peek().blockxrefs++;
+      this.lastXRefTransclude = "transclude".equals(atts.getValue("type"));
     }
   }
 
@@ -407,15 +439,24 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    */
   @Override
   public void endElement(String uri, String localName, String qName) throws SAXException {
-    // if transcluded document/fragment update uriids
+    if ("blockxref".equals(qName) && !this.elements.contains("compare")) {
+      this.locations.peek().blockxrefs--;
+      this.lastXRefTransclude = false;
+    }
     if ("document-fragment".equals(qName)) {
       this.ancestorUriIDs.pop();
-      this.locations.pop();
+      // if not in a transclusion
+      if (this.locations.peek().blockxrefs == 0) {
+        this.locations.pop();
+      }
       return;
     }
     if ("document".equals(qName)) {
       this.ancestorUriIDs.pop();
-      this.locations.pop();
+      // if not in a transclusion
+      if (this.locations.peek().blockxrefs == 0) {
+        this.locations.pop();
+      }
     }
     this.elements.pop();
     try {

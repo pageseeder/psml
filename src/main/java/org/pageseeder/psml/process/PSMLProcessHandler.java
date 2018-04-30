@@ -448,7 +448,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   public void setPublicationConfig(PublicationConfig config, File root, boolean toc) throws ProcessException {
     // process transclussions
     XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
-    TransclusionHandler thandler = new TransclusionHandler(out, "default", false, this);
+    TransclusionHandler thandler = new TransclusionHandler(out, "default", true, this);
     XMLUtils.parse(root, thandler);
     // parse document tree
     DocumentTreeHandler tochandler = new DocumentTreeHandler();

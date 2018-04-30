@@ -230,9 +230,11 @@ public final class FragmentNumbering implements Serializable {
       nextTree = pub.tree(next);
       // can only be numbered if the referenced tree exists
       if (nextTree != null || Reference.Type.TRANSCLUDE.equals(refType)) {
-        nextCount = doccount.get(next);
-        nextCount = nextCount == null ? 1 : nextCount + 1;
-        doccount.put(next, nextCount);
+        if (nextTree != null) {
+          nextCount = doccount.get(next);
+          nextCount = nextCount == null ? 1 : nextCount + 1;
+          doccount.put(next, nextCount);
+        }
         if (Reference.Type.EMBED.equals(refType)) {
           nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
           if (PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo())) {

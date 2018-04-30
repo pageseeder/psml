@@ -327,18 +327,30 @@ public class ProcessTest {
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
+    Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
+    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC Test")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title", equalTo("")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title", equalTo("Ref 1 embed")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[3][@level='3']/@title", equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[4][@level='4']/@title", equalTo("Content 3")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[5][@level='4']/@title", equalTo("Content 2")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[6][@level='1']/@title", equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[7][@level='2']/@title", equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[8][@level='3']/@title", equalTo("Ref 2 embed")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[9][@level='4']/@title", equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[10][@level='5']/@title", equalTo("Content 3")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[11][@level='4']/@title", equalTo("Content 2")));
+    Assert.assertThat(xml, hasXPath("(//heading)[1]/@id", equalTo("21926-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[2]/@id", equalTo("21927-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[3]/@id", equalTo("21927-1-2-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[4]/@id", equalTo("21934-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[5]/@id", equalTo("21931-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[6]/@id", equalTo("21926-1-2-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[7]/@id", equalTo("21926-1-2-2")));
+    Assert.assertThat(xml, hasXPath("(//heading)[8]/@id", equalTo("21928-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[9]/@id", equalTo("21930-4-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[10]/@id", equalTo("21934-2-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[11]/@id", equalTo("21931-2-1-1")));
   }
 
   @Test
