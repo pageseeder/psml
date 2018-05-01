@@ -113,8 +113,8 @@ public final class FragmentNumbering implements Serializable {
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     if (root != null) {
-      // store prefix on default fragment of root
-      this.numbering.put(root.id() + "-1-default", new Prefix("", null, 1, null));
+      // store prefix on default fragment of root with level as an adjustment to the first heading in the document
+      this.numbering.put(root.id() + "-1-default", new Prefix("", null, 2 - root.level(), null));
       // mark root as embeded
       addTransclusionParents(root.id(), -1, transclusions);
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
@@ -320,11 +320,11 @@ public final class FragmentNumbering implements Serializable {
       pref = number.generateNumbering(level, "heading", "");
     }
     if (pref == null) {
-      // increment level if not collapsed so content and TOC levels match
-      pref = new Prefix(p, null, level + (target.titlefragment() == Element.NO_FRAGMENT ? 1 :0), null);
+      pref = new Prefix(p, null, level, null);
     }
-    // always store prefix on default fragment
-    this.numbering.put(target.id() + "-" + count + "-default", pref);
+    // always store prefix on default fragment with level as an adjustment to the first heading in the document
+    this.numbering.put(target.id() + "-" + count + "-default",
+        new Prefix(pref.value, pref.canonical, level + 2 - target.level(), pref.parentNumber));
     if (NO_PREFIX.equals(pref.value)) return;
     // store prefix on first heading fragment (must have index=1 for reference to have a prefix)
     this.numbering.put(target.id() + "-" + count + "-" + target.titlefragment()+ "-1", pref);

@@ -117,6 +117,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
   /**
    * @param id                The URI ID of the document.
+   * @param level             The level of the first part of the tree.
    * @param title             The title the document.
    * @param labels            The document labels
    * @param reverse           The list of reverse references.
@@ -127,14 +128,14 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    * @param fragmentlevels    Map of fragment ID to the level of the fragment
    */
-  private DocumentTree(long id, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
+  private DocumentTree(long id, int level, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
       String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
     this._id = id;
     this._title = title;
     this._labels = labels;
     this._reverse = Collections.unmodifiableList(reverse);
     this._parts = Collections.unmodifiableList(parts);
-    this._level = computeActualLevel();
+    this._level = level;
     this._titlefragment = titlefragment;
     this._numbered = numbered;
     this._prefix = prefix;
@@ -153,7 +154,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public DocumentTree(long id, String title, String labels, List<Long> reverse,
       List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
-    this(id, title, labels, reverse, NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings, fragmentlevels);
+    this(id, parts.isEmpty() ? 0 : parts.get(0).level(), title, labels, reverse,
+        NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings, fragmentlevels);
   }
 
   @Override
@@ -350,7 +352,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     List<Part<?>> parts = removeOtherFragments(this.parts(), fragment, false);
     if (parts == null) parts = new ArrayList<>();
     DocumentTree tree = new DocumentTree(this._id, this._title, this._labels, this._reverse,
-        NO_FRAGMENT, false, NO_PREFIX, parts, this._fragmentheadings, this._fragmentlevels);
+        parts, this._fragmentheadings, this._fragmentlevels);
     return removePhantomParts(tree);
   }
 
@@ -447,9 +449,10 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     while (normalized.parts().size() == 1 && !normalized.parts().get(0).hasTitle()) {
       List<Part<?>> unwrapped = new ArrayList<>();
       for (Part<?> p : normalized.parts().get(0).parts()) {
-        unwrapped.add(p.adjustLevel(-1));
+        unwrapped.add(p);//.adjustLevel(-1));
       }
-      normalized = new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, tree._titlefragment,
+      normalized = new DocumentTree(tree._id,  unwrapped.isEmpty() ? 0 : unwrapped.get(0).level(),
+          tree._title, tree._labels, tree._reverse, tree._titlefragment,
           tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings, tree._fragmentlevels);
     }
     return normalized;
@@ -480,10 +483,10 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       // Copy the parts within that part
       List<Part<?>> children = new ArrayList<>();
       for (Part<?> p : firstPart.parts()) {
-        children.add(p.adjustLevel(-1));
+        children.add(p);//.adjustLevel(-1));
       }
       // Move the numbered and prefix from the first heading to the tree
-      return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
+      return new DocumentTree(tree._id, firstHeading.level() + 1, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
           firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
     }
     return tree;

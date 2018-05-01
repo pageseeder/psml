@@ -388,7 +388,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position);
           int base = pref == null ? 0 : pref.level;
           headingLevel += base - 1;
-          value = String.valueOf(headingLevel);
+          value = String.valueOf(headingLevel > 0 ? headingLevel : 1);
         } else if (isPara && "indent".equals(name) && this.numberingAndTOC != null &&
             this.publicationConfig.getParaLevelAdjust() == PublicationConfig.LevelAdjust.CONTENT) {
           int paraLevel = Integer.parseInt(atts.getValue(name));
@@ -398,7 +398,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           if (this.publicationConfig.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.HEADING) {
             paraLevel += this.previousheadingLevel;
           }
-          value = String.valueOf(paraLevel);
+          value = String.valueOf(paraLevel > 0 ? paraLevel : 1);
         } else {
           value = atts.getValue(i);
         }

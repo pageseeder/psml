@@ -795,7 +795,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     // clone this handler
     PSMLProcessHandler handler = new PSMLProcessHandler(this.xml, this, toParse, this.psmlRoot,
         this.binaryRepository);
-    handler.setLevel(this.level + (lvl > 0 ? lvl : 0));
+    handler.setLevel(lvl);
     handler.transcluder.addParentFile(this.sourceFile, this.currentFragment);
     handler.transcluder.addParentFile(this.sourceFile, "default");
     handler.setIncludeXMLDeclaration(false);
