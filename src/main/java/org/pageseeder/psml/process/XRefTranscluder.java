@@ -210,7 +210,8 @@ public final class XRefTranscluder {
       this.parentHandler.getLogger().debug("Transcluding XRef to "+href);
       // clone handler
       String levelAtt = atts.getValue("level");
-      int level = levelAtt == null || levelAtt.isEmpty() ? 0 : Integer.parseInt(levelAtt);
+      int level = levelAtt == null || levelAtt.isEmpty() || !"transclude".equals(atts.getValue("type")) ?
+          0 : Integer.parseInt(levelAtt);
       PSMLProcessHandler handler = this.parentHandler.cloneForTransclusion(
           target, atts.getValue("uriid"), fragment, level, image,
           inEmbedHierarchy && "embed".equals(type), "transclude".equals(type));

@@ -113,6 +113,8 @@ public final class FragmentNumbering implements Serializable {
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     if (root != null) {
+      // store prefix on default fragment of root
+      this.numbering.put(root.id() + "-1-default", new Prefix("", null, 1, null));
       // mark root as embeded
       addTransclusionParents(root.id(), -1, transclusions);
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
@@ -318,7 +320,8 @@ public final class FragmentNumbering implements Serializable {
       pref = number.generateNumbering(level, "heading", "");
     }
     if (pref == null) {
-      pref = new Prefix(p, null, level, null);
+      // increment level if not collapsed so content and TOC levels match
+      pref = new Prefix(p, null, level + (target.titlefragment() == Element.NO_FRAGMENT ? 1 :0), null);
     }
     // always store prefix on default fragment
     this.numbering.put(target.id() + "-" + count + "-default", pref);

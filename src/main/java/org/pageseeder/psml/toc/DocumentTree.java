@@ -474,47 +474,19 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     String headingTitle = firstHeading.title();
     String prefixedTitle = firstHeading.getPrefixedTitle();
     String documentTitle = tree._title;
-    List<Part<?>> children = new ArrayList<>();
-    // The first heading 1 matches the document title or always collapse
+    // If the first heading 1 matches the document title or always collapse and only one part, then collapse
     if ((headingTitle.equals(documentTitle) || prefixedTitle.equals(documentTitle) || collapse == TitleCollapse.always)
-        && collapse != TitleCollapse.never) {
-      if (parts.size() > 1) {
-        // if first heading has children
-        if (firstPart.size() > 0) {
-          boolean transclusion = false;
-          Part<?> firstChild = firstPart.parts().get(0);
-          if (firstChild.element() instanceof Reference) {
-            transclusion = Reference.Type.TRANSCLUDE.equals(((Reference)firstChild.element()).type());
-          }
-          // if first heading only contains a transclusion, just add the transclusion
-          if (firstPart.size() == 1 && transclusion) {
-            children.add(firstChild);
-          // else add first heading as a phantom
-          } else {
-            children.add(new Part<>(
-              new Phantom(firstHeading.level(), firstHeading.fragment(), firstHeading.originalFragment()), firstPart.parts()));
-          }
-        }
-        // Copy the other parts
-        children.addAll(parts.subList(1, parts.size()));
-      } else {
-        // Copy the parts within that part
-        for (Part<?> p : firstPart.parts()) {
-          children.add(p.adjustLevel(-1));
-        }
+        && collapse != TitleCollapse.never && parts.size() == 1) {
+      // Copy the parts within that part
+      List<Part<?>> children = new ArrayList<>();
+      for (Part<?> p : firstPart.parts()) {
+        children.add(p.adjustLevel(-1));
       }
-    } else if (!firstHeading.numbered() && NO_PREFIX.equals(firstHeading.prefix())){
-      return tree;
-    } else {
-      children.add(firstPart.element(firstHeading.numbered(false).prefix(NO_PREFIX)));
-      if (parts.size() > 1) {
-        // Copy the other parts
-        children.addAll(parts.subList(1, parts.size()));
-      }
+      // Move the numbered and prefix from the first heading to the tree
+      return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
+          firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
     }
-    // Always move the numbered and prefix from the first heading to the tree
-    return new DocumentTree(tree._id, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
-        firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
+    return tree;
   }
 
   /**

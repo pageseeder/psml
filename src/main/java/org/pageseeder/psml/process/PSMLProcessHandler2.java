@@ -244,24 +244,6 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     if (isDocument && atts.getValue("id") == null)
       throw new SAXException("Document has no id attribute.");
 
-    // set heading/para prefix
-    String prefix = null;
-    Location location = this.locations.isEmpty() ? null : this.locations.peek();
-    if ((isHeading || isPara) && !this.elements.contains("compare") && this.numberingAndTOC != null) {
-      if (isHeading) {
-        this.previousheadingLevel = Integer.parseInt(atts.getValue("level"));
-      }
-      location.index++;
-      prefix = atts.getValue("prefix");
-      if ("true".equals(atts.getValue("numbered"))) {
-        Prefix pref = this.numberingAndTOC.fragmentNumbering().getTranscludedPrefix(
-            location.uriid, location.position, location.fragment, location.index);
-        if (pref != null) {
-          prefix = pref.value;
-        }
-      }
-    }
-
     // if single transcluded fragment update uriids
     if ("document-fragment".equals(qName)) {
       String uriid = atts.getValue("uriid");
@@ -282,6 +264,29 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       this.xml.write('<'+qName);
     } catch (IOException ex) {
       throw new SAXException("Failed to open element "+qName, ex);
+    }
+    // set heading/para prefix
+    Location location = this.locations.isEmpty() ? null : this.locations.peek();
+    if ((isHeading || isPara) && !this.elements.contains("compare") && this.numberingAndTOC != null) {
+      if (isHeading) {
+        this.previousheadingLevel = Integer.parseInt(atts.getValue("level"));
+      }
+      location.index++;
+      String prefix = atts.getValue("prefix");
+      if ("true".equals(atts.getValue("numbered"))) {
+        Prefix pref = this.numberingAndTOC.fragmentNumbering().getTranscludedPrefix(
+            location.uriid, location.position, location.fragment, location.index);
+        if (pref != null) {
+          prefix = pref.value;
+        }
+      }
+      if (prefix != null) {
+        try {
+          this.xml.write(" prefix=\""+XMLUtils.escapeForAttribute(prefix)+"\"");
+        } catch (IOException ex) {
+          throw new SAXException("Failed to add id attribute: " + ex.getMessage(), ex);
+        }
+      }
     }
     // attributes
     String xhref = atts.getValue("xhref");
@@ -373,18 +378,22 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
             }
             value = id;
           }
-        } else if ((isHeading || isPara)  && "prefix".equals(name) && this.numberingAndTOC != null) {
-          value = prefix;
+        } else if ((isHeading || isPara)  && "prefix".equals(name)
+            && !this.elements.contains("compare") && this.numberingAndTOC != null) {
+          // prefix already added
+          continue;
         } else if (isHeading && "level".equals(name) && this.numberingAndTOC != null &&
             this.publicationConfig.getHeadingLevelAdjust() == PublicationConfig.LevelAdjust.CONTENT) {
           int headingLevel = Integer.parseInt(atts.getValue(name));
-          int base = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position).level;
+          Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position);
+          int base = pref == null ? 0 : pref.level;
           headingLevel += base - 1;
           value = String.valueOf(headingLevel);
         } else if (isPara && "indent".equals(name) && this.numberingAndTOC != null &&
             this.publicationConfig.getParaLevelAdjust() == PublicationConfig.LevelAdjust.CONTENT) {
           int paraLevel = Integer.parseInt(atts.getValue(name));
-          int base = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position).level;
+          Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position);
+          int base = pref == null ? 0 : pref.level;
           paraLevel += base - 1;
           if (this.publicationConfig.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.HEADING) {
             paraLevel += this.previousheadingLevel;
