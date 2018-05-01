@@ -339,6 +339,7 @@ public class ProcessTest {
     // test xpaths
     Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
     Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC Test")));
+    Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("13")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title", equalTo("")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title", equalTo("Ref 1 embed")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[3][@level='3']/@title", equalTo("Content 1")));
@@ -350,6 +351,9 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//toc-part)[9][@level='4']/@title", equalTo("Content 1")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[10][@level='5']/@title", equalTo("Content 3")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[11][@level='4']/@title", equalTo("Content 2")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[12][@level='1']/@title", equalTo("Ref 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[13][@level='2']/@title", equalTo("Content 2")));
+    Assert.assertThat(xml, hasXPath("count(//heading)", equalTo("13")));
     Assert.assertThat(xml, hasXPath("(//heading)[1]/@id", equalTo("21926-1-1-1")));
     Assert.assertThat(xml, hasXPath("(//heading)[2]/@id", equalTo("21927-1-1-1")));
     Assert.assertThat(xml, hasXPath("(//heading)[3]/@id", equalTo("21927-1-2-1")));
@@ -361,6 +365,8 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//heading)[9]/@id", equalTo("21930-4-1-1")));
     Assert.assertThat(xml, hasXPath("(//heading)[10]/@id", equalTo("21934-2-1-1")));
     Assert.assertThat(xml, hasXPath("(//heading)[11]/@id", equalTo("21931-2-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[12]/@id", equalTo("21926-1-2-3")));
+    Assert.assertThat(xml, hasXPath("(//heading)[13]/@id", equalTo("21931-3-1-1")));
   }
 
   @Test

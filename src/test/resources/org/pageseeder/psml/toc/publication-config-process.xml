@@ -2,7 +2,7 @@
 <publication-config>
 
   <!-- <numbering [document-label="xyz"]> -->
-  <numbering skipped-levels="strip">
+  <numbering>
     <schemes>
       <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
       <scheme level="1" type="decimal" format="[1.]" />

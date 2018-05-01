@@ -44,6 +44,11 @@
         display="document" type="embed" uriid="21928" href="ref_2.psml"
         urititle="Ref 2" mediatype="application/vnd.pageseeder.psml+xml"
         documenttype="references">Ref 2 embed</blockxref>
+      <blockxref id="39416" frag="default" reversefrag="2"
+        reversetitle="References" reverselink="true" reversetype="none"
+        display="document" type="transclude" uriid="21927" href="ref_1.psml"
+        urititle="Ref 1" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="references">Ref 1 transclude</blockxref>
       <blockxref id="39455" frag="default" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="document" type="none" uriid="21930" href="content/content_1.psml"

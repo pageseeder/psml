@@ -228,6 +228,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private boolean inTranscludedXRef = false;
 
   /**
+   * If the parser is currently in transcluded content.
+   */
+  private boolean inTranscludedContent = false;
+
+  /**
    * If the current element is an XRef and it should be replaced by its
    * contents.
    */
@@ -366,6 +371,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   public void setInEmbedHierarchy(boolean embed) {
     this.inEmbedHierarchy = embed;
+  }
+
+  /**
+   * @param transclude if in transcluded content
+   */
+  public void setInTranscludedContent(boolean transclude) {
+    this.inTranscludedContent = transclude;
   }
 
   /**
@@ -761,16 +773,18 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Create a new handler using this one as parent.
    *
-   * @param toParse   the file to transclude
-   * @param uriid     the URI ID of the document to transclude
-   * @param fragment  the fragment to transclude
-   * @param lvl       the start level of numbering
-   * @param fromImage whether transclusion is from an image
-   * @param embed     whether hierarchy has all embed XRefs
+   * @param toParse    the file to transclude
+   * @param uriid      the URI ID of the document to transclude
+   * @param fragment   the fragment to transclude
+   * @param lvl        the start level of numbering
+   * @param fromImage  whether transclusion is from an image
+   * @param embed      whether hierarchy has all embed XRefs
+   * @param transclude whether the XRef was a transclude
+   *
    * @return the handler
    */
   protected PSMLProcessHandler cloneForTransclusion(File toParse, String uriid, String fragment,
-                                                    int lvl, boolean fromImage, boolean embed) {
+                                                    int lvl, boolean fromImage, boolean embed, boolean transclude) {
     // update uri count
     Integer count = this.allUriIDs.get(uriid);
     if (count == null)
@@ -801,6 +815,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.setAllUriIDs(this.allUriIDs);
     handler.setHierarchyUriFragIDs(this.hierarchyUriFragIDs);
     handler.setInEmbedHierarchy(embed);
+    handler.setInTranscludedContent(transclude);
     handler.numberingAndTOC = this.numberingAndTOC;
     handler.publicationConfig = this.publicationConfig;
     // load only one fragment?
@@ -893,6 +908,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @throws SAXException if something went wrong
    */
   private void transcludeXRef(Attributes atts, boolean image) throws SAXException {
+    // ignore nested transclude
+    if ("transclude".equals(atts.getValue("type")) && this.inTranscludedContent) return;
     String href = atts.getValue(image ? "src" : "href");
     try {
       // find out if the fragment we're in is an xref-fragment
