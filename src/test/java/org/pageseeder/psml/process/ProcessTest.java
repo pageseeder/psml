@@ -19,8 +19,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
@@ -31,6 +37,7 @@ import org.pageseeder.psml.process.config.XRefsTransclude;
 import org.pageseeder.psml.process.config.XSLTTransformation;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.Tests;
+import org.pageseeder.psml.toc.Tests.Validates;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
 
 public class ProcessTest {
@@ -327,6 +334,9 @@ public class ProcessTest {
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    // validate
+    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    // test xpaths
     Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
     Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC Test")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title", equalTo("")));
@@ -573,6 +583,18 @@ public class ProcessTest {
 
   private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {
     return new EvaluateXPathMatcher(xPath, valueMatcher);
+  }
+
+  public static Source getSchema(String filename) {
+    try {
+      String pathToSchema = "/org/pageseeder/psml/process/util/"+filename;
+      URL url = Tests.class.getResource(pathToSchema);
+      StreamSource schema = new StreamSource(url.openStream());
+      schema.setSystemId(url.toURI().toString());
+      return schema;
+    } catch (URISyntaxException | IOException ex) {
+      throw new IllegalStateException("Unable to open schema source", ex);
+    }
   }
 
 }

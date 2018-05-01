@@ -75,6 +75,16 @@
           <xs:documentation>The URI ID of the document. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="publicationid" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The publication ID of the document. INFORMATIONAL - ignored by upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="position" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>The position (instance number) of the document in the publication. INFORMATIONAL - ignored by upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
     <xs:key name="section-id">
       <xs:selector xpath="section" />
