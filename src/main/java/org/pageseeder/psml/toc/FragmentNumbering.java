@@ -427,7 +427,7 @@ public final class FragmentNumbering implements Serializable {
   }
 
   /**
-   * Get prefix for a heading/para in a fragment.
+   * Get prefix for a heading/para in a fragment (or first heading if fragment=default).
    *
    * @param uriid     the URI ID of the document
    * @param position  the document position (occurrence number) in the tree
@@ -437,6 +437,9 @@ public final class FragmentNumbering implements Serializable {
    * @return the prefix
    */
   public Prefix getPrefix(long uriid, int position, String fragment, int index) {
+    if ("default".equals(fragment)) {
+      return getPrefix(uriid, position);
+    }
     Prefix pref = this.numbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
     if (pref == null) {
       LOGGER.warn("Numbering not found for uriid: {}, position: {}, fragment: {}, index: {}",

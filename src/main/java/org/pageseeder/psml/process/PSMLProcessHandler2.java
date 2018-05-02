@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.psml.toc.DocumentTree;
+import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -157,6 +159,18 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    * Unadjusted level of previous heading
    */
   private int previousheadingLevel = 0;
+
+  /**
+   * The resolved title when inside an <xref display="template" title="[{prefix}|{heading}|{parentnumber}]">,
+   * otherwise <code>null</code>.
+   */
+  private String resolvedXRefTemplate = null;
+
+  /**
+   * The position of the target URI in the publication for the current XRef.
+   */
+  private int xrefTargetPosition = 1;
+
 
   /**
    * @param out            where the resulting XML should be written.
@@ -440,6 +454,31 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     if ("blockxref".equals(qName) && !this.elements.contains("compare")) {
       this.locations.peek().blockxrefs++;
       this.lastXRefTransclude = "transclude".equals(atts.getValue("type"));
+    // else handle xref template
+    } else if ("xref".equals(qName) && "template".equals(atts.getValue("display"))
+        && !this.elements.contains("compare") && this.numberingAndTOC != null) {
+      // only title with the right tokens
+      String title = atts.getValue("title");
+      if (title != null && title.matches(".*?((\\{prefix})|(\\{heading})|(\\{parentnumber})).*?")) {
+
+        // get xref's traget details
+        String targetfrag = atts.getValue("frag");
+        long targeturiid = Long.parseLong(atts.getValue("uriid"));
+
+        // compute adjusted values
+        FragmentNumbering.Prefix prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
+            targeturiid, this.xrefTargetPosition, targetfrag, 1);
+        String newPrefix       = prefix == null ? null : prefix.value;
+        DocumentTree tree      = this.numberingAndTOC.publicationTree().tree(targeturiid);
+        String newHeading      = tree == null ? null : tree.fragmentheadings().get(targetfrag);
+        String newParentNumber = prefix == null ? null : prefix.parentNumber;
+
+        // set content and title attribute
+        this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : newPrefix)
+                                       .replaceAll("\\{heading}",      newHeading      == null ? "?" : newHeading)
+                                       .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : newParentNumber);
+      }
+
     }
   }
 
@@ -451,6 +490,14 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     if ("blockxref".equals(qName) && !this.elements.contains("compare")) {
       this.locations.peek().blockxrefs--;
       this.lastXRefTransclude = false;
+    } else if (this.resolvedXRefTemplate != null) {
+      try {
+        this.xml.write(XMLUtils.escape(this.resolvedXRefTemplate));
+      } catch (IOException ex) {
+        throw new SAXException("Failed to write text", ex);
+      } finally {
+        this.resolvedXRefTemplate = null;
+      }
     }
     if ("document-fragment".equals(qName)) {
       this.ancestorUriIDs.pop();
@@ -481,7 +528,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   @Override
   public void characters(char[] ch, int start, int length) throws SAXException {
     try {
-      this.xml.write(XMLUtils.escape(new String(ch, start, length)));
+      if (this.resolvedXRefTemplate == null) {
+        this.xml.write(XMLUtils.escape(new String(ch, start, length)));
+      }
     } catch (IOException ex) {
       throw new SAXException("Failed to write text", ex);
     }
@@ -572,6 +621,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         if (this.failOnError) throw new ProcessException(message);
         else this.logger.error(message);
       }
+      this.xrefTargetPosition = global_count;
       if ("default".equals(frag)) return "#" + (global_count != 1 ? global_count + "_" : "") + uriid;
       return "#" + (global_count != 1 ? global_count + "_" : "") + uriid + "-" + frag;
     } else {

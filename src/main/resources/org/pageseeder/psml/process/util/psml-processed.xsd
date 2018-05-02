@@ -812,7 +812,8 @@
             - document: [document title];
             - document+manual: [document title]: [manual title];
             - document+fragment: [document title]: [target fragment id];
-            - manual: [manual title].</xs:documentation>
+            - manual: [manual title];
+            - template: defined by {tokens} in title attribute.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -820,6 +821,7 @@
             <xs:enumeration value="document+manual" />
             <xs:enumeration value="document+fragment" />
             <xs:enumeration value="manual" />
+            <xs:enumeration value="template" />
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -1121,15 +1123,10 @@
         <xs:group ref="character-style-group" />
         <xs:element ref="image" />
       </xs:choice>
-      <xs:attribute name="indent">
+      <xs:attribute name="indent" type="xs:positiveInteger">
         <xs:annotation>
-          <xs:documentation>Number of levels to indent (1 to 6).</xs:documentation>
+          <xs:documentation>Number of levels to indent.</xs:documentation>
         </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:integer">
-            <xs:pattern value="[1-6]"/>
-          </xs:restriction>
-        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="prefix" type="xs:string">
         <xs:annotation>
@@ -1837,7 +1834,8 @@
           - document: [document title];
           - document+manual: [document title]: [manual title];
           - document+fragment: [document title]: [target fragment id];
-          - manual: [manual title].</xs:documentation>
+          - manual: [manual title];
+          - template: defined by {tokens} in title attribute.</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:restriction base="xs:string">
@@ -1845,6 +1843,7 @@
           <xs:enumeration value="document+manual" />
           <xs:enumeration value="document+fragment" />
           <xs:enumeration value="manual" />
+          <xs:enumeration value="template" />
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
