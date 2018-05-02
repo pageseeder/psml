@@ -372,6 +372,65 @@ public class ProcessTest {
   }
 
   @Test
+  public void testGenerateTOCRelative() throws IOException, ProcessException {
+    String filename = "toc.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    PublicationConfig config = Tests.parseConfig("publication-config-process-relative.xml");
+    p.setPublicationConfig(config, filename, true);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    // validate
+    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    // test xpaths
+    Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
+    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC Test")));
+    Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("15")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title",  equalTo("Ref 1 embed")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title",  equalTo("Ref 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[3][@level='2']/@title",  equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[4][@level='3']/@title",  equalTo("Content 3")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[5][@level='3']/@title",  equalTo("Content 2")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[6][@level='1']/@title",  equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[7][@level='2']/@title",  equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[8][@level='3']/@title",  equalTo("")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[9][@level='4']/@title",  equalTo("")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[10][@level='5']/@title", equalTo("Ref 2 embed")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[11][@level='6']/@title", equalTo("Content 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[12][@level='7']/@title", equalTo("Content 3")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[13][@level='6']/@title", equalTo("Content 2")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[14][@level='1']/@title", equalTo("Ref 1")));
+    Assert.assertThat(xml, hasXPath("(//toc-part)[15][@level='2']/@title", equalTo("Content 2")));
+    Assert.assertThat(xml, hasXPath("count(//heading)", equalTo("13")));
+    Assert.assertThat(xml, hasXPath("(//heading)[1][not(@prefix)][@level='1']/@id",      equalTo("21926-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[2][@prefix='1.1.'][@level='2']/@id",    equalTo("21927-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[3][@prefix='1.2.'][@level='2']/@id",    equalTo("21927-1-2-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[4][@prefix='2.'][@level='1']/@id",      equalTo("21934-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[5][@prefix='3.'][@level='1']/@id",      equalTo("21931-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[6][@prefix='4.'][@level='1']/@id",      equalTo("21926-1-2-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[7][@prefix='4.1.'][@level='2']/@id",    equalTo("21926-1-2-2")));
+    Assert.assertThat(xml, hasXPath("(//heading)[8][@prefix='4.1.1.'][@level='3']/@id",  equalTo("21928-1-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[9][@prefix='4.1.2.'][@level='3']/@id",  equalTo("21930-4-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[10][@prefix='4.1.3.'][@level='3']/@id", equalTo("21934-2-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[11][@prefix='4.1.4.'][@level='3']/@id", equalTo("21931-2-1-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[12][@prefix='5.'][@level='1']/@id",     equalTo("21926-1-2-3")));
+    Assert.assertThat(xml, hasXPath("(//heading)[13][@prefix='6.'][@level='1']/@id",     equalTo("21931-3-1-1")));
+  }
+
+  @Test
   public void testProcessXRefs() throws IOException, ProcessException {
     String filename = "ref_0.psml";
     Process p = new Process();
