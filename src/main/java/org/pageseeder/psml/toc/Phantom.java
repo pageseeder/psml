@@ -44,12 +44,6 @@ public final class Phantom extends Element implements Serializable {
   }
 
   @Override
-  public Phantom adjustLevel(int delta) {
-    if (delta == 0) return this;
-    return new Phantom(level()+delta, fragment(), originalFragment());
-  }
-
-  @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     // don't output phantom XML
   }

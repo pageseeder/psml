@@ -32,14 +32,6 @@ public final class DocumentTitle extends Element {
     super(0, title, NO_FRAGMENT, NO_FRAGMENT);
   }
 
-  /**
-   * @throws UnsupportedOperationException Adjusting the level of the document is not supported.
-   */
-  @Override
-  public DocumentTitle adjustLevel(int delta) {
-    throw new UnsupportedOperationException();
-  }
-
   @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     xml.openElement("title", false);

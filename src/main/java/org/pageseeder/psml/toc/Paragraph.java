@@ -148,17 +148,6 @@ public final class Paragraph extends Element implements Serializable {
     return new Paragraph(level(), title(), fragment(), originalFragment(), this._index, numbered, this._prefix, this._blocklabel);
   }
 
-  /**
-   *
-   * @param delta The difference with the current level.
-   *
-   * @return this paragraph (no adjustment for paragraphs)
-   */
-  @Override
- public Paragraph adjustLevel(int delta) {
-   return this;
- }
-
   @Override
   public void print(Appendable out) {
     try {

@@ -100,11 +100,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private boolean logXRefNotFound = false;
 
   /**
-   * Whether to process xref levels
-   */
-  private boolean xrefLevels = true;
-
-  /**
    * if alternate iamge xrefs are handled like images
    */
   private boolean alternateImageXRefs = false;
@@ -392,14 +387,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param excludeXRefFragment If the xrefs in an xref-fragment are ignored.
    * @param onlyXRefFrament     If only the xrefs in an xref-fragment are included.
    * @param logxrefnotfound     If an error is logged when an XRef's target is not resolved
-   * @param levels              Whether xref levels attribute should be processed
    */
   public void setXRefsHandling(List<String> xrefTypes, boolean excludeXRefFragment,
-                               boolean onlyXRefFrament, boolean logxrefnotfound, boolean levels) {
+                               boolean onlyXRefFrament, boolean logxrefnotfound) {
     this.transcluder.addXRefsTypes(xrefTypes);
     this.transcluder.setXRefFragmentHandling(excludeXRefFragment, onlyXRefFrament);
     this.logXRefNotFound = logxrefnotfound;
-    this.xrefLevels = levels;
   }
 
   /**
@@ -654,7 +647,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         } else if ("level".equals(name) && "heading".equals(qName)) {
           headingLevel = Integer.parseInt(atts.getValue(name));
           // increase level with our start value
-          if (this.xrefLevels && this.level > 0)
+          if (this.level > 0)
             headingLevel += this.level;
           value = String.valueOf(headingLevel);
         } else {
@@ -807,7 +800,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.setProcessed(this.processed);
     handler.setXRefsHandling(this.transcluder.xrefsTranscludeTypes,
         this.transcluder.excludeXRefFragment, this.transcluder.onlyXRefFrament,
-        this.logXRefNotFound, this.xrefLevels);
+        this.logXRefNotFound);
     handler.alternateImageXRefs = fromImage;
     handler.setURIID(uriid);
     handler.setURICount(count);

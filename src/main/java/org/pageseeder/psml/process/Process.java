@@ -500,7 +500,7 @@ public final class Process {
       List<String> xrefsTypes = null;
       boolean excludeXRefFrag = false;
       boolean onlyXRefFrag = false;
-      boolean xrefLevels = true;
+
       // make sure the path matches
       if (this.xrefs != null && this.xrefs.getTypes() != null && (xrefsMatcher == null ||
                                                                  !xrefsMatcher.hasPatterns() ||
@@ -508,10 +508,12 @@ public final class Process {
         xrefsTypes = Arrays.asList(this.xrefs.getTypes().toLowerCase().split(","));
         excludeXRefFrag = this.xrefs.excludeXRefsInXRefFragment();
         onlyXRefFrag = this.xrefs.onlyXRefsInXRefFragment();
-        xrefLevels = this.xrefs.getLevels();
+        if (!this.xrefs.getLevels()) {
+          this.logger.error("XRef levels option is no longer supported, use publication config instead.");
+        };
       }
       handler1.setXRefsHandling(xrefsTypes, excludeXRefFrag, onlyXRefFrag,
-          this.error == null ? false : this.error.getXrefNotFound(), xrefLevels);
+          this.error == null ? false : this.error.getXrefNotFound());
       // add images paths processing details
       boolean logImagesNotFound = false;
       boolean embedMetadata = false;

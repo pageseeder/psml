@@ -22,7 +22,7 @@
   <toc />
   <section id="xrefs">
     <xref-fragment id="2">
-      <blockxref id="939311" title="" frag="default"
+      <blockxref id="939311" title="" frag="default" level="1"
         reversefrag="2" reversetitle="References" reverselink="true"
         reversetype="none" display="document" type="transclude" uriid="186250"
         href="/ps/dev/test/clauret/part_a.psml" urititle="Part A"
@@ -60,9 +60,9 @@
           </section>
         </document>
       </blockxref>
-      <blockxref id="939312" title="" frag="default"
+      <blockxref id="939312" title="" frag="default" level="2"
         reversefrag="2" reversetitle="References" reverselink="true"
-        reversetype="none" display="document" level="1" type="transclude"
+        reversetype="none" display="document" type="transclude"
         uriid="186251" href="/ps/dev/test/clauret/sub-part_1.psml"
         urititle="Sub-part 1" mediatype="application/vnd.pageseeder.psml+xml">
         <document id="186251" schemaversion="0.10"
@@ -99,9 +99,9 @@
           </section>
         </document>
       </blockxref>
-      <blockxref id="939313" title="" frag="default"
+      <blockxref id="939313" title="" frag="default" level="3"
         reversefrag="2" reversetitle="References" reverselink="true"
-        reversetype="none" display="document" level="2" type="transclude"
+        reversetype="none" display="document" type="transclude"
         uriid="186252" href="/ps/dev/test/clauret/division_a.psml"
         urititle="Division a" mediatype="application/vnd.pageseeder.psml+xml">
         <document id="186252" schemaversion="0.10"

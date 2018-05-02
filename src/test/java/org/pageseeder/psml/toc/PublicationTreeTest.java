@@ -53,7 +53,7 @@ public final class PublicationTreeTest {
 
   @Test
   public void testSimpleReferenceWithTitle() throws SAXException {
-    DocumentTree tree = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 0)).part(ref(1, "A", 100L)).part(ref(1, "A", 100L)).build();
+    DocumentTree tree = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 100L)).build();
     tree = tree.normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(tree);
     Assert.assertEquals(tree.id(), publication.id());

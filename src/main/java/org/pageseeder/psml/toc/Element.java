@@ -120,16 +120,6 @@ public abstract class Element implements Serializable, XMLWritable {
   }
 
   /**
-   *
-   * @param delta The difference with the current level.
-   *
-   * @return a new element with the adjusted level of the same type.
-   *
-   * @throws IllegalArgumentException If the resulting level is equal to or less than zero.
-   */
-  public abstract Element adjustLevel(int delta);
-
-  /**
    * Print a text representation of the structural element.
    *
    * @param out Where to print the structure

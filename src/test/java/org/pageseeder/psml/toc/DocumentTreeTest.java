@@ -171,32 +171,14 @@ public final class DocumentTreeTest {
 
   @Test
   public void testLevel_2() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, h2("A", "1", 1))).build();
+    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(h2("A", "1", 1)).build();
     Assert.assertEquals(2, tree.level());
   }
 
   @Test
   public void testLevel_2R() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, ref(2, "A", 100L))).build();
+    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(ref(2, "A", 100L)).build();
     Assert.assertEquals(2, tree.level());
-  }
-
-  @Test
-  public void testLevel_3() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, phantom(2, h3("A", "1", 1)))).build();
-    Assert.assertEquals(3, tree.level());
-  }
-
-  @Test
-  public void testLevel_3R() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, phantom(2, ref(3, "A", 100L)))).build();
-    Assert.assertEquals(3, tree.level());
-  }
-
-  @Test
-  public void testLevel_4() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, phantom(2, phantom(3, h4("A", "1", 1))))).build();
-    Assert.assertEquals(4, tree.level());
   }
 
   // Normalization
@@ -211,81 +193,27 @@ public final class DocumentTreeTest {
   }
 
   @Test
-  public void testNormalize_0() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(h1("A", "1", 1)).build();
-    Assert.assertSame(tree, tree.normalize(TitleCollapse.auto));
-    Assert.assertSame(tree, tree.normalize(TitleCollapse.never));
-    DocumentTree always = new DocumentTree.Builder(123L, "T").build();
-    Tests.assertDocumentTreeEquals(always, tree.normalize(TitleCollapse.always));
-  }
-
-  @Test
   public void testNormalize_Phantom1() throws IOException {
     DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, h2("A", "1", 1))).build();
-    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h1("A", "1", 1)).build();
+    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h2("A", "1", 1)).build();
     Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.auto));
     Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.never));
-    DocumentTree always = new DocumentTree.Builder(123L, "T").build();
-    Tests.assertDocumentTreeEquals(always, tree.normalize(TitleCollapse.always));
   }
 
   @Test
   public void testNormalize_Phantom2() throws IOException {
     DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, phantom(2, h3("A", "1", 1)))).build();
-    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h1("A", "1", 1)).build();
+    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h3("A", "1", 1)).build();
     Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.auto));
     Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.never));
-    DocumentTree always = new DocumentTree.Builder(123L, "T").build();
-    Tests.assertDocumentTreeEquals(always, tree.normalize(TitleCollapse.always));
   }
 
   @Test
   public void testNormalize_Phantom3() throws IOException {
     DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, phantom(2, phantom(3, h4("A", "1", 1))))).build();
-    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h1("A", "1", 1)).build();
+    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h4("A", "1", 1)).build();
     Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.never));
     Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.auto));
-    DocumentTree always = new DocumentTree.Builder(123L, "T").build();
-    Tests.assertDocumentTreeEquals(always, tree.normalize(TitleCollapse.always));
-  }
-
-  @Test
-  public void testNormalize_0_match() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(h1("T", "1", 1)).build();
-    DocumentTree match = new DocumentTree.Builder(123L, "T").build();
-    Assert.assertSame(tree, tree.normalize(TitleCollapse.never));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.auto));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.always));
-  }
-
-  @Test
-  public void testNormalize_Phantom1_match() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, h2("T", "1", 1))).build();
-    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h1("T", "1", 1)).build();
-    DocumentTree match = new DocumentTree.Builder(123L, "T").build();
-    Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.never));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.auto));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.always));
-  }
-
-  @Test
-  public void testNormalize_Phantom2_match() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, phantom(2, h3("T", "1", 1)))).build();
-    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h1("T", "1", 1)).build();
-    DocumentTree match = new DocumentTree.Builder(123L, "T").build();
-    Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.never));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.auto));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.always));
-  }
-
-  @Test
-  public void testNormalize_Phantom3_match() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(phantom(1, phantom(2, phantom(3, h4("T", "1", 1))))).build();
-    DocumentTree exp = new DocumentTree.Builder(123L, "T").part(h1("T", "1", 1)).build();
-    DocumentTree match = new DocumentTree.Builder(123L, "T").build();
-    Tests.assertDocumentTreeEquals(exp, tree.normalize(TitleCollapse.never));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.auto));
-    Tests.assertDocumentTreeEquals(match, tree.normalize(TitleCollapse.always));
   }
 
   @Test
@@ -305,13 +233,13 @@ public final class DocumentTreeTest {
       .build();
     DocumentTree tree2 = new DocumentTree.Builder(1).title("Y")
         .part(
-            phantom(1, "1",
-                phantom(2, "2",
-                  h3("c", "2", 1))))
+            phantom(2, "1",
+                phantom(3, "2",
+                  h4("c", "2", 1))))
         .part(
-            h1("d", "2", 1,
-                phantom(2, "2",
-                  h3("e", "2", 2))))
+            h2("d", "2", 1,
+                phantom(3, "2",
+                  h4("e", "2", 2))))
         .build();
     //Tests.print(tree.singleFragmentTree("2"));
     //Tests.print(tree2);
@@ -372,21 +300,23 @@ public final class DocumentTreeTest {
         .build();
     DocumentTree normalized = tree.normalize(TitleCollapse.auto);
     Assert.assertEquals(3, tree.parts().size());
-    Assert.assertEquals(2, normalized.parts().size());
+    Assert.assertEquals(3, normalized.parts().size());
   }
 
   @Test
   public void testNormalize_2() throws IOException {
-    Part<Heading> p1 = h1("Hello", "1", 1);
-    Part<Heading> p2 = h2("I", "2", 2, h3("A", "2", 3), h3("B", "2", 2));
-    Part<Heading> p3 = h2("II", "2", 5, h3("A", "2", 6), h3("B", "2", 7));
+    Part<Heading> p1 = h1("Hello", "1", 1,
+                         h2("I", "2", 2,
+                           h3("A", "2", 3),
+                           h3("B", "2", 2)),
+                         h2("II", "2", 5,
+                           h3("A", "2", 6),
+                           h3("B", "2", 7)));
     DocumentTree tree = new DocumentTree.Builder(123L, "Hello")
         .part(p1)
-        .part(p2)
-        .part(p3)
         .build();
     DocumentTree normalized = tree.normalize(TitleCollapse.auto);
-    Assert.assertEquals(3, tree.parts().size());
+    Assert.assertEquals(1, tree.parts().size());
     Assert.assertEquals(2, normalized.parts().size());
   }
 
@@ -399,7 +329,7 @@ public final class DocumentTreeTest {
     Assert.assertEquals(1, tree.parts().get(0).level());
     Assert.assertEquals(Element.NO_TITLE, tree.parts().get(0).title());
     Assert.assertEquals(1, normalized.parts().size());
-    Assert.assertEquals(1, normalized.parts().get(0).level());
+    Assert.assertEquals(3, normalized.parts().get(0).level());
     Assert.assertEquals("Hola", normalized.parts().get(0).title());
   }
 

@@ -247,11 +247,11 @@ public class Tests {
   }
 
   public static void assertHeadingEquals(Heading e, Heading f) {
-    Assert.assertEquals("Reference levels don't match", e.level(), f.level());
-    Assert.assertEquals("Reference titles don't match", e.title(), f.title());
-    Assert.assertEquals("Reference fragments don't match", e.fragment(), f.fragment());
-    Assert.assertEquals("Reference prefixes don't match", e.prefix(), f.prefix());
-    Assert.assertEquals("Reference indexes don't match", e.index(), f.index());
+    Assert.assertEquals("Heading levels don't match", e.level(), f.level());
+    Assert.assertEquals("Heading titles don't match", e.title(), f.title());
+    Assert.assertEquals("Heading fragments don't match", e.fragment(), f.fragment());
+    Assert.assertEquals("Heading prefixes don't match", e.prefix(), f.prefix());
+    Assert.assertEquals("Heading indexes don't match", e.index(), f.index());
   }
 
   public static void assertEmbedEquals(Reference e, Reference f) {

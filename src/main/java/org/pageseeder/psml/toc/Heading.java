@@ -164,18 +164,6 @@ public final class Heading extends Element implements Serializable {
     return new Heading(level(), title(), fragment(), originalFragment(), this._index, numbered, this._prefix, this._blocklabel);
   }
 
-  /**
-   *
-   * @param delta The difference with the current level.
-   *
-   * @return a new heading with a adjusted level or this heading if the delta is 0.
-   */
-  @Override
-  public Heading adjustLevel(int delta) {
-    if (delta == 0) return this;
-    return new Heading(level()+delta, title(), fragment(), originalFragment(), this._index, this._numbered, this._prefix, this._blocklabel);
-  }
-
   @Override
   public void print(Appendable out) {
     try {

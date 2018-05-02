@@ -38,11 +38,6 @@ public final class TransclusionEnd extends Element implements Serializable {
   }
 
   @Override
-  public TransclusionEnd adjustLevel(int delta) {
-    return this;
-  }
-
-  @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     // don't output phantom XML
   }

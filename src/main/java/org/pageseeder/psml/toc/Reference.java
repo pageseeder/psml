@@ -140,12 +140,6 @@ public final class Reference extends Element implements Serializable {
     return this._targetfragment;
   }
 
-  @Override
-  public Reference adjustLevel(int delta) {
-    // xref levels are not adjusted
-    return this;
-  }
-
   /**
    * Create a new reference identical to this reference but with the specified title
    *

@@ -128,7 +128,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    * @param fragmentlevels    Map of fragment ID to the level of the fragment
    */
-  private DocumentTree(long id, int level, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
+  public DocumentTree(long id, int level, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
       String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
     this._id = id;
     this._title = title;
@@ -217,32 +217,6 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public Map<String,Integer> fragmentlevels() {
     return Collections.unmodifiableMap(this._fragmentlevels);
-  }
-
-  /**
-   * Compute the actual level of the document.
-   */
-  private int computeActualLevel() {
-    for (Part<?> p : this._parts) {
-      int level = computeActualLevel(p);
-      if (level > 0) return level;
-    }
-    return 0;
-  }
-
-  /**
-   * Compute the actual level of the part.
-   *
-   * @param part The part to collect from.
-   */
-  private static int computeActualLevel(Part<?> part) {
-    Element element = part.element();
-    if (element.hasTitle()) return element.level();
-    for (Part<?> p : part.parts()) {
-      int level = computeActualLevel(p);
-      if (level > 0) return level;
-    }
-    return 0;
   }
 
   /**

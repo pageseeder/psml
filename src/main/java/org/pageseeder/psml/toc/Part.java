@@ -5,7 +5,6 @@ package org.pageseeder.psml.toc;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -157,41 +156,6 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
       if (!p.isLevelConsistent(level+1)) return false;
     }
     return true;
-  }
-
-  /**
-   * Attaches a list of parts to this part
-   *
-   * @param parts The list of parts to attach.
-   *
-   * @return a new part with the specified parts attached.
-   */
-  public Part<T> attach(List<Part<?>> parts) {
-    List<Part<?>> attached = new ArrayList<>(parts.size());
-    for (Part<?> c : parts) {
-      // We adjust the levels so that attached references are one level below (+1)
-      int delta = level() - c.level() + 1;
-      attached.add(c.adjustLevel(delta));
-    }
-    T element = element();
-    return new Part<>(element, attached);
-  }
-
-  /**
-   * Adjust the level of this reference.
-   *
-   * @param delta The difference with the current level.
-   *
-   * @return a new part unless the delta was zero.
-   */
-  public Part<T> adjustLevel(int delta) {
-    if (delta == 0) return this;
-    List<Part<?>> adjusted = new ArrayList<>();
-    for (Part<?> sub : parts()) {
-      adjusted.add(sub.adjustLevel(delta));
-    }
-    T element = (T)element().adjustLevel(delta);
-    return new Part<>(element, adjusted);
   }
 
   /**
