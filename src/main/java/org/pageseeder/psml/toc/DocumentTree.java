@@ -317,7 +317,6 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * Preserves hierarchy by changing non-fragment ancestor parts to phantoms
    * and removing the top phantoms.
    *
-   * @param tree     The tree to process
    * @param fragment The fragment ID to preserve
    *
    * @return a new tree with other fragments removed

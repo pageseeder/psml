@@ -232,7 +232,7 @@ public final class PublicationNumbering {
    *
    * @param level      the level of the scheme
    * @param blocklabel the parent block label (optional)
-   * @param type       the scheme element
+   * @param element    the scheme element
    */
   public void addElement(int level, @Nullable String blocklabel, String element) {
     if (blocklabel == null) blocklabel = "";
