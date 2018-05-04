@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
@@ -134,11 +133,6 @@ public final class FragmentNumbering implements Serializable {
         entryIt.remove();
       }
     }
-    String result = this.numbering.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
   }
 
   /**
