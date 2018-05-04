@@ -479,7 +479,8 @@ public final class PublicationTreeTest {
         .part(h1("T", "1", 1,
             phantom(2,
             ref(3, "A", 100L),
-            ref(3, "B", 101L)))).build();
+            ref(3, "B", 101L),
+            ref(3, "C", 102L)))).build();
     //Tests.print(root);
     root = root.normalize(TitleCollapse.auto);
     //Tests.print(root);
@@ -496,32 +497,41 @@ public final class PublicationTreeTest {
               ref(1, "BX", 1000L),
               ref(1, "BY", 1001L)))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter3 = new DocumentTree.Builder(102).title("C")
+        .part(phantom(1,
+              p(1, "1", 1, true, ""),
+              h2("C", "1", 2, true, ""),
+              h2("CA", "1", 3, true, "")))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    System.out.println("Tree 102 level: " + inter3.level());
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
             p(1, "1a", 1, true, ""),
             p(2, "1b", 1, true, ""),
             p(1, "1c", 1, false, "x"),
-            h2("a", "2", 1, true, "x.x.x"),
+            h2("a", "2", 1, true, "x.x.x"), // will not be numbered when adjusted to level 5 or 6
             p(0, "3", 1, false, ""),
-            h2("b", "3", 2, true, "",
+            h2("b", "3", 2, true, "", // will not be numbered when adjusted to level 5 or 6
                 p(1, "3a", 1, true, ""),
                 p(2, "3a", 2, true, ""),
                 p(1, "3b", 1, true, "x.x")),
             h2("c", "4", 1, false, ""),
-            h2("d", "4", 2, true, "", h3("xc", "5", 1, false, "x.x.x.x"))))
+            h2("d", "4", 2, true, "", // will not be numbered when adjusted to level 5 or 6
+                h3("xc", "5", 1, false, "x.x.x.x"))))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 1, true, "x.x",
                 p(1, "1a", 1, true, ""),
                 p(3, "1b", 1, true, ""),
-            h2("a", "2", 1, true, "x.x.x"),
-            h2("b", "2", 2, true, "",
-                h3("x", "3", 1, true, "")), // will not be numbered when adjusted to level 5
+            h2("a", "2", 1, true, "x.x.x"), // will not be numbered when adjusted to level 5 or 6
+            h2("b", "2", 2, true, "", // will not be numbered when adjusted to level 5 or 6
+                h3("x", "3", 1, true, "")), // will not be numbered twice when adjusted to level 5 or 6
             h2("c", "4", 1, false, "")))
         .addReverseReference(100L).addReverseReference(101L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(inter2);
+    publication = publication.add(inter3);
     publication = publication.add(tree);
     publication = publication.add(tree2);
     Assert.assertEquals(root.id(), publication.id());

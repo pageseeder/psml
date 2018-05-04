@@ -154,7 +154,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public DocumentTree(long id, String title, String labels, List<Long> reverse,
       List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
-    this(id, parts.isEmpty() ? 0 : parts.get(0).level(), title, labels, reverse,
+    this(id, calculateLevel(parts), title, labels, reverse,
         NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings, fragmentlevels);
   }
 
@@ -424,11 +424,29 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       for (Part<?> p : normalized.parts().get(0).parts()) {
         unwrapped.add(p);//.adjustLevel(-1));
       }
-      normalized = new DocumentTree(tree._id,  unwrapped.isEmpty() ? 0 : unwrapped.get(0).level(),
+      normalized = new DocumentTree(tree._id,  calculateLevel(unwrapped),
           tree._title, tree._labels, tree._reverse, tree._titlefragment,
           tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings, tree._fragmentlevels);
     }
     return normalized;
+  }
+
+  /**
+   * Get the level of the first phantom or heading part in the list.
+   *
+   * @param parts  the list of parts
+   *
+   * @return the level
+   */
+  private static int calculateLevel(List<Part<?>> parts) {
+    int level = 0;
+    for (Part<?> part : parts) {
+      Element el = part.element();
+      if (el instanceof Phantom || el instanceof Heading) {
+        return el.level();
+      }
+    }
+    return level;
   }
 
   /**

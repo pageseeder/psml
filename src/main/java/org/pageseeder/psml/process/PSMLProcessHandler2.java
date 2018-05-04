@@ -504,6 +504,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       // if not in a transclusion
       if (this.locations.peek().blockxrefs == 0) {
         this.locations.pop();
+        this.previousheadingLevel = 0;
       }
       return;
     }
@@ -512,6 +513,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       // if not in a transclusion
       if (this.locations.peek().blockxrefs == 0) {
         this.locations.pop();
+        this.previousheadingLevel = 0;
       }
     }
     this.elements.pop();
