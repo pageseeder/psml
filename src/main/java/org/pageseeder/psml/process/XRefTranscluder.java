@@ -209,21 +209,23 @@ public final class XRefTranscluder {
       }
       this.parentHandler.getLogger().debug("Transcluding XRef to "+href);
       // clone handler
+      NumberedTOCGenerator numberingAndTOC = this.parentHandler.getNumberedTOCGenerator();
       String levelAtt = atts.getValue("level");
-      int level = levelAtt == null || levelAtt.isEmpty() || !"transclude".equals(atts.getValue("type")) ?
-          0 : Integer.parseInt(levelAtt);
+      // use level if it exists and a transclude or no publication specified (for backward compatibility)
+      int level = levelAtt != null && !levelAtt.isEmpty() &&
+          ("transclude".equals(atts.getValue("type")) || numberingAndTOC == null) ?
+          Integer.parseInt(levelAtt) : 0;
       PSMLProcessHandler handler = this.parentHandler.cloneForTransclusion(
           target, atts.getValue("uriid"), fragment, level, image,
           inEmbedHierarchy && "embed".equals(type), "transclude".equals(type));
       handler.getTranscluder().parentFiles.putAll(this.parentFiles);
       // parse now
       XMLUtils.parse(target, handler);
-      // if publication and not a transclusion then parse TOC
-      NumberedTOCGenerator numberingAndTOC = this.parentHandler.getNumberedTOCGenerator();
+      // if publication then parse TOC
       if (numberingAndTOC != null) {
         // process transclussions
         XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
-        TransclusionHandler thandler = new TransclusionHandler(out, "default", true, this.parentHandler);
+        TransclusionHandler thandler = new TransclusionHandler(out, "default", true, handler);
         XMLUtils.parse(target, thandler);
         // parse document tree
         DocumentTreeHandler tochandler = new DocumentTreeHandler();

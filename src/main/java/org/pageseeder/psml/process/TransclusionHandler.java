@@ -195,7 +195,7 @@ public class TransclusionHandler extends DefaultHandler {
     File target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + href);
     // make sure it's valid
     if (target == null || !target.exists() ||!target.isFile())
-      throw new TransclusionException("XRef target not found for path: " + href);
+      throw new TransclusionException("XRef target not found for path: " + dadPath + '/' + href);
     // parse target
     TransclusionHandler handler = new TransclusionHandler(this.xml, fragment, false, this.parentHandler);
     try {
