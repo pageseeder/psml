@@ -85,7 +85,7 @@ public final class DocumentTreeTest {
         .build();
     Assert.assertEquals(123, tree.id());
     Assert.assertEquals("Hello", tree.title());
-    Assert.assertEquals(1, tree.level());
+    Assert.assertEquals(0, tree.level());
     Assert.assertEquals(0, tree.listReverseReferences().size());
     Assert.assertEquals(1, tree.listForwardReferences().size());
     Assert.assertEquals(1, tree.parts().size());
@@ -101,7 +101,7 @@ public final class DocumentTreeTest {
         .build();
     Assert.assertEquals(123, tree.id());
     Assert.assertEquals("Hello", tree.title());
-    Assert.assertEquals(1, tree.level());
+    Assert.assertEquals(0, tree.level());
     Assert.assertEquals(0, tree.listReverseReferences().size());
     Assert.assertEquals(3, tree.listForwardReferences().size());
     Assert.assertEquals(3, tree.parts().size());
@@ -166,18 +166,12 @@ public final class DocumentTreeTest {
   @Test
   public void testLevel_1R() throws IOException {
     DocumentTree tree = new DocumentTree.Builder(123L, "T").part(ref(1, "A", 100L)).build();
-    Assert.assertEquals(1, tree.level());
+    Assert.assertEquals(0, tree.level());
   }
 
   @Test
   public void testLevel_2() throws IOException {
     DocumentTree tree = new DocumentTree.Builder(123L, "T").part(h2("A", "1", 1)).build();
-    Assert.assertEquals(2, tree.level());
-  }
-
-  @Test
-  public void testLevel_2R() throws IOException {
-    DocumentTree tree = new DocumentTree.Builder(123L, "T").part(ref(2, "A", 100L)).build();
     Assert.assertEquals(2, tree.level());
   }
 
