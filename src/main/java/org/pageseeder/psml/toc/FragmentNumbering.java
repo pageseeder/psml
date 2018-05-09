@@ -395,7 +395,9 @@ public final class FragmentNumbering implements Serializable {
     // adjust level minus 1 as level is already incremented
     int adjusted_level = level + para.level() - 1;
     if (para.numbered() && number != null) {
-      pref = number.generateNumbering(adjusted_level, "para", para.blocklabel());
+      // if block label set then use original paragraph level
+      pref = number.generateNumbering(
+          Paragraph.NO_BLOCK_LABEL.equals(para.blocklabel()) ? adjusted_level : para.level(), "para", para.blocklabel());
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, adjusted_level, null);
     }

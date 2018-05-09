@@ -87,7 +87,7 @@ public final class NumberingGenerator {
     // for each stack of levels
     for (String label : labels) {
       boolean blockdefined = this.numberConfig.getNumberFormat(level, label) != null;
-      // if block defined add to it's stack or if default block add to all undefined stacks
+      // if block defined add to it's stack or if default block add to all stacks undefined for that level
       if ((blockdefined && label.equals(blocklabel)) || (!blockdefined && "".equals(blocklabel))) {
         Deque<Integer> levels = this.numberingLevels.get(label);
         if (levels.size() == level) {
@@ -96,8 +96,11 @@ public final class NumberingGenerator {
           levels.push(1);
         } else {
           while (levels.size() > level) levels.pop();
-          while (levels.size() < level) levels.push(
-              this.numberConfig.getSkippedLevels() == PublicationNumbering.SkippedLevels.ONE && levels.size() < level - 1 ? 1 : 0);
+          while (levels.size() < level) {
+            // if skipped levels set to one and not a block stack push 1
+            levels.push(this.numberConfig.getSkippedLevels() == PublicationNumbering.SkippedLevels.ONE &&
+                levels.size() < level - 1 && "".equals(label) ? 1 : 0);
+          }
           levels.push(levels.pop() + 1);
         }
       }

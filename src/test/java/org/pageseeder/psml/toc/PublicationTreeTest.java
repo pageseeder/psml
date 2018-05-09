@@ -348,26 +348,25 @@ public final class PublicationTreeTest {
   public void testAutoNumberingBlockLabels() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
-            phantom(2,
-            ref(3, "X", 1000L),
-            ref(3, "Y", 1001L)))).build().normalize(TitleCollapse.auto);
+              ref(0, "X", 1000L),
+              ref(0, "Y", 1001L))).build().normalize(TitleCollapse.auto);
     DocumentTree inter = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "",
-            p(1, "1a", 1, true, ""),
-            p(1, "1b", 1, true, "", "table-caption"),
-            p(1, "1c", 1, true, ""),
-            p(1, "1d", 1, true, "", "table-caption"),
-            p(1, "1e", 1, true, "", "figure-caption"),
-            p(1, "1f", 1, true, "", "table-caption")))
+            p(2, "1a", 1, true, ""),
+            p(2, "1b", 1, true, "", "table-caption"),
+            p(2, "1c", 1, true, ""),
+            p(2, "1d", 1, true, "", "table-caption"),
+            p(2, "1e", 1, true, "", "figure-caption"),
+            p(2, "1f", 1, true, "", "table-caption")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 1, true, "",
-            p(1, "1a", 1, true, ""),
-            p(1, "1b", 1, true, "", "table-caption"),
-            p(1, "1c", 1, true, ""),
-            p(1, "1d", 1, true, "", "table-caption"),
-            p(1, "1e", 1, true, "", "figure-caption"),
-            p(1, "1f", 1, true, "", "table-caption")))
+            p(2, "1a", 1, true, ""),
+            p(2, "1b", 1, true, "", "table-caption"),
+            p(2, "1c", 1, true, ""),
+            p(2, "1d", 1, true, "", "table-caption"),
+            p(2, "1e", 1, true, "", "figure-caption"),
+            p(2, "1f", 1, true, "", "table-caption")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
