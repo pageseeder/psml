@@ -15,14 +15,14 @@
  */
 package org.pageseeder.psml.md;
 
-import org.pageseeder.psml.model.PSMLElement;
-import org.pageseeder.psml.model.PSMLElement.Name;
-import org.pageseeder.psml.model.PSMLNode;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.pageseeder.psml.model.PSMLElement;
+import org.pageseeder.psml.model.PSMLElement.Name;
+import org.pageseeder.psml.model.PSMLNode;
 
 /**
  * The block parser parses Markdown and generates the block-level elements
@@ -147,7 +147,7 @@ public class BlockParser {
     }
 
     // Lines starting with four spaces: preformatted code
-    else if (line.matches("\\s{4}.*")) {
+    else if (line.matches("\\s{4}.*") && !state.isFenced()) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }

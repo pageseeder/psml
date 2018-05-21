@@ -15,6 +15,10 @@
  */
 package org.pageseeder.psml.md;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.md.BlockParser.State;
@@ -22,10 +26,6 @@ import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class BlockParserTest {
 
@@ -141,11 +141,13 @@ public class BlockParserTest {
     List<String> fencedCode3 = Arrays.asList("```", "function() {", "  return 'Hello!';", "}", "```");
     List<String> fencedCode4 = Arrays.asList("```", "function() {", "  if (a", "  > b) then a = b;", "}", "```");
     List<String> fencedCode5 = Arrays.asList("```", "function() {","","return 'Hello!';}", "```");
+    List<String> fencedCode6 = Arrays.asList("```", "<report>","  <errors>","    <error>", "```");
     Assert.assertEquals("<preformat>\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode1));
     Assert.assertEquals("<preformat role=\"javascript\">\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode2));
     Assert.assertEquals("<preformat>\nfunction() {\n  return 'Hello!';\n}\n</preformat>", toPSML(fencedCode3));
     Assert.assertEquals("<preformat>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</preformat>", toPSML(fencedCode4));
     Assert.assertEquals("<preformat>\nfunction() {\n\nreturn 'Hello!';}\n</preformat>", toPSML(fencedCode5));
+    Assert.assertEquals("<preformat>\n&lt;report&gt;\n  &lt;errors&gt;\n    &lt;error&gt;\n</preformat>", toPSML(fencedCode6));
   }
 
   @Test

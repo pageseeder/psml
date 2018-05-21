@@ -49,7 +49,7 @@ function() {
 
   // do something
   if (a
-  > b) then a = b;
+    > b) then a = b;
 }
 ```
 

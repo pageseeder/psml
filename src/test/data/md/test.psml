@@ -51,7 +51,7 @@ function() {
 
   // do something
   if (a
-  &gt; b) then a = b;
+    &gt; b) then a = b;
 }
 </preformat>
     </fragment>

@@ -15,6 +15,10 @@
  */
 package org.pageseeder.psml.md;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.html.HTMLElement;
@@ -22,10 +26,6 @@ import org.pageseeder.psml.html.HTMLElement.Name;
 import org.pageseeder.psml.md.HTMLBlockParser.State;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class HTMLBlockParserTest {
 
@@ -140,11 +140,13 @@ public class HTMLBlockParserTest {
     List<String> fencedCode3 = Arrays.asList("```", "function() {", "  return 'Hello!';", "}", "```");
     List<String> fencedCode4 = Arrays.asList("```", "function() {", "  if (a", "  > b) then a = b;", "}", "```");
     List<String> fencedCode5 = Arrays.asList("```", "function() {","","return 'Hello!';}", "```");
+    List<String> fencedCode6 = Arrays.asList("```", "<report>","  <errors>","    <error>", "```");
     Assert.assertEquals("<pre>\nfunction() { return 'Hello!';}\n</pre>", toHTML(fencedCode1));
     Assert.assertEquals("<pre><code class=\"javascript\">\nfunction() { return 'Hello!';}\n</code></pre>", toHTML(fencedCode2));
     Assert.assertEquals("<pre>\nfunction() {\n  return 'Hello!';\n}\n</pre>", toHTML(fencedCode3));
     Assert.assertEquals("<pre>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</pre>", toHTML(fencedCode4));
     Assert.assertEquals("<pre>\nfunction() {\n\nreturn 'Hello!';}\n</pre>", toHTML(fencedCode5));
+    Assert.assertEquals("<pre>\n&lt;report&gt;\n  &lt;errors&gt;\n    &lt;error&gt;\n</pre>", toHTML(fencedCode6));
   }
 
   @Test
