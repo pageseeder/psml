@@ -5,12 +5,12 @@
     <schemes>
       <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
       <scheme level="1" type="decimal" format="[1.]" />
-      <scheme level="2" type="decimal" format="[1.][2.]" />
+      <scheme level="2" type="decimal" format="[1.][2.]"         element="any" />
       <scheme level="3" type="decimal" format="[1.][2.][3.]"     element="any"/>
       <scheme level="4" type="decimal" format="[1.][2.][3.][4.]" element="any"/>
       <scheme level="5" type="loweralpha" format="[(5)]"         element="para"/>
       <scheme level="6" type="lowerroman" format="[(6)]"         element="para" />
-      <scheme level="7" type="upperalpha" format="[(7)]" />
+      <scheme level="7" type="upperalpha" format="[(7)]"         element="para" />
       <scheme level="8" type="upperroman" format="[(8)]" />
       <scheme level="9" type="loweralpha" format="[9]" />
     </schemes>

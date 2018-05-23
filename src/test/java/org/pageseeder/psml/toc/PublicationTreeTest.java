@@ -652,7 +652,7 @@ public final class PublicationTreeTest {
       publication = publication.add(tree);
     }
     // Generate fragment numbering
-    PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    PublicationConfig config = Tests.parseConfig("publication-config-paras.xml");
     //Tests.print(publication, -1, number);
     long start = System.currentTimeMillis();
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
@@ -663,12 +663,13 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
-    System.out.println("Number of prefixes: " + prefixes.size());
-    System.out.println("Generation time: " + (end - start));
-    start = System.currentTimeMillis();
+    long pstart = System.currentTimeMillis();
     Tests.print(publication, 1499, -1, numbering, true);
-    end = System.currentTimeMillis();
-    System.out.println("Print time: " + (end - start));
+    long pend = System.currentTimeMillis();
+    System.out.println("Number of prefixes: " + prefixes.size());
+    System.out.println("Number of transclude prefixes: " + numbering.getAllTranscludedPrefixes().size());
+    System.out.println("Generation time: " + (end - start));
+    System.out.println("Print time: " + (pend - pstart));
   }
 
   @Test(expected = IllegalStateException.class)
