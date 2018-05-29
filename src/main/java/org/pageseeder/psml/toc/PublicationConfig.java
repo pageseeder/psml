@@ -154,6 +154,48 @@ public final class PublicationConfig {
   private List<PublicationNumbering> numberingConfigs = new ArrayList<>();
 
   /**
+   * @param tocTitleCollapse the tocTitleCollapse to set
+   */
+  public void setTocTitleCollapse(TitleCollapse tocTitleCollapse) {
+    this.tocTitleCollapse = tocTitleCollapse;
+  }
+
+  /**
+   * @param xrefLevelRelativeTo the xrefLevelRelativeTo to set
+   */
+  public void setXrefLevelRelativeTo(LevelRelativeTo xrefLevelRelativeTo) {
+    this.xrefLevelRelativeTo = xrefLevelRelativeTo;
+  }
+
+  /**
+   * @param paraLevelRelativeTo the paraLevelRelativeTo to set
+   */
+  public void setParaLevelRelativeTo(LevelRelativeTo paraLevelRelativeTo) {
+    this.paraLevelRelativeTo = paraLevelRelativeTo;
+  }
+
+  /**
+   * @param paraLevelAdjust the paraLevelAdjust to set
+   */
+  public void setParaLevelAdjust(LevelAdjust paraLevelAdjust) {
+    this.paraLevelAdjust = paraLevelAdjust;
+  }
+
+  /**
+   * @param headingLevelAdjust the headingLevelAdjust to set
+   */
+  public void setHeadingLevelAdjust(LevelAdjust headingLevelAdjust) {
+    this.headingLevelAdjust = headingLevelAdjust;
+  }
+
+  /**
+   * @param numberingConfigs the numberingConfigs to set
+   */
+  public void setNumberingConfigs(List<PublicationNumbering> numberingConfigs) {
+    this.numberingConfigs = numberingConfigs;
+  }
+
+  /**
    * Return the first numbering config with one of the specified labels.
    * If none found return the first config with no label, otherwise <code>null<code>.
    *
