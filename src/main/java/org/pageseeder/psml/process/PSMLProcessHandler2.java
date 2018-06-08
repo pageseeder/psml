@@ -463,22 +463,24 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
 
         // get xref's traget details
         String targetfrag = atts.getValue("frag");
-        long targeturiid = Long.parseLong(atts.getValue("uriid"));
+        String targeturi = atts.getValue("uriid");
+        if (targeturi != null) {
+          long targeturiid = Long.parseLong(targeturi);
 
-        // compute adjusted values
-        FragmentNumbering.Prefix prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
-            targeturiid, this.xrefTargetPosition, targetfrag, 1);
-        String newPrefix       = prefix == null ? null : prefix.value;
-        DocumentTree tree      = this.numberingAndTOC.publicationTree().tree(targeturiid);
-        String newHeading      = tree == null ? null : tree.fragmentheadings().get(targetfrag);
-        String newParentNumber = prefix == null ? null : prefix.parentNumber;
+          // compute adjusted values
+          FragmentNumbering.Prefix prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
+              targeturiid, this.xrefTargetPosition, targetfrag, 1);
+          String newPrefix       = prefix == null ? null : prefix.value;
+          DocumentTree tree      = this.numberingAndTOC.publicationTree().tree(targeturiid);
+          String newHeading      = tree == null ? null : tree.fragmentheadings().get(targetfrag);
+          String newParentNumber = prefix == null ? null : prefix.parentNumber;
 
-        // set content and title attribute
-        this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : newPrefix)
-                                       .replaceAll("\\{heading}",      newHeading      == null ? "?" : newHeading)
-                                       .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : newParentNumber);
+          // set content and title attribute
+          this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : newPrefix)
+                                         .replaceAll("\\{heading}",      newHeading      == null ? "?" : newHeading)
+                                         .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : newParentNumber);
+        }
       }
-
     }
   }
 
