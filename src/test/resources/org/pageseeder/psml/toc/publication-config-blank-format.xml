@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<publication-config>
+  <numbering skipped-levels="1">
+    <schemes>
+      <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
+      <scheme level="1" type="decimal" format="" />
+      <scheme level="2" type="decimal" format="[2.]" />
+      <scheme level="3" type="decimal" format="[2.][3.]" />
+      <scheme level="4" type="loweralpha" format="[(4)]" element="para" />
+      <scheme level="5" type="lowerroman" format="[(4)][(5)]" element="para" />
+      <scheme level="6" type="upperalpha" format="[(6)]" />
+      <scheme level="7" type="upperroman" format="[(7)]" />
+      <scheme level="8" type="loweralpha" format="[8]" />
+      <scheme level="9" type="lowerroman" format="[9]" />
+    </schemes>
+  </numbering>
+</publication-config>

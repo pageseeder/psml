@@ -388,6 +388,45 @@ public final class PublicationTreeTest {
   }
 
   @Test
+  public void testAutoNumberingBlankFormat() throws SAXException, IOException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+              ref(0, "X", 1000L),
+              ref(0, "Y", 1001L))).build().normalize(TitleCollapse.auto);
+    DocumentTree inter = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 1, true, "",
+              h2("A", "1", 2, true, "",
+                h3("B", "1", 3, true, "",
+                  p(1, "1a", 1, true, ""),
+                  p(2, "1b", 1, true, "")))))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree = new DocumentTree.Builder(1001).title("Y")
+        .part(h1("Y", "1", 1, true, "",
+              h2("A", "1", 2, true, "",
+                h3("B", "1", 3, true, "",
+                  p(1, "1a", 1, true, ""),
+                  p(2, "1b", 1, true, "")))))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(inter);
+    publication = publication.add(tree);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-blank-format.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering, false);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+  }
+
+  @Test
   public void testAutoNumberingSkippedLevels() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("X", "1", 1, true, "",

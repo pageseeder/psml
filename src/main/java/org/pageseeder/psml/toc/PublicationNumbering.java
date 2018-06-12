@@ -289,17 +289,19 @@ public final class PublicationNumbering {
     int level = toParse.split("\\.").length;
     // compute prefix
     StringBuilder prefix = new StringBuilder();
-    boolean levelone = buildPrefix(prefix, toParse, getNumberFormat(level, blocklabel), blocklabel);
-    if (levelone) return new Prefix(prefix.toString(), canonical, level, null);
+    int lowest = buildPrefix(prefix, toParse, getNumberFormat(level, blocklabel), blocklabel);
+    if (lowest == 1) return new Prefix(prefix.toString(), canonical, level, null);
     // compute parent number
     StringBuilder parentNumber = new StringBuilder();
     int i = toParse.lastIndexOf('.', toParse.length() - 2);
     int prevlevel = level;
-    while (i != -1 && !levelone) {
+    while (i != -1 && prevlevel > 1) {
+      prevlevel--;
+      // skip levels that are already included
+      if (prevlevel >= lowest) continue;
       toParse = toParse.substring(0, i + 1);
       StringBuilder parent = new StringBuilder();
-      prevlevel--;
-      levelone = buildPrefix(parent, toParse, getNumberFormat(prevlevel, ""), "");
+      lowest = buildPrefix(parent, toParse, getNumberFormat(prevlevel, ""), "");
       parentNumber.insert(0, parent);
       i = toParse.lastIndexOf('.', toParse.length() - 2);
     }
@@ -314,9 +316,9 @@ public final class PublicationNumbering {
    * @param scheme     the scheme to apply
    * @param blocklabel the parent block label name
    *
-   * @return whether level one was included in prefix
+   * @return the lowest level included in prefix
    */
-  private boolean buildPrefix(StringBuilder prefix, String canonical, String scheme, String blocklabel) {
+  private int buildPrefix(StringBuilder prefix, String canonical, String scheme, String blocklabel) {
     // no scheme, return canonical value then
     if (scheme == null) {
       // no zeros or we don't strip them, return as is
@@ -325,7 +327,7 @@ public final class PublicationNumbering {
       } else {
         prefix.append(canonical);
       }
-      return true;
+      return 1;
     }
     // find the values for each level
     Matcher canonicalMatcher = CANONICAL_PATTERN.matcher(canonical);
@@ -337,10 +339,10 @@ public final class PublicationNumbering {
     }
     // build prefix
     Matcher schemeMatcher = SCHEME_PATTERN.matcher(scheme);
-    boolean levelone = false;
+    int lowest = currentLevel;
     while (schemeMatcher.find()) {
       int level = Integer.parseInt(schemeMatcher.group(2));
-      if (level == 1) levelone = true;
+      if (level < lowest) lowest = level;
       Integer value = levels.get(level);
       // make sure level is good
       if (value == null) continue;
@@ -350,7 +352,7 @@ public final class PublicationNumbering {
       prefix.append(numbering(value, getNumberType(level, blocklabel)));
       prefix.append(schemeMatcher.group(3));
     }
-    return levelone;
+    return lowest;
   }
 
   /**
