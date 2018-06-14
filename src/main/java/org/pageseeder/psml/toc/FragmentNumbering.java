@@ -515,11 +515,11 @@ public final class FragmentNumbering implements Serializable {
      * Constructor
      *
      * @param val        the prefix value
-     * @param canonic    the canonical numbering
+     * @param canonic    the canonical numbering (optional)
      * @param lvl        the heading/para level
      * @param parent     the parent number (optional)
      */
-    public Prefix(String val, String canonic, int lvl, @Nullable String parent) {
+    public Prefix(String val, @Nullable String canonic, int lvl, @Nullable String parent) {
       this.value = val;
       this.canonical = canonic;
       this.level = lvl;

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.process.ProcessException;
@@ -168,11 +169,47 @@ public final class PublicationTreeTest {
     Tests.print(publication, -1, -1, numbering, true);
     Tests.print(publication, 1000, 2, numbering, true);
     Tests.print(publication, 1002, -1, numbering, true);
-    String result = numbering.getAllPrefixes().entrySet()
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"100-1-1-1",null,"1.",2,"0.1.");
+    assertHasPrefix(prefixes,"100-1-default",null,"1.",2,"0.1.");
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"1.1.",4,"0.1.0.1.");
+    assertHasPrefix(prefixes,"1000-1-2-1","1.1.","(a)",5,"0.1.0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-2-2","1.1.","(b)",5,"0.1.0.1.2.");
+    assertHasPrefix(prefixes,"1000-1-3-1","1.1.(b)","(i)",6,"0.1.0.1.2.1.");
+    assertHasPrefix(prefixes,"1000-1-4-2","1.1.","(c)",5,"0.1.0.1.3.");
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1000-1-default",null,"",4,null);
+    assertHasPrefix(prefixes,"1000-2-1-1","1.2.","(a)",5,"0.1.2.0.1.");
+    assertHasPrefix(prefixes,"1000-2-2-1","1.2.(a)","(i)",6,"0.1.2.0.1.1.");
+    assertHasPrefix(prefixes,"1000-2-2-2","1.2.(a)","(ii)",6,"0.1.2.0.1.2.");
+    assertHasPrefix(prefixes,"1000-2-3-1","1.2.(a)(ii)","(A)",7,"0.1.2.0.1.2.1.");
+    assertHasPrefix(prefixes,"1000-2-4-2","1.2.(a)","(iii)",6,"0.1.2.0.1.3.");
+    assertHasPrefix(prefixes,"1000-2-5-1",null,"x.x.x.x",7,null);
+    assertHasPrefix(prefixes,"1000-2-default",null,"",5,null);
+    assertHasPrefix(prefixes,"1001-1-1-1",null,"1.1.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1001-1-2-1",null,"1.1.1.",4,"0.1.1.1.");
+    assertHasPrefix(prefixes,"1001-1-2-2",null,"1.1.2.",4,"0.1.1.2.");
+    assertHasPrefix(prefixes,"1001-1-3-1","1.1.2.","(a)",5,"0.1.1.2.1.");
+    assertHasPrefix(prefixes,"1001-1-4-2","1.1.2.","(b)",5,"0.1.1.2.2.");
+    assertHasPrefix(prefixes,"1001-1-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1001-1-default",null,"1.1.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1001-2-2-1","1.2.","(b)",5,"0.1.2.0.2.");
+    assertHasPrefix(prefixes,"1001-2-2-2","1.2.","(c)",5,"0.1.2.0.3.");
+    assertHasPrefix(prefixes,"1002-1-1-1",null,"1.2.1.",4,"0.1.2.1.");
+    assertHasPrefix(prefixes,"1002-1-default",null,"1.2.1.",4,"0.1.2.1.");
+    assertHasPrefix(prefixes,"1003-1-1-1","1.1.","(d)",5,"0.1.0.1.4.");
+    assertHasPrefix(prefixes,"1003-1-default","1.1.","(d)",5,"0.1.0.1.4.");
+    assertHasPrefix(prefixes,"1003-2-1-1","1.2.(a)","(iv)",6,"0.1.2.0.1.4.");
+    assertHasPrefix(prefixes,"1003-2-default","1.2.(a)","(iv)",6,"0.1.2.0.1.4.");
+    assertHasPrefix(prefixes,"101-1-1-1",null,"1.2.",3,"0.1.2.");
+    assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
+    Assert.assertEquals(34, prefixes.size());
   }
 
   @Test
@@ -237,16 +274,56 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("Prefixes:\n" + result);
-    String tpresult = numbering.getAllTranscludedPrefixes().entrySet()
+    Map<String,Prefix> prefixes = numbering.getAllTranscludedPrefixes();
+    String tpresult = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("Transcluded prefixes:\n" + tpresult);
+    assertHasPrefix(prefixes,"100-1-1-1",null,"1.",2,"0.1.");
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"1.1.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"1.1.1.",4,"0.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-2-2",null,"1.1.2.",4,"0.1.1.2.");
+    assertHasPrefix(prefixes,"1000-1-3-1","1.1.2.","(a)",5,"0.1.1.2.1.");
+    assertHasPrefix(prefixes,"1000-1-4-2",null,"1.1.3.",4,"0.1.1.3.");
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",5,null);
+    assertHasPrefix(prefixes,"1000-2-1-1",null,"1.2.3.",4,"0.1.2.3.");
+    assertHasPrefix(prefixes,"1000-2-2-1","1.2.3.","(a)",5,"0.1.2.3.1.");
+    assertHasPrefix(prefixes,"1000-2-2-2","1.2.3.","(b)",5,"0.1.2.3.2.");
+    assertHasPrefix(prefixes,"1000-2-3-1","1.2.3.(b)","(i)",6,"0.1.2.3.2.1.");
+    assertHasPrefix(prefixes,"1000-2-4-2","1.2.3.","(c)",5,"0.1.2.3.3.");
+    assertHasPrefix(prefixes,"1000-2-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1001-1-1-1",null,"1.2.",3,"0.1.2.");
+    assertHasPrefix(prefixes,"1001-1-2-1",null,"1.2.1.",4,"0.1.2.1.");
+    assertHasPrefix(prefixes,"1001-1-2-2",null,"1.2.2.",4,"0.1.2.2.");
+    assertHasPrefix(prefixes,"1001-1-4-2","1.2.2.","(b)",5,"0.1.2.2.2.");
+    assertHasPrefix(prefixes,"1001-1-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1001-2-2-1","1.2.3.","(d)",5,"0.1.2.3.4.");
+    assertHasPrefix(prefixes,"1001-2-2-2","1.2.3.","(e)",5,"0.1.2.3.5.");
+    assertHasPrefix(prefixes,"1002-1-1-1","1.2.2.","(a)",5,"0.1.2.2.1.");
+    assertHasPrefix(prefixes,"1002-2-1-1","1.2.3.(e)","(i)",6,"0.1.2.3.5.1.");
+    assertHasPrefix(prefixes,"1002-3-1-1","1.2.5.","(a)",5,"0.1.2.5.1.");
+    assertHasPrefix(prefixes,"1002-4-1-1","1.3.2.","(a)",5,"0.1.3.2.1.");
+    assertHasPrefix(prefixes,"101-1-2-1",null,"1.2.4.",4,"0.1.2.4.");
+    assertHasPrefix(prefixes,"101-1-2-2",null,"1.2.5.",4,"0.1.2.5.");
+    assertHasPrefix(prefixes,"101-1-2-3",null,"1.3.",3,"0.1.3.");
+    assertHasPrefix(prefixes,"101-1-2-4",null,"1.3.1.",4,"0.1.3.1.");
+    assertHasPrefix(prefixes,"101-1-2-5",null,"1.3.2.",4,"0.1.3.2.");
+    assertHasPrefix(prefixes,"101-1-2-7","1.3.2.","(b)",5,"0.1.3.2.2.");
+    assertHasPrefix(prefixes,"101-1-2-8",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"101-1-2-9",null,"1.3.3.",4,"0.1.3.3.");
+    Assert.assertEquals(32, prefixes.size());
     String tresult = transclusions.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("Transclusions:\n" + tresult);
+    List<Long> t = transclusions.get(1001L);
+    Assert.assertNotNull(t);
+    Assert.assertEquals(2, t.size());
+    Assert.assertEquals(-1, t.get(0).longValue());
+    Assert.assertEquals(101, t.get(1).longValue());
+    Assert.assertEquals(1, transclusions.size());
   }
 
   @Test
@@ -295,11 +372,41 @@ public final class PublicationTreeTest {
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering, true);
     Tests.print(publication, 1000, 2, numbering, true);
-    String result = numbering.getAllPrefixes().entrySet()
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"100-1-1-1",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"100-1-default",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"2.",1,"2.");
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"2.1.",2,"2.1.");
+    assertHasPrefix(prefixes,"1000-1-2-2",null,"2.2.",2,"2.2.");
+    assertHasPrefix(prefixes,"1000-1-3-1",null,"2.2.1.",3,"2.2.1.");
+    assertHasPrefix(prefixes,"1000-1-4-2",null,"2.3.",2,"2.3.");
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",3,null);
+    assertHasPrefix(prefixes,"1000-1-default",null,"2.",1,"2.");
+    assertHasPrefix(prefixes,"1000-2-1-1",null,"3.4.",2,"3.4.");
+    assertHasPrefix(prefixes,"1000-2-2-1",null,"3.4.1.",3,"3.4.1.");
+    assertHasPrefix(prefixes,"1000-2-2-2",null,"3.4.2.",3,"3.4.2.");
+    assertHasPrefix(prefixes,"1000-2-3-1",null,"3.4.2.1.",4,"3.4.2.1.");
+    assertHasPrefix(prefixes,"1000-2-4-2",null,"3.4.3.",3,"3.4.3.");
+    assertHasPrefix(prefixes,"1000-2-5-1",null,"x.x.x.x",4,null);
+    assertHasPrefix(prefixes,"1000-2-default",null,"3.4.",2,"3.4.");
+    assertHasPrefix(prefixes,"1001-1-1-1",null,"3.",1,"3.");
+    assertHasPrefix(prefixes,"1001-1-2-1",null,"3.1.",2,"3.1.");
+    assertHasPrefix(prefixes,"1001-1-2-2",null,"3.2.",2,"3.2.");
+    assertHasPrefix(prefixes,"1001-1-3-1",null,"3.2.1.",3,"3.2.1.");
+    assertHasPrefix(prefixes,"1001-1-4-2",null,"3.2.2.",3,"3.2.2.");
+    assertHasPrefix(prefixes,"1001-1-5-1",null,"x.x.x.x",4,null);
+    assertHasPrefix(prefixes,"1001-1-default",null,"3.",1,"3.");
+    assertHasPrefix(prefixes,"1001-2-2-1",null,"3.4.4.",3,"3.4.4.");
+    assertHasPrefix(prefixes,"1001-2-2-2",null,"3.4.5.",3,"3.4.5.");
+    assertHasPrefix(prefixes,"101-1-1-1",null,"3.3.",2,"3.3.");
+    assertHasPrefix(prefixes,"101-1-default",null,"",2,null);
+    Assert.assertEquals(28, prefixes.size());
   }
 
   @Test
@@ -341,7 +448,14 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"x.x.x",3,null);
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",4,null);
+    assertHasPrefix(prefixes,"1000-1-default",null,"",2,null);
+    Assert.assertEquals(4, prefixes.size());
     System.out.println("unusedIds: " + unusedIds);
+    Assert.assertEquals(1, unusedIds.size());
+    Assert.assertEquals(100, unusedIds.get(0).longValue());
   }
 
   @Test
@@ -385,6 +499,24 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"1000-1-1a-1",null,"1.1.1.",3,"1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1b-1",null,"Table 1-1",2,"1.1.");
+    assertHasPrefix(prefixes,"1000-1-1c-1",null,"1.1.2.",3,"1.1.2.");
+    assertHasPrefix(prefixes,"1000-1-1d-1",null,"Table 1-2",2,"1.2.");
+    assertHasPrefix(prefixes,"1000-1-1e-1",null,"Fig 1-A",2,"1.1.");
+    assertHasPrefix(prefixes,"1000-1-1f-1",null,"Table 1-3",2,"1.3.");
+    assertHasPrefix(prefixes,"1000-1-default",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"1001-1-1-1",null,"2.",1,"2.");
+    assertHasPrefix(prefixes,"1001-1-1a-1",null,"2.1.1.",3,"2.1.1.");
+    assertHasPrefix(prefixes,"1001-1-1b-1",null,"Table 2-1",2,"2.1.");
+    assertHasPrefix(prefixes,"1001-1-1c-1",null,"2.1.2.",3,"2.1.2.");
+    assertHasPrefix(prefixes,"1001-1-1d-1",null,"Table 2-2",2,"2.2.");
+    assertHasPrefix(prefixes,"1001-1-1e-1",null,"Fig 2-A",2,"2.1.");
+    assertHasPrefix(prefixes,"1001-1-1f-1",null,"Table 2-3",2,"2.3.");
+    assertHasPrefix(prefixes,"1001-1-default",null,"2.",1,"2.");
+    Assert.assertEquals(17, prefixes.size());
   }
 
   @Test
@@ -424,6 +556,18 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"1000-1-1-1","","1.",2,"1.1.");
+    assertHasPrefix(prefixes,"1000-1-1-2","","1.1.",3,"1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1a-1","1.1.","(a)",4,"1.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1b-1","1.1.","(a)(i)",5,"1.1.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-default","","",1,"1.");
+    assertHasPrefix(prefixes,"1001-1-1-1","","1.",2,"2.1.");
+    assertHasPrefix(prefixes,"1001-1-1-2","","1.1.",3,"2.1.1.");
+    assertHasPrefix(prefixes,"1001-1-1a-1","1.1.","(a)",4,"2.1.1.1.");
+    assertHasPrefix(prefixes,"1001-1-1b-1","1.1.","(a)(i)",5,"2.1.1.1.1.");
+    assertHasPrefix(prefixes,"1001-1-default","","",1,"2.");
+    Assert.assertEquals(11, prefixes.size());
   }
 
   @Test
@@ -457,6 +601,27 @@ public final class PublicationTreeTest {
     List<Long> unusedIds = new ArrayList<>();
     FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds, new HashMap<Long,List<Long>>());
     Tests.print(publication, -1, -1, numbering, false);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-1-1",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"1-1-2-1",null,"1.1.",2,"1.1.");
+    assertHasPrefix(prefixes,"1-1-2-2",null,"1.2.",2,"1.2.");
+    assertHasPrefix(prefixes,"1-1-3-1",null,"1.2.1.1.",4,"1.2.1.1.");
+    assertHasPrefix(prefixes,"1-1-4-2",null,"1.3.",2,"1.3.");
+    assertHasPrefix(prefixes,"1-1-5-1",null,"1.3.1.1.",4,"1.3.1.1.");
+    assertHasPrefix(prefixes,"1-1-default",null,"",1,null);
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"0.1.",2,"0.1.");
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"0.1.1.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-2-2",null,"0.1.2.",3,"0.1.2.");
+    assertHasPrefix(prefixes,"1000-1-3-1","0.1.2.0.","(a)",5,"0.1.2.0.1.");
+    assertHasPrefix(prefixes,"1000-1-4-2",null,"0.1.3.",3,"0.1.3.");
+    assertHasPrefix(prefixes,"1000-1-5-1","0.1.3.0.","(a)",5,"0.1.3.0.1.");
+    assertHasPrefix(prefixes,"1000-1-default",null,"0.1.",2,"0.1.");
+    Assert.assertEquals(14, prefixes.size());
   }
 
   @Test
@@ -510,11 +675,44 @@ public final class PublicationTreeTest {
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering, true);
-    String result = numbering.getAllPrefixes().entrySet()
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"100-1-1-1",null,"a.",2,"0.1.");
+    assertHasPrefix(prefixes,"100-1-default",null,"a.",2,"0.1.");
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"a.a.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"a.a.a.",4,"0.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-2-2",null,"a.a.b.",4,"0.1.1.2.");
+    assertHasPrefix(prefixes,"1000-1-3-1","a.a.b.","(a)",5,"0.1.1.2.1.");
+    assertHasPrefix(prefixes,"1000-1-4-2",null,"a.a.c.",4,"0.1.1.3.");
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",5,null);
+    assertHasPrefix(prefixes,"1000-1-default",null,"a.a.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1000-2-1-1",null,"a.",4,"0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-2-2-1","a.","(a)",5,"0.0.0.1.1.");
+    assertHasPrefix(prefixes,"1000-2-2-2","a.","(b)",5,"0.0.0.1.2.");
+    assertHasPrefix(prefixes,"1000-2-3-1","a.(b)","(i)",6,"0.0.0.1.2.1.");
+    assertHasPrefix(prefixes,"1000-2-4-2","a.","(c)",5,"0.0.0.1.3.");
+    assertHasPrefix(prefixes,"1000-2-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1000-2-default",null,"a.",4,"0.0.0.1.");
+    assertHasPrefix(prefixes,"1001-1-1-1",null,"A.",3,"0.0.1.");
+    assertHasPrefix(prefixes,"1001-1-2-1",null,"A.A.",4,"0.0.1.1.");
+    assertHasPrefix(prefixes,"1001-1-2-2",null,"A.B.",4,"0.0.1.2.");
+    assertHasPrefix(prefixes,"1001-1-3-1","A.B.","(a)",5,"0.0.1.2.1.");
+    assertHasPrefix(prefixes,"1001-1-4-2","A.B.","(b)",5,"0.0.1.2.2.");
+    assertHasPrefix(prefixes,"1001-1-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1001-1-default",null,"A.",3,"0.0.1.");
+    assertHasPrefix(prefixes,"1001-2-2-1","","(a)",5,"0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1001-2-2-2","","(b)",5,"0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1002-1-1-1",null,"a.b.",3,"0.1.2.");
+    assertHasPrefix(prefixes,"1002-1-2-1",null,"a.b.a.",4,"0.1.2.1.");
+    assertHasPrefix(prefixes,"1002-1-default",null,"a.b.",3,"0.1.2.");
+    assertHasPrefix(prefixes,"101-1-1-1",null,"1.",3,"0.0.1.");
+    assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
+    Assert.assertEquals(31, prefixes.size());
   }
 
   @Test
@@ -588,11 +786,53 @@ public final class PublicationTreeTest {
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering, true);
     tree.print(System.out);
-    String result = numbering.getAllPrefixes().entrySet()
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"100-1-1-1",null,"1.1.",2,"1.1.");
+    assertHasPrefix(prefixes,"100-1-default",null,"1.1.",2,"1.1.");
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"1.1.1.",3,"1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1a-1",null,"1.1.1.1.",4,"1.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1b-1","1.1.1.1.","(a)",5,"1.1.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1c-1",null,"x",4,null);
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"1.1.1.2.",4,"1.1.1.2.");
+    assertHasPrefix(prefixes,"1000-1-3-2",null,"1.1.1.3.",4,"1.1.1.3.");
+    assertHasPrefix(prefixes,"1000-1-3a-1","1.1.1.3.","(a)",5,"1.1.1.3.1.");
+    assertHasPrefix(prefixes,"1000-1-3a-2","1.1.1.3.(a)","(i)",6,"1.1.1.3.1.1.");
+    assertHasPrefix(prefixes,"1000-1-3b-1","1.1.1.3.","(b)",5,"1.1.1.3.2.");
+    assertHasPrefix(prefixes,"1000-1-4-2",null,"1.1.1.4.",4,"1.1.1.4.");
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",5,null);
+    assertHasPrefix(prefixes,"1000-1-default",null,"1.1.1.",3,"1.1.1.");
+    assertHasPrefix(prefixes,"1000-2-1-1",null,"1.1.3.1.",4,"1.1.3.1.");
+    assertHasPrefix(prefixes,"1000-2-1a-1","1.1.3.1.","(a)",5,"1.1.3.1.1.");
+    assertHasPrefix(prefixes,"1000-2-1b-1","1.1.3.1.(a)","(i)",6,"1.1.3.1.1.1.");
+    assertHasPrefix(prefixes,"1000-2-1c-1",null,"x",5,null);
+    assertHasPrefix(prefixes,"1000-2-3a-1","1.1.3.1.(a)","(ii)",6,"1.1.3.1.1.2.");
+    assertHasPrefix(prefixes,"1000-2-3a-2","1.1.3.1.(a)(ii)","(A)",7,"1.1.3.1.1.2.1.");
+    assertHasPrefix(prefixes,"1000-2-3b-1","1.1.3.1.(a)","(iii)",6,"1.1.3.1.1.3.");
+    assertHasPrefix(prefixes,"1000-2-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1000-2-default",null,"1.1.3.1.",4,"1.1.3.1.");
+    assertHasPrefix(prefixes,"1001-1-1-1",null,"1.1.2.",3,"1.1.2.");
+    assertHasPrefix(prefixes,"1001-1-1a-1",null,"1.1.2.1.",4,"1.1.2.1.");
+    assertHasPrefix(prefixes,"1001-1-1b-1","1.1.2.1.(a)","(i)",6,"1.1.2.1.1.1.");
+    assertHasPrefix(prefixes,"1001-1-2-1",null,"1.1.2.2.",4,"1.1.2.2.");
+    assertHasPrefix(prefixes,"1001-1-2-2",null,"1.1.2.3.",4,"1.1.2.3.");
+    assertHasPrefix(prefixes,"1001-1-default",null,"1.1.2.",3,"1.1.2.");
+    assertHasPrefix(prefixes,"1001-2-1-1",null,"1.1.3.2.",4,"1.1.3.2.");
+    assertHasPrefix(prefixes,"1001-2-1a-1","1.1.3.2.","(a)",5,"1.1.3.2.1.");
+    assertHasPrefix(prefixes,"1001-2-1b-1","1.1.3.2.(a)(i)","(A)",7,"1.1.3.2.1.1.1.");
+    assertHasPrefix(prefixes,"1001-2-default",null,"1.1.3.2.",4,"1.1.3.2.");
+    assertHasPrefix(prefixes,"101-1-1-1",null,"1.1.3.",3,"1.1.3.");
+    assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
+    assertHasPrefix(prefixes,"102-1-1-1",null,"1.1.4.",3,"1.1.4.");
+    assertHasPrefix(prefixes,"102-1-1-2",null,"1.1.5.",3,"1.1.5.");
+    assertHasPrefix(prefixes,"102-1-1-3",null,"1.1.6.",3,"1.1.6.");
+    assertHasPrefix(prefixes,"102-1-default",null,"",2,null);
+    Assert.assertEquals(40, prefixes.size());
   }
 
   @Test
@@ -656,11 +896,45 @@ public final class PublicationTreeTest {
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering, true);
     tree.print(System.out);
-    String result = numbering.getAllPrefixes().entrySet()
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"100-1-1-1",null,"1.",2,"0.1.");
+    assertHasPrefix(prefixes,"100-1-default",null,"1.",2,"0.1.");
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"1.1.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1b-1",null,"1.2.",3,"0.1.2.");
+    assertHasPrefix(prefixes,"1000-1-1c-1",null,"x",2,null);
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"1.2.1.",4,"0.1.2.1.");
+    assertHasPrefix(prefixes,"1000-1-3-2",null,"1.2.2.",4,"0.1.2.2.");
+    assertHasPrefix(prefixes,"1000-1-3a-1",null,"1.2.3.",4,"0.1.2.3.");
+    assertHasPrefix(prefixes,"1000-1-3a-2","1.2.3.","(a)",5,"0.1.2.3.1.");
+    assertHasPrefix(prefixes,"1000-1-3b-1",null,"1.3.",3,"0.1.3.");
+    assertHasPrefix(prefixes,"1000-1-4-2",null,"1.3.1.",4,"0.1.3.1.");
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",5,null);
+    assertHasPrefix(prefixes,"1000-1-default",null,"1.1.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1000-2-1-1",null,"1.5.1.",4,"0.1.5.1.");
+    assertHasPrefix(prefixes,"1000-2-1b-1",null,"1.6.",3,"0.1.6.");
+    assertHasPrefix(prefixes,"1000-2-1c-1",null,"x",2,null);
+    assertHasPrefix(prefixes,"1000-2-3a-1",null,"1.6.1.",4,"0.1.6.1.");
+    assertHasPrefix(prefixes,"1000-2-3a-2","1.6.1.","(a)",5,"0.1.6.1.1.");
+    assertHasPrefix(prefixes,"1000-2-3b-1",null,"1.7.",3,"0.1.7.");
+    assertHasPrefix(prefixes,"1000-2-5-1",null,"x.x.x.x",6,null);
+    assertHasPrefix(prefixes,"1000-2-default",null,"1.5.1.",4,"0.1.5.1.");
+    assertHasPrefix(prefixes,"1001-1-1-1",null,"1.4.",3,"0.1.4.");
+    assertHasPrefix(prefixes,"1001-1-1b-1",null,"1.4.1.",4,"0.1.4.1.");
+    assertHasPrefix(prefixes,"1001-1-2-1",null,"1.4.2.",4,"0.1.4.2.");
+    assertHasPrefix(prefixes,"1001-1-2-2",null,"1.4.3.",4,"0.1.4.3.");
+    assertHasPrefix(prefixes,"1001-1-default",null,"1.4.",3,"0.1.4.");
+    assertHasPrefix(prefixes,"1001-2-1-1",null,"1.7.1.",4,"0.1.7.1.");
+    assertHasPrefix(prefixes,"1001-2-1b-1",null,"1.7.2.",4,"0.1.7.2.");
+    assertHasPrefix(prefixes,"1001-2-default",null,"1.7.1.",4,"0.1.7.1.");
+    assertHasPrefix(prefixes,"101-1-1-1",null,"1.5.",3,"0.1.5.");
+    assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
+    Assert.assertEquals(32, prefixes.size());
   }
 
   @Test
@@ -713,8 +987,14 @@ public final class PublicationTreeTest {
     long pend = System.currentTimeMillis();
     System.out.println("Number of prefixes: " + prefixes.size());
     System.out.println("Number of transclude prefixes: " + numbering.getAllTranscludedPrefixes().size());
-    System.out.println("Generation time: " + (end - start));
-    System.out.println("Print time: " + (pend - pstart));
+    long gtime = end - start;
+    long ptime = pend - pstart;
+    System.out.println("Generation time: " + gtime);
+    System.out.println("Print time: " + ptime);
+    Assert.assertEquals(10501, prefixes.size());
+    Assert.assertEquals(10000, numbering.getAllTranscludedPrefixes().size());
+    Assert.assertTrue(gtime < 400);
+    Assert.assertTrue(ptime < 40);
   }
 
   @Test(expected = IllegalStateException.class)
@@ -805,6 +1085,19 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    Assert.assertEquals(1, prefixes.size());
+//    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+//    String code = prefixes.entrySet()
+//        .stream().sorted(Map.Entry.comparingByKey())
+//        .map(entry -> "assertHasPrefix(prefixes,\"" + entry.getKey() + "\"," +
+//            (entry.getValue().parentNumber == null ? "null" : "\"" + entry.getValue().parentNumber + "\"") + ",\"" +
+//            entry.getValue().value + "\"," +
+//            entry.getValue().level + "," +
+//            (entry.getValue().canonical == null ? "null" : "\"" + entry.getValue().canonical + "\"") + ");")
+//        .collect(Collectors.joining("\n"));
+//    System.out.println(code);
+//    System.out.println("Assert.assertEquals(" + prefixes.size() + ", prefixes.size());");
   }
 
 
@@ -817,5 +1110,24 @@ public final class PublicationTreeTest {
     }
   }
 
+  /**
+   * Asserts that a prefix has a specified key in the map.
+   *
+   * @param prefixes   the map of prefixes
+   * @param key        the map key
+   * @param parent     the parent number (optional)
+   * @param val        the prefix value
+   * @param lvl        the heading/para level
+   * @param canonic    the canonical numbering (optional)
+   */
+  public static void assertHasPrefix(Map<String,Prefix> prefixes, String key,
+      @Nullable String parent, String val, int lvl, @Nullable String canonic) {
+    Prefix p = prefixes.get(key);
+    Assert.assertNotNull(p);
+    Assert.assertEquals(parent, p.parentNumber);
+    Assert.assertEquals(val, p.value);
+    Assert.assertEquals(lvl, p.level);
+    Assert.assertEquals(canonic, p.canonical);
+  }
 
 }
