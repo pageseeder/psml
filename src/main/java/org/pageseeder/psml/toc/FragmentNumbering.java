@@ -422,7 +422,7 @@ public final class FragmentNumbering implements Serializable {
   public Prefix getPrefix(long uriid, int position) {
     Prefix pref = this.numbering.get(uriid + "-" + position + "-default");
     if (pref == null) {
-      LOGGER.warn("Numbering not found for uriid: {}, position: {}, fragment default",
+      LOGGER.debug("Numbering not found for uriid: {}, position: {}, fragment default",
           uriid, position);
     }
     return pref;
@@ -444,7 +444,7 @@ public final class FragmentNumbering implements Serializable {
     }
     Prefix pref = this.numbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
     if (pref == null) {
-      LOGGER.warn("Numbering not found for uriid: {}, position: {}, fragment: {}, index: {}",
+      LOGGER.debug("Numbering not found for uriid: {}, position: {}, fragment: {}, index: {}",
           uriid, position, fragment, index);
     }
     return pref;
@@ -463,7 +463,7 @@ public final class FragmentNumbering implements Serializable {
   public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index) {
     Prefix pref = this.transcludedNumbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
     if (pref == null) {
-      LOGGER.warn("Numbering not found for uriid: {}, position: {}, fragment: {}, index: {}",
+      LOGGER.debug("Numbering not found for uriid: {}, position: {}, fragment: {}, index: {}",
           uriid, position, fragment, index);
     }
     return pref;
