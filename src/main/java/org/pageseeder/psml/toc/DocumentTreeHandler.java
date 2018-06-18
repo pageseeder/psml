@@ -279,8 +279,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private void startReverseRef(Attributes attributes) {
     String type = getString(attributes, "forwardtype", "none");
     Long ref = getLong(attributes, "uriid");
-    // Only add embed/transclude references that haven't been added yet
-    if ("embed".equals(type) || "transclude".equals(type)) {
+    // Only add embed references that haven't been added yet
+    if ("embed".equals(type)) {
       this._tree.addReverseReferenceIfNew(ref);
     }
   }
