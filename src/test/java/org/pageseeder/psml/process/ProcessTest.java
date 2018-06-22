@@ -32,6 +32,7 @@ import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
+import org.pageseeder.psml.process.config.ErrorHandling;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.config.XRefsTransclude;
 import org.pageseeder.psml.process.config.XSLTTransformation;
@@ -507,7 +508,6 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
-    p.setFailOnError(false);
     p.process();
 
     // check result
@@ -543,6 +543,9 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
+    ErrorHandling error = new ErrorHandling();
+    error.setXrefAmbiguous(true);
+    p.setError(error);
     p.process();
   }
 
@@ -561,7 +564,6 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
-    p.setFailOnError(false);
     p.process();
 
     // check result
@@ -599,6 +601,9 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
+    ErrorHandling error = new ErrorHandling();
+    error.setXrefAmbiguous(true);
+    p.setError(error);
     p.process();
   }
 

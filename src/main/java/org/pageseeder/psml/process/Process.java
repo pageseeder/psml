@@ -245,7 +245,7 @@ public final class Process {
   public void setError(ErrorHandling err) {
     if (err == null) return;
     this.error = err;
-    if (this.error.getImageNotFound() || this.error.getXrefNotFound())
+    if (this.error.getImageNotFound() || this.error.getXrefNotFound() || this.error.getXrefAmbiguous())
       this.processXML = true;
   }
 
@@ -580,6 +580,7 @@ public final class Process {
       PSMLProcessHandler2 handler2 = new PSMLProcessHandler2(new OutputStreamWriter(fos, UTF8), relPath);
       handler2.setLogger(this.logger);
       handler2.setFailOnError(this.failOnError);
+      handler2.setErrorOnAmbiguous(this.error == null ? false : this.error.getXrefAmbiguous());
       handler2.setHierarchyUriFragIDs(handler1.getHierarchyUriFragIDs());
       handler2.setRelativiseImagePaths(imageSrc == ImageSrc.LOCATION);
       // generate numbering

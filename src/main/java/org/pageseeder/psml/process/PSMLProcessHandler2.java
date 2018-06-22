@@ -95,6 +95,11 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   private boolean failOnError = false;
 
   /**
+   *  Whether to raise an error when an XRef target is ambiguous.
+   */
+  private boolean errorOnAmbiguous = false;
+
+  /**
    * If the images path should be rewritten to permalinks.
    */
   private boolean relativiseImagePaths = true;
@@ -193,6 +198,13 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    */
   public void setFailOnError(boolean failonerror) {
     this.failOnError = failonerror;
+  }
+
+  /**
+   * @param error whether to raise an error when an XRef target is ambiguous.
+   */
+  public void setErrorOnAmbiguous(boolean error) {
+    this.errorOnAmbiguous = error;
   }
 
   /**
@@ -622,8 +634,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         String message = "Internal link pointing to URI "+uriid+
             " fragment "+frag+" is ambiguous because this content appears in multiple locations (see Dev > References check for "+
             this.sourceRelativePath+").";
-        if (this.failOnError) throw new ProcessException(message);
-        else this.logger.error(message);
+        if (this.errorOnAmbiguous) {
+          if (this.failOnError) throw new ProcessException(message);
+          else this.logger.error(message);
+        } else {
+          this.logger.warn(message);
+        }
       }
       this.xrefTargetPosition = global_count;
       if ("default".equals(frag)) return "#" + (global_count != 1 ? global_count + "_" : "") + uriid;
