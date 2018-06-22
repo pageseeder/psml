@@ -1063,16 +1063,26 @@ public final class PublicationTreeTest {
     tree = tree.normalize(TitleCollapse.auto);
     Tests.print(tree);
     System.out.println(tree.listReverseReferences());
-    String headings = tree.fragmentheadings().entrySet()
+    Map<String, String> fheadings = tree.fragmentheadings();
+    String headings = fheadings.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("HEADINGS\n" + headings);
-    String levels = tree.fragmentlevels().entrySet()
+    Assert.assertEquals("Test doc 1", fheadings.get("1"));
+    Assert.assertEquals("My link", fheadings.get("3"));
+    Assert.assertEquals("Related", fheadings.get("content"));
+    Assert.assertEquals(3, fheadings.size());
+    Map<String, Integer> flevels = tree.fragmentlevels();
+    String levels = flevels.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("LEVELS\n" + levels);
+    Assert.assertEquals(Integer.valueOf(0), flevels.get("1"));
+    Assert.assertEquals(Integer.valueOf(2), flevels.get("2"));
+    Assert.assertEquals(Integer.valueOf(2), flevels.get("3"));
+    Assert.assertEquals(3, fheadings.size());
     PublicationTree publication = new PublicationTree(tree);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering

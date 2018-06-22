@@ -131,6 +131,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startDocument(attributes);
     } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
+    } else if (isElement("property")) {
+      startProperty(attributes);
     } else if (isElement("para")) {
       startPara(attributes);
     } else if (isAny("fragment", "xref-fragment", "properties-fragment", "media-fragment")) {
@@ -282,6 +284,22 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     // Only add embed references that haven't been added yet
     if ("embed".equals(type)) {
       this._tree.addReverseReferenceIfNew(ref);
+    }
+  }
+
+  /**
+   * Found `property` element
+   *
+   * @param attributes The attributes
+   */
+  private void startProperty(Attributes attributes) {
+    String value = attributes.getValue("value");
+    if (value != null) {
+      if (this.firstHeading) {
+        // set first property value as heading
+        this._tree.putFragmentHeading(this.fragment, value);
+        this.firstHeading = false;
+      }
     }
   }
 

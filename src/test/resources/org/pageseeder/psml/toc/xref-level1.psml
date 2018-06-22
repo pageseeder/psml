@@ -47,5 +47,8 @@
   <section>
     <title>Related</title>
     <xref-fragment id="2"/>
+    <properties-fragment id="3">
+      <property name="link-text" title="Link text" value="My link" />
+    </properties-fragment>
   </section>
 </document>
