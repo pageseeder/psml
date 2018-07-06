@@ -1803,7 +1803,7 @@
         and must be URL encoded (overrides docid and uriid).</xs:documentation>
       </xs:annotation>
     </xs:attribute>
-    <xs:attribute name="config" type="xs:string">
+    <xs:attribute name="config" type="xref-config">
       <xs:annotation>
         <xs:documentation>The name of an XRef configuration used when creating/editing this XRef.</xs:documentation>
       </xs:annotation>
@@ -1960,6 +1960,12 @@
   <xs:simpleType name="label-list">
     <xs:restriction base="xs:string">
       <xs:pattern value="[a-zA-Z0-9_\-,]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="xref-config">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9\-_]+"/>
     </xs:restriction>
   </xs:simpleType>
 
