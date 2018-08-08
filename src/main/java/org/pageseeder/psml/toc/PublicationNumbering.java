@@ -23,7 +23,7 @@ public final class PublicationNumbering {
    *
    * @author Philip Rutherford
    */
-  private enum NumberType {
+  protected enum NumberType {
 
     /** decimal number **/
     DECIMAL,
@@ -141,12 +141,10 @@ public final class PublicationNumbering {
       "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
   /** The lowercase roman numerals, for convenience */
   private static final String[] LOWERCASE_ROMAN_ALPHABET = new String[] { "i",
-      "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii",
-      "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx" };
+      "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"};
   /** The uppercase roman numerals, for convenience */
   private static final String[] UPPERCASE_ROMAN_ALPHABET = new String[] { "I",
-      "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII",
-      "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" };
+      "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
 
   /**
    * Numbering of skipped levels
@@ -363,13 +361,25 @@ public final class PublicationNumbering {
    *
    * @return the numbering computed
    */
-  private static String numbering(int value, NumberType type) {
+  protected static String numbering(int value, NumberType type) {
     if (value == 0 || type == NumberType.DECIMAL)  return String.valueOf(value);
-    if (type == NumberType.LOWERALPHA)             return LOWERCASE_ALPHABET[value-1];
-    if (type == NumberType.UPPERALPHA)             return UPPERCASE_ALPHABET[value-1];
-    if (type == NumberType.LOWERROMAN)             return LOWERCASE_ROMAN_ALPHABET[value-1];
-    if (type == NumberType.UPPERROMAN)             return UPPERCASE_ROMAN_ALPHABET[value-1];
-    return String.valueOf(value);
+    String[] numbers = null;
+    if (type == NumberType.LOWERALPHA) numbers = LOWERCASE_ALPHABET;
+    else if (type == NumberType.UPPERALPHA) numbers = UPPERCASE_ALPHABET;
+    else if (type == NumberType.LOWERROMAN) numbers = LOWERCASE_ROMAN_ALPHABET;
+    else if (type == NumberType.UPPERROMAN) numbers = UPPERCASE_ROMAN_ALPHABET;
+    else return String.valueOf(value);
+    StringBuilder number = new StringBuilder();
+    while (value > 0) {
+      int digit = value % numbers.length;
+      if (digit == 0) digit = numbers.length;
+      number.insert(0, numbers[digit - 1]);
+      value -= digit;
+      if (value > 0 && type != NumberType.LOWERROMAN && type != NumberType.UPPERROMAN) {
+        value = value / numbers.length;
+      }
+    }
+    return number.toString();
   }
 
 }
