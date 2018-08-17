@@ -124,6 +124,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void startElement(String element, Attributes attributes) {
+    if (this.hasAncestor("fragmentinfo") || this.hasAncestor("metadata")) return;
     if ("blockxref".equals(element)) {
       this._blockxrefs.push("transclude".equals(attributes.getValue("type")));
     }
@@ -305,6 +306,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void endElement(String element) {
+    if (this.hasAncestor("fragmentinfo") || this.hasAncestor("metadata")) return;
     if ("heading".equals(element) || (isElement("title") && isParent("section"))) {
       // Set the title of the current part (top of stack)
       Heading heading = this.currentHeading;
