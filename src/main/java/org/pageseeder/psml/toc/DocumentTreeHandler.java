@@ -69,6 +69,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private boolean firstHeading = false;
 
   /**
+   * Whether to ignore elements (used for compare and metadata content).
+   */
+  private boolean ignore = false;
+
+  /**
    * The content tree being built.
    */
   private final DocumentTree.Builder _tree;
@@ -124,11 +129,13 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void startElement(String element, Attributes attributes) {
-    if (this.hasAncestor("fragmentinfo") || this.hasAncestor("metadata")) return;
+    if (this.ignore) return;
     if ("blockxref".equals(element)) {
       this._blockxrefs.push("transclude".equals(attributes.getValue("type")));
     }
-    if (isElement("document")) {
+    if (isElement("fragmentinfo") || isElement("metadata")) {
+      this.ignore = true;
+    } else if (isElement("document")) {
       startDocument(attributes);
     } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
@@ -306,7 +313,10 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void endElement(String element) {
-    if (this.hasAncestor("fragmentinfo") || this.hasAncestor("metadata")) return;
+    if (isElement("fragmentinfo") || isElement("metadata")) {
+      this.ignore = false;
+    }
+    if (this.ignore) return;
     if ("heading".equals(element) || (isElement("title") && isParent("section"))) {
       // Set the title of the current part (top of stack)
       Heading heading = this.currentHeading;
