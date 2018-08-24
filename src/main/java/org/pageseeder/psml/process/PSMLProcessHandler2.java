@@ -468,7 +468,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       this.lastXRefTransclude = "transclude".equals(atts.getValue("type"));
     // else handle xref template
     } else if ("xref".equals(qName) && "template".equals(atts.getValue("display"))
-        && !this.elements.contains("compare") && this.numberingAndTOC != null) {
+        && this.numberingAndTOC != null) {
       // only title with the right tokens
       String title = atts.getValue("title");
       if (title != null && title.matches(".*?((\\{prefix})|(\\{heading})|(\\{parentnumber})).*?")) {

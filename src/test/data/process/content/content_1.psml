@@ -31,7 +31,12 @@
       <compare>
         <content>
           <fragment id="2">
-            <heading level="2" numbered="true">My second heading</heading>
+            <heading level="2" numbered="true">My second heading
+              <xref id="39456" frag="1" reversefrag="2"
+        reversetitle="References" reverselink="true" reversetype="none"
+        display="template" title="{parentnumber}{prefix} {heading}"
+        type="none" uriid="21934" href="content_3.psml"
+        urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx x</xref></heading>
           </fragment>
         </content>
       </compare>
