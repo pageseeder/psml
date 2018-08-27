@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="69152" schemaversion="0.12" type="references"
+  date="2018-08-27T13:58:12+10:00" version="current" level="portable">
+  <documentinfo>
+    <uri id="69152" scheme="http" host="localhost" port="80"
+      path="/ps/test/local2/documents/compare/compare_ref.psml"
+      decodedpath="/ps/test/local2/documents/compare/compare_ref.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      documenttype="references" created="2018-08-27T13:53:26+10:00"
+      modified="2018-08-27T13:58:12+10:00" title="Compare Ref">
+      <displaytitle>Compare Ref</displaytitle>
+    </uri>
+    <versions>
+      <version id="156709" name="1.0" created="2018-08-27T13:58:12+10:00"
+        publicationid="compare1">
+        <author id="1" firstname="Philip" surname="Rutherford">
+          <fullname>Philip Rutherford</fullname>
+        </author>
+      </version>
+    </versions>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="55792" fragment="2" editid="156694"
+      modified="2018-08-27T13:54:19+10:00" />
+  </fragmentinfo>
+  <metadata />
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Compare Ref</heading>
+    </fragment>
+  </section>
+  <toc />
+  <section id="xrefs">
+    <xref-fragment id="2">
+      <blockxref id="156691" frag="default" reversefrag="2"
+        reversetitle="" reverselink="true" reversetype="none" display="document"
+        type="embed" uriid="69153" href="compare_1.psml" urititle="Compare 1"
+        mediatype="application/vnd.pageseeder.psml+xml">Compare 1</blockxref>
+      <blockxref id="156692" frag="default" reversefrag="2"
+        reversetitle="" reverselink="true" reversetype="none" display="document"
+        type="embed" uriid="69154" href="compare_2.psml" urititle="Compare 2"
+        mediatype="application/vnd.pageseeder.psml+xml">Compare 2</blockxref>
+      <blockxref id="156693" frag="default" reversefrag="2"
+        reversetitle="" reverselink="true" reversetype="none" display="document"
+        type="embed" uriid="69153" href="compare_1.psml" urititle="Compare 1"
+        mediatype="application/vnd.pageseeder.psml+xml">Compare 1</blockxref>
+    </xref-fragment>
+  </section>
+</document>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="69154" schemaversion="0.12" date="2018-08-27T14:49:29+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="69154" scheme="http" host="localhost" port="80"
+      path="/ps/test/local2/documents/compare/compare_2.psml"
+      decodedpath="/ps/test/local2/documents/compare/compare_2.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2018-08-27T13:53:54+10:00" modified="2018-08-27T14:49:29+10:00"
+      title="Compare 2">
+      <displaytitle>Compare 2</displaytitle>
+    </uri>
+    <versions>
+      <version id="156708" name="1.0" created="2018-08-27T13:58:12+10:00"
+        publicationid="compare1">
+        <author id="1" firstname="Philip" surname="Rutherford">
+          <fullname>Philip Rutherford</fullname>
+        </author>
+      </version>
+    </versions>
+    <reversexrefs>
+      <reversexref uriid="69152" href="compare_ref.psml"
+        frag="2" urititle="Compare Ref" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="references" id="156692" title="" type="none"
+        forwardtype="embed" forwarddisplay="document" forwardfrag="default" />
+      <reversexref uriid="69153" href="compare_1.psml" frag="3"
+        urititle="Compare 1" mediatype="application/vnd.pageseeder.psml+xml"
+        id="156718" title="" type="none" forwardtype="transclude"
+        forwarddisplay="document" forwardfrag="default" level="1" />
+    </reversexrefs>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="55797" fragment="1" editid="156715"
+      modified="2018-08-27T14:46:11+10:00">
+      <reversexrefs>
+        <reversexref uriid="69154" href="compare_2.psml"
+          frag="2" urititle="Compare 2" mediatype="application/vnd.pageseeder.psml+xml"
+          id="156722" title="" type="none" forwardtype="none"
+          forwardtitle="{prefix} {heading}" forwarddisplay="template"
+          forwardfrag="1" />
+      </reversexrefs>
+    </locator>
+    <locator id="55794" fragment="2" editid="156723"
+      modified="2018-08-27T14:49:28+10:00">
+      <reversexrefs>
+        <reversexref uriid="69153" href="compare_1.psml"
+          frag="2" urititle="Compare 1" mediatype="application/vnd.pageseeder.psml+xml"
+          id="156701" title="" type="none" forwardtype="transclude"
+          forwarddisplay="document" forwardfrag="2" />
+      </reversexrefs>
+    </locator>
+  </fragmentinfo>
+  <metadata />
+  <section id="title">
+    <fragment id="1">
+      <heading level="1" numbered="true">Compare 2</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>
+        Some more content, see
+        <xref id="156722" title="{prefix} {heading}" frag="1"
+          reversefrag="2" reversetitle="" reverselink="true"
+          reversetype="none" display="template" type="none" uriid="69154"
+          href="compare_2.psml" urititle="Compare 2"
+          mediatype="application/vnd.pageseeder.psml+xml">x x</xref>
+        .
+      </para>
+    </fragment>
+  </section>
+</document>

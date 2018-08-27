@@ -270,6 +270,13 @@ public final class FragmentNumbering implements Serializable {
       processParagraph((Paragraph)element, paralevel, id, number, count, location);
     } else if (element instanceof TransclusionEnd) {
       location.transclusions--;
+      // reset location after top level transclusion
+      if (location.transclusions == 0) {
+        location.uriid = id;
+        location.position = count;
+        location.fragment = Element.NO_FRAGMENT;
+        location.index = 0;
+      }
     }
 
     // Expand found reference

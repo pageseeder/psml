@@ -1110,6 +1110,38 @@ public final class PublicationTreeTest {
 //    System.out.println("Assert.assertEquals(" + prefixes.size() + ", prefixes.size());");
   }
 
+  @Test
+  public void testParseCompareRef() throws SAXException, IOException {
+    DocumentTree root = parse(69152, "compare_ref.psml").normalize(TitleCollapse.always);
+    DocumentTree tree1 = parse(69153, "compare_1.psml").normalize(TitleCollapse.always);
+    DocumentTree tree2 = parse(69154, "compare_2.psml").normalize(TitleCollapse.always);
+    //tree1.print(System.out);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(tree1);
+    publication = publication.add(tree2);
+    PublicationConfig config = Tests.parseConfig("publication-config.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering, true);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+    assertHasPrefix(prefixes,"69152-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"69153-1-1-1",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"69153-1-3-1",null,"1.1.",2,"1.1.");
+    assertHasPrefix(prefixes,"69153-1-default",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"69153-2-1-1",null,"3.",1,"3.");
+    assertHasPrefix(prefixes,"69153-2-3-1",null,"3.1.",2,"3.1.");
+    assertHasPrefix(prefixes,"69153-2-default",null,"3.",1,"3.");
+    assertHasPrefix(prefixes,"69154-2-1-1",null,"1.1.1.",3,"1.1.1.");
+    assertHasPrefix(prefixes,"69154-3-1-1",null,"2.",1,"2.");
+    assertHasPrefix(prefixes,"69154-3-default",null,"2.",1,"2.");
+    assertHasPrefix(prefixes,"69154-5-1-1",null,"3.1.1.",3,"3.1.1.");
+    Assert.assertEquals(11, prefixes.size());
+  }
 
   private static void assertValidPublication(PublicationTree publication) {
     try {
