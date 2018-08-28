@@ -189,10 +189,13 @@ public final class Reference extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count, boolean numbered, String prefix) throws IOException {
+  public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count, boolean numbered, String prefix, boolean children) throws IOException {
     toXMLNoClose(xml, level, count);
     if (numbered) {
       xml.attribute("numbered", "true");
+    }
+    if (children) {
+      xml.attribute("children", "true");
     }
     if (numbered && number != null) {
       Prefix pref = number.getPrefix(treeid, count);

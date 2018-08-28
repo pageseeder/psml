@@ -39,6 +39,7 @@
   <xs:attribute name="prefix"         type="xs:string"/>  
   <xs:attribute name="numbered"       type="xs:boolean"/>
   <xs:attribute name="position"       type="xs:integer"/>
+  <xs:attribute name="children"       type="xs:boolean"/>
 </xs:complexType>
 
 <xs:complexType name="heading-ref">

@@ -441,10 +441,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       }
       if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
-          if (output) element.toXML(xml, level, state.number, next, nextcount, nextTree.numbered(), nextTree.prefix());
+          if (output) element.toXML(xml, level, state.number, next, nextcount,
+              nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null));
         } else {
           // single embedded fragments can't be numbered
-          if (output) element.toXML(xml, level, state.number, id, count);
+          if (output) element.toXML(xml, level, state.number, id, count,
+              false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment));
         }
       }
     } else if (element instanceof Reference && !state.externalrefs) {

@@ -151,10 +151,12 @@ public abstract class Element implements Serializable, XMLWritable {
    * @param count    The position (occurrence number) of the document in the publication.
    * @param numbered Whether the heading is auto-numbered
    * @param prefix   Any prefix given to the title.
+   * @param content  Whether this TOC element has children
    *
    * @throws IOException Should an I/O error occur
    */
-  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count, boolean numbered, String prefix) throws IOException {
+  public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
+      boolean numbered, String prefix, boolean children) throws IOException {
     toXML(xml, level, number, treeid, count);
   }
 

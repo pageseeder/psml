@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
 
@@ -251,6 +252,20 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
+   * Check if this tree contains a heading or embed reference.
+   *
+   * @param fragment  The fragment for the heading or reference (optional)
+   *
+   * @return <code>true</code> if heading or reference found.
+   */
+  public boolean hasHeadingOrReferences(@Nullable String fragment) {
+    for (Part<?> c : this._parts) {
+      if (hasHeadingOrReferences(c, fragment)) return true;
+    }
+    return false;
+  }
+
+  /**
    * Collect the list of URI IDs from the references in this tree.
    *
    * @param part The part to collect from.
@@ -285,6 +300,27 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     for (Part<?> c : part.parts()) {
       collectReferences(c, refs);
     }
+  }
+
+  /**
+   * Check if this part or it's children has a heading or embed reference.
+   *
+   * @param part      The part to check.
+   * @param fragment  The fragment for the heading or reference (optional)
+   *
+   * @return <code>true</code> if heading or reference found.
+   */
+  private static boolean hasHeadingOrReferences(Part<?> part, @Nullable String fragment) {
+    Element element = part.element();
+    if (((element instanceof Reference && Reference.Type.EMBED.equals(((Reference)element).type())) ||
+          element instanceof Heading) &&
+        (fragment == null || fragment.equals(element.fragment()))) {
+      return true;
+    }
+    for (Part<?> c : part.parts()) {
+      if (hasHeadingOrReferences(c, fragment)) return true;
+    }
+    return false;
   }
 
   /**
