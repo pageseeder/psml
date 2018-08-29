@@ -15,12 +15,12 @@ public final class IncludesExcludesMatcher {
   /**
    * A list of patterns matching documents' paths to exclude.
    */
-  private final List<String> excludePatterns = new ArrayList<String>();
+  private final List<String> excludePatterns = new ArrayList<>();
 
   /**
    * A list of patterns matching documents' paths to include.
    */
-  private final List<String> includePatterns = new ArrayList<String>();
+  private final List<String> includePatterns = new ArrayList<>();
 
   /**
    * Adds some patterns to include.
@@ -135,6 +135,8 @@ public final class IncludesExcludesMatcher {
       for (String inc : this.includePatterns) {
         if (path.matches(inc)) return true;
       }
+    } else {
+      return true;
     }
     // if we're here then none of the matchers matched so no good!
     return false;
