@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="69158" schemaversion="0.12" date="2018-08-28T16:57:34+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="69158" scheme="http" host="localhost" port="80"
+      path="/ps/test/local2/documents/compare/compare_3.psml"
+      decodedpath="/ps/test/local2/documents/compare/compare_3.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2018-08-28T16:56:24+10:00" modified="2018-08-28T16:57:34+10:00"
+      title="Compare 3">
+      <displaytitle>Compare 3</displaytitle>
+    </uri>
+    <versions>
+      <version id="156752" name="1.0" created="2018-08-28T16:57:10+10:00">
+        <author id="1" firstname="Philip" surname="Rutherford">
+          <fullname>Philip Rutherford</fullname>
+        </author>
+      </version>
+    </versions>
+    <compareto version="1.0" date="2018-08-28T16:57:10+10:00">
+      <title>Compare 3</title>
+      <structure>
+        <section-ref id="title">
+          <fragment-ref id="1" />
+        </section-ref>
+        <section-ref id="content">
+          <fragment-ref id="2" />
+        </section-ref>
+      </structure>
+    </compareto>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="55807" fragment="2" editid="156753"
+      modified="2018-08-28T16:57:19+10:00">
+      <compare>
+        <content>
+          <fragment id="2"><para>Some content.</para></fragment>
+        </content>
+      </compare>
+    </locator>
+    <locator id="55808" fragment="3" editid="156756"
+      modified="2018-08-28T16:57:33+10:00">
+      <compare>
+        <content>
+          <fragment id="3" />
+        </content>
+      </compare>
+    </locator>
+  </fragmentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Compare 3</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2"><para>Some new content.</para></fragment>
+    <fragment id="3"><para>Some new fragment.</para></fragment>
+  </section>
+</document>

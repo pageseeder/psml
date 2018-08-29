@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="69160" schemaversion="0.12" date="2018-08-29T16:46:30+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="69160" scheme="http" host="localhost" port="80"
+      path="/ps/test/local2/documents/compare/compare_4.psml"
+      decodedpath="/ps/test/local2/documents/compare/compare_4.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2018-08-29T16:45:26+10:00" modified="2018-08-29T16:46:30+10:00"
+      title="Compare 4">
+      <displaytitle>Compare 4</displaytitle>
+    </uri>
+    <versions>
+      <version id="156760" name="1.0" created="2018-08-29T16:45:41+10:00">
+        <author id="1" firstname="Philip" surname="Rutherford">
+          <fullname>Philip Rutherford</fullname>
+        </author>
+      </version>
+      <version id="156763" name="2.0" created="2018-08-29T16:46:30+10:00">
+        <author id="1" firstname="Philip" surname="Rutherford">
+          <fullname>Philip Rutherford</fullname>
+        </author>
+      </version>
+    </versions>
+    <compareto version="2.0" date="2018-08-29T16:46:30+10:00">
+      <title>Compare 4</title>
+      <structure>
+        <section-ref id="title">
+          <fragment-ref id="1" />
+        </section-ref>
+        <section-ref id="content">
+          <fragment-ref id="2" />
+        </section-ref>
+      </structure>
+    </compareto>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="55810" fragment="2" editid="156762"
+      modified="2018-08-29T16:46:22+10:00" />
+  </fragmentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Compare 4</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>Some content.</para>
+    </fragment>
+  </section>
+</document>

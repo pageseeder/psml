@@ -56,7 +56,7 @@ public final class Process {
   private Logger logger = null;
 
   /**
-   * The folder containg the documents to process.
+   * The folder containing the documents to process.
    */
   private File src = null;
 
