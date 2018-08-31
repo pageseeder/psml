@@ -44,6 +44,7 @@ import org.xmlunit.matchers.EvaluateXPathMatcher;
 public class ProcessTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/process";
+  private static final String SOURCE_FOLDER_DIFF = "src/test/data/processdiff";
   private static final String DEST_FOLDER = "build/test/process/xrefs";
   private static final String COPY_FOLDER = "build/test/process/copy";
 
@@ -466,6 +467,40 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]",   equalTo("4.1.3. Content 3")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[5]",   equalTo("4.1.3.1.")));
   }
+
+  @Test
+  public void testProcessDiff() throws IOException, ProcessException {
+    String filename = "compare_ref.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER_DIFF));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
+    p.setPublicationConfig(config, filename, true);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("count(//diff//xref)", equalTo("9")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[1]", equalTo("1.3. Heading Ax")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[2]", equalTo("1.4. Heading B")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[3]", equalTo("1.2. Compare 2content.")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[4]", equalTo("1.2. Compare 2content.")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[5]", equalTo("2. Compare 2content.")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[6]", equalTo("3.3. Heading Ax")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[7]", equalTo("3.4. Heading B")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[8]", equalTo("3.2. Compare 2content.")));
+    Assert.assertThat(xml, hasXPath("(//diff//xref)[9]", equalTo("3.2. Compare 2content.")));
+   }
 
   @Test
   public void testProcessXRefs() throws IOException, ProcessException {

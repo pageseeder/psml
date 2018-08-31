@@ -83,11 +83,14 @@ public final class Diff {
   }
 
   /**
-   * Adds <diff> elements to portable PSML files (only if they have compare <content> elements).
+   * Adds diff elements to portable PSML files (only if they have compare <content> elements).
+   * Files under <code>[src]/WEB-INF</code> are ignored.
+   *
+   * @param outputAll  if <code>true</code> output all PSML files to <code>[dest]</code> even if no compare elements.
    *
    * @throws DiffException if problem adding the elements.
    */
-  public void diff() throws DiffException {
+  public void addDiffElements(boolean outputAll) throws DiffException {
 
     // parameters validation
     // src
@@ -125,7 +128,7 @@ public final class Diff {
         this.logger.error("Failed to parse input file "+relPath+" : "+ex.getMessage());
         throw new DiffException("Failed to parse input file "+relPath+" : "+ex.getMessage(), ex);
       }
-      if (compareFragments.isEmpty()) {
+      if (compareFragments.isEmpty() && !outputAll) {
         continue;
       }
 

@@ -32,6 +32,17 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public final class PSMLProcessHandler2 extends DefaultHandler {
 
+  private enum DiffType {
+    INSERT,
+    DELETE,
+    CHANGE
+  }
+
+  private enum DiffElement {
+    INS,
+    DEL
+  }
+
   /**
    * Specifies a heading/para location within a publication.
    *
@@ -176,6 +187,15 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    */
   private int xrefTargetPosition = 1;
 
+  /**
+   * The type of diffx change when inside an xref element.
+   */
+  private DiffType xrefElementChange = null;
+
+  /**
+   * The element when inside a diffx element.
+   */
+  private DiffElement insideDiffElement = null;
 
   /**
    * @param out            where the resulting XML should be written.
@@ -269,6 +289,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     boolean isPara  = noNamespace && "para".equals(qName);
     if (isDocument && atts.getValue("id") == null)
       throw new SAXException("Document has no id attribute.");
+
+    this.insideDiffElement = "dfx:ins".equals(qName) ? DiffElement.INS :
+      ("dfx:del".equals(qName) ? DiffElement.DEL : null);
 
     // if single transcluded fragment update uriids
     if ("document-fragment".equals(qName)) {
@@ -467,15 +490,21 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       this.locations.peek().blockxrefs++;
       this.lastXRefTransclude = "transclude".equals(atts.getValue("type"));
     // else handle xref template
-    } else if ("xref".equals(qName) && "template".equals(atts.getValue("display"))
+    } else if ("xref".equals(qName)
+        && ("template".equals(atts.getValue("display")) || "template".equals(atts.getValue("del:display")))
         && this.numberingAndTOC != null) {
       // only title with the right tokens
-      String title = atts.getValue("title");
+      String title = atts.getValue("title") != null ? atts.getValue("title") : atts.getValue("del:title");
       if (title != null && title.matches(".*?((\\{prefix})|(\\{heading})|(\\{parentnumber})).*?")) {
 
+        this.xrefElementChange = "true".equals(atts.getValue("dfx:insert")) ? DiffType.INSERT :
+                                 ("true".equals(atts.getValue("dfx:delete")) ? DiffType.DELETE :
+                                 (("true".equals(atts.getValue("ins:frag")) ||
+                                  "true".equals(atts.getValue("ins:uriid")))  ? DiffType.CHANGE : null));
+
         // get xref's traget details
-        String targetfrag = atts.getValue("frag");
-        String targeturi = atts.getValue("uriid");
+        String targetfrag = atts.getValue("frag") != null ? atts.getValue("frag") : atts.getValue("del:frag");
+        String targeturi = atts.getValue("uriid") != null ? atts.getValue("uriid") : atts.getValue("del:uriid");
         if (targeturi != null) {
           long targeturiid = Long.parseLong(targeturi);
 
@@ -504,15 +533,28 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     if ("blockxref".equals(qName) && !this.elements.contains("compare")) {
       this.locations.peek().blockxrefs--;
       this.lastXRefTransclude = false;
-    } else if (this.resolvedXRefTemplate != null) {
+    // if writing xref template ensure it's inside the correct diffx element.
+    } else if (this.resolvedXRefTemplate != null &&
+        !(this.xrefElementChange == DiffType.INSERT && this.insideDiffElement == DiffElement.DEL) &&
+        !(this.xrefElementChange == DiffType.DELETE && this.insideDiffElement == DiffElement.INS)) {
       try {
-        this.xml.write(XMLUtils.escape(this.resolvedXRefTemplate));
+        // if xref has changed but no diffx elements then add some to flag the change
+        if (this.xrefElementChange == DiffType.CHANGE && this.insideDiffElement == null) {
+          this.xml.write("<dfx:ins>");
+          this.xml.write(XMLUtils.escape(this.resolvedXRefTemplate));
+          this.xml.write("</dfx:ins>");
+          // it's difficult to find the previous template value so just output x.
+          this.xml.write("<dfx:del>x</dfx:del>");
+        } else {
+          this.xml.write(XMLUtils.escape(this.resolvedXRefTemplate));
+        }
       } catch (IOException ex) {
         throw new SAXException("Failed to write text", ex);
       } finally {
         this.resolvedXRefTemplate = null;
       }
     }
+    if ("xref".equals(qName)) this.xrefElementChange = null;
     if ("document-fragment".equals(qName)) {
       this.ancestorUriIDs.pop();
       // if not in a transclusion
@@ -543,6 +585,10 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    */
   @Override
   public void characters(char[] ch, int start, int length) throws SAXException {
+    // if XRef template already output ignore other diffx element content of the same type
+    if (this.resolvedXRefTemplate == null &&
+        ((this.xrefElementChange == DiffType.INSERT && this.insideDiffElement == DiffElement.INS) ||
+          (this.xrefElementChange == DiffType.DELETE && this.insideDiffElement == DiffElement.DEL))) return;
     try {
       if (this.resolvedXRefTemplate == null) {
         this.xml.write(XMLUtils.escape(new String(ch, start, length)));

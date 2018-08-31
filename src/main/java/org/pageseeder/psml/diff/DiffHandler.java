@@ -134,7 +134,7 @@ public final class DiffHandler extends DefaultHandler {
             }
             this.xml.write("\n<diff>");
             this.xml.write(diffx);
-            this.xml.write("</diff>");
+            this.xml.write("</diff>\n");
           } catch (DiffXException ex) {
             LOGGER.error("Failed to diff content: "+ex.getMessage());
           } catch (IOException ex) {
