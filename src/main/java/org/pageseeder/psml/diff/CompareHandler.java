@@ -56,6 +56,10 @@ public final class CompareHandler extends DefaultHandler {
   @Override
   public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 
+    if ("document".equals(qName) && !"portable".equals(atts.getValue("level"))) {
+      throw new SAXException("Diff is only supported for PSML with level=\"portable\"");
+    }
+
     if (isFragment(qName)) {
       if ("content".equals(this.elements.peek())) {
             this.compareFragments.put(atts.getValue("id"), "");

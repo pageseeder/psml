@@ -18,6 +18,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.pageseeder.diffx.config.TextGranularity;
+import org.pageseeder.diffx.config.WhiteSpaceProcessing;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.slf4j.Logger;
@@ -50,6 +52,21 @@ public final class Diff {
   private File dest = null;
 
   /**
+   * Max diff events allowed
+   */
+  private int maxEvents = 4000000;
+
+  /**
+   * How the white spaces should be processed by Diff-X.
+   */
+  private WhiteSpaceProcessing whiteSpaceProcessing = WhiteSpaceProcessing.PRESERVE;
+
+  /**
+   * The granularity of the text compare used by Diff-X
+   */
+  private TextGranularity textGranularity = TextGranularity.WORD;
+
+  /**
    * Defines the images to process
    */
   private IncludesExcludesMatcher filesMatcher = null;
@@ -80,6 +97,37 @@ public final class Diff {
    */
   public void setFilesMatcher(IncludesExcludesMatcher matcher) {
     this.filesMatcher = matcher;
+  }
+
+  /**
+   * Defines how the white spaces should be processed by Diff-X (default is PRESERVE).
+   *
+   * @param whitespace how the white spaces should be processed by Diff-X.
+   */
+  public void setWhiteSpaceProcessing(WhiteSpaceProcessing whitespace) {
+    this.whiteSpaceProcessing = whitespace;
+  }
+
+  /**
+   * Defines the granularity of the text compare used by Diff-X (default is WORD).
+   *
+   * @param granularity the granularity of the text compare used by Diff-X.
+   */
+  public void setGranularity(TextGranularity granularity) {
+    this.textGranularity = granularity;
+  }
+
+  /**
+   * Set maximum allowed diff events (default 4,000,000).
+   * Diff events are the number of elements/attributes/text in each fragment multiplied by each other.
+   * When maxevents is reached the diff will set the coarsest granularity (TEXT) and try again.
+   * If events is still larger than maxevents an exception is generated.
+   * For reasonable performance maximum 4,000,000 is recommended.
+   *
+   * @param maxevents maximum allowed diff events
+   */
+  public void setMaxEvents(int maxevents) {
+    this.maxEvents = maxevents;
   }
 
   /**
@@ -191,7 +239,10 @@ public final class Diff {
    */
   public void diffPSML(InputStream in, Writer out, Map<String,String> compareFragments)
       throws ParserConfigurationException, SAXException, IOException {
-    DiffHandler handler = new DiffHandler(out, compareFragments, new PSMLDiffer(4000000));
+    PSMLDiffer differ = new PSMLDiffer(this.maxEvents);
+    differ.setWhiteSpaceProcessing(this.whiteSpaceProcessing);
+    differ.setGranularity(this.textGranularity);
+    DiffHandler handler = new DiffHandler(out, compareFragments, differ);
     SAXParserFactory factory = SAXParserFactory.newInstance();
     SAXParser parser = factory.newSAXParser();
     parser.parse(in, handler);
