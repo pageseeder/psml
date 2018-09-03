@@ -121,7 +121,7 @@ public final class Diff {
    * Set maximum allowed diff events (default 4,000,000).
    * Diff events are the number of elements/attributes/text in each fragment multiplied by each other.
    * When maxevents is reached the diff will set the coarsest granularity (TEXT) and try again.
-   * If events is still larger than maxevents an exception is generated.
+   * If events is still larger than maxevents no diff element is generated for that fragment.
    * For reasonable performance maximum 4,000,000 is recommended.
    *
    * @param maxevents maximum allowed diff events
