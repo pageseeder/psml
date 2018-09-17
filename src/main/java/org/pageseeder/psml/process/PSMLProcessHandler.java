@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
 
 import org.pageseeder.psml.md.BlockParser;
@@ -243,11 +242,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * The current fragment being processed.
    */
   private String currentFragment = null;
-
-  /**
-   * Namespace mappings storage
-   */
-  private final Map<String, String> namespaces = new HashMap<>();
 
   /**
    * @param out            where the resulting XML should be written.
@@ -539,16 +533,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
   // --------------------------------------------
 
   @Override
-  public final void startPrefixMapping(String prefix, String uri) throws SAXException {
-    this.namespaces.put(prefix, uri);
-  }
-
-  @Override
-  public final void endPrefixMapping(String prefix) throws SAXException {
-    this.namespaces.remove(prefix);
-  }
-
-  @Override
   public void startDocument() throws SAXException {
     // start to write something just in case there's an IO error
     if (this.includeXMLDeclaration)
@@ -614,14 +598,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.currentFragment = atts.getValue("id");
     // write start tag
     write('<' + qName);
-    // Put the prefix mapping was reported BEFORE the startElement was reported...
-    if (!this.namespaces.isEmpty()) {
-      for (Entry<String, String> e : this.namespaces.entrySet()) {
-        boolean hasPrefix = e.getKey() != null && e.getKey().length() > 0;
-        write(" xmlns"+(hasPrefix? ":"+ e.getKey() : e.getKey()) + "=\"" + XMLUtils.escapeForAttribute(e.getValue()) + "\"");
-      }
-      this.namespaces.clear();
-    }
     // level of heading if it is one
     int headingLevel = -1;
     // attributes

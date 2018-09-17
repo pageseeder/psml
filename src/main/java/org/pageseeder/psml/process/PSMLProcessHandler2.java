@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
 
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -199,11 +198,6 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   private DiffElement insideDiffElement = null;
 
   /**
-   * Namespace mappings storage
-   */
-  private final Map<String, String> namespaces = new HashMap<>();
-
-  /**
    * @param out            where the resulting XML should be written.
    * @param relativePath   the source's file relative path (used to compute relative paths).
    */
@@ -271,16 +265,6 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   }
 
   @Override
-  public final void startPrefixMapping(String prefix, String uri) throws SAXException {
-    this.namespaces.put(prefix, uri);
-  }
-
-  @Override
-  public final void endPrefixMapping(String prefix) throws SAXException {
-    this.namespaces.remove(prefix);
-  }
-
-  @Override
   public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
     // check for xrefs or images
     boolean noNamespace = uri == null || uri.isEmpty();
@@ -323,18 +307,6 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       this.xml.write('<'+qName);
     } catch (IOException ex) {
       throw new SAXException("Failed to open element "+qName, ex);
-    }
-    // Put the prefix mapping was reported BEFORE the startElement was reported...
-    if (!this.namespaces.isEmpty()) {
-      for (Entry<String, String> e : this.namespaces.entrySet()) {
-        boolean hasPrefix = e.getKey() != null && e.getKey().length() > 0;
-        try {
-          this.xml.write(" xmlns"+(hasPrefix? ":"+ e.getKey() : e.getKey()) + "=\"" + XMLUtils.escapeForAttribute(e.getValue()) + "\"");
-        } catch (IOException ex) {
-          throw new SAXException("Failed to write namespace attributes on element "+qName, ex);
-        }
-      }
-      this.namespaces.clear();
     }
     // set heading/para prefix
     Location location = this.locations.isEmpty() ? null : this.locations.peek();

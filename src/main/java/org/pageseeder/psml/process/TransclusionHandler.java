@@ -7,9 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -46,11 +43,6 @@ public class TransclusionHandler extends DefaultHandler {
   private final XMLWriter xml;
 
   /**
-   * Namespace mappings storage
-   */
-  private final Map<String, String> namespaces = new HashMap<>();
-
-  /**
    * A flag to specifiy if characters should be outputed (for resolved transclusions)
    */
   private boolean ignoreText = false;
@@ -83,16 +75,6 @@ public class TransclusionHandler extends DefaultHandler {
   }
 
   @Override
-  public final void startPrefixMapping(String prefix, String uri) throws SAXException {
-    this.namespaces.put(prefix, uri);
-  }
-
-  @Override
-  public final void endPrefixMapping(String prefix) throws SAXException {
-    this.namespaces.remove(prefix);
-  }
-
-  @Override
   public final void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
     if ("compare".equals(qName)) {
       this.inCompare = true;
@@ -106,18 +88,6 @@ public class TransclusionHandler extends DefaultHandler {
       this.xml.openElement(qName, true);
     } catch (IOException ex) {
       throw new SAXException("Failed to open element "+qName, ex);
-    }
-    // Put the prefix mapping was reported BEFORE the startElement was reported...
-    if (!this.namespaces.isEmpty()) {
-      for (Entry<String, String> e : this.namespaces.entrySet()) {
-        boolean hasPrefix = e.getKey() != null && e.getKey().length() > 0;
-        try {
-          this.xml.attribute("xmlns"+(hasPrefix? ":"+ e.getKey() : e.getKey()), e.getValue());
-        } catch (IOException ex) {
-          throw new SAXException("Failed to output namespace", ex);
-        }
-      }
-      this.namespaces.clear();
     }
     // attributes
     for (int i = 0; i < atts.getLength(); i++) {
