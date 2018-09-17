@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document xmlns:m="http://www.w3.org/1998/Math/MathML" id="69154" schemaversion="0.12" date="2018-08-29T15:17:55+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="69154" scheme="http" host="localhost" port="80"
+      path="/ps/test/local2/documents/compare/compare_2.psml"
+      decodedpath="/ps/test/local2/documents/compare/compare_2.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2018-08-27T13:53:54+10:00" modified="2018-08-29T15:17:55+10:00"
+      title="Compare MathML">
+      <displaytitle>Compare MathML</displaytitle>
+    </uri>
+    <versions>
+      <version id="156708" name="1.0" created="2018-08-27T13:58:12+10:00"
+        publicationid="compare1">
+        <author id="1" firstname="Philip" surname="Rutherford">
+          <fullname>Philip Rutherford</fullname>
+        </author>
+      </version>
+      <version id="156728" name="2.0" created="2018-08-27T16:10:24+10:00"
+        publicationid="compare1">
+        <author id="1" firstname="Philip" surname="Rutherford">
+          <fullname>Philip Rutherford</fullname>
+        </author>
+      </version>
+    </versions>
+    <reversexrefs>
+      <reversexref uriid="69152" href="compare_ref.psml"
+        frag="2" urititle="Compare Ref" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="references" id="156692" title="" type="none"
+        forwardtype="embed" forwarddisplay="document" forwardfrag="default" />
+      <reversexref uriid="69153" href="test_compare_1.psml"
+        frag="3" urititle="Test Compare 1" mediatype="application/vnd.pageseeder.psml+xml"
+        id="156718" title="" type="none" forwardtype="transclude"
+        forwarddisplay="document" forwardfrag="default" level="1" />
+    </reversexrefs>
+    <compareto version="2.0" date="2018-08-27T16:10:24+10:00">
+      <title>Compare 2</title>
+      <structure>
+        <section-ref id="title">
+          <fragment-ref id="1" />
+        </section-ref>
+        <section-ref id="content">
+          <fragment-ref id="2" />
+        </section-ref>
+      </structure>
+    </compareto>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="55797" fragment="1" editid="156715"
+      modified="2018-08-27T14:46:11+10:00">
+      <reversexrefs>
+        <reversexref uriid="69154" href="compare_2.psml"
+          frag="2" urititle="Compare 2" mediatype="application/vnd.pageseeder.psml+xml"
+          id="156722" title="" type="none" forwardtype="none"
+          forwardtitle="{prefix} {heading}" forwarddisplay="template"
+          forwardfrag="1" />
+      </reversexrefs>
+      <compare>
+        <content>
+          <media-fragment id="1" mediatype="application/mathml+xml">
+            <math xmlns="http://www.w3.org/1999/xhtml">
+              <mrow>
+                <mn>167</mn>
+                <mo>°</mo>
+              </mrow>
+            </math>
+          </media-fragment>
+        </content>
+      </compare>
+    </locator>
+    <locator id="55794" fragment="2" editid="156731"
+      modified="2018-08-27T16:11:02+10:00">
+      <reversexrefs>
+        <reversexref uriid="69153" href="test_compare_1.psml"
+          frag="2" urititle="Test Compare 1" mediatype="application/vnd.pageseeder.psml+xml"
+          id="156701" title="" type="none" forwardtype="transclude"
+          forwarddisplay="document" forwardfrag="2" />
+      </reversexrefs>
+      <compare>
+        <content>
+          <media-fragment id="2" mediatype="application/mathml+xml">
+            <m:math xmlns="http://www.w3.org/1999/xhtml">
+              <m:mrow>
+                <m:mn>167</m:mn>
+                <m:mo>°</m:mo>
+              </m:mrow>
+            </m:math>
+          </media-fragment>
+        </content>
+      </compare>
+    </locator>
+  </fragmentinfo>
+  <section id="title">
+    <media-fragment id="1" mediatype="application/mathml+xml">
+      <math xmlns="http://www.w3.org/1999/xhtml">
+        <mrow>
+          <mn>16</mn>
+          <mo>°</mo>
+        </mrow>
+      </math>
+    </media-fragment>
+  </section>
+  <section id="content">
+    <media-fragment id="2" mediatype="application/mathml+xml">
+      <m:math xmlns="http://www.w3.org/1999/xhtml">
+        <m:mrow>
+          <m:mn>16</m:mn>
+          <m:mo>°</m:mo>
+        </m:mrow>
+      </m:math>
+    </media-fragment>
+  </section>
+</document>
