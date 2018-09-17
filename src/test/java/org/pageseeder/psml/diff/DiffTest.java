@@ -28,6 +28,9 @@ public class DiffTest {
   private static final File C4 = new File(DEST, "compare_4.psml");
   private static final File MI = new File(DEST, "META-INF");
 
+  private static final File DEST2 = new File(DEST_FOLDER + "2");
+  private static final File CM = new File(DEST2, "compare_mathml.psml");
+
   @Test
   public void testDiffAll() throws IOException, DiffException {
     Diff d = new Diff();
@@ -128,6 +131,25 @@ public class DiffTest {
     Assert.assertTrue(C1.exists());
     Assert.assertTrue(C2.exists());
     Assert.assertFalse(MI.exists());
+  }
+
+  @Test
+  public void testDiffMathML() throws IOException, DiffException {
+    Diff d = new Diff();
+    d.setSrc(new File(SOURCE_FOLDER + "2"));
+    if (DEST2.exists()) {
+      FileUtils.deleteDirectory(DEST2);
+    }
+    DEST2.mkdirs();
+    d.setDest(DEST2);
+    d.addDiffElements(false);
+
+    // check results
+    Assert.assertTrue(CM.exists());
+    String xml = new String (Files.readAllBytes(CM.toPath()), StandardCharsets.UTF_8);
+    System.out.println(xml);
+    // XML with namespaces produces diff errors
+    Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("0")));
   }
 
   private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {

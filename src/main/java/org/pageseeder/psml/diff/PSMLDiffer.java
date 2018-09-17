@@ -18,6 +18,7 @@ import org.pageseeder.diffx.format.SafeXMLFormatter;
 import org.pageseeder.diffx.load.SAXRecorder;
 import org.pageseeder.diffx.sequence.EventSequence;
 import org.pageseeder.diffx.sequence.SequenceSlicer;
+import org.pageseeder.xmlwriter.UndeclaredNamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -160,7 +161,11 @@ public final class PSMLDiffer {
     }
 
     // Diff
-    diff(seq1, seq2, slicer, out);
+    try {
+      diff(seq1, seq2, slicer, out);
+    } catch (UndeclaredNamespaceException ex) {
+      throw new DiffXException(ex.getMessage(), ex);
+    }
   }
 
   // Private helpers ------------------------------------------------------------------------------
