@@ -147,7 +147,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startFragment(attributes);
     } else if ("block".equals(element)) {
       startBlock(attributes);
-    } else if ("blockxref".equals(element) && PSML_MEDIATYPE.equals(attributes.getValue("mediatype")) &&
+    } else if ("blockxref".equals(element) &&
         ("embed".equals(attributes.getValue("type")) || "transclude".equals(attributes.getValue("type")))) {
       startReference(attributes);
     } else if ("reversexref".equals(element) && !hasAncestor("blockxref")) {
@@ -265,7 +265,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     // We eliminate unresolved cross-references
     if (uriid > 0) {
       int level = getInt(attributes, "level", 0);
-      String documenttype = getString(attributes, "documenttype", Reference.DEFAULT_TYPE);
+      String documenttype = PSML_MEDIATYPE.equals(attributes.getValue("mediatype")) ?
+          getString(attributes, "documenttype", Reference.DEFAULT_TYPE) : null;
       Reference.Type type = Reference.Type.fromString(attributes.getValue("type"));
       String title = computeReferenceTitle(attributes);
       Reference reference = new Reference(level, title, this.fragment, this._fragmentIDs.peek(),

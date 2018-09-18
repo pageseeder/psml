@@ -32,8 +32,8 @@
 <xs:complexType name="document-ref">
   <xs:attribute name="level"          type="level"        use="required"/>
   <xs:attribute name="title"          type="xs:string"    use="required"/>
-  <xs:attribute name="documenttype"   type="documenttype" use="required"/>
   <xs:attribute name="uriid"          type="uriid"        use="required"/>
+  <xs:attribute name="documenttype"   type="documenttype" />
   <xs:attribute name="targetfragment" type="fragment"/>  
   <xs:attribute name="canonical"      type="xs:string"/>
   <xs:attribute name="prefix"         type="xs:string"/>  

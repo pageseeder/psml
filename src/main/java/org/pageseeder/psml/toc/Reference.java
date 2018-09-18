@@ -91,7 +91,7 @@ public final class Reference extends Element implements Serializable {
    * @param targetfrag    The target fragment ID.
    */
   public Reference(int level, String title, String fragment, String originalfrag,
-      Long uri, Type type, String documenttype, String targetfrag) {
+      Long uri, Type type, @Nullable String documenttype, String targetfrag) {
     super(level, title, fragment, originalfrag);
     this._uri = uri;
     this._type = type;
@@ -178,7 +178,9 @@ public final class Reference extends Element implements Serializable {
     if (!Element.NO_TITLE.equals(title())) {
       xml.attribute("title", title());
     }
-    xml.attribute("documenttype", this._documenttype);
+    if (this._documenttype != null) {
+      xml.attribute("documenttype", this._documenttype);
+    }
     if (this._uri > 0) {
       xml.attribute("uriid", Long.toString(this._uri));
     }

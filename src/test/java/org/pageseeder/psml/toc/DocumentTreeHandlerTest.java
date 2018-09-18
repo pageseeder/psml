@@ -271,7 +271,8 @@ public final class DocumentTreeHandlerTest {
       phantom(2,
         phantom(3,
           ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
-        ref(1, "Another heading 2", 199328,
+        ref(1, "Another heading 2", 199328),
+        ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
           ref(2, "Another heading 2a", 199326))),
       h2("Related", "default", 1));
     List<Long> reverse = new ArrayList<>();
@@ -284,7 +285,8 @@ public final class DocumentTreeHandlerTest {
         phantom(2,
           phantom(3,
             ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
-          ref(1, "Another heading 2", 199328,
+          ref(1, "Another heading 2", 199328),
+          ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
             ref(2, "Another heading 2a", 199326))),
         h2("Related", "default", 1));
     expected = new DocumentTree(4, "Test doc 1", "", reverse, parts,

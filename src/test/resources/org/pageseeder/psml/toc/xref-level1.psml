@@ -34,7 +34,7 @@
         urititle="Another heading 2" mediatype="application/vnd.pageseeder.psml+xml">Another heading 2</blockxref>
       <blockxref id="15240" frag="default" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="embed" uriid="6173"
+        display="document" level="1" type="embed" uriid="6173"
         href="/ps/test/local2/attachments/2016/08/Test%20doc%201.pdf"
         urititle="Test doc 1.pdf" mediatype="application/pdf">Test doc 1.pdf</blockxref>
       <blockxref id="651020" title="Another heading 2a" frag="default"
