@@ -59,12 +59,14 @@ public final class NumberingGenerator {
    */
   public Prefix generateNumbering(int level, String element, String blocklabel) {
     if (this.numberConfig != null && this.numberConfig.hasElement(level, blocklabel, element)) {
+      // if blocklabel not defined, use empty
+      String label = this.numberConfig.getNumberFormat(level, blocklabel) == null ? "" : blocklabel;
       // add it to current levels
-      this.addNewLevel(level, blocklabel);
-      // compute canonical label
-      String canonical = canonicalLabel(blocklabel);
-      // compute numbered label
-      return this.numberConfig.getPrefix(canonical, blocklabel);
+      this.addNewLevel(level, label);
+      // compute canonical numbering
+      String canonical = canonicalLabel(label);
+      // compute prefix
+      return this.numberConfig.getPrefix(canonical, label);
     }
     return null;
   }

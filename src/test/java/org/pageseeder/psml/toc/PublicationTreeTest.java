@@ -471,7 +471,8 @@ public final class PublicationTreeTest {
             p(2, "1c", 1, true, ""),
             p(2, "1d", 1, true, "", "table-caption"),
             p(2, "1e", 1, true, "", "figure-caption"),
-            p(2, "1f", 1, true, "", "table-caption")))
+            p(2, "1f", 1, true, "", "table-caption"),
+            p(3, "1g", 1, true, "", "table-caption"))) // not defined for level 3
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 1, true, "",
@@ -507,6 +508,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-1-1d-1",null,"Table 1-2",2,"1.2.");
     assertHasPrefix(prefixes,"1000-1-1e-1",null,"Fig 1-A",2,"1.1.");
     assertHasPrefix(prefixes,"1000-1-1f-1",null,"Table 1-3",2,"1.3.");
+    assertHasPrefix(prefixes,"1000-1-1g-1",null,"1.1.3.",3,"1.1.3.");
     assertHasPrefix(prefixes,"1000-1-default",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"1001-1-1-1",null,"2.",1,"2.");
     assertHasPrefix(prefixes,"1001-1-1a-1",null,"2.1.1.",3,"2.1.1.");
@@ -516,7 +518,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-1-1e-1",null,"Fig 2-A",2,"2.1.");
     assertHasPrefix(prefixes,"1001-1-1f-1",null,"Table 2-3",2,"2.3.");
     assertHasPrefix(prefixes,"1001-1-default",null,"2.",1,"2.");
-    Assert.assertEquals(17, prefixes.size());
+    Assert.assertEquals(18, prefixes.size());
   }
 
   @Test
