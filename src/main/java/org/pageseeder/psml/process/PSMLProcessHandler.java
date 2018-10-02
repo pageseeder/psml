@@ -809,6 +809,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.setInTranscludedContent(transclude);
     handler.numberingAndTOC = this.numberingAndTOC;
     handler.publicationConfig = this.publicationConfig;
+    handler.setConvertMarkdown(this.convertMarkdown);
     // load only one fragment?
     if (fragment != null && !"default".equals(fragment)) {
       handler.setFragment(fragment);
