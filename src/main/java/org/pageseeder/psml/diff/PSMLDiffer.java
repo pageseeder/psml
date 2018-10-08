@@ -70,6 +70,7 @@ public final class PSMLDiffer {
     this.maxEvents = maxevents;
     this.config.setGranularity(TextGranularity.WORD);
     this.config.setWhiteSpaceProcessing(WhiteSpaceProcessing.PRESERVE);
+    this.config.setNamespaceAware(false);
   }
 
 // getters and setters -------------------------------------------------------------------------
@@ -93,9 +94,9 @@ public final class PSMLDiffer {
   }
 
   /**
-   * Sets whether compare XML contains namspaces.
+   * Sets whether to process XML namespaces (default false).
    *
-   * @param aware <code>true</code> if contains namespaces;
+   * @param aware <code>true</code> to process namespaces;
    *                 <code>false</code> otherwise.
    */
   public void setNamespaceAware(boolean aware) {
