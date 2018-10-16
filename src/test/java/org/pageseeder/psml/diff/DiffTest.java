@@ -148,8 +148,7 @@ public class DiffTest {
     Assert.assertTrue(CM.exists());
     String xml = new String (Files.readAllBytes(CM.toPath()), StandardCharsets.UTF_8);
     System.out.println(xml);
-    // XML with namespaces produces diff errors
-    Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("0")));
+    Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
   }
 
   private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {
