@@ -218,7 +218,7 @@ public final class FragmentNumbering implements Serializable {
     Element element = part.element();
     Long next = null;
     DocumentTree nextTree = null;
-    Integer nextCount = null;
+    Integer nextCount = 1;
     NumberingGenerator nextNumber = number;
     int nextLevel = level + 1;
     int nextTreeLevel = treeLevel;
