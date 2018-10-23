@@ -157,7 +157,8 @@ public final class PSMLDiffer {
       }
       // Let's check again
       if (max > this.maxEvents) {
-        throw new DiffXException("Cannot compare contents with many elements that generates more than "+this.maxEvents+" possible change events (found "+max+").");
+        throw new DiffXException("There are over "+this.maxEvents+" points of comparison (" +
+            max + "), reducing the fragment size will allow the comparison to be calculated.");
       }
     }
 
