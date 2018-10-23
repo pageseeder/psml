@@ -15,19 +15,6 @@
  */
 package org.pageseeder.psml.process;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
@@ -39,13 +26,27 @@ import org.pageseeder.psml.process.config.XSLTTransformation;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.psml.toc.Tests.Validates;
+import org.xmlunit.matchers.CompareMatcher;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class ProcessTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/process";
   private static final String SOURCE_FOLDER_DIFF = "src/test/data/processdiff";
   private static final String DEST_FOLDER = "build/test/process/xrefs";
+  private static final String MATH_FOLDER = "build/test/process/math";
   private static final String COPY_FOLDER = "build/test/process/copy";
 
   public ProcessTest() {
@@ -319,8 +320,8 @@ public class ProcessTest {
     String filename = "mathml_ns_prefix.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
-    p.setSrc(new File(SOURCE_FOLDER));
-    File dest = new File(DEST_FOLDER);
+    p.setSrc(new File(SOURCE_FOLDER, "math"));
+    File dest = new File(MATH_FOLDER);
     if (dest.exists())
       FileUtils.deleteDirectory(dest);
     dest.mkdirs();
@@ -330,7 +331,7 @@ public class ProcessTest {
     p.process();
 
     // check result
-    File result = new File(DEST_FOLDER + "/" + filename);
+    File result = new File(MATH_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     //System.out.println(xml);
     // validate
@@ -343,8 +344,8 @@ public class ProcessTest {
     String filename = "mathml_no_ns_prefix.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
-    p.setSrc(new File(SOURCE_FOLDER));
-    File dest = new File(DEST_FOLDER);
+    p.setSrc(new File(SOURCE_FOLDER, "math"));
+    File dest = new File(MATH_FOLDER);
     if (dest.exists())
       FileUtils.deleteDirectory(dest);
     dest.mkdirs();
@@ -354,12 +355,41 @@ public class ProcessTest {
     p.process();
 
     // check result
-    File result = new File(DEST_FOLDER + "/" + filename);
+    File result = new File(MATH_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     //System.out.println(xml);
     // validate
     Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     Assert.assertThat(xml, hasXPath("namespace-uri(//*[local-name()='math'])", equalTo("http://www.w3.org/1998/Math/MathML")));
+  }
+
+  @Test
+  public void testAsciiMathConvert() throws IOException, ProcessException {
+    String filename = "asciimath_conversion.psml";
+    String filename_expected = "asciimath_conversion_result.psml";
+    Process p = new Process();
+    p.setConvertAsciiMath(true);
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER, "math"));
+    File dest = new File(MATH_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
+    p.setPublicationConfig(config, filename, true);
+    p.process();
+
+    // check result
+    File expected = new File(SOURCE_FOLDER + "/" + filename_expected);
+    String xml_expected = new String (Files.readAllBytes(expected.toPath()), StandardCharsets.UTF_8);
+    File result = new File(MATH_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+//    System.out.println(xml);
+    // validate
+    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    Assert.assertThat(xml, hasXPath("count(inline[@label = 'asciimath'])", equalTo("0")));
+    Assert.assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace().ignoreComments());
   }
 
   @Test

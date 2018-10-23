@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document id="1" type="mathml" level="portable">
+  <section id="media">
+    <media-fragment id="1" mediatype="application/mathml+xml">
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mrow>
+          <msub>
+            <mo stretchy="false">∑</mo>
+            <mrow>
+              <mtable>
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <maligngroup />
+                      <mn>0</mn>
+                      <mo>≤</mo>
+                      <mi> </mi>
+                      <mi>i</mi>
+                      <mi> </mi>
+                      <mo>≤</mo>
+                      <mi> </mi>
+                      <mi>m</mi>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd>
+                    <mrow>
+                      <maligngroup />
+                      <mn>0</mn>
+                      <mo>&lt;</mo>
+                      <mi>j</mi>
+                      <mo>&lt;</mo>
+                      <mi>n</mi>
+                      <mi> </mi>
+                    </mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+            </mrow>
+          </msub>
+          <mrow>
+            <mi>P</mi>
+            <mfenced separators="|">
+              <mrow>
+                <mi>i</mi>
+                <mo>,</mo>
+                <mi>j</mi>
+              </mrow>
+            </mfenced>
+          </mrow>
+        </mrow>
+      </math>
+    </media-fragment>
+  </section>
+</document>

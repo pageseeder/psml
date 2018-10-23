@@ -3,25 +3,8 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.pageseeder.psml.process.config.ErrorHandling;
-import org.pageseeder.psml.process.config.Images;
+import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
-import org.pageseeder.psml.process.config.ManifestDocument;
-import org.pageseeder.psml.process.config.Strip;
-import org.pageseeder.psml.process.config.XRefsTransclude;
-import org.pageseeder.psml.process.config.XSLTTransformation;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -31,10 +14,13 @@ import org.pageseeder.psml.toc.PublicationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+
 /**
  * Perform the process task.
- * For more info, see {@link
- * https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_process.html}
+ * For more info, see {@link https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_process.html}
  *
  * @author Jean-Baptiste Reure
  *
@@ -89,6 +75,11 @@ public final class Process {
    * If markdown properties are converted to PSML
    */
   private boolean convertMarkdown = false;
+
+  /**
+   * If ascii math is converted to mathjax
+   */
+  private boolean convertAsciiMath = false;
 
   /**
    * If we should process the XML content.
@@ -157,6 +148,7 @@ public final class Process {
    */
   public void setProcessed(boolean processed) {
     this.processed = processed;
+    this.processXML = true;
   }
 
   /**
@@ -171,6 +163,15 @@ public final class Process {
    */
   public void setConvertMarkdown(boolean convert) {
     this.convertMarkdown = convert;
+    this.processXML = true;
+  }
+
+  /**
+   * @param convert If ascii math content is converted to Mathjax
+   */
+  public void setConvertAsciiMath(boolean convert) {
+    this.convertAsciiMath = convert;
+    this.processXML = true;
   }
 
   /**
@@ -323,7 +324,8 @@ public final class Process {
 
     String tempFolder = System.getProperty("java.io.tmpdir");
     List<File> tempFoldersToDelete = new ArrayList<>();
-    List<File> originalFilesInDestination = Arrays.asList(this.dest.listFiles());
+    File[] ffiles = this.dest.listFiles();
+    List<File> originalFilesInDestination = ffiles == null ? new ArrayList<>() : Arrays.asList(ffiles);
     try {
       // run pre transform
       File currentSource = this.src;
@@ -403,8 +405,7 @@ public final class Process {
         File other = rest.get(relPath);
         File target;
         if (moveImages && imageCache.isCached(relPath)) {
-          String newPath = "location".equals(this.imageHandling.getSrc()) ?
-                            relPath : imageCache.getImageNewPath(relPath);
+          String newPath = this.imageHandling.getSrc() == ImageSrc.LOCATION ? relPath : imageCache.getImageNewPath(relPath);
           target = new File(this.imageHandling.getLocation(), newPath);
         } else {
           target = new File(this.dest, relPath);
@@ -446,7 +447,7 @@ public final class Process {
       if (manifestFile != null && manifestFile.exists() && !manifestFile.delete())
         this.logger.warn("Failed to delete manifest file "+manifestFile.getAbsolutePath());
       // then compare current destination files with original ones
-      for (File f : this.dest.listFiles()) {
+      if (ffiles != null) for (File f : ffiles) {
         if (!originalFilesInDestination.contains(f)) {
           if (f.isFile()) {
             if (!f.delete())
@@ -496,6 +497,7 @@ public final class Process {
       handler1.setFailOnError(this.failOnError);
       handler1.setProcessed(this.processed);
       handler1.setConvertMarkdown(this.convertMarkdown);
+      handler1.setConvertAsciiMath(this.convertAsciiMath);
       // add xrefs handling details
       List<String> xrefsTypes = null;
       boolean excludeXRefFrag = false;
@@ -510,10 +512,10 @@ public final class Process {
         onlyXRefFrag = this.xrefs.onlyXRefsInXRefFragment();
         if (!this.xrefs.getLevels()) {
           this.logger.error("XRef levels option is no longer supported, use publication config instead.");
-        };
+        }
       }
       handler1.setXRefsHandling(xrefsTypes, excludeXRefFrag, onlyXRefFrag,
-          this.error == null ? false : this.error.getXrefNotFound());
+          this.error != null && this.error.getXrefNotFound());
       // add images paths processing details
       boolean logImagesNotFound = false;
       boolean embedMetadata = false;
@@ -526,7 +528,7 @@ public final class Process {
         // set proper values
         thecache          = cache;
         imageSrc          = this.imageHandling.getSrc();
-        logImagesNotFound = this.error == null ? false : this.error.getImageNotFound();
+        logImagesNotFound = this.error != null && this.error.getImageNotFound();
         siteprefix        = this.imageHandling.getSitePrefix();
         embedMetadata     = this.imageHandling.isMetadataEmbedded();
       }
@@ -580,7 +582,7 @@ public final class Process {
       PSMLProcessHandler2 handler2 = new PSMLProcessHandler2(new OutputStreamWriter(fos, UTF8), relPath);
       handler2.setLogger(this.logger);
       handler2.setFailOnError(this.failOnError);
-      handler2.setErrorOnAmbiguous(this.error == null ? false : this.error.getXrefAmbiguous());
+      handler2.setErrorOnAmbiguous(this.error != null && this.error.getXrefAmbiguous());
       handler2.setHierarchyUriFragIDs(handler1.getHierarchyUriFragIDs());
       handler2.setRelativiseImagePaths(imageSrc == ImageSrc.LOCATION);
       // generate numbering
@@ -630,17 +632,12 @@ public final class Process {
     if (this.preservesrc) {
       // copy file
       try {
-        FileInputStream fis = new FileInputStream(from);
-        FileOutputStream fos = new FileOutputStream(to);
-        try {
+        try (FileInputStream fis = new FileInputStream(from); FileOutputStream fos = new FileOutputStream(to)) {
           int read;
           byte[] buffer = new byte[BUFFER_SIZE];
           while ((read = fis.read(buffer)) != -1) {
             fos.write(buffer, 0, read);
           }
-        } finally {
-          fis.close();
-          fos.close();
         }
       } catch (IOException ex) {
         throw new ProcessException("Failed to copy file "+from.getAbsolutePath()+" to "+to.getAbsolutePath(), ex);
@@ -688,7 +685,7 @@ public final class Process {
       Map<String, File> metadata, Map<String, File> others, boolean isRoot) {
     if (file.isDirectory()) {
       File[] all = file.listFiles();
-      for (File f : all) {
+      if (all != null) for (File f : all) {
         if (isRoot && "META-INF".equals(f.getName()) && metadata != null) {
           collectFiles(f, root, metadata, metadata, others, false);
         } else {

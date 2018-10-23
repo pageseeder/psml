@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document id="1" level="processed">
+  <section id="1-1">
+    <fragment id="1-1">
+      <para>You can use the following ASCIIMathML constructs: <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mfrac>
+                <mrow>
+                  <mi>x</mi>
+                  <mo>+</mo>
+                  <mn>1</mn>
+                </mrow>
+                <mrow>
+                  <mi>x</mi>
+                  <mo>-</mo>
+                  <mn>1</mn>
+                </mrow>
+              </mfrac>
+              <msup>
+                <mi>x</mi>
+                <mrow>
+                  <mi>i</mi>
+                  <mo>+</mo>
+                  <mi>j</mi>
+                </mrow>
+              </msup>
+              <msub>
+                <mi>x</mi>
+                <mrow>
+                  <mi>i</mi>
+                  <mi>j</mi>
+                </mrow>
+              </msub>
+              <msqrt>
+                <mrow>
+                  <mi>x</mi>
+                </mrow>
+              </msqrt>
+              <mroot>
+                <mrow>
+                  <mi>x</mi>
+                </mrow>
+                <mrow>
+                  <mi>n</mi>
+                </mrow>
+              </mroot>
+              <mover>
+                <mrow>
+                  <mo>&#8594;</mo>
+                </mrow>
+                <mrow>
+                  <mo>+</mo>
+                </mrow>
+              </mover>
+              <mrow>
+                <mtext>any
+                </mtext>
+              </mrow>
+              <mrow>
+                <mtext>any
+                </mtext>
+              </mrow>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Operation symbols <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mo>+</mo>
+              <mo>-</mo>
+              <mo>&#8901;</mo>
+              <mo>&#8727;</mo>
+              <mo>&#8902;</mo>
+              <mo>/</mo>
+              <mo>\</mo>
+              <mo>&#215;</mo>
+              <mo>&#247;</mo>
+              <mo>&#8728;</mo>
+              <mo>&#8853;</mo>
+              <mo>&#8855;</mo>
+              <mo>&#8721;</mo>
+              <mo>&#8719;</mo>
+              <mo>&#8743;</mo>
+              <mo>&#8896;</mo>
+              <mo>&#8744;</mo>
+              <mo>&#8897;</mo>
+              <mo>&#8745;</mo>
+              <mo>&#8898;</mo>
+              <mo>&#8746;</mo>
+              <mo>&#8899;</mo>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Relation symbols <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mo>=</mo>
+              <mo>&#8800;</mo>
+              <mo>&lt;</mo>
+              <mo>&#8804;</mo>
+              <mo>&gt;</mo>
+              <mo>&#8805;</mo>
+              <mo>&#8826;</mo>
+              <mo>&#8827;</mo>
+              <mo>&#8712;</mo>
+              <mo>&#8713;</mo>
+              <mo>&#8834;</mo>
+              <mo>&#8835;</mo>
+              <mo>&#8838;</mo>
+              <mo>&#8839;</mo>
+              <mo>&#8801;</mo>
+              <mo>&#8773;</mo>
+              <mo>&#8776;</mo>
+              <mo>&#8733;</mo>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Logical symbols <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mrow>
+                <mspace width="1ex">
+                </mspace>
+                <mtext>and
+                </mtext>
+                <mspace width="1ex">
+                </mspace>
+              </mrow>
+              <mrow>
+                <mspace width="1ex">
+                </mspace>
+                <mtext>or
+                </mtext>
+                <mspace width="1ex">
+                </mspace>
+              </mrow>
+              <mo>&#172;</mo>
+              <mo>&#8658;</mo>
+              <mrow>
+                <mspace width="1ex">
+                </mspace>
+                <mo>if</mo>
+                <mspace width="1ex">
+                </mspace>
+              </mrow>
+              <mo>&#8660;</mo>
+              <mo>&#8704;</mo>
+              <mo>&#8707;</mo>
+              <mo>&#8869;</mo>
+              <mo>&#8868;</mo>
+              <mo>&#8866;</mo>
+              <mo>&#8872;</mo>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Miscellaneous symbols <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mo>&#8747;</mo>
+              <mo>&#8750;</mo>
+              <mo>&#8706;</mo>
+              <mo>&#8711;</mo>
+              <mo>&#177;</mo>
+              <mo>&#8709;</mo>
+              <mo>&#8734;</mo>
+              <mo>&#8501;</mo>
+              <mo>...</mo>
+              <mo>&#8943;</mo>
+              <mo>&#160;</mo>
+              <mo>&#160;&#160;</mo>
+              <mo>&#160;&#160;&#160;&#160;</mo>
+              <mo>&#8900;</mo>
+              <mo>&#9633;</mo>
+              <mo>&#8970;</mo>
+              <mo>&#8971;</mo>
+              <mo>&#8968;</mo>
+              <mo>&#8969;</mo>
+              <mo>&#8450;</mo>
+              <mo>&#8469;</mo>
+              <mo>&#8474;</mo>
+              <mo>&#8477;</mo>
+              <mo>&#8484;</mo>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Standard functions <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mrow>
+                <mi>sin</mi>
+                <mrow>
+                  <mi>cos</mi>
+                  <mrow>
+                    <mi>tan</mi>
+                    <mrow>
+                      <mi>csc</mi>
+                      <mrow>
+                        <mi>sec</mi>
+                        <mrow>
+                          <mi>cot</mi>
+                          <mrow>
+                            <mi>sinh</mi>
+                            <mrow>
+                              <mi>cosh</mi>
+                              <mrow>
+                                <mi>tanh</mi>
+                                <mrow>
+                                  <mi>log</mi>
+                                  <mrow>
+                                    <mi>ln</mi>
+                                    <mrow>
+                                      <mi>det</mi>
+                                      <mo>dim</mo>
+                                    </mrow>
+                                  </mrow>
+                                </mrow>
+                              </mrow>
+                            </mrow>
+                          </mrow>
+                        </mrow>
+                      </mrow>
+                    </mrow>
+                  </mrow>
+                </mrow>
+              </mrow>
+              <mo>lim</mo>
+              <mo>mod</mo>
+              <mrow>
+                <mi>gcd</mi>
+                <mrow>
+                  <mi>lcm</mi>
+                  <mo></mo>
+                </mrow>
+              </mrow>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Grouping brackets <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mrow>
+                <mo>(</mo>
+                <mo>)</mo>
+              </mrow>
+              <mrow>
+                <mo>[</mo>
+                <mo>]</mo>
+              </mrow>
+              <mrow>
+                <mo>{</mo>
+                <mo>}</mo>
+              </mrow>
+              <mrow>
+                <mo>&#9001;</mo>
+                <mo>&#9002;</mo>
+              </mrow>
+              <mrow>
+              </mrow>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Arrows <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mo>&#8593;</mo>
+              <mo>&#8595;</mo>
+              <mo>&#8594;</mo>
+              <mo>&#8594;</mo>
+              <mo>&#8592;</mo>
+              <mo>&#8596;</mo>
+              <mo>&#8658;</mo>
+              <mo>&#8656;</mo>
+              <mo>&#8660;</mo>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Accents <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mover>
+                <mi>x</mi>
+                <mo>^</mo>
+              </mover>
+              <mover>
+                <mi>x</mi>
+                <mo>&#175;</mo>
+              </mover>
+              <munder>
+                <mi>x</mi>
+                <mo>&#818;</mo>
+              </munder>
+              <mover>
+                <mi>x</mi>
+                <mo stretchy="false">&#8594;</mo>
+              </mover>
+              <mover>
+                <mi>x</mi>
+                <mo>.</mo>
+              </mover>
+              <mover>
+                <mi>x</mi>
+                <mo>..</mo>
+              </mover>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Font commands <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mstyle mathvariant="bold">
+                <mi>A</mi>
+              </mstyle>
+              <mstyle mathvariant="double-struck">
+                <mi>A</mi>
+              </mstyle>
+              <mstyle mathvariant="script">
+                <mi>A</mi>
+              </mstyle>
+              <mstyle mathvariant="monospace">
+                <mi>A</mi>
+              </mstyle>
+              <mstyle mathvariant="fraktur">
+                <mi>A</mi>
+              </mstyle>
+              <mstyle mathvariant="sans-serif">
+                <mi>A</mi>
+              </mstyle>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para>Matrices <xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mrow>
+                <mo>[</mo>
+                <mtable columnlines="none none">
+                  <mtr>
+                    <mtd>
+                      <mi>a</mi>
+                    </mtd>
+                    <mtd>
+                      <mi>b</mi>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mi>c</mi>
+                    </mtd>
+                    <mtd>
+                      <mi>d</mi>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mo>]</mo>
+              </mrow>
+              <mrow>
+                <mo>(</mo>
+                <mtable columnlines="none none">
+                  <mtr>
+                    <mtd>
+                      <mn>1</mn>
+                    </mtd>
+                    <mtd>
+                      <mn>0</mn>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mn>0</mn>
+                    </mtd>
+                    <mtd>
+                      <mn>1</mn>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mo>)</mo>
+              </mrow>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+    <para>Greek letters <xref frag="media" type="math">
+      <media-fragment id="media" mediatype="application/mathml+xml">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <mstyle displaystyle="true">
+            <mi>&#945;</mi>
+            <mi>&#946;</mi>
+            <mi>&#967;</mi>
+            <mi>&#948;</mi>
+            <mo>&#916;</mo>
+            <mi>&#949;</mi>
+            <mi>&#951;</mi>
+            <mi>&#947;</mi>
+            <mo>&#915;</mo>
+            <mi>&#953;</mi>
+            <mi>&#954;</mi>
+            <mi>&#955;</mi>
+            <mo>&#923;</mo>
+            <mi>&#956;</mi>
+            <mi>&#957;</mi>
+            <mi>&#969;</mi>
+            <mo>&#937;</mo>
+            <mi>&#981;</mi>
+            <mo>&#934;</mo>
+            <mi>&#960;</mi>
+            <mo>&#928;</mo>
+            <mi>&#968;</mi>
+            <mi>&#936;</mi>
+            <mi>&#961;</mi>
+            <mi>&#963;</mi>
+            <mo>&#931;</mo>
+            <mi>&#964;</mi>
+            <mi>&#952;</mi>
+            <mo>&#920;</mo>
+            <mi>&#965;</mi>
+            <mi>&#958;</mi>
+            <mo>&#926;</mo>
+            <mi>&#950;</mi>
+          </mstyle>
+        </math>
+      </media-fragment>
+    </xref></para>
+    </fragment>
+    <fragment id="1-2">
+      <para><xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mrow>
+                <msubsup>
+                  <mo>&#8747;</mo>
+                  <mrow>
+                    <mo>-</mo>
+                    <mn>1</mn>
+                  </mrow>
+                  <mn>1</mn>
+                </msubsup>
+              </mrow>
+              <msqrt>
+                <mrow>
+                  <mn>1</mn>
+                  <mo>-</mo>
+                  <msup>
+                    <mi>x</mi>
+                    <mn>2</mn>
+                  </msup>
+                </mrow>
+              </msqrt>
+              <mrow>
+                <mi>d</mi>
+                <mi>x</mi>
+              </mrow>
+              <mo>=</mo>
+              <mfrac>
+                <mi>&#960;</mi>
+                <mn>2</mn>
+              </mfrac>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+      <para><xref frag="media" type="math">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <msup>
+                <mrow>
+                  <mo>(</mo>
+                  <mtable columnlines="none none">
+                    <mtr>
+                      <mtd>
+                        <mi>a</mi>
+                      </mtd>
+                      <mtd>
+                        <mi>b</mi>
+                      </mtd>
+                    </mtr>
+                    <mtr>
+                      <mtd>
+                        <mi>c</mi>
+                      </mtd>
+                      <mtd>
+                        <mi>d</mi>
+                      </mtd>
+                    </mtr>
+                  </mtable>
+                  <mo>)</mo>
+                </mrow>
+                <mrow>
+                  <mo>-</mo>
+                  <mn>1</mn>
+                </mrow>
+              </msup>
+              <mo>=</mo>
+              <mfrac>
+                <mn>1</mn>
+                <mrow>
+                  <mi>a</mi>
+                  <mi>d</mi>
+                  <mo>-</mo>
+                  <mi>b</mi>
+                  <mi>c</mi>
+                </mrow>
+              </mfrac>
+              <mrow>
+                <mo>(</mo>
+                <mtable columnlines="none none">
+                  <mtr>
+                    <mtd>
+                      <mi>d</mi>
+                    </mtd>
+                    <mtd>
+                      <mo>-</mo>
+                      <mi>b</mi>
+                    </mtd>
+                  </mtr>
+                  <mtr>
+                    <mtd>
+                      <mo>-</mo>
+                      <mi>c</mi>
+                    </mtd>
+                    <mtd>
+                      <mi>a</mi>
+                    </mtd>
+                  </mtr>
+                </mtable>
+                <mo>)</mo>
+              </mrow>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
+    </fragment>
+    <media-fragment id="1-3" mediatype="application/mathml+xml">
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mstyle displaystyle="true">
+          <mrow>
+            <msubsup>
+              <mo>&#8747;</mo>
+              <mrow>
+                <mo>-</mo>
+                <mn>1</mn>
+              </mrow>
+              <mn>1</mn>
+            </msubsup>
+          </mrow>
+          <msqrt>
+            <mrow>
+              <mn>1</mn>
+              <mo>-</mo>
+              <msup>
+                <mi>x</mi>
+                <mn>2</mn>
+              </msup>
+            </mrow>
+          </msqrt>
+          <mrow>
+            <mi>d</mi>
+            <mi>x</mi>
+          </mrow>
+          <mo>=</mo>
+          <mfrac>
+            <mi>&#960;</mi>
+            <mn>2</mn>
+          </mfrac>
+        </mstyle>
+      </math>
+    </media-fragment>
+  </section>
+</document>

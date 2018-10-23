@@ -3,21 +3,6 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import org.pageseeder.psml.md.BlockParser;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.process.XRefTranscluder.InfiniteLoopException;
@@ -25,6 +10,7 @@ import org.pageseeder.psml.process.XRefTranscluder.TooDeepException;
 import org.pageseeder.psml.process.XRefTranscluder.XRefNotFoundException;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.config.Strip;
+import org.pageseeder.psml.process.math.AsciiMathConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
@@ -39,6 +25,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 /**
@@ -57,12 +49,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * The XML writer where XML content is stored.
    */
-  private Writer xml = null;
+  private Writer xml;
 
   /**
    * The parent handler if current content is transcluded.
    */
-  private PSMLProcessHandler parent = null;
+  private PSMLProcessHandler parent;
 
   /**
    * Handle the transclusion of XRefs.
@@ -88,6 +80,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * If markdown properties are converted to PSML
    */
   private boolean convertMarkdown = false;
+
+  /**
+   * If ascii content is converted to MathJax
+   */
+  private boolean convertAsciiMath = false;
 
   /**
    * If an error should be logged when an image was not found.
@@ -172,9 +169,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private String uriID = null;
 
   /**
-   * The markdown content to convert.
+   * The markdown or ascii content to convert.
    */
-  private StringBuilder markdownContent = null;
+  private StringBuilder convertContent = null;
 
   /**
    * Number of times this URI has appeared.
@@ -352,6 +349,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   public void setConvertMarkdown(boolean convert) {
     this.convertMarkdown = convert;
+  }
+
+  /**
+   * @param convert if ascii math content converted to MathJax
+   */
+  public void setConvertAsciiMath(boolean convert) {
+    this.convertAsciiMath = convert;
   }
 
   /**
@@ -593,6 +597,16 @@ public final class PSMLProcessHandler extends DefaultHandler {
         return;
       }
     }
+    // convert ascii math inline labels
+    if (this.convertAsciiMath && noNamespace && "inline".equals(qName) && "asciimath".equals(atts.getValue("label"))) {
+      this.convertContent = new StringBuilder();
+      return;
+    } else if (this.convertAsciiMath && noNamespace && "media-fragment".equals(qName) && "text/asciimath".equals(atts.getValue("mediatype"))) {
+      String id = this.uriID == null ? atts.getValue("id") : (this.uriID + "-" + atts.getValue("id"));
+      write("<media-fragment id=\""+XMLUtils.escapeForAttribute(id)+"\" mediatype=\"application/mathml+xml\">");
+      this.convertContent = new StringBuilder();
+      return;
+    }
     // store current fragment
     if (isFragment && !this.elements.contains("compare"))
       this.currentFragment = atts.getValue("id");
@@ -621,8 +635,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         } catch (ProcessException ex) {
           // die or not?
           if (this.failOnError)
-            throw new SAXException(
-                "Failed to rewrite src attribute " + atts.getValue(i) + ": " + ex.getMessage(), ex);
+            throw new SAXException("Failed to rewrite src attribute " + atts.getValue(i) + ": " + ex.getMessage(), ex);
           else
             this.logger.warn("Failed to rewrite image src attribute " + atts.getValue(i) + ": "
                 + ex.getMessage());
@@ -667,7 +680,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     this.elements.push(qName);
     // handle markdown
     if (this.convertMarkdown && noNamespace && "markdown".equals(qName)) {
-      this.markdownContent = new StringBuilder();
+      this.convertContent = new StringBuilder();
     }
     // add transcluded content now
     if ((isXRef || isImage) && !this.elements.contains("compare")) {
@@ -699,22 +712,33 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if (this.inTranscludedXRef)
       this.inTranscludedXRef = false;
     // replace xref by its contents?
-    boolean isXRef = (uri == null || uri.isEmpty())
-        && ("blockxref".equals(qName) || "xref".equals(qName));
+    boolean isXRef = (uri == null || uri.isEmpty()) && ("blockxref".equals(qName) || "xref".equals(qName));
     if (isXRef && this.stripCurrentXRefElement) {
       if ("blockxref".equals(qName))
         write("</para>");
       this.stripCurrentXRefElement = false;
       return;
     }
-    // otherwise print close tag
+    // convert ascii?
+    if (this.convertAsciiMath && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
+      write("<xref frag=\"media\" type=\"math\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
+      write(AsciiMathConverter.convert(convertContent.toString()));
+      write("</media-fragment></xref>");
+      this.convertContent = null;
+      return;
+    } else if (this.convertAsciiMath && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
+      write(AsciiMathConverter.convert(convertContent.toString()));
+      write("</media-fragment>");
+      this.convertContent = null;
+      return;
+    }
+      // otherwise print close tag
     this.elements.pop();
     // handle markdown
-    if (this.convertMarkdown && (uri == null || uri.isEmpty()) && "markdown".equals(qName)
-        && this.markdownContent != null) {
+    if (this.convertMarkdown && (uri == null || uri.isEmpty()) && "markdown".equals(qName) && this.convertContent != null) {
       // convert to PSML
-      write(markdownToPSML(this.markdownContent.toString()));
-      this.markdownContent = null;
+      write(markdownToPSML(this.convertContent.toString()));
+      this.convertContent = null;
     }
     write("</" + qName + ">");
     // handle fragment ending (not the compare fragments!)
@@ -738,8 +762,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       return;
     }
     // markdown
-    if (this.convertMarkdown && this.markdownContent != null)
-      this.markdownContent.append(ch, start, length);
+    if ((this.convertAsciiMath || this.convertMarkdown) && this.convertContent != null)
+      this.convertContent.append(ch, start, length);
     else
       write(XMLUtils.escape(new String(ch, start, length)));
   }

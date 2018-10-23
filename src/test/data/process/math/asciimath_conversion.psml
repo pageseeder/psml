@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document id="1" level="portable">
+  <section id="1">
+    <fragment id="1">
+      <para>You can use the following ASCIIMathML constructs: <inline label="asciimath">`(x+1)/(x-1) x^(i+j) x_(ij) sqrt(x) root(n)(x) stackrel(+)(->) text(any) "any"`</inline></para>
+      <para>Operation symbols <inline label="asciimath">+ - * ** *** // \\ xx -: @ o+ ox sum prod ^^ ^^^ vv vvv nn nnn uu uuu</inline></para>
+      <para>Relation symbols <inline label="asciimath">`= != &lt; &lt;= > >= -&lt; >- in !in sub sup sube supe -= ~= ~~ prop`</inline></para>
+      <para>Logical symbols <inline label="asciimath">and or not => if iff AA EE _|_ TT |-- |==</inline></para>
+      <para>Miscellaneous symbols <inline label="asciimath">int oint del grad +- O/ oo aleph ... cdots \ quad qquad diamond square |__ __| |~ ~| CC NN QQ RR ZZ</inline></para>
+      <para>Standard functions <inline label="asciimath">sin cos tan csc sec cot sinh cosh tanh log ln det dim lim mod gcd lcm</inline></para>
+      <para>Grouping brackets <inline label="asciimath">`( ) [ ] { } (: :) {: :}`</inline></para>
+      <para>Arrows <inline label="asciimath">uarr darr rarr -> larr harr rArr lArr hArr</inline></para>
+      <para>Accents <inline label="asciimath">hatx barx ulx vecx dotx ddotx</inline></para>
+      <para>Font commands <inline label="asciimath">bbA bbbA ccA ttA frA sfA</inline></para>
+      <para>Matrices <inline label="asciimath">[[a,b],[c,d]] ((1,0),(0,1))</inline></para>
+      <para>Greek letters <inline label="asciimath">alpha beta chi delta Delta epsi eta gamma Gamma iota kappa lambda Lambda mu nu omega Omega phi Phi pi Pi psi Psi rho sigma Sigma tau theta Theta upsilon xi Xi zeta</inline></para>
+    </fragment>
+    <fragment id="2">
+      <para><inline label="asciimath">int_-1^1 sqrt(1-x^2)dx = pi/2</inline></para>
+      <para><inline label="asciimath">`((a,b),(c,d))^-1 = 1/(ad-bc)((d,-b),(-c,a))`</inline></para>
+    </fragment>
+    <media-fragment id="3" mediatype="text/asciimath">`int_-1^1 sqrt(1-x^2)dx = pi/2`</media-fragment>
+  </section>
+</document>
