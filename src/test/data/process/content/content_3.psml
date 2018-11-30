@@ -1,6 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?><document id="21934" schemaversion="0.10" date="2017-06-23T16:41:37+10:00" version="current" level="portable"><documentinfo><uri id="21934" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/content/content_3.psml" decodedpath="/ps/test/local1/documents/process/content/content_3.psml" external="false" mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:38:25+10:00" modified="2017-06-23T16:41:37+10:00" title="Content 3"><displaytitle>Content 3</displaytitle></uri><reversexrefs><reversexref uriid="21930" href="content_1.psml" frag="2" urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml" id="39448" title="Content 2" type="none" forwardtype="embed" forwarddisplay="document" forwardfrag="default"/><reversexref uriid="21926" href="../ref_0.psml" frag="2" urititle="Ref 0" mediatype="application/vnd.pageseeder.psml+xml" documenttype="references" id="39456" title="References" type="none" forwardtype="none" forwarddisplay="document" forwardfrag="default"/></reversexrefs></documentinfo><fragmentinfo/><metadata/>
-  <section id="title"><fragment id="1">
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21934" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="21934" scheme="http" host="localhost" port="80"
+      path="/ps/test/local1/documents/process/content/content_3.psml"
+      decodedpath="/ps/test/local1/documents/process/content/content_3.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2017-06-23T16:38:25+10:00" modified="2017-06-23T16:41:37+10:00"
+      title="Content 3">
+      <displaytitle>Content 3</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="21930" href="content_1.psml" frag="2"
+        urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml"
+        id="39448" title="Content 2" type="none" forwardtype="embed"
+        forwarddisplay="document" forwardfrag="default" />
+      <reversexref uriid="21926" href="../ref_0.psml" frag="2"
+        urititle="Ref 0" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="references" id="39456" title="References" type="none"
+        forwardtype="none" forwarddisplay="document" forwardfrag="default" />
+    </reversexrefs>
+  </documentinfo>
+  <fragmentinfo>
+    <locator fragment="1">
+      <reversexrefs>
+        <reversexref uriid="21926" href="../toc.psml" frag="3"
+          urititle="TOC Test" mediatype="application/vnd.pageseeder.psml+xml"
+          documenttype="references" id="394561" title="{parentnumber}{prefix} {heading}" type="none"
+          forwardtype="alternate" forwarddisplay="template" forwardfrag="default" />
+      </reversexrefs>      
+    </locator>
+  </fragmentinfo>
+  <metadata />
+  <section id="title">
+    <fragment id="1">
       <heading level="1" numbered="true">Content 3</heading>
-    </fragment></section><section id="content"><fragment id="2">
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
       <para indent="1" numbered="true">A numbered paragraph</para>
-    </fragment></section></document>
+    </fragment>
+  </section>
+</document>

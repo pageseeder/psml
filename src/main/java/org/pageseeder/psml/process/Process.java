@@ -3,8 +3,25 @@
  */
 package org.pageseeder.psml.process;
 
-import org.pageseeder.psml.process.config.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.pageseeder.psml.process.config.ErrorHandling;
+import org.pageseeder.psml.process.config.Images;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
+import org.pageseeder.psml.process.config.ManifestDocument;
+import org.pageseeder.psml.process.config.Strip;
+import org.pageseeder.psml.process.config.XRefsTransclude;
+import org.pageseeder.psml.process.config.XSLTTransformation;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -13,10 +30,6 @@ import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
 
 /**
  * Perform the process task.
@@ -592,6 +605,12 @@ public final class Process {
         numberingAndTOC.setFragmentNumbering(
             new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig));
         handler2.setPublicationConfig(this.publicationConfig, numberingAndTOC, this.generatetoc);
+        //Map<String,Prefix> prefixes = numberingAndTOC.fragmentNumbering().getAllPrefixes();
+        //String result = prefixes.entrySet()
+        //    .stream().sorted(Map.Entry.comparingByKey())
+        //    .map(entry -> entry.getKey() + " - " + entry.getValue())
+        //    .collect(Collectors.joining("\n"));
+        //System.out.println(result);
       }
       // parse XML input
       try {

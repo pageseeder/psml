@@ -287,7 +287,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     this.insideDiffElement = "dfx:ins".equals(qName) ? DiffElement.INS :
       ("dfx:del".equals(qName) ? DiffElement.DEL : null);
 
-    // if single transcluded fragment update uriids
+    // if single transcluded fragment update uriids (document-fragment added temporarily by first process)
     if ("document-fragment".equals(qName)) {
       String uriid = atts.getValue("uriid");
       Integer count = this.uriIDsAlreadyFound.get(uriid);

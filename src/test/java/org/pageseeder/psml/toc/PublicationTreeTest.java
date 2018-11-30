@@ -201,6 +201,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-1-default",null,"1.1.",3,"0.1.1.");
     assertHasPrefix(prefixes,"1001-2-2-1","1.2.","(b)",5,"0.1.2.0.2.");
     assertHasPrefix(prefixes,"1001-2-2-2","1.2.","(c)",5,"0.1.2.0.3.");
+    assertHasPrefix(prefixes,"1001-2-default",null,"",4,null);
     assertHasPrefix(prefixes,"1002-1-1-1",null,"1.2.1.",4,"0.1.2.1.");
     assertHasPrefix(prefixes,"1002-1-default",null,"1.2.1.",4,"0.1.2.1.");
     assertHasPrefix(prefixes,"1003-1-1-1","1.1.","(d)",5,"0.1.0.1.4.");
@@ -209,7 +210,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1003-2-default","1.2.(a)","(iv)",6,"0.1.2.0.1.4.");
     assertHasPrefix(prefixes,"101-1-1-1",null,"1.2.",3,"0.1.2.");
     assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
-    Assert.assertEquals(34, prefixes.size());
+    Assert.assertEquals(35, prefixes.size());
   }
 
   @Test
@@ -404,9 +405,10 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-1-default",null,"3.",1,"3.");
     assertHasPrefix(prefixes,"1001-2-2-1",null,"3.4.4.",3,"3.4.4.");
     assertHasPrefix(prefixes,"1001-2-2-2",null,"3.4.5.",3,"3.4.5.");
+    assertHasPrefix(prefixes,"1001-2-default",null,"",2,null);
     assertHasPrefix(prefixes,"101-1-1-1",null,"3.3.",2,"3.3.");
     assertHasPrefix(prefixes,"101-1-default",null,"",2,null);
-    Assert.assertEquals(28, prefixes.size());
+    Assert.assertEquals(29, prefixes.size());
   }
 
   @Test
@@ -709,12 +711,13 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-1-default",null,"A.",3,"0.0.1.");
     assertHasPrefix(prefixes,"1001-2-2-1","","(a)",5,"0.0.0.0.1.");
     assertHasPrefix(prefixes,"1001-2-2-2","","(b)",5,"0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1001-2-default",null,"",4,null);
     assertHasPrefix(prefixes,"1002-1-1-1",null,"a.b.",3,"0.1.2.");
     assertHasPrefix(prefixes,"1002-1-2-1",null,"a.b.a.",4,"0.1.2.1.");
     assertHasPrefix(prefixes,"1002-1-default",null,"a.b.",3,"0.1.2.");
     assertHasPrefix(prefixes,"101-1-1-1",null,"1.",3,"0.0.1.");
     assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
-    Assert.assertEquals(31, prefixes.size());
+    Assert.assertEquals(32, prefixes.size());
   }
 
   @Test

@@ -246,6 +246,10 @@ public final class FragmentNumbering implements Serializable {
           // references to embedded single fragments are not numbered
           if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
             processReference(ref, nextLevel - 1, nextTree, nextNumber, nextCount);
+          } else {
+            // always store prefix on default fragment with level as an adjustment to the first heading in the document
+            this.numbering.put(nextTree.id() + "-" + nextCount + "-default",
+                new Prefix(DocumentTree.NO_PREFIX, null, nextLevel + 1 - nextTree.level(), null));
           }
           // add -1 to transclusion map
           addTransclusionParents(ref.uri(), -1, transclusions);

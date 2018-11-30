@@ -49,6 +49,11 @@
         display="document" type="transclude" uriid="21927" href="ref_1.psml"
         urititle="Ref 1" mediatype="application/vnd.pageseeder.psml+xml"
         documenttype="references">Ref 1 transclude</blockxref>
+      <blockxref id="39419" frag="1" reversefrag="2"
+        reversetitle="References" reverselink="true" reversetype="none"
+        display="document" type="embed" uriid="219350" href="content/content_4.psml"
+        urititle="Content 4" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="references">Content 4 embed frag</blockxref>
       <blockxref id="39419" frag="default" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="document" type="embed" uriid="219350" href="content/content_4.psml"
@@ -71,6 +76,13 @@
         display="template" title="{parentnumber}{prefix}"
         type="none" uriid="21934" href="content/content_3.psml"
         urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx</xref></para>
+      <!-- 
+      <para><xref id="394561" frag="1" reversefrag="2"
+        reversetitle="References" reverselink="true" reversetype="none"
+        display="template" title="{parentnumber}{prefix} {heading}"
+        type="alternate" uriid="21934" href="content/content_3.psml"
+        urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx x</xref></para>
+       -->
     </fragment>
   </section>
 </document>
