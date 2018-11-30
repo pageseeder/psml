@@ -66,23 +66,22 @@
         display="template" title="Parentnumber {parentnumber} Prefix {prefix}"
         type="none" uriid="21930" href="content/content_1.psml"
         urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Parentnumber x Prefix x</xref></para>
-      <para><xref id="39456" frag="1" reversefrag="2"
+      <para><xref id="394561" frag="1" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="template" title="{parentnumber}{prefix} {heading}"
-        type="none" uriid="21934" href="content/content_3.psml"
+        type="alternate" uriid="21934" href="content/content_3.psml"
         urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx x</xref></para>
       <para><xref id="39456" frag="2" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="template" title="{parentnumber}{prefix}"
         type="none" uriid="21934" href="content/content_3.psml"
         urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx</xref></para>
-      <!-- 
-      <para><xref id="394561" frag="1" reversefrag="2"
+      <para><xref id="39456" frag="1" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="template" title="{parentnumber}{prefix} {heading}"
-        type="alternate" uriid="21934" href="content/content_3.psml"
+        type="none" uriid="21934" href="content/content_3.psml"
         urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx x</xref></para>
-       -->
+      <heading level="2" numbered="true">TOC heading 2</heading>
     </fragment>
   </section>
 </document>

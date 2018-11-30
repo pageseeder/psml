@@ -217,7 +217,8 @@ public final class XRefTranscluder {
           Integer.parseInt(levelAtt) : 0;
       PSMLProcessHandler handler = this.parentHandler.cloneForTransclusion(
           target, atts.getValue("uriid"), fragment, level, image,
-          inEmbedHierarchy && "embed".equals(type), "transclude".equals(type));
+          inEmbedHierarchy && "embed".equals(type), "transclude".equals(type),
+          "alternate".equals(type) || this.parentHandler.inAlternateXRef());
       handler.getTranscluder().parentFiles.putAll(this.parentFiles);
       // parse now
       XMLUtils.parse(target, handler);

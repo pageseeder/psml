@@ -198,6 +198,11 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   private DiffElement insideDiffElement = null;
 
   /**
+   * The number of nested XRefs under an alternate XRef (including itself)
+   */
+  private int alternateXRefs = 0;
+
+  /**
    * @param out            where the resulting XML should be written.
    * @param relativePath   the source's file relative path (used to compute relative paths).
    */
@@ -286,17 +291,32 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
 
     this.insideDiffElement = "dfx:ins".equals(qName) ? DiffElement.INS :
       ("dfx:del".equals(qName) ? DiffElement.DEL : null);
+    // only diff elements are handled for XRef template (not alternate content)
+    if (this.insideDiffElement == null) {
+      this.resolvedXRefTemplate = null;
+    }
+
+    // update alternate XRef counter
+    if (isXRef) {
+      if (this.alternateXRefs > 0) {
+        this.alternateXRefs++;
+      } else if ("alternate".equals(atts.getValue("type"))) {
+        this.alternateXRefs = 1;
+      }
+    }
 
     // if single transcluded fragment update uriids (document-fragment added temporarily by first process)
     if ("document-fragment".equals(qName)) {
-      String uriid = atts.getValue("uriid");
-      Integer count = this.uriIDsAlreadyFound.get(uriid);
-      if (count == null) count = 0;
-      count++;
-      this.uriIDsAlreadyFound.put(uriid, count);
-      this.ancestorUriIDs.push(count + "_" + uriid);
-      if (!this.lastXRefTransclude) {
-        this.locations.push(new Location(Long.parseLong(uriid), count));
+      if (this.alternateXRefs == 0) {
+        String uriid = atts.getValue("uriid");
+        Integer count = this.uriIDsAlreadyFound.get(uriid);
+        if (count == null) count = 0;
+        count++;
+        this.uriIDsAlreadyFound.put(uriid, count);
+        this.ancestorUriIDs.push(count + "_" + uriid);
+        if (!this.lastXRefTransclude) {
+          this.locations.push(new Location(Long.parseLong(uriid), count));
+        }
       }
       return;
     }
@@ -310,7 +330,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     }
     // set heading/para prefix
     Location location = this.locations.isEmpty() ? null : this.locations.peek();
-    if ((isHeading || isPara) && !this.elements.contains("compare") && this.numberingAndTOC != null) {
+    if ((isHeading || isPara) && !this.elements.contains("compare") && this.numberingAndTOC != null && this.alternateXRefs == 0) {
       if (isHeading) {
         this.previousheadingLevel = Integer.parseInt(atts.getValue("level"));
       }
@@ -364,7 +384,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         } catch (ProcessException e) {
           throw new SAXException(e.getMessage(), e);
         }
-      } else if (isSection && "id".equals(name)) {
+      } else if (isSection && "id".equals(name) && this.alternateXRefs == 0) {
         String id = atts.getValue(i);
         // get uriid and make id unique
         int j = id.indexOf('-');
@@ -376,7 +396,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         } else {
           value = id;
         }
-      } else if (isDocument && "id".equals(name)) {
+      } else if (isDocument && "id".equals(name) && this.alternateXRefs == 0) {
         String id = atts.getValue(i);
         Integer count = this.uriIDsAlreadyFound.get(id);
         if (count == null) count = 0;
@@ -399,7 +419,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
 //            value = atts.getValue(i);
 //          }
       } else if (!this.elements.contains("compare")) {
-        if (isFrag && "id".equals(name)) {
+        if (isFrag && "id".equals(name) && this.alternateXRefs == 0) {
           String id = atts.getValue(i);
           // get uriid and make id unique
           int j = id.indexOf('-');
@@ -425,14 +445,14 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
             && !this.elements.contains("compare") && this.numberingAndTOC != null) {
           // prefix already added
           continue;
-        } else if (isHeading && "level".equals(name) && this.numberingAndTOC != null &&
+        } else if (isHeading && "level".equals(name) && this.numberingAndTOC != null && this.alternateXRefs == 0 &&
             this.publicationConfig.getHeadingLevelAdjust() == PublicationConfig.LevelAdjust.CONTENT) {
           int headingLevel = Integer.parseInt(atts.getValue(name));
           Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position);
           int base = pref == null ? 0 : pref.level;
           headingLevel += base - 1;
           value = String.valueOf(headingLevel > 0 ? headingLevel : 1);
-        } else if (isPara && "indent".equals(name) && this.numberingAndTOC != null &&
+        } else if (isPara && "indent".equals(name) && this.numberingAndTOC != null && this.alternateXRefs == 0 &&
             this.publicationConfig.getParaLevelAdjust() == PublicationConfig.LevelAdjust.CONTENT) {
           int paraLevel = Integer.parseInt(atts.getValue(name));
           Prefix pref = this.numberingAndTOC.fragmentNumbering().getPrefix(location.uriid, location.position);
@@ -455,7 +475,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       }
     }
     // write toc ids if needed
-    if (isHeading && this.generateTOC && !this.elements.contains("compare")) {
+    if (isHeading && this.generateTOC && !this.elements.contains("compare") && this.alternateXRefs == 0) {
       try {
         this.xml.write(" id=\""+XMLUtils.escapeForAttribute(
             location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index)+"\"");
@@ -548,17 +568,23 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         this.resolvedXRefTemplate = null;
       }
     }
+    // update alternate XRef counter
+    if (("xref".equals(qName) || "blockxref".equals(qName)) && this.alternateXRefs > 0) {
+      this.alternateXRefs--;
+    }
     if ("xref".equals(qName)) this.xrefElementChange = null;
     if ("document-fragment".equals(qName)) {
-      this.ancestorUriIDs.pop();
-      // if not in a transclusion
-      if (this.locations.peek().blockxrefs == 0) {
-        this.locations.pop();
-        this.previousheadingLevel = 0;
+      if (this.alternateXRefs == 0) {
+        this.ancestorUriIDs.pop();
+        // if not in a transclusion
+        if (this.locations.peek().blockxrefs == 0) {
+          this.locations.pop();
+          this.previousheadingLevel = 0;
+        }
       }
       return;
     }
-    if ("document".equals(qName)) {
+    if ("document".equals(qName) && this.alternateXRefs == 0) {
       this.ancestorUriIDs.pop();
       // if not in a transclusion
       if (this.locations.peek().blockxrefs == 0) {

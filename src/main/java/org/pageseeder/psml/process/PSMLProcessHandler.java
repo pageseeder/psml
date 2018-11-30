@@ -3,6 +3,21 @@
  */
 package org.pageseeder.psml.process;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import org.pageseeder.psml.md.BlockParser;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.process.XRefTranscluder.InfiniteLoopException;
@@ -25,12 +40,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import java.io.*;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 
 /**
@@ -220,6 +229,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private boolean inTranscludedXRef = false;
 
   /**
+   * If the parser is currently inside an alternate an XRef.
+   */
+  private boolean inAlternateXRef = false;
+
+  /**
    * If the parser is currently in transcluded content.
    */
   private boolean inTranscludedContent = false;
@@ -407,6 +421,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param embed  whether hierarchy has all embed XRefs
    */
   public void addUriFragID(String uriid, String fragid, boolean embed) {
+    // can't XRef to alternate content
+    if (this.inAlternateXRef) return;
     // if not root add to parent
     if (this.parent != null)
       this.parent.addUriFragID(uriid, fragid, embed);
@@ -519,7 +535,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
     return this.sourceFile;
   }
 
+
   /**
+   * @return whether parser is inside an alternate XRef
+   */
+  public boolean inAlternateXRef() {
+    return this.inAlternateXRef;
+  }
+
+/**
    * @return the parentFolderRelativePath
    */
   public String getParentFolderRelativePath() {
@@ -709,8 +733,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if (this.ignore)
       return;
     // reset flags
-    if (this.inTranscludedXRef)
-      this.inTranscludedXRef = false;
+    this.inTranscludedXRef = false;
     // replace xref by its contents?
     boolean isXRef = (uri == null || uri.isEmpty()) && ("blockxref".equals(qName) || "xref".equals(qName));
     if (isXRef && this.stripCurrentXRefElement) {
@@ -722,12 +745,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
     // convert ascii?
     if (this.convertAsciiMath && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
       write("<xref frag=\"media\" type=\"math\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
-      write(AsciiMathConverter.convert(convertContent.toString()));
+      write(AsciiMathConverter.convert(this.convertContent.toString()));
       write("</media-fragment></xref>");
       this.convertContent = null;
       return;
     } else if (this.convertAsciiMath && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
-      write(AsciiMathConverter.convert(convertContent.toString()));
+      write(AsciiMathConverter.convert(this.convertContent.toString()));
       write("</media-fragment>");
       this.convertContent = null;
       return;
@@ -794,11 +817,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param fromImage  whether transclusion is from an image
    * @param embed      whether hierarchy has all embed XRefs
    * @param transclude whether the XRef was a transclude
+   * @param transclude whether the XRef was an alternate
    *
    * @return the handler
    */
   protected PSMLProcessHandler cloneForTransclusion(File toParse, String uriid, String fragment,
-                                                    int lvl, boolean fromImage, boolean embed, boolean transclude) {
+                                  int lvl, boolean fromImage, boolean embed, boolean transclude, boolean alternate) {
     // update uri count
     Integer count = this.allUriIDs.get(uriid);
     if (count == null)
@@ -824,6 +848,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.transcluder.excludeXRefFragment, this.transcluder.onlyXRefFrament,
         this.logXRefNotFound);
     handler.alternateImageXRefs = fromImage;
+    handler.inAlternateXRef = alternate;
     handler.setURIID(uriid);
     handler.setURICount(count);
     handler.generateTOC = this.generateTOC;
