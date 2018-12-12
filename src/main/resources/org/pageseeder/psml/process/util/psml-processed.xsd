@@ -140,9 +140,9 @@
           <xs:documentation>The title for the section.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="fragmenttype" type="fragment-type">
+      <xs:attribute name="fragmenttype" type="fragment-type-list">
         <xs:annotation>
-          <xs:documentation>A fragment type.</xs:documentation>
+          <xs:documentation>A list of fragment types allowed.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="lockstructure" type="xs:boolean" default="true">
@@ -1991,6 +1991,12 @@
   <xs:simpleType name="fragment-type">
     <xs:restriction base="xs:string">
       <xs:pattern value="[a-zA-Z0-9_\-\.]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="fragment-type-list">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9_\-\.,]+"/>
     </xs:restriction>
   </xs:simpleType>
 
