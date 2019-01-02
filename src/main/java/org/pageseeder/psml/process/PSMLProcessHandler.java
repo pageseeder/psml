@@ -3,21 +3,6 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import org.pageseeder.psml.md.BlockParser;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.process.XRefTranscluder.InfiniteLoopException;
@@ -40,6 +25,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 /**
@@ -753,6 +744,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
       write(AsciiMathConverter.convert(this.convertContent.toString()));
       write("</media-fragment>");
       this.convertContent = null;
+      if (this.fragmentToLoad != null) {
+        this.inRequiredFragment = false;
+      }
       return;
     }
       // otherwise print close tag
@@ -859,6 +853,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.numberingAndTOC = this.numberingAndTOC;
     handler.publicationConfig = this.publicationConfig;
     handler.setConvertMarkdown(this.convertMarkdown);
+    handler.setConvertAsciiMath(this.convertAsciiMath);
     // load only one fragment?
     if (fragment != null && !"default".equals(fragment)) {
       handler.setFragment(fragment);
