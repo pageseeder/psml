@@ -37,7 +37,7 @@
       </xs:attribute>
       <xs:attribute name="schemaversion" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The version of the PSML schema: currently set to "0.9". INFORMATIONAL - ignored by upload.</xs:documentation>
+          <xs:documentation>The version of the PSML schema. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="type" type="document-type">
@@ -563,7 +563,7 @@
           <xs:documentation>Publication type.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="hostid" type="xs:string">
+      <xs:attribute name="hostid" type="xs:long">
         <xs:annotation>
           <xs:documentation>ID of the host. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
@@ -580,7 +580,7 @@
       </xs:attribute>
       <xs:attribute name="defaultgroupid" type="xs:long">
         <xs:annotation>
-          <xs:documentation>ID of teh publication's default group. INFORMATIONAL - ignored by upload.</xs:documentation>
+          <xs:documentation>ID of the publication's default group. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
