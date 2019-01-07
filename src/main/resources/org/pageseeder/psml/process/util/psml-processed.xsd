@@ -75,7 +75,7 @@
           <xs:documentation>The URI ID of the document. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="publicationid" type="xs:string">
+      <xs:attribute name="publicationid" type="publication-id">
         <xs:annotation>
           <xs:documentation>The publication ID of the document. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
