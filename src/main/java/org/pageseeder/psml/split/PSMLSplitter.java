@@ -38,6 +38,7 @@ public final class PSMLSplitter {
   private PSMLSplitter(Builder producer, Writer log) {
     if (producer.source() == null) { throw new NullPointerException("source is null"); }
     if (producer.destination() == null) { throw new NullPointerException("destination is null"); }
+    if (producer.config() == null) { throw new NullPointerException("config is null"); }
     this._builder = producer;
     this._log = log;
   }
@@ -99,17 +100,16 @@ public final class PSMLSplitter {
     Map<String, String> parameters = new HashMap<>();
     parameters.put("_outputfolder", outuri);
     parameters.put("_mediafoldername", mediaFolderName);
-    if (this._builder.config() != null) {
-      parameters.put("_configfileurl", this._builder.config().toURI().toString());
-    }
+    parameters.put("_configfileurl", this._builder.config().toURI().toString());
+
     // Add custom parameters
     parameters.putAll(this._builder.params());
 
     // Map fragments to new locations
-    log("Mapping fragments to new locations");
-    File fragmetMap = new File(this._builder.working(), "fragment-map.xml");
-    XSLT.transform(source, fragmetMap, split, parameters);
-    parameters.put("_fragmetMap", fragmetMap.toURI().toString());
+    //log("Mapping fragments to new locations");
+    //File fragmetMap = new File(this._builder.working(), "fragment-map.xml");
+    //XSLT.transform(source, fragmetMap, split, parameters);
+    //parameters.put("_fragmetMap", fragmetMap.toURI().toString());
 
     // Split files
     log("Splitting PSML (this may take several minutes)");

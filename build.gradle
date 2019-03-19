@@ -43,4 +43,8 @@ dependencies {
     'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
   )
 
+  testRuntime (
+    'net.sf.saxon:Saxon-HE:9.7.0-2',   
+  )
+
 }
