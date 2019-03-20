@@ -1,113 +1,127 @@
+<!--
+  XSLT to split a pre-split PSML into multiple files.
+
+  @author Philip Rutherford
+-->
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:config="http://pageseeder.org/psml/config"
+                xmlns:fn="http://pageseeder.org/psml/function"
                 exclude-result-prefixes="#all">
-
-  <xsl:import href="config.xsl" />
   
   <!-- Output folder URL -->
   <xsl:param name="_outputfolder" as="xs:string"/>
-  
-  <!-- Configuration file URL -->
-  <xsl:param name="_configfileurl" as="xs:string" />
-  
-  <!-- Name of the media folder to reference images -->
-  <xsl:param name="_mediafoldername" as="xs:string" />
 
-  <!-- Generate main document -->
+  <!-- Output filename -->
+  <xsl:param name="_outputfilename" as="xs:string"/>
+  
+  <!-- Process main document -->
   <xsl:template match="/">
-    <document level="portable"
-        type="{if (config:main-container()/@type!='') then config:main-container()/@type else 'references'}">
-      <documentinfo>
-        <uri>
-          <xsl:if test="document/documentinfo/uri/@title">
-            <xsl:attribute name="title" select="document/documentinfo/uri/@title"/>
-          </xsl:if>
-          <xsl:if test="config:main-container()/@labels != ''">
-            <labels><xsl:value-of select="config:main-container()/@labels"/></labels>
-          </xsl:if>
-        </uri>
-      </documentinfo>
-      
-      <!-- output frontmatter -->
-      <xsl:variable name="frontmatter"
-          select="not((//fragment/*)[1][config:split-document(.)])" />
-      <section id="title">
-        <fragment id="1">
-          <xsl:for-each-group select="//fragment/*" group-starting-with="*[config:split-document(.)]">
-            <xsl:if test="position() = 1 and $frontmatter">
-               <xsl:apply-templates select="current-group()" />
-            </xsl:if>
-          </xsl:for-each-group>
-        </fragment>
-      </section>
-      <toc/>
-      
-      <!-- output components -->
-      <section id="xrefs">
-        <xref-fragment id="2">
-          <xsl:for-each-group select="//fragment/*" group-starting-with="*[config:split-document(.)]">
-            <xsl:if test="not(position() = 1) or not($frontmatter)">
-              <xsl:variable name="first" select="current-group()[1]" />
-              <xsl:variable name="config" select="config:split-document($first)" />
-              
-              <!-- output component document -->
-              <document level="portable">
-                <xsl:if test="$config/@type != ''">
-                  <xsl:attribute name="type" select="$config/@type"/>
-                </xsl:if>
-                <xsl:if test="$config/@folder != ''">
-                  <xsl:attribute name="folder" select="$config/@folder"/>
-                </xsl:if>
-                <documentinfo>
-                  <uri>
-                    <xsl:if test="normalize-space($first) != ''">
-                      <xsl:attribute name="title" select="normalize-space($first)"/>
-                    </xsl:if>
-                    <xsl:if test="$config/@labels != ''">
-                      <labels><xsl:value-of select="$config/@labels"/></labels>
-                    </xsl:if>
-                  </uri>
-                </documentinfo>
-                
-                <!-- output component title -->
-                <section id="title">
-                  <fragment id="1">
-                    <xsl:apply-templates select="$first" />
-                  </fragment>
-                </section>
+    <document>
+      <xsl:copy-of select="document/@*" />
+      <xsl:apply-templates select="document/node()" />
+    </document>
+  </xsl:template>
+  
+  <!-- Handle component documents -->
+  <xsl:template match="document">
+    <xsl:variable name="path" select="concat(@folder, fn:generate-filename(.))" />
+    <xsl:variable name="level" as="xs:integer">
+      <xsl:choose>
+        <xsl:when test="section/fragment[@id='1']//heading">
+          <xsl:value-of select="xs:integer(section/fragment[@id='1']//heading/@level) - 1" />
+        </xsl:when>
+        <xsl:otherwise>0</xsl:otherwise>
+      </xsl:choose>     
+    </xsl:variable>
+    <blockxref frag="default" display="document" type="embed" href="{$path}">
+      <xsl:if test="$level > 0">
+        <xsl:attribute name="level" select="$level" />
+      </xsl:if>
+      <xsl:result-document href="{concat($_outputfolder,$path)}">
+        <xsl:copy>
+          <xsl:copy-of select="@*[not(name()='folder')]" />
+          <xsl:apply-templates>
+            <xsl:with-param name="level" select="$level" tunnel="yes" as="xs:integer" />
+          </xsl:apply-templates>
+        </xsl:copy>
+      </xsl:result-document>
+    </blockxref>
+  </xsl:template>    
 
-                <!-- output component content -->
-                <section id="content">
-                  <xsl:for-each-group select="current-group()[not(position() = 1)]"
-                        group-starting-with="*[config:split-fragment(.)]">
-                    <xsl:variable name="config-frag" select="config:split-fragment(current-group()[1])" />
-                    <fragment id="{position() + 1}">
-                      <xsl:if test="$config-frag/@type != ''">
-                        <xsl:attribute name="type" select="$config-frag/@type"/>
-                      </xsl:if>
-                      <xsl:if test="$config-frag/@labels != ''">
-                        <xsl:attribute name="labels" select="$config-frag/@labels"/>
-                      </xsl:if>
-                      <xsl:apply-templates select="current-group()" />
-                    </fragment>
-                  </xsl:for-each-group>
-                </section>
-              </document>
-            </xsl:if>
-          </xsl:for-each-group>
-        </xref-fragment>
-      </section>
-    </document>    
+  <!-- Handle inline documents -->
+  <xsl:template match="inline[document]">
+    <xsl:variable name="path" select="concat(document/@folder, fn:generate-filename(document))" />
+    <xref frag="default" display="document" type="none"
+        href="{concat(if (ancestor::document[@folder]) then '../' else '', $path)}">
+      <xsl:value-of select="document/documentinfo/uri/@title" />
+    </xref>    
+    <xsl:for-each select="document">
+      <xsl:result-document href="{concat($_outputfolder,$path)}">
+        <xsl:copy>
+          <xsl:copy-of select="@*[not(name()='folder')]" />
+          <xsl:apply-templates>
+            <xsl:with-param name="level" select="0" tunnel="yes" as="xs:integer" />
+          </xsl:apply-templates>
+        </xsl:copy>
+      </xsl:result-document>
+    </xsl:for-each>
+  </xsl:template>    
+
+  <!-- modify heading level -->
+  <xsl:template match="heading">
+    <xsl:param name="level" select="0" tunnel="yes" as="xs:integer"/>
+    <xsl:copy>
+      <xsl:copy-of select="@*[not(name()='level')]" />
+      <xsl:attribute name="level" select="if ($level > 0) then number(@level) - 1 else @level" />
+      <xsl:apply-templates select="node()" />
+    </xsl:copy>
   </xsl:template>
 
-  <!-- ignore xref transclusion content -->
-  <xsl:template match="xref[@type='transclude']">
+  <!-- modify image src -->
+  <xsl:template match="image">
     <xsl:copy>
-      <xsl:copy-of select="@*" />
+      <xsl:copy-of select="@*[not(name()='src')]" />
+      <xsl:attribute name="src" select="concat(if (ancestor::document[@folder]) then '../' else '', @src)" />
+      <xsl:apply-templates select="node()" />
     </xsl:copy>
-  </xsl:template>  
+  </xsl:template>
+  
+  <!-- replace internal links with xrefs -->
+  <xsl:template match="link[starts-with(@href,'#')]">
+    <xsl:variable name="anchor" select="//anchor[@name = substring-after(current()/@href,'#')]" />
+    <xsl:choose>
+      <xsl:when test="$anchor">
+        <xsl:variable name="document" select="($anchor/ancestor::document)[last()]" />
+        <xsl:variable name="path">
+          <xsl:choose>
+            <xsl:when test="count($anchor/ancestor::document) > 1">
+              <xsl:value-of
+                select="concat($document/@folder, fn:generate-filename($document))" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$_outputfilename" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xref frag="{($anchor/ancestor::fragment)[last()]/@id}" display="manual" type="none"
+            href="{concat(if (ancestor::document[@folder]) then '../' else '', $path)}" title="{normalize-space(.)}">
+          <xsl:value-of select="." />
+        </xref>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:copy-of select="@*" />
+          <xsl:apply-templates select="node()" />
+        </xsl:copy>       
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <!-- remove anchors -->
+  <xsl:template match="anchor">
+    <xsl:apply-templates select="node()" />
+  </xsl:template>
   
   <!-- copy all other elements unchanged -->
   <xsl:template match="*">
@@ -115,6 +129,21 @@
       <xsl:copy-of select="@*" />
       <xsl:apply-templates select="node()" />
     </xsl:copy>
-  </xsl:template>  
+  </xsl:template>
+  
+  <!-- return generated filename for document ([@type]-NNN.psml) -->
+  <xsl:function name="fn:generate-filename" as="xs:string">
+    <xsl:param name="doc" as="element(document)" />    
+    <xsl:choose>
+      <xsl:when test="$doc/@type">
+        <xsl:value-of select="concat($doc/@type, '-',
+            format-number(count($doc/preceding::document[@type=$doc/@type]) + 1, '000'), '.psml')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat('component-',
+            format-number(count($doc/preceding::document[not(@type)]) + 1, '000'),'.psml')"/>
+      </xsl:otherwise>
+    </xsl:choose>   
+  </xsl:function>
 
 </xsl:stylesheet>

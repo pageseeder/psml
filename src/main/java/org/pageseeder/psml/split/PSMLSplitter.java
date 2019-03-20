@@ -85,6 +85,7 @@ public final class PSMLSplitter {
     }
 
     // Parse templates
+    Templates pre = XSLT.getTemplatesFromResource("org/pageseeder/psml/split/pre-split.xsl");
     Templates split = XSLT.getTemplatesFromResource("org/pageseeder/psml/split/split.xsl");
     String outuri = destination.toURI().toString();
 
@@ -99,6 +100,7 @@ public final class PSMLSplitter {
     // Initiate parameters
     Map<String, String> parameters = new HashMap<>();
     parameters.put("_outputfolder", outuri);
+    parameters.put("_outputfilename", name);
     parameters.put("_mediafoldername", mediaFolderName);
     parameters.put("_configfileurl", this._builder.config().toURI().toString());
 
@@ -106,14 +108,13 @@ public final class PSMLSplitter {
     parameters.putAll(this._builder.params());
 
     // Map fragments to new locations
-    //log("Mapping fragments to new locations");
-    //File fragmetMap = new File(this._builder.working(), "fragment-map.xml");
-    //XSLT.transform(source, fragmetMap, split, parameters);
-    //parameters.put("_fragmetMap", fragmetMap.toURI().toString());
+    log("Preprocessing PSML (this may take several minutes)");
+    File pre_split = new File(this._builder.working(), "pre-split.xml");
+    XSLT.transform(source, pre_split, pre, parameters);
 
     // Split files
-    log("Splitting PSML (this may take several minutes)");
-    XSLT.transform(source, new File(destination, name), split, parameters);
+    log("Splitting PSML");
+    XSLT.transform(pre_split, new File(destination, name), split, parameters);
 
   }
 

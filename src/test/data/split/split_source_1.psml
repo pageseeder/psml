@@ -17,7 +17,15 @@
   <metadata />
   <section id="title">
     <fragment id="1">
-      <heading level="1">Split source 1</heading>
+      <heading level="1">Split source 1<anchor name="top" /></heading>
+      <para>Front matter <inline label="inline1">[My field 1]</inline></para>
+      <para>Front matter
+        <link href="#B">link to B</link>
+      </para>
+      <para>Front matter
+        <link href="http://pageseeder.com">link to PageSeeder</link>
+      </para>
+      <image src="images/diagram1.jpg" />
     </fragment>
   </section>
   <section id="content">
@@ -26,16 +34,17 @@
       <para>A content</para>
       <heading level="2">Heading B<anchor name="B" /></heading>
       <para>B content</para>
-      <para>B content</para>
-      <para>B content</para>
+      <para>B content <link href="#top">link to top</link></para>
+      <para>B content <inline label="inline2">with inline</inline></para>
+      <image src="images/diagram1.jpg" width="200" height="100" />
       <heading level="3">Heading B1</heading>
       <para>B1 content</para>
       <para indent="1" numbered="true">B1-1 clause</para>
       <para indent="1" numbered="true">B1-2 clause<anchor name="B1-2" /></para>
       <heading level="3">Heading B2</heading>
-      <para>B2 content <inline name="inline1">My field 1</inline></para>
+      <para>B2 content <inline label="inline1">[My field 2]</inline></para>
       <heading level="2">Heading C</heading>
-      <para>C content <inline name="inline1">My field 2</inline></para>
+      <para>C content <inline label="inline1">[My field 3]</inline></para>
       <heading level="2" numbered="true">Heading D</heading>
       <para>D content</para>
       <block label="block2">
@@ -52,9 +61,7 @@
       </para>
       <block label="block1">Special content</block>
       <para>More special content</para>
-      <block label="block2">
-        <heading level="2">Heading F</heading>
-      </block>
+      <block label="block2">Heading F</block>
       <para>Heading F content</para>
     </fragment>
   </section>

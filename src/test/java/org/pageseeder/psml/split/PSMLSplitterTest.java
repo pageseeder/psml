@@ -12,6 +12,7 @@ public class PSMLSplitterTest {
   private static final String SOURCE_FOLDER = "src/test/data/split";
   private static final String DEST_FOLDER = "build/test/split/result";
   private static final String COPY_FOLDER = "build/test/split/copy";
+  private static final String WORKING_FOLDER = "build/test/split/working";
 
   @Test
   public void testConfig0() throws IOException, ProcessException {
@@ -31,6 +32,7 @@ public class PSMLSplitterTest {
     b.source(copyfile);
     b.destination(dest);
     b.config(new File(src, "psml-split-config-0.xml"));
+    b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
   }
@@ -53,6 +55,7 @@ public class PSMLSplitterTest {
     b.source(copyfile);
     b.destination(dest);
     b.config(new File(src, "psml-split-config-1.xml"));
+    b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
   }

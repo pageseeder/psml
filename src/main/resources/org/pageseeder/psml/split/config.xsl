@@ -52,6 +52,13 @@
       </xsl:when>
     </xsl:choose>
   </xsl:function>
+
+  <!-- Returns the document config element matching the given inline element -->
+  <xsl:function name="config:inline-document" as="element(document)?">
+    <xsl:param name="el" as="element(inline)" />
+    
+    <xsl:sequence select="($config-doc/split-config/document/inline[@label=$el/@label])[1]/.." />
+  </xsl:function>
   
   <!-- Returns the fragment config element matching the given element -->
   <xsl:function name="config:split-fragment" as="element(fragment)?">
