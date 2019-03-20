@@ -17,17 +17,6 @@ package org.pageseeder.psml.process;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
@@ -41,6 +30,17 @@ import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.psml.toc.Tests.Validates;
 import org.xmlunit.matchers.CompareMatcher;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class ProcessTest {
 
@@ -390,7 +390,7 @@ public class ProcessTest {
     // validate
     Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     Assert.assertThat(xml, hasXPath("count(inline[@label = 'asciimath'])", equalTo("0")));
-    Assert.assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace().ignoreComments());
+    Assert.assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace());
   }
 
   @Test
