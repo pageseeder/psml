@@ -4,13 +4,13 @@
 package org.pageseeder.psml.split;
 
 import org.pageseeder.psml.util.XSLT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.Templates;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,35 +29,14 @@ public final class PSMLSplitter {
   /**
    * A writer to store the log
    */
-  private final Writer _log;
+  private final Logger _logger;
 
-  private PSMLSplitter(Builder producer) {
-    this(producer, new StringWriter());
-  }
-
-  private PSMLSplitter(Builder producer, Writer log) {
+  private PSMLSplitter(Builder producer, Logger log) {
     if (producer.source() == null) { throw new NullPointerException("source is null"); }
     if (producer.destination() == null) { throw new NullPointerException("destination is null"); }
     if (producer.config() == null) { throw new NullPointerException("config is null"); }
     this._builder = producer;
-    this._log = log;
-  }
-
-  /**
-   * @return the log in string
-   */
-  public String getLog() {
-    if (this._log != null) {
-      try {
-        this._log.flush();
-        this._log.close();
-      } catch (IOException e) {
-        return "";
-      }
-      return this._log.toString();
-    } else {
-      return "";
-    }
+    this._logger = log;
   }
 
   /**
@@ -70,10 +49,9 @@ public final class PSMLSplitter {
     // Find destination folder and filename
     File source = this._builder.source();
     File destination;
-    String name;
-    if (this._builder.destination().isFile()) {
+    String name = this._builder.destination().getName();
+    if (name.endsWith(".psml")) {
       destination = this._builder.destination().getParentFile();
-      name = this._builder.destination().getName();
     } else {
       destination = this._builder.destination();
       name = source.getName();
@@ -90,7 +68,7 @@ public final class PSMLSplitter {
     String outuri = destination.toURI().toString();
 
     // Move the media files
-    log("Moving media files");
+    this._logger.info("Moving media files");
     String mediaFolderName = this._builder.media() == null ? "images" : this._builder.media();
     File mediaFolder = new File(source.getParentFile(), mediaFolderName);
     if (mediaFolder.exists()) {
@@ -108,22 +86,18 @@ public final class PSMLSplitter {
     parameters.putAll(this._builder.params());
 
     // Map fragments to new locations
-    log("Preprocessing PSML (this may take several minutes)");
+    this._logger.info("Preprocessing PSML (this may take several minutes)");
     File pre_split = new File(this._builder.working(), "pre-split.xml");
     XSLT.transform(source, pre_split, pre, parameters);
 
     // Split files
-    log("Splitting PSML");
+    this._logger.info("Splitting PSML");
     XSLT.transform(pre_split, new File(destination, name), split, parameters);
 
   }
 
   // Helpers
   // ----------------------------------------------------------------------------------------------
-
-  private void log(String log) throws IOException {
-    this._log.append(log).append("\n");
-  }
 
   public static class Builder {
 
@@ -160,9 +134,9 @@ public final class PSMLSplitter {
     private Map<String, String> params;
 
     /**
-     *  A writer to store the log
+     *  For logging
      */
-    private Writer log;
+    private Logger logger;
 
     /**
      * @return the srouce
@@ -225,11 +199,11 @@ public final class PSMLSplitter {
     }
 
     /**
-     * @param log the Writer to store the log
+     * @param log  for logging
      * @return {@link Builder}
      */
-    public Builder log(Writer log) {
-      this.log = log;
+    public Builder log(Logger log) {
+      this.logger = log;
       return this;
     }
 
@@ -291,10 +265,10 @@ public final class PSMLSplitter {
      * @return the PSMLSplitter
      */
     public PSMLSplitter build() {
-      if (this.log != null) {
-        return new PSMLSplitter(this, this.log);
+      if (this.logger != null) {
+        return new PSMLSplitter(this, this.logger);
       } else {
-        return new PSMLSplitter(this);
+        return new PSMLSplitter(this, LoggerFactory.getLogger(PSMLSplitter.class));
       }
     }
   }
