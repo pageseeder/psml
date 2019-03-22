@@ -29,7 +29,9 @@
     <xsl:variable name="level" as="xs:integer">
       <xsl:choose>
         <xsl:when test="section/fragment[@id='1']//heading">
-          <xsl:value-of select="xs:integer(section/fragment[@id='1']//heading/@level) - 1" />
+          <xsl:variable name="toplevel" select="(section/fragment[@id='1']//heading)[1]/@level" as="xs:integer" />
+          <!-- If any  heading levels less than the top then don't adjust -->
+          <xsl:value-of select="if (.//heading[xs:integer(@level) &lt; $toplevel]) then 0 else $toplevel - 1" />
         </xsl:when>
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>     

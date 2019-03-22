@@ -68,7 +68,7 @@ public final class PSMLSplitter {
     String outuri = destination.toURI().toString();
 
     // Move the media files
-    this._logger.info("Moving media files");
+    this._logger.info("PSML Splitter: Moving media files");
     String mediaFolderName = this._builder.media() == null ? "images" : this._builder.media();
     File mediaFolder = new File(source.getParentFile(), mediaFolderName);
     if (mediaFolder.exists()) {
@@ -86,12 +86,12 @@ public final class PSMLSplitter {
     parameters.putAll(this._builder.params());
 
     // Map fragments to new locations
-    this._logger.info("Preprocessing PSML (this may take several minutes)");
+    this._logger.info("PSML Splitter: Preprocessing PSML (this may take several minutes)");
     File pre_split = new File(this._builder.working(), "pre-split.xml");
     XSLT.transform(source, pre_split, pre, parameters);
 
     // Split files
-    this._logger.info("Splitting PSML");
+    this._logger.info("PSML Splitter: Splitting PSML");
     XSLT.transform(pre_split, new File(destination, name), split, parameters);
 
   }
