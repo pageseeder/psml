@@ -86,7 +86,7 @@ public final class PSMLSplitter {
     parameters.putAll(this._builder.params());
 
     // Map fragments to new locations
-    this._logger.info("PSML Splitter: Preprocessing PSML (this may take several minutes)");
+    this._logger.info("PSML Splitter: Preprocessing PSML");
     File pre_split = new File(this._builder.working(), "pre-split.xml");
     XSLT.transform(source, pre_split, pre, parameters);
 
