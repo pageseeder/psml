@@ -31,7 +31,7 @@ public class PSMLSplitterTest {
     Builder b = new PSMLSplitter.Builder();
     b.source(copyfile);
     b.destination(dest);
-    b.config(new File(src, "psml-split-config-0.xml"));
+    b.config(new File(src, "psml-split-config-empty.xml"));
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
@@ -54,7 +54,7 @@ public class PSMLSplitterTest {
     Builder b = new PSMLSplitter.Builder();
     b.source(copyfile);
     b.destination(dest);
-    b.config(new File(src, "psml-split-config-1.xml"));
+    b.config(new File(src, "psml-split-config-single.xml"));
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
@@ -77,7 +77,7 @@ public class PSMLSplitterTest {
     Builder b = new PSMLSplitter.Builder();
     b.source(copyfile);
     b.destination(dest);
-    b.config(new File(src, "psml-split-config-2.xml"));
+    b.config(new File(src, "psml-split-config-multiple.xml"));
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();

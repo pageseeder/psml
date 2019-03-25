@@ -126,9 +126,14 @@
       </xsl:if>
       <documentinfo>
         <uri>
-          <xsl:if test="normalize-space($first) != ''">
-            <xsl:attribute name="title" select="normalize-space($first)"/>
-          </xsl:if>
+          <xsl:choose>
+            <xsl:when test="$first/heading and normalize-space($first/heading[1]) != ''">
+              <xsl:attribute name="title" select="normalize-space($first/heading[1])"/>
+            </xsl:when>
+            <xsl:when test="normalize-space($first) != ''">
+              <xsl:attribute name="title" select="normalize-space($first)"/>
+            </xsl:when>
+            </xsl:choose>
           <xsl:if test="$config/@labels != ''">
             <labels><xsl:value-of select="$config/@labels"/></labels>
           </xsl:if>

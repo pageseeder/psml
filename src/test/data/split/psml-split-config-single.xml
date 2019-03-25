@@ -19,10 +19,11 @@
   <document folder="components">
     <heading level="2" />
   </document>
-  <document type="schedule" folder="schedules">
+  <document type="term" folder="terms">
     <heading level="2" numbered="true" />
+    <heading level="3" numbered="true" />
   </document>
-  <document type="annex" labels="myannex" folder="annexes">
+  <document type="schedule" labels="myschedule" folder="schedules">
     <block label="block2"/>
   </document>
   <document type="field" folder="fields">

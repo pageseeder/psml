@@ -17,7 +17,7 @@
   <metadata />
   <section id="title">
     <fragment id="1">
-      <heading level="1">Split source 1<anchor name="top" /></heading>
+      <heading level="1">Split source 2<anchor name="top" /></heading>
       <para>Front matter <inline label="inline1">[My field 1]</inline></para>
       <para>Front matter
         <link href="#B">link to B</link>
@@ -45,14 +45,14 @@
       <para>B2 content <inline label="inline1">[My field 2]</inline></para>
       <heading level="2">Heading C</heading>
       <para>C content <inline label="inline1">[My field 3]</inline></para>
-      <heading level="2" numbered="true">My Schedules</heading>
-      <para>Schedules front matter</para>
-      <heading level="3" numbered="true">Heading D-S1</heading>
-      <para>D-S1 content</para>
-      <heading level="3" numbered="true">Heading D-S2</heading>
-      <para>D-S2 content</para>
-      <heading level="3" numbered="true">Heading D-S3</heading>
-      <para>D-S3 content</para>
+      <heading level="2" numbered="true">My definitions</heading>
+      <para>Definitions front matter</para>
+      <heading level="3" numbered="true">Heading D1</heading>
+      <para>D1 content</para>
+      <heading level="3" numbered="true">Heading D2</heading>
+      <para>D2 content</para>
+      <heading level="4" numbered="true">Heading D2-1</heading>
+      <para>D2-1 content</para>
       <block label="block2">
         <heading level="2">Heading E</heading>
       </block>

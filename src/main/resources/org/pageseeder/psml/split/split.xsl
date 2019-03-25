@@ -19,14 +19,15 @@
   <xsl:template match="/">
     <document>
       <xsl:copy-of select="document/@*" />
-      <xsl:apply-templates select="document/node()" />
+      <xsl:apply-templates select="document/node()" />        
     </document>
   </xsl:template>
   
   <!-- Handle component documents -->
   <xsl:template match="document">
+    <xsl:param name="level" select="0" tunnel="yes" as="xs:integer"/>
     <xsl:variable name="path" select="concat(@folder, fn:generate-filename(.))" />
-    <xsl:variable name="level" as="xs:integer">
+    <xsl:variable name="adjust" as="xs:integer">
       <xsl:choose>
         <xsl:when test="section/fragment[@id='1']//heading">
           <xsl:variable name="toplevel" select="(section/fragment[@id='1']//heading)[1]/@level" as="xs:integer" />
@@ -37,14 +38,17 @@
       </xsl:choose>     
     </xsl:variable>
     <blockxref frag="default" display="document" type="embed" href="{$path}">
-      <xsl:if test="$level > 0">
-        <xsl:attribute name="level" select="$level" />
+      <xsl:if test="@type">
+        <xsl:attribute name="documenttype" select="@type" />
+      </xsl:if>
+      <xsl:if test="$adjust - $level - 1 > 0">
+        <xsl:attribute name="level" select="$adjust - $level - 1" />
       </xsl:if>
       <xsl:result-document href="{concat($_outputfolder,$path)}">
         <xsl:copy>
           <xsl:copy-of select="@*[not(name()='folder')]" />
           <xsl:apply-templates>
-            <xsl:with-param name="level" select="$level" tunnel="yes" as="xs:integer" />
+            <xsl:with-param name="level" select="$adjust" tunnel="yes" as="xs:integer" />
           </xsl:apply-templates>
         </xsl:copy>
       </xsl:result-document>
@@ -56,6 +60,9 @@
     <xsl:variable name="path" select="concat(document/@folder, fn:generate-filename(document))" />
     <xref frag="default" display="document" type="none"
         href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
+      <xsl:if test="@type">
+        <xsl:attribute name="documenttype" select="@type" />
+      </xsl:if>
       <xsl:value-of select="document/documentinfo/uri/@title" />
     </xref>    
     <xsl:for-each select="document">
@@ -75,7 +82,7 @@
     <xsl:param name="level" select="0" tunnel="yes" as="xs:integer"/>
     <xsl:copy>
       <xsl:copy-of select="@*[not(name()='level')]" />
-      <xsl:attribute name="level" select="if ($level > 0) then number(@level) - 1 else @level" />
+      <xsl:attribute name="level" select="if ($level > 0) then number(@level) - $level else @level" />
       <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>

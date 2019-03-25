@@ -8,10 +8,10 @@
   </container>
 -->
   <container type="contract" labels="mycontract" />
-  <container type="schedules" labels="myschedules" contains="schedule">
+  <container type="definitions" labels="myterms" contains="term">
     <heading level="2" numbered="true" />
   </container>
-  <container type="annexes" labels="myannexes" contains="annex" />
+  <container type="schedules" labels="myschedule" contains="schedule" />
 <!-- 
   <document [type="mydoc"] [folder="components"] [labels="mylabel"]>
     [<heading level="3" [numbered="true"]/>
@@ -23,10 +23,11 @@
   <document folder="components">
     <heading level="2" numbered="false" />
   </document>
-  <document type="schedule" folder="schedules">
+  <document type="term" folder="terms">
     <heading level="3" numbered="true" />
+    <heading level="4" numbered="true" />
   </document>
-  <document type="annex" labels="myannex" folder="annexes">
+  <document type="schedule" labels="myschedule" folder="schedules">
     <block label="block2"/>
   </document>
   <document type="field" folder="fields">
