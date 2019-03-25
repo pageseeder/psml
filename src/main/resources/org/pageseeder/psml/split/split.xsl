@@ -55,7 +55,7 @@
   <xsl:template match="inline[document]">
     <xsl:variable name="path" select="concat(document/@folder, fn:generate-filename(document))" />
     <xref frag="default" display="document" type="none"
-        href="{concat(if (ancestor::document[@folder]) then '../' else '', $path)}">
+        href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
       <xsl:value-of select="document/documentinfo/uri/@title" />
     </xref>    
     <xsl:for-each select="document">
@@ -84,7 +84,7 @@
   <xsl:template match="image">
     <xsl:copy>
       <xsl:copy-of select="@*[not(name()='src')]" />
-      <xsl:attribute name="src" select="concat(if (ancestor::document[@folder]) then '../' else '', @src)" />
+      <xsl:attribute name="src" select="concat(if ((ancestor::document)[last()][@folder]) then '../' else '', @src)" />
       <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>
@@ -107,7 +107,7 @@
           </xsl:choose>
         </xsl:variable>
         <xref frag="{($anchor/ancestor::fragment)[last()]/@id}" display="manual" type="none"
-            href="{concat(if (ancestor::document[@folder]) then '../' else '', $path)}" title="{normalize-space(.)}">
+            href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}" title="{normalize-space(.)}">
           <xsl:value-of select="." />
         </xref>
       </xsl:when>

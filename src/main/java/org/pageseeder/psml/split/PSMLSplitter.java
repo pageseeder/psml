@@ -63,7 +63,8 @@ public final class PSMLSplitter {
     }
 
     // Parse templates
-    Templates pre = XSLT.getTemplatesFromResource("org/pageseeder/psml/split/pre-split.xsl");
+    Templates pre1 = XSLT.getTemplatesFromResource("org/pageseeder/psml/split/pre-split1.xsl");
+    Templates pre2 = XSLT.getTemplatesFromResource("org/pageseeder/psml/split/pre-split2.xsl");
     Templates split = XSLT.getTemplatesFromResource("org/pageseeder/psml/split/split.xsl");
     String outuri = destination.toURI().toString();
 
@@ -85,14 +86,19 @@ public final class PSMLSplitter {
     // Add custom parameters
     parameters.putAll(this._builder.params());
 
-    // Map fragments to new locations
-    this._logger.info("PSML Splitter: Preprocessing PSML");
-    File pre_split = new File(this._builder.working(), "pre-split.xml");
-    XSLT.transform(source, pre_split, pre, parameters);
+    // Pre-split 1
+    this._logger.info("PSML Splitter: First pre-process");
+    File pre_split1 = new File(this._builder.working(), "pre-split1.xml");
+    XSLT.transform(source, pre_split1, pre1, parameters);
+
+    // Pre-split 2
+    this._logger.info("PSML Splitter: Second pre-process");
+    File pre_split2 = new File(this._builder.working(), "pre-split2.xml");
+    XSLT.transform(pre_split1, pre_split2, pre2, parameters);
 
     // Split files
     this._logger.info("PSML Splitter: Splitting PSML");
-    XSLT.transform(pre_split, new File(destination, name), split, parameters);
+    XSLT.transform(pre_split2, new File(destination, name), split, parameters);
 
   }
 

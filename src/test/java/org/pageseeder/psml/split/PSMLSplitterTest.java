@@ -15,7 +15,7 @@ public class PSMLSplitterTest {
   private static final String WORKING_FOLDER = "build/test/split/working";
 
   @Test
-  public void testConfig0() throws IOException, ProcessException {
+  public void testConfigEmpty() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -38,7 +38,7 @@ public class PSMLSplitterTest {
   }
 
   @Test
-  public void testConfig1() throws IOException, ProcessException {
+  public void testConfigSingleContainer() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -55,6 +55,29 @@ public class PSMLSplitterTest {
     b.source(copyfile);
     b.destination(dest);
     b.config(new File(src, "psml-split-config-1.xml"));
+    b.working(new File(WORKING_FOLDER));
+    PSMLSplitter s = b.build();
+    s.process();
+  }
+
+  @Test
+  public void testConfigMultipleContainer() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    File copyfile = new File(copy, "split_source_2.psml");
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Builder b = new PSMLSplitter.Builder();
+    b.source(copyfile);
+    b.destination(dest);
+    b.config(new File(src, "psml-split-config-2.xml"));
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
