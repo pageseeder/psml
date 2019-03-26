@@ -47,6 +47,7 @@
       <xsl:if test="$adjust - $level - 1 > 0">
         <xsl:attribute name="level" select="$adjust - $level - 1" />
       </xsl:if>
+      <xsl:value-of select="documentinfo/uri/@title" />
       <xsl:result-document href="{concat($_outputfolder,$path)}">
         <xsl:copy>
           <xsl:copy-of select="@*[not(name()='folder')]" />
