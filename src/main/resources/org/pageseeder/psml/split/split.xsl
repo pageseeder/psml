@@ -19,7 +19,10 @@
   <xsl:template match="/">
     <document>
       <xsl:copy-of select="document/@*" />
-      <xsl:apply-templates select="document/node()" />        
+      <xsl:apply-templates select="document/node()">
+        <!-- Use -1 because top level heading is usually not included in the TOC -->
+        <xsl:with-param name="level" select="-1" tunnel="yes" as="xs:integer" />
+      </xsl:apply-templates>      
     </document>
   </xsl:template>
   
