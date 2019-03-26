@@ -21,42 +21,76 @@
     <xsl:sequence select="($config-doc/split-config/container[not(*)])[1]" />
   </xsl:function>
 
-  <!-- Returns the container config element matching the given element -->
+  <!-- Returns the container config element with start matching the given element -->
   <xsl:function name="config:split-container" as="element(container)?">
     <xsl:param name="el" as="element()" />
     
     <!-- handle the case of a heading inside a block -->
     <xsl:variable name="h" select="if (local-name($el) = 'heading') then $el else ($el/heading)[1]" />
     <xsl:variable name="block-match"
-        select="($config-doc/split-config/container/block[@label=$el/@label])[1]" />
+        select="($config-doc/split-config/container/start/block[@label=$el/@label])[1]" />
     <xsl:variable name="numbered-heading-match"
-        select="($config-doc/split-config/container/heading[@level=$h/@level and @numbered='true' and $h/@numbered])[1]" />
+        select="($config-doc/split-config/container/start/heading[@level=$h/@level and @numbered='true' and $h/@numbered])[1]" />
     <xsl:variable name="not-numbered-heading-match"
-        select="($config-doc/split-config/container/heading[@level=$h/@level and @numbered='false' and not($h/@numbered)])[1]" />
+        select="($config-doc/split-config/container/start/heading[@level=$h/@level and @numbered='false' and not($h/@numbered)])[1]" />
     <xsl:variable name="heading-match"
-        select="($config-doc/split-config/container/heading[@level=$h/@level and not(@numbered)])[1]" />
+        select="($config-doc/split-config/container/start/heading[@level=$h/@level and not(@numbered)])[1]" />
     <xsl:choose>
       <!-- check block label -->
       <xsl:when test="local-name($el) = 'block' and $block-match">
-        <xsl:sequence select="$block-match/.." />
+        <xsl:sequence select="$block-match/../.." />
       </xsl:when>
       <!-- check numbered heading -->
       <xsl:when test="$numbered-heading-match">
-        <xsl:sequence select="$numbered-heading-match/.." />
+        <xsl:sequence select="$numbered-heading-match/../.." />
       </xsl:when>
       <!-- check not numbered heading -->
       <xsl:when test="$not-numbered-heading-match">
-        <xsl:sequence select="$not-numbered-heading-match/.." />
+        <xsl:sequence select="$not-numbered-heading-match/../.." />
       </xsl:when>
       <!-- check heading -->
       <xsl:when test="$heading-match">
-        <xsl:sequence select="$heading-match/.." />
+        <xsl:sequence select="$heading-match/../.." />
       </xsl:when>
       <!-- when the document type changes check for a container, otherwise return the main container -->
       <xsl:when test="$el/@start-document and 
           not(($el/preceding::*[@start-document])[last()][@start-document=$el/@start-document or @start-document='-container'])">
         <xsl:variable name="c" select="($config-doc/split-config/container[@contains=$el/@start-document])[1]" />
         <xsl:sequence select="if ($c) then $c else config:main-container()" />
+      </xsl:when>
+    </xsl:choose>
+  </xsl:function>
+
+  <!-- Returns the container config element with continue matching the given element -->
+  <xsl:function name="config:continue-container" as="element(container)?">
+    <xsl:param name="el" as="element()" />
+    
+    <!-- handle the case of a heading inside a block -->
+    <xsl:variable name="h" select="if (local-name($el) = 'heading') then $el else ($el/heading)[1]" />
+    <xsl:variable name="block-match"
+        select="($config-doc/split-config/container/continue/block[@label=$el/@label])[1]" />
+    <xsl:variable name="numbered-heading-match"
+        select="($config-doc/split-config/container/continue/heading[@level=$h/@level and @numbered='true' and $h/@numbered])[1]" />
+    <xsl:variable name="not-numbered-heading-match"
+        select="($config-doc/split-config/container/continue/heading[@level=$h/@level and @numbered='false' and not($h/@numbered)])[1]" />
+    <xsl:variable name="heading-match"
+        select="($config-doc/split-config/container/continue/heading[@level=$h/@level and not(@numbered)])[1]" />
+    <xsl:choose>
+      <!-- check block label -->
+      <xsl:when test="local-name($el) = 'block' and $block-match">
+        <xsl:sequence select="$block-match/../.." />
+      </xsl:when>
+      <!-- check numbered heading -->
+      <xsl:when test="$numbered-heading-match">
+        <xsl:sequence select="$numbered-heading-match/../.." />
+      </xsl:when>
+      <!-- check not numbered heading -->
+      <xsl:when test="$not-numbered-heading-match">
+        <xsl:sequence select="$not-numbered-heading-match/../.." />
+      </xsl:when>
+      <!-- check heading -->
+      <xsl:when test="$heading-match">
+        <xsl:sequence select="$heading-match/../.." />
       </xsl:when>
     </xsl:choose>
   </xsl:function>

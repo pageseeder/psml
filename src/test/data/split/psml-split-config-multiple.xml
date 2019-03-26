@@ -9,7 +9,12 @@
 -->
   <container type="contract" labels="mycontract" />
   <container type="definitions" labels="myterms" contains="term">
-    <heading level="2" numbered="true" />
+    <start>
+      <block label="block4" />
+    </start>
+    <continue>
+      <block label="block5" />
+    </continue>
   </container>
   <container type="schedules" labels="myschedule" contains="schedule" />
 <!-- 
@@ -21,7 +26,7 @@
   </document>
 -->
   <document folder="components">
-    <heading level="2" numbered="false" />
+    <heading level="2" />
   </document>
   <document type="term" folder="terms">
     <heading level="3" numbered="true" />

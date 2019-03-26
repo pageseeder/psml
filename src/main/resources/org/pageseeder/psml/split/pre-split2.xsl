@@ -33,7 +33,7 @@
         </uri>
       </documentinfo>
       
-      <!-- output frontmatter -->
+      <!-- output front matter -->
       <xsl:variable name="frontmatter"
           select="not(config:split-container((//fragment/*)[1]))" />
       <section id="title">
@@ -64,7 +64,8 @@
                 <xsl:otherwise>
                   <!-- output container document -->
                   <xsl:variable name="frontmatter"
-                      select="not(config:split-document($first))" />
+                      select="not(config:split-document($first) and not(config:split-container($first)/start))" />
+                  <xsl:variable name="endmatter" select="current-group()[config:continue-container(.)]" />
                   <document level="portable"
                       type="{if ($config/@type != '') then $config/@type else 'references'}">
                     <documentinfo>
@@ -77,10 +78,11 @@
                       </uri>
                     </documentinfo>
                     
-                    <!-- output container frontmatter -->
+                    <!-- output container front matter -->
                     <section id="title">
                       <fragment id="1">
-                        <xsl:for-each-group select="current-group()" group-starting-with="*[config:split-document(.)]">
+                        <xsl:for-each-group select="current-group()"
+                            group-starting-with="*[config:split-document(.) and not(config:split-container(.)/start)]">
                           <xsl:if test="position() = 1 and $frontmatter">
                              <xsl:apply-templates select="current-group()" />
                           </xsl:if>
@@ -93,14 +95,28 @@
                     <section id="xrefs">
                       <xref-fragment id="2">
                         <!-- output components -->
-                        <xsl:for-each-group select="current-group()" group-starting-with="*[config:split-document(.)]">
-                          <xsl:if test="not(position() = 1) or not($frontmatter)">
+                        <xsl:for-each-group select="current-group()"
+                            group-starting-with="*[(config:split-document(.) and not(config:split-container(.)/start))
+                                or config:continue-container(.)]">
+                          <xsl:if test="(not(position() = 1) or not($frontmatter)) and
+                              (not(position() = last()) or not($endmatter))">
                             <xsl:call-template name="output-component" />
                           </xsl:if>
                         </xsl:for-each-group>
                       </xref-fragment>
                     </section>
                   
+                    <!-- output container end matter -->
+                    <section id="content">
+                      <fragment id="3">
+                        <xsl:for-each-group select="current-group()"
+                            group-starting-with="*[config:split-document(.) or config:continue-container(.)]">
+                          <xsl:if test="position() = last() and $endmatter">
+                             <xsl:apply-templates select="current-group()" />
+                          </xsl:if>
+                        </xsl:for-each-group>
+                      </fragment>
+                    </section>
                   </document>
                 </xsl:otherwise>
               </xsl:choose>
