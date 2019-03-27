@@ -65,8 +65,8 @@
         if (document/@filename) then document/@filename else fn:generate-filename(document))" />
     <xref frag="default" display="document" type="none"
         href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
-      <xsl:if test="@type">
-        <xsl:attribute name="documenttype" select="@type" />
+      <xsl:if test="document/@type">
+        <xsl:attribute name="documenttype" select="document/@type" />
       </xsl:if>
       <xsl:value-of select="document/documentinfo/uri/@title" />
     </xref>
@@ -127,10 +127,10 @@
         </xref>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:copy>
-          <xsl:copy-of select="@*" />
-          <xsl:apply-templates select="node()" />
-        </xsl:copy>       
+        <xref frag="default" display="manual" type="none"
+            href="{@href}" title="{normalize-space(.)}">
+          <xsl:value-of select="." />
+        </xref>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
