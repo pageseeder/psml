@@ -184,7 +184,8 @@
   
   <!-- handle inline labels -->
   <xsl:template match="inline">
-    <xsl:variable name="config" select="config:inline-document(.)" />
+    <xsl:variable name="inline" select="config:document-inline(.)" />
+    <xsl:variable name="config" select="$inline/.." />
     <xsl:copy>
       <xsl:copy-of select="@*" />
       <xsl:choose>
@@ -198,16 +199,49 @@
             <xsl:if test="$config/@folder != ''">
               <xsl:attribute name="folder" select="concat($config/@folder,'/')"/>
             </xsl:if>
+            <xsl:variable name="filename">
+              <xsl:choose>
+                <xsl:when test="$inline[@as='filename' or @as='title-filename']">
+                  <xsl:value-of select="normalize-space(string-join(text(), ''))"/>
+                </xsl:when>
+                <xsl:when test="$inline/inline[@as='filename' or @as='title-filename']
+                    and inline[@label=$inline/inline/@label]">
+                  <xsl:value-of select="normalize-space(inline[@label=$inline/inline/@label])"/>
+                </xsl:when>
+              </xsl:choose>
+            </xsl:variable>
+            <xsl:if test="$filename != ''">
+              <xsl:attribute name="filename"
+                  select="lower-case(concat(translate($filename,' ','_'),'.psml'))"/>
+            </xsl:if>
             <documentinfo>
+              <xsl:variable name="title">
+                <xsl:choose>
+                  <xsl:when test="$inline[@as='title' or @as='title-filename']">
+                    <xsl:value-of select="if ($inline/@as='title-filename')
+                        then concat('[',string-join(text(), ''),']')
+                        else text()"/>
+                  </xsl:when>
+                  <xsl:when test="$inline/inline[@as='title' or @as='title-filename']
+                      and inline[@label=$inline/inline/@label]">
+                    <xsl:value-of select="if ($inline/inline/@as='title-filename')
+                        then concat('[',inline[@label=$inline/inline/@label],']')
+                        else inline[@label=$inline/inline/@label]"/>
+                  </xsl:when>
+                  <xsl:when test="normalize-space(.) != ''">
+                    <xsl:value-of select="normalize-space(.)"/>
+                  </xsl:when>
+                </xsl:choose>
+              </xsl:variable>
               <uri>
-                <xsl:if test="normalize-space(.) != ''">
-                  <xsl:attribute name="title" select="normalize-space(.)"/>
+                <xsl:if test="$title != ''">
+                  <xsl:attribute name="title" select="$title"/>
                 </xsl:if>
                 <xsl:if test="$config/@labels != ''">
                   <labels><xsl:value-of select="$config/@labels"/></labels>
                 </xsl:if>
-                <xsl:if test="normalize-space(.) != ''">
-                  <description><xsl:value-of select="normalize-space(.)"/></description>
+                <xsl:if test="$title != ''">
+                  <description><xsl:value-of select="$title"/></description>
                 </xsl:if>
               </uri>
             </documentinfo>

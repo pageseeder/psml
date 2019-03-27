@@ -54,7 +54,7 @@
       </xsl:when>
       <!-- when the document type changes check for a container, otherwise return the main container -->
       <xsl:when test="$el/@start-document and 
-          not(($el/preceding::*[@start-document])[last()][@start-document=$el/@start-document or @start-document='-container'])">
+          not($el/preceding::*[@start-document][1][@start-document=$el/@start-document or @start-document='-container'])">
         <xsl:variable name="c" select="($config-doc/split-config/container[@contains=$el/@start-document])[1]" />
         <xsl:sequence select="if ($c) then $c else config:main-container()" />
       </xsl:when>
@@ -130,10 +130,10 @@
   </xsl:function>
 
   <!-- Returns the document config element matching the given inline element -->
-  <xsl:function name="config:inline-document" as="element(document)?">
+  <xsl:function name="config:document-inline" as="element(inline)?">
     <xsl:param name="el" as="element(inline)" />
     
-    <xsl:sequence select="($config-doc/split-config/document/inline[@label=$el/@label])[1]/.." />
+    <xsl:sequence select="($config-doc/split-config/document/inline[@label=$el/@label])[1]" />
   </xsl:function>
   
   <!-- Returns the fragment config element matching the given element -->

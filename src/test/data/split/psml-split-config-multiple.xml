@@ -36,7 +36,12 @@
     <block label="block2"/>
   </document>
   <document type="field" folder="fields">
-    <inline label="inline1"/>
+    <inline label="inline1">
+      <inline label="inline3" as="title-filename"/>
+    </inline>
+    <inline label="inline4" as="title">
+      <inline label="inline3" as="filename"/>
+    </inline>
   </document>
 
 <!-- 

@@ -18,7 +18,7 @@
   <section id="title">
     <fragment id="1">
       <heading level="1">Split source 2<anchor name="top" /></heading>
-      <para>Front matter <inline label="inline1">[My field 1]</inline></para>
+      <para>Front matter <inline label="inline1"><inline label="inline3">Text123</inline>[My field 1]</inline></para>
       <para>Front matter
         <link href="#B">link to B</link>
       </para>
@@ -42,9 +42,10 @@
       <para indent="1" numbered="true">B1-1 clause</para>
       <para indent="1" numbered="true">B1-2 clause<anchor name="B1-2" /></para>
       <heading level="3">Heading B2</heading>
-      <para>B2 content <inline label="inline1">[My field 2]</inline></para>
+      <para>B2 content <inline label="inline1"><inline label="inline3">Text123</inline>[My field 2]</inline></para>
       <heading level="2">Heading C</heading>
-      <para>C content <inline label="inline1">[My field 3]</inline></para>
+      <para>C content <inline label="inline1"><inline label="inline3">Text 456</inline>[My field 3]</inline> text</para>
+      <para>C field2 <inline label="inline4"><inline label="inline3">Text789</inline>[My field 3]</inline> text</para>
       <block label="block4">
         <heading level="2" numbered="true">My definitions</heading>
       </block>

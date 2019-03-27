@@ -61,23 +61,27 @@
 
   <!-- Handle inline documents -->
   <xsl:template match="inline[document]">
-    <xsl:variable name="path" select="concat(document/@folder, fn:generate-filename(document))" />
+    <xsl:variable name="path" select="concat(document/@folder,
+        if (document/@filename) then document/@filename else fn:generate-filename(document))" />
     <xref frag="default" display="document" type="none"
         href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
       <xsl:if test="@type">
         <xsl:attribute name="documenttype" select="@type" />
       </xsl:if>
       <xsl:value-of select="document/documentinfo/uri/@title" />
-    </xref>    
+    </xref>
     <xsl:for-each select="document">
-      <xsl:result-document href="{concat($_outputfolder,$path)}">
-        <xsl:copy>
-          <xsl:copy-of select="@*[not(name()='folder')]" />
-          <xsl:apply-templates>
-            <xsl:with-param name="level" select="0" tunnel="yes" as="xs:integer" />
-          </xsl:apply-templates>
-        </xsl:copy>
-      </xsl:result-document>
+      <!-- don't output duplicate files -->
+      <xsl:if test="not(@filename) or not(preceding::document[@filename=current()/@filename and @folder=current()/@folder])" >  
+        <xsl:result-document href="{concat($_outputfolder,$path)}">
+          <xsl:copy>
+            <xsl:copy-of select="@*[not(name()='folder' or name()='filename')]" />
+            <xsl:apply-templates>
+              <xsl:with-param name="level" select="0" tunnel="yes" as="xs:integer" />
+            </xsl:apply-templates>
+          </xsl:copy>
+        </xsl:result-document>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>    
 
