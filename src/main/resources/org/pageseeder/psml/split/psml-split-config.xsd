@@ -1,0 +1,141 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="0.4.8">
+
+  <xs:element name="split-config">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="container" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element ref="document"  minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="fragment"  minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="container">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="start" minOccurs="0" maxOccurs="1" />
+        <xs:element ref="continue" minOccurs="0" maxOccurs="1" />
+      </xs:sequence>
+      <xs:attribute name="type"     type="document-type" />
+      <xs:attribute name="labels"   type="label-list" />
+      <xs:attribute name="contains" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="start">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="heading" />
+        <xs:element ref="block" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="continue">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="heading" />
+        <xs:element ref="block" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="document">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="heading" />
+        <xs:element ref="block" />
+        <xs:element ref="inline" />
+      </xs:choice>
+      <xs:attribute name="type"   type="document-type" />
+      <xs:attribute name="folder" type="xs:string" />
+      <xs:attribute name="labels" type="label-list" />
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="fragment">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="heading" />
+        <xs:element ref="block" />
+        <xs:element ref="para" />
+      </xs:choice>
+      <xs:attribute name="type"   type="fragment-type" />
+      <xs:attribute name="labels" type="label-list" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="heading">
+    <xs:complexType>
+      <xs:attribute name="level" use="required">
+        <xs:annotation>
+          <xs:documentation>The level of the heading (1 to 6).</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:pattern value="[1-6]"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="numbered" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="block">
+    <xs:complexType>
+      <xs:attribute name="label" type="label" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="para">
+    <xs:complexType>
+      <xs:attribute name="numbered" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="inline">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- only one nesting is supported -->
+        <xs:element ref="inline" minOccurs="0" maxOccurs="1" />
+      </xs:sequence>
+      <xs:attribute name="label" type="label" use="required" />
+      <xs:attribute name="as">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="title" />
+            <xs:enumeration value="filename" />
+            <xs:enumeration value="title-filename" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="document-type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9_]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="fragment-type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9_\-\.]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="label">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9_\-]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="label-list">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9_\-,]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

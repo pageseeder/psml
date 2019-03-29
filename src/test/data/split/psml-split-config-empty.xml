@@ -1,12 +1,12 @@
 <split-config>
 <!-- 
-  <container [type="mycontainer"] [labels="mylabel"]
-      [folder="parts"] [contains="mydoc"]>
+  <container [type="mycontainer"] [labels="mylabel"] [contains="mydoc"]>
     [<heading level="2" [numbered="true"]>
     |<block label="mylabel">]
     ...
   </container>
 -->
+  <container />
 <!-- 
   <document [type="mydoc"] [folder="components"] [labels="mylabel"]>
     [<heading level="3" [numbered="true"]/>

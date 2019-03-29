@@ -5,9 +5,17 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.split.PSMLSplitter.Builder;
+import org.pageseeder.psml.toc.Tests;
+import org.pageseeder.psml.toc.Tests.Validates;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -26,6 +34,9 @@ public class PSMLSplitterTest {
       FileUtils.deleteDirectory(copy);
     FileUtils.copyDirectory(src, copy);
     File copyfile = new File(copy, "split_source_single.psml");
+    File config = new File(src, "psml-split-config-empty.xml");
+    String config_xml = new String (Files.readAllBytes(config.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(Tests.toDOMSource(new StringReader(config_xml)), new Validates(getSchema("psml-split-config.xsd")));
     // process
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
@@ -34,7 +45,7 @@ public class PSMLSplitterTest {
     Builder b = new PSMLSplitter.Builder();
     b.source(copyfile);
     b.destination(dest);
-    b.config(new File(src, "psml-split-config-empty.xml"));
+    b.config(config);
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
@@ -50,6 +61,9 @@ public class PSMLSplitterTest {
       FileUtils.deleteDirectory(copy);
     FileUtils.copyDirectory(src, copy);
     File copyfile = new File(copy, "split_source_single.psml");
+    File config = new File(src, "psml-split-config-single.xml");
+    String config_xml = new String (Files.readAllBytes(config.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(Tests.toDOMSource(new StringReader(config_xml)), new Validates(getSchema("psml-split-config.xsd")));
     // process
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
@@ -58,7 +72,7 @@ public class PSMLSplitterTest {
     Builder b = new PSMLSplitter.Builder();
     b.source(copyfile);
     b.destination(dest);
-    b.config(new File(src, "psml-split-config-single.xml"));
+    b.config(config);
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
@@ -74,6 +88,9 @@ public class PSMLSplitterTest {
       FileUtils.deleteDirectory(copy);
     FileUtils.copyDirectory(src, copy);
     File copyfile = new File(copy, "split_source_multiple.psml");
+    File config = new File(src, "psml-split-config-multiple.xml");
+    String config_xml = new String (Files.readAllBytes(config.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(Tests.toDOMSource(new StringReader(config_xml)), new Validates(getSchema("psml-split-config.xsd")));
     // process
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
@@ -82,7 +99,7 @@ public class PSMLSplitterTest {
     Builder b = new PSMLSplitter.Builder();
     b.source(copyfile);
     b.destination(dest);
-    b.config(new File(src, "psml-split-config-multiple.xml"));
+    b.config(config);
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
@@ -98,6 +115,9 @@ public class PSMLSplitterTest {
       FileUtils.deleteDirectory(copy);
     FileUtils.copyDirectory(src, copy);
     File copyfile = new File(copy, "split_source_xrefs.psml");
+    File config = new File(src, "psml-split-config-multiple.xml");
+    String config_xml = new String (Files.readAllBytes(config.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(Tests.toDOMSource(new StringReader(config_xml)), new Validates(getSchema("psml-split-config.xsd")));
     // process
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
@@ -106,7 +126,7 @@ public class PSMLSplitterTest {
     Builder b = new PSMLSplitter.Builder();
     b.source(copyfile);
     b.destination(dest);
-    b.config(new File(src, "psml-split-config-multiple.xml"));
+    b.config(config);
     b.working(new File(WORKING_FOLDER));
     PSMLSplitter s = b.build();
     s.process();
@@ -137,4 +157,17 @@ public class PSMLSplitterTest {
       }
     }
   }
+
+  public static Source getSchema(String filename) {
+    try {
+      String pathToSchema = "/org/pageseeder/psml/split/"+filename;
+      URL url = Tests.class.getResource(pathToSchema);
+      StreamSource schema = new StreamSource(url.openStream());
+      schema.setSystemId(url.toURI().toString());
+      return schema;
+    } catch (URISyntaxException | IOException ex) {
+      throw new IllegalStateException("Unable to open schema source", ex);
+    }
+  }
+
 }
