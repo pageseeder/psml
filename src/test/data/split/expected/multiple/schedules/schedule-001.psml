@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="schedule"><documentinfo><uri title="Heading E"><labels>myschedule</labels></uri></documentinfo><section id="title"><fragment id="1"><block label="block2">
+        <heading level="2">Heading E</heading>
+      </block></fragment></section><section id="content"><fragment id="2"><heading level="1">Heading E0</heading><para>E content</para></fragment><fragment id="3"><heading level="3">Heading E1</heading><para>E1 content
+        <xref frag="1" display="manual" type="none" href="../components/component-002.psml" title="link to B">link to B</xref>
+      </para></fragment><fragment id="4"><heading level="3">Heading E2</heading><para>E2 content
+        <xref frag="5" display="manual" type="none" href="../components/component-002.psml" title="link to B1-2">link to B1-2</xref>
+      </para></fragment><fragment id="5" type="special" labels="myspecial"><block label="block1">Special content</block><para>More special content</para></fragment></section></document>

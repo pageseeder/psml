@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="definitions"><documentinfo><uri title="My definitions"><labels>myterms</labels></uri></documentinfo><section id="title"><fragment id="1"><block label="block4">
+        <heading numbered="true" level="1">My definitions</heading>
+      </block><para>Definitions front matter</para></fragment></section><toc/><section id="xrefs"><xref-fragment id="2"><blockxref frag="default" display="document" type="embed" href="terms/term-001.psml" documenttype="term">Heading D1</blockxref><blockxref frag="default" display="document" type="embed" href="terms/term-002.psml" documenttype="term">Heading D2</blockxref><blockxref frag="default" display="document" type="embed" href="terms/term-003.psml" documenttype="term" level="1">Heading D2-1</blockxref></xref-fragment></section><section id="content"><fragment id="3"><block label="block5">
+        <para>Definition end 1</para>
+      </block><para>Definition end 2</para></fragment></section></document>
