@@ -21,7 +21,8 @@
       <xsl:apply-templates select="document/documentinfo" />
       <section>
         <fragment>
-          <xsl:for-each-group select="//fragment/*"
+          <xsl:for-each-group select="//fragment/*[not(self::blockxref[@type='embed']
+                or ancestor::blockxref[@type='transclude'])]"
               group-starting-with="*[config:split-document(.) or config:split-container(.)]">
             <xsl:variable name="first" select="current-group()[1]" />
             <!-- Add start-document attribute if not first group -->
@@ -32,8 +33,9 @@
                     <xsl:copy-of select="@*" />
                       <xsl:attribute name="start-document" select="if (config:split-container($first)/@contains)
                           then '-container' else config:split-document($first)/@type" />
+                      <xsl:call-template name="add-fragment-anchor" />         
                     <xsl:apply-templates select="node()" />
-                  </xsl:copy>            
+                  </xsl:copy>
                 </xsl:for-each>
                </xsl:when>
                <xsl:otherwise>
@@ -47,12 +49,28 @@
     </document>
   </xsl:template>
   
+  <!-- Ignore transcluded content -->
+  <xsl:template match="blockxref[@type='transclude']">
+    <xsl:copy>
+      <xsl:copy-of select="@*" />
+      <xsl:call-template name="add-fragment-anchor" />
+    </xsl:copy>
+  </xsl:template>
+  
   <!-- Copy all other elements unchanged -->
   <xsl:template match="*">
     <xsl:copy>
       <xsl:copy-of select="@*" />
+      <xsl:call-template name="add-fragment-anchor" />
       <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>  
 
+  <!-- Adds fragment anchors to preserve xrefs -->
+  <xsl:template name="add-fragment-anchor">
+    <xsl:if test="local-name(..) = 'fragment' and not(preceding-sibling::*)">
+      <fragment-anchor id="{../@id}" />
+    </xsl:if>
+  </xsl:template>
+  
 </xsl:stylesheet>

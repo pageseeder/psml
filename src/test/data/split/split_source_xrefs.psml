@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="96533" schemaversion="1.0" date="2019-03-19T12:43:31+11:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="96533" scheme="http" host="localhost" port="80"
+      path="/ps/test/split/documents/split_source_2.psml" decodedpath="/ps/test/split/documents/split_source_2.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2019-03-14T15:55:06+11:00" modified="2019-03-19T12:43:31+11:00"
+      title="Split source 2">
+      <displaytitle>Split source 2</displaytitle>
+    </uri>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="70781" fragment="2" editid="201737"
+      modified="2019-03-19T12:43:31+11:00" />
+  </fragmentinfo>
+  <metadata />
+  <section id="title">
+    <fragment id="96533-top">
+      <heading level="1">Split source 2</heading>
+      <para>Front matter <inline label="inline1"><inline label="inline3">Text123</inline>[My field 1]</inline></para>
+      <para>Front matter
+        <xref frag="B" display="manual" type="none" href="#96533-B" title="link to B">link to B</xref>
+      </para>
+      <para>Front matter
+        <link href="http://pageseeder.com">link to PageSeeder</link>
+      </para>
+      <image src="images/diagram1.jpg" />
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="96533-2">
+      <heading level="2">Heading A</heading>
+      <para>A content</para>
+    </fragment>
+    <fragment id="96533-B">
+      <heading level="2">Heading B</heading>
+      <para>B content</para>
+      <para>B content <xref frag="top" display="manual" type="none" href="#96533-top" title="link to top">link to top</xref></para>
+      <para>B content <inline label="inline2">with inline</inline></para>
+      <image src="images/diagram1.jpg" width="200" height="100" />
+      <heading level="3">Heading B1</heading>
+      <para>B1 content</para>
+      <para indent="1" numbered="true">B1-1 clause</para>
+    </fragment>
+    <fragment id="96533-B1-2">
+      <para indent="1" numbered="true">B1-2 clause</para>
+      <heading level="3">Heading B2</heading>
+      <para>B2 content <inline label="inline1"><inline label="inline3">Text123</inline>[My field 2]</inline></para>
+      <heading level="2">Heading C</heading>
+      <para>C content <inline label="inline1"><inline label="inline3">Text 456</inline>[My field 3]</inline> text</para>
+      <para>C field2 <inline label="inline4"><inline label="inline3">Text789</inline>[My field 3]</inline> text</para>
+      <block label="block4">
+        <heading level="2" numbered="true">My definitions</heading>
+      </block>
+      <para>Definitions front matter</para>
+      <heading level="3" numbered="true">Heading D1</heading>
+      <para>D1 content</para>
+      <heading level="3" numbered="true">Heading D2</heading>
+      <para>D2 content</para>
+      <heading level="4" numbered="true">Heading D2-1</heading>
+      <para>D2-1 content</para>>
+      <block label="block5">
+        <para>Definition end 1</para>
+      </block>
+      <para>Definition end 2</para>
+      <block label="block2">
+        <heading level="2">Heading E</heading>
+      </block>
+      <heading level="1">Heading E0</heading>
+      <para>E content</para>
+      <heading level="3">Heading E1</heading>
+      <para>E1 content
+        <xref frag="B" display="manual" type="none" href="#96533-B" title="link to B">link to B</xref>
+      </para>
+      <heading level="3">Heading E2</heading>
+      <para>E2 content
+        <xref frag="B1-2" display="manual" type="none" href="#96533-B1-2" title="link to B1-2">link to B1-2</xref>
+      </para>
+      <block label="block1">Special content</block>
+      <para>More special content</para>
+      <block label="block2">Heading F</block>
+      <para>F content</para>
+      <block label="block3">
+        <heading level="2">Heading G</heading>
+        <heading level="1">Heading G1</heading>
+      </block>
+      <para>G1 content</para>
+      <blockxref frag="1" display="document" type="embed" href="common.psml">
+        <fragment id="1">
+          <para>Embedded content</para>
+        </fragment>
+      </blockxref>
+      <blockxref frag="2" display="document" type="transclude" href="common.psml">
+        <fragment id="2">
+          <para>Transcluded content</para>
+        </fragment>
+      </blockxref>
+      <block label="block3">
+        <para indent="1" numbered="true">G1-1 clause</para>
+      </block>
+    </fragment>
+  </section>
+</document>

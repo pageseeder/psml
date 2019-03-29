@@ -134,10 +134,46 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
+  <!-- adjust internal xref targets -->
+  <xsl:template match="xref[starts-with(@href,'#')]">
+    <xsl:variable name="anchor" select="//fragment-anchor[@id = substring-after(current()/@href,'#')]" />
+    <xsl:choose>
+      <xsl:when test="$anchor">
+        <xsl:variable name="document" select="($anchor/ancestor::document)[last()]" />
+        <xsl:variable name="path">
+          <xsl:choose>
+            <xsl:when test="count($anchor/ancestor::document) > 1">
+              <xsl:value-of
+                select="concat($document/@folder, fn:generate-filename($document))" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$_outputfilename" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xref frag="{($anchor/ancestor::fragment)[last()]/@id}"
+            href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
+          <xsl:copy-of select="@*[name()!='frag' and name()!='href']" />
+          <xsl:value-of select="." />
+        </xref>
+      </xsl:when>
+      <xsl:otherwise>
+        <xref frag="default" href="{@href}">
+          <xsl:copy-of select="@*[name()!='frag' and name()!='href']" />
+          <xsl:value-of select="." />
+        </xref>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   
   <!-- remove anchors -->
   <xsl:template match="anchor">
     <xsl:apply-templates select="node()" />
+  </xsl:template>
+
+  <!-- remove fragment anchors -->
+  <xsl:template match="fragment-anchor">
   </xsl:template>
   
   <!-- copy all other elements unchanged -->

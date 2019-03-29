@@ -256,7 +256,7 @@
   </xsl:template> 
   
   <!-- ignore xref transclusion content -->
-  <xsl:template match="xref[@type='transclude']">
+  <xsl:template match="blockxref[@type='transclude']">
     <xsl:copy>
       <xsl:copy-of select="@*" />
     </xsl:copy>
