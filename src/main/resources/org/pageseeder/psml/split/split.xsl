@@ -40,7 +40,8 @@
         <xsl:otherwise>0</xsl:otherwise>
       </xsl:choose>     
     </xsl:variable>
-    <blockxref frag="default" display="document" type="embed" href="{$path}">
+    <blockxref frag="default" display="document" type="embed"
+        href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
       <xsl:if test="@type">
         <xsl:attribute name="documenttype" select="@type" />
       </xsl:if>

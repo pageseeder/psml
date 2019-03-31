@@ -7,7 +7,7 @@
   </container>
 -->
   <container type="contract" labels="mycontract" />
-  <container type="definitions" labels="myterms" contains="term">
+  <container type="definitions" folder="components" labels="myterms" contains="term">
     <start>
       <block label="block4" />
     </start>

@@ -68,6 +68,9 @@
                   <xsl:variable name="endmatter" select="current-group()[config:continue-container(.)]" />
                   <document level="portable"
                       type="{if ($config/@type != '') then $config/@type else 'references'}">
+                    <xsl:if test="$config/@folder != ''">
+                      <xsl:attribute name="folder" select="concat($config/@folder,'/')"/>
+                    </xsl:if>
                     <documentinfo>
                       <uri title="{if (normalize-space($first) != '' and $frontmatter) then normalize-space($first)
                           else if ($config/@type != '') then concat(upper-case(substring($config/@type,1,1)),substring($config/@type, 2))

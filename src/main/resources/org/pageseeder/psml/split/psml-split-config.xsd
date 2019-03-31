@@ -19,6 +19,7 @@
         <xs:element ref="continue" minOccurs="0" maxOccurs="1" />
       </xs:sequence>
       <xs:attribute name="type"     type="document-type" />
+      <xs:attribute name="folder"   type="xs:string" />
       <xs:attribute name="labels"   type="label-list" />
       <xs:attribute name="contains" type="xs:string" />
     </xs:complexType>
