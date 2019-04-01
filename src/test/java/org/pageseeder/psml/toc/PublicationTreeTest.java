@@ -1,22 +1,6 @@
 package org.pageseeder.psml.toc;
 
-import static org.pageseeder.psml.toc.Tests.h1;
-import static org.pageseeder.psml.toc.Tests.h2;
-import static org.pageseeder.psml.toc.Tests.h3;
-import static org.pageseeder.psml.toc.Tests.h4;
-import static org.pageseeder.psml.toc.Tests.h5;
-import static org.pageseeder.psml.toc.Tests.p;
-import static org.pageseeder.psml.toc.Tests.parse;
-import static org.pageseeder.psml.toc.Tests.phantom;
-import static org.pageseeder.psml.toc.Tests.ref;
-import static org.pageseeder.psml.toc.Tests.tend;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import static org.pageseeder.psml.toc.Tests.*;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.Assert;
@@ -25,6 +9,13 @@ import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.toc.DocumentTree.Builder;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class PublicationTreeTest {
 
@@ -474,7 +465,8 @@ public final class PublicationTreeTest {
             p(2, "1d", 1, true, "", "table-caption"),
             p(2, "1e", 1, true, "", "figure-caption"),
             p(2, "1f", 1, true, "", "table-caption"),
-            p(3, "1g", 1, true, "", "table-caption"))) // not defined for level 3
+            p(1, "1g", 1, true, "", "table-caption"),
+            p(3, "1h", 1, true, "", "table-caption")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
     DocumentTree tree = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 1, true, "",
@@ -510,7 +502,8 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-1-1d-1",null,"Table 1-2",2,"1.2.");
     assertHasPrefix(prefixes,"1000-1-1e-1",null,"Fig 1-A",2,"1.1.");
     assertHasPrefix(prefixes,"1000-1-1f-1",null,"Table 1-3",2,"1.3.");
-    assertHasPrefix(prefixes,"1000-1-1g-1",null,"1.1.3.",3,"1.1.3.");
+    assertHasPrefix(prefixes,"1000-1-1g-1",null,"Table 1-4",2,"1.4.");
+    assertHasPrefix(prefixes,"1000-1-1h-1",null,"Table 1-5",2,"1.5.");
     assertHasPrefix(prefixes,"1000-1-default",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"1001-1-1-1",null,"2.",1,"2.");
     assertHasPrefix(prefixes,"1001-1-1a-1",null,"2.1.1.",3,"2.1.1.");
@@ -520,7 +513,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-1-1e-1",null,"Fig 2-A",2,"2.1.");
     assertHasPrefix(prefixes,"1001-1-1f-1",null,"Table 2-3",2,"2.3.");
     assertHasPrefix(prefixes,"1001-1-default",null,"2.",1,"2.");
-    Assert.assertEquals(18, prefixes.size());
+    Assert.assertEquals(19, prefixes.size());
   }
 
   @Test

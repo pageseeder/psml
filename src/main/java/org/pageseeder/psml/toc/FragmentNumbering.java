@@ -3,18 +3,13 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Generates fragment numbering for a publication.
@@ -356,7 +351,7 @@ public final class FragmentNumbering implements Serializable {
     String p = h.prefix();
     Prefix pref = null;
     if (h.numbered() && number != null) {
-      pref = number.generateNumbering(level, "heading", h.blocklabel());
+      pref = number.generateNumbering(level, "heading", "");
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, level, null);
     }

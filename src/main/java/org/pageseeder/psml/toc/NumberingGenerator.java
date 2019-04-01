@@ -3,14 +3,9 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+
+import java.util.*;
 
 /**
  * Generates numbering for a publication.
@@ -58,11 +53,12 @@ public final class NumberingGenerator {
    * @return the numbering prefix
    */
   public Prefix generateNumbering(int level, String element, String blocklabel) {
-    if (this.numberConfig != null && this.numberConfig.hasElement(level, blocklabel, element)) {
+    int found_level = (this.numberConfig != null) ? this.numberConfig.elementLevel(level, blocklabel, element) : 0;
+    if (found_level != 0) {
       // if blocklabel not defined, use empty
-      String label = this.numberConfig.getNumberFormat(level, blocklabel) == null ? "" : blocklabel;
+      String label = this.numberConfig.getNumberFormat(found_level, blocklabel) == null ? "" : blocklabel;
       // add it to current levels
-      this.addNewLevel(level, label);
+      this.addNewLevel(found_level, label);
       // compute canonical numbering
       String canonical = canonicalLabel(label);
       // compute prefix

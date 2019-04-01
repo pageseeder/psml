@@ -3,13 +3,14 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Publication numbering configuration
@@ -260,16 +261,43 @@ public final class PublicationNumbering {
   }
 
   /**
-   * Whether number for an element is defined. If none found for blocklabel returns result for no blocklabel.
+   * Finds the level that numbering for an element is defined at.
+   * For non-empty blocklabel it ignores the given level and searches all levels.
+   * If none found for blocklabel it, returns the result for no blocklabel.
    *
    * @param level      the level of the scheme
    * @param blocklabel the parent block label name
    * @param name       the element name
+   *
+   * @return level element was found at
    */
-  public boolean hasElement(int level, String blocklabel, String name) {
-    ElementName element = this.elements.get(level + "-" + blocklabel);
-    if (element == null) element = this.elements.get(level + "-");
-    return ElementName.ANY.equals(element) || (element != null && element.toString().equals(name));
+  public int elementLevel(int level, String blocklabel, String name) {
+    String key = "";
+    // search for blocklabel at any level
+    if (!"".equals(blocklabel)) {
+      Set<String> keys = this.elements.keySet();
+      String suffix = "-" + blocklabel;
+      for (String k : keys) {
+        if (k.endsWith(suffix)) {
+          if ("".equals(key)) {
+            key = k;
+          // if found twice it is invalid
+          } else {
+            key = "";
+            break;
+          }
+        }
+      }
+    } else {
+      key = level + "-" + blocklabel;
+    }
+    ElementName element = this.elements.get(key);
+    if (element == null) {
+      key = level + "-";
+      element = this.elements.get(key);
+    }
+    int l = Integer.parseInt(key.substring(0, key.indexOf('-')));
+    return (ElementName.ANY.equals(element) || (element != null && element.toString().equals(name))) ? l : 0;
   }
 
   /**
