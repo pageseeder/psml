@@ -264,8 +264,10 @@ public final class FragmentNumbering implements Serializable {
     } else if (element instanceof Heading) {
       processHeading((Heading)element, level, id, number, count, location);
     } else if (element instanceof Paragraph) {
-      int paralevel = PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getParaLevelRelativeTo()) ?
-          treeLevel + 3 - pub.tree(id).level(): level; // adjust be tree level for collapse/phantom removal
+      int paralevel = config.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.DOCUMENT ?
+          treeLevel + 3 - pub.tree(id).level() : // adjust by tree level for collapse/phantom removal
+          config.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.HEADING ? level :
+          config.getParaLevelRelativeTo().getLevel() + 1;
       processParagraph((Paragraph)element, paralevel, id, number, count, location);
     } else if (element instanceof TransclusionEnd) {
       location.transclusions--;

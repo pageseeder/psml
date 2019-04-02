@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<publication-config>
+  <levels para-relative-to="7" />
+
+  <numbering skipped-levels="strip">
+    <schemes>
+      <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
+      <scheme level="1" type="decimal" format="[1.]" />
+      <scheme level="2" type="decimal" format="[1.][2.]"                 element="any" />
+      <scheme level="3" type="decimal" format="[1.][2.][3.]"             element="any"/>
+      <scheme level="4" type="decimal" format="[1.][2.][3.][4.]"         element="any"/>
+      <scheme level="5" type="decimal" format="[1.][2.][3.][4.][5.]"     element="any"/>
+      <scheme level="6" type="decimal" format="[1.][2.][3.][4.][5.][6.]" element="any"/>
+      <scheme level="7" type="decimal" format=""                         element="any"/>
+      <scheme level="8" type="loweralpha" format="[(8)]"                 element="para"/>
+      <scheme level="9" type="lowerroman" format="[(9)]"                 element="para" />
+      <scheme level="10" type="upperalpha" format="[(10)]"               element="para" />
+      <scheme level="11" type="upperroman" format="[(11)]"               element="para"/>
+      <scheme level="12" type="loweralpha" format="[12]"                 element="para"/>
+    </schemes>
+  </numbering>
+</publication-config>

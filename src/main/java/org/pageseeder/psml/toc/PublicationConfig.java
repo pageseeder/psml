@@ -3,24 +3,16 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.jdt.annotation.Nullable;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.eclipse.jdt.annotation.Nullable;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Publication configuration file format:
@@ -69,10 +61,38 @@ public final class PublicationConfig {
   public enum LevelRelativeTo {
 
     /** relative to previous heading (default) **/
-    HEADING,
+    HEADING(-2),
 
     /** relative to containing document **/
-    DOCUMENT;
+    DOCUMENT(-1),
+
+    /** relative to fixed number 5 (para only) **/
+    FIVE(5),
+
+    /** relative to fixed number 6 (para only) **/
+    SIX(6),
+
+    /** relative to fixed number 7 (para only) **/
+    SEVEN(7),
+
+    /** relative to fixed number 8 (para only) **/
+    EIGHT(8),
+
+    /** relative to fixed number 9 (para only) **/
+    NINE(9);
+
+    /**
+     * The level paras are relative to
+     */
+    private final int level;
+
+    private LevelRelativeTo(int level) {
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return this.level;
+    }
 
     /**
      * Create the title collapse from a string.
@@ -82,8 +102,11 @@ public final class PublicationConfig {
      * @return the type
      */
     public static LevelRelativeTo fromString(String value) {
+      if ("document".equals(value)) {
+        return DOCUMENT;
+      }
       for (LevelRelativeTo n : values()) {
-        if (n.name().toLowerCase().equals(value)) return n;
+        if (Integer.toString(n.level).equals(value)) return n;
       }
       return HEADING;
     }
@@ -164,6 +187,7 @@ public final class PublicationConfig {
    * @param xrefLevelRelativeTo the xrefLevelRelativeTo to set
    */
   public void setXrefLevelRelativeTo(LevelRelativeTo xrefLevelRelativeTo) {
+    if (xrefLevelRelativeTo.getLevel() > 0) throw new IllegalArgumentException("Numbers are not allowed");
     this.xrefLevelRelativeTo = xrefLevelRelativeTo;
   }
 
@@ -315,6 +339,7 @@ public final class PublicationConfig {
         this.config.tocTitleCollapse = TitleCollapse.fromString(attributes.getValue("title-collapse"));
       } else if ("levels".equals(qName)) {
         this.config.xrefLevelRelativeTo = LevelRelativeTo.fromString(attributes.getValue("xref-relative-to"));
+        if (this.config.xrefLevelRelativeTo.getLevel() > 0 ) this.config.xrefLevelRelativeTo = LevelRelativeTo.HEADING;
         this.config.paraLevelRelativeTo = LevelRelativeTo.fromString(attributes.getValue("para-relative-to"));
         this.config.paraLevelAdjust = LevelAdjust.fromString(attributes.getValue("para-adjust"));
         this.config.headingLevelAdjust = LevelAdjust.fromString(attributes.getValue("heading-adjust"));

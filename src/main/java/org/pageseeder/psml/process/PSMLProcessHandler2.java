@@ -3,14 +3,6 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.FragmentNumbering;
@@ -22,6 +14,10 @@ import org.slf4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.*;
 
 /**
  * Handle inserting TOC and other processes.

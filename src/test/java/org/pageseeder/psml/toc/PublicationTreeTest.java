@@ -834,6 +834,78 @@ public final class PublicationTreeTest {
   }
 
   @Test
+  public void testAutoNumberingParasFixed() throws SAXException, IOException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+            phantom(2,
+            ref(3, "A", 1000L,
+              phantom(4,
+                ref(5, "B", 1000L)))))).build();
+    root = root.normalize(TitleCollapse.always);
+    Tests.print(root);
+    DocumentTree tree = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 1, true, "x.x",
+            p(1, "1a", 1, true, ""),
+            p(2, "1b", 1, true, ""),
+            p(1, "1c", 1, false, "x"),
+            h2("a", "2", 1, true, "x.x.x"),
+            p(0, "3", 1, false, ""),
+            h2("b", "3", 2, true, "",
+                p(1, "3a", 1, true, ""),
+                p(2, "3b", 2, true, ""),
+                p(3, "3c", 1, true, "x.x"),
+                p(1, "3d", 1, true, "")),
+            h2("c", "4", 1, false, ""),
+            h2("d", "4", 2, true, "",
+                h3("xc", "5", 1, true, ""))))
+        .addReverseReference(1L).build().normalize(TitleCollapse.always);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(tree);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-paras-fixed.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering, true);
+    tree.print(System.out);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"1.",2,"0.1.");
+    assertHasPrefix(prefixes,"1000-1-1a-1","1.","(a)",8,"0.1.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-1-1b-1","1.(a)","(i)",9,"0.1.0.0.0.0.0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-1c-1",null,"x",8,null);
+    assertHasPrefix(prefixes,"1000-1-2-1",null,"1.1.",3,"0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-3-2",null,"1.2.",3,"0.1.2.");
+    assertHasPrefix(prefixes,"1000-1-3a-1","1.2.","(a)",8,"0.1.2.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-1-3b-1","1.2.(a)","(i)",9,"0.1.2.0.0.0.0.1.1.");
+    assertHasPrefix(prefixes,"1000-1-3c-1","1.2.(a)(i)","(A)",10,"0.1.2.0.0.0.0.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-3d-1","1.2.","(b)",8,"0.1.2.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1000-1-4-2",null,"1.3.",3,"0.1.3.");
+    assertHasPrefix(prefixes,"1000-1-5-1",null,"1.3.1.",4,"0.1.3.1.");
+    assertHasPrefix(prefixes,"1000-1-default",null,"1.",2,"0.1.");
+    assertHasPrefix(prefixes,"1000-2-1-1",null,"1.3.2.",4,"0.1.3.2.");
+    assertHasPrefix(prefixes,"1000-2-1a-1","1.3.2.","(a)",8,"0.1.3.2.0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-2-1b-1","1.3.2.(a)","(i)",9,"0.1.3.2.0.0.0.1.1.");
+    assertHasPrefix(prefixes,"1000-2-1c-1",null,"x",8,null);
+    assertHasPrefix(prefixes,"1000-2-2-1",null,"1.3.2.1.",5,"0.1.3.2.1.");
+    assertHasPrefix(prefixes,"1000-2-3-2",null,"1.3.2.2.",5,"0.1.3.2.2.");
+    assertHasPrefix(prefixes,"1000-2-3a-1","1.3.2.2.","(a)",8,"0.1.3.2.2.0.0.1.");
+    assertHasPrefix(prefixes,"1000-2-3b-1","1.3.2.2.(a)","(i)",9,"0.1.3.2.2.0.0.1.1.");
+    assertHasPrefix(prefixes,"1000-2-3c-1","1.3.2.2.(a)(i)","(A)",10,"0.1.3.2.2.0.0.1.1.1.");
+    assertHasPrefix(prefixes,"1000-2-3d-1","1.3.2.2.","(b)",8,"0.1.3.2.2.0.0.2.");
+    assertHasPrefix(prefixes,"1000-2-4-2",null,"1.3.2.3.",5,"0.1.3.2.3.");
+    assertHasPrefix(prefixes,"1000-2-5-1",null,"1.3.2.3.1.",6,"0.1.3.2.3.1.");
+    assertHasPrefix(prefixes,"1000-2-default",null,"1.3.2.",4,"0.1.3.2.");
+    Assert.assertEquals(27, prefixes.size());  }
+
+  @Test
   public void testAutoNumberingParasRelative() throws SAXException, IOException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
