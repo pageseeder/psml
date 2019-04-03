@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <publication-config>
+  <toc block-labels="table-caption" />
+  
   <numbering skipped-levels="1">
     <schemes>
       <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->

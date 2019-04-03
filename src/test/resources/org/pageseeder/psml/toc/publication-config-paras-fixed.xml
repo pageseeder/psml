@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <publication-config>
+  <toc para-indents="1,2" />
+
   <levels para-relative-to="7" />
 
   <numbering skipped-levels="strip">

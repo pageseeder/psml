@@ -1,23 +1,5 @@
 package org.pageseeder.psml.toc;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.hamcrest.BaseMatcher;
@@ -34,6 +16,20 @@ import org.xmlunit.validation.Languages;
 import org.xmlunit.validation.ValidationProblem;
 import org.xmlunit.validation.ValidationResult;
 import org.xmlunit.validation.Validator;
+
+import javax.xml.parsers.*;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 public class Tests {
 
@@ -404,11 +400,12 @@ public class Tests {
     System.out.println(xml.toString());
   }
 
-  public static void print(PublicationTree o, long cid, int cposition, @Nullable FragmentNumbering number, boolean externalrefs) {
+  public static void print(PublicationTree o, long cid, int cposition, @Nullable FragmentNumbering number,
+      @Nullable PublicationConfig config, boolean externalrefs) {
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
     xml.setIndentChars("  ");
     try {
-      o.toXML(xml, cid, cposition, number, externalrefs);
+      o.toXML(xml, cid, cposition, number, config, externalrefs);
     } catch (IOException ex) {
       // Won't happen
     }

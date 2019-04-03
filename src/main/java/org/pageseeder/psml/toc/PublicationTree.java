@@ -3,19 +3,13 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * An immutable tree aggregating multiple trees together in order to generate a
@@ -61,6 +55,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     private @Nullable FragmentNumbering number;
 
     /**
+     * The config for the publication (optional)
+     */
+    private @Nullable PublicationConfig config;
+
+    /**
      * Map of [uriid], [number of uses]
      */
     private Map<Long,Integer> doccount = new HashMap<>();
@@ -82,14 +81,16 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
      * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
      * @param trees         The IDs of trees that cid is a descendant of (optional)
      * @param number        The fragment numbering for the publication (optional)
+     * @param config        The config for the publication (optional)
      * @param externalrefs  Whether to output references to IDs not in this publication tree.
      */
     private TOCState(long cid, int cposition, @Nullable List<Long> trees, @Nullable FragmentNumbering number,
-        boolean externalrefs) {
+        @Nullable PublicationConfig config, boolean externalrefs) {
       this.cid = cid;
       this.cposition = cposition;
       this.trees = trees;
       this.number = number;
+      this.config = config;
       this.externalrefs = externalrefs;
     }
   }
@@ -304,7 +305,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    toXML(xml, -1, -1, null, true);
+    toXML(xml, -1, -1, null, null, true);
   }
 
   /**
@@ -314,11 +315,13 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param cid           The ID of the content tree (leaf). If -1 output all.
    * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
    * @param number        The fragment numbering for the publication (optional)
+   * @param config        The config for the publication (optional)
    * @param externalrefs  Whether to output references to IDs not in this publication tree.
    *
    * @throws IOException If thrown by XML writer
    */
-  public void toXML(XMLWriter xml, long cid, int cposition, @Nullable FragmentNumbering number, boolean externalrefs) throws IOException {
+  public void toXML(XMLWriter xml, long cid, int cposition, @Nullable FragmentNumbering number,
+      @Nullable PublicationConfig config, boolean externalrefs) throws IOException {
     xml.openElement("publication-tree", true);
     DocumentTree root = tree(cposition == -1 ? this._rootid : cid);
     if (root != null) {
@@ -338,7 +341,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
         }
       }
       toXML(xml, this._rootid, 1, 1, Reference.DEFAULT_FRAGMENT,
-          new TOCState(cid, cposition, trees, number, externalrefs));
+          new TOCState(cid, cposition, trees, number, config, externalrefs));
     }
     xml.closeElement();
   }
@@ -404,7 +407,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   private void toXML(XMLWriter xml, long id, int level, Part<?> part, Integer count, TOCState state) throws IOException {
     Element element = part.element();
     // ignore paragraphs
-    if (element instanceof Paragraph || element instanceof TransclusionEnd) return;
+    if (element instanceof TransclusionEnd) return;
     boolean output = (state.trees == null || state.trees.contains(id)) &&
         (state.cposition == -1 || state.cposition == count);
     boolean toNext = false;
@@ -421,13 +424,24 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       toNext = nextTree != null && Reference.Type.EMBED.equals(refType);
     }
     if (output && !Reference.Type.TRANSCLUDE.equals(refType)) {
-      xml.openElement("part", !part.parts().isEmpty() ||
-          (toNext && (state.trees == null || state.trees.contains(next) || state.cid == id)));
-      xml.attribute("level", level);
-      if (toNext && state.cid == next) {
-        xml.attribute("content", "true");
-      } else if (element instanceof Heading) {
-        xml.attribute("uriid", Long.toString(id));
+      if (element instanceof Paragraph) {
+        Paragraph para = (Paragraph) element;
+        if (state.config != null && (state.config.getTocParaIndents().indexOf(para.level() + ",") != -1 ||
+            (!"".equals(para.blocklabel()) && state.config.getTocBlockLabels().indexOf(para.blocklabel() + ",") != -1))) {
+          element.toXML(xml, level, state.number, id, count);
+          return;
+        } else {
+          return;
+        }
+      } else {
+        xml.openElement("part", !part.parts().isEmpty() ||
+            (toNext && (state.trees == null || state.trees.contains(next) || state.cid == id)));
+        xml.attribute("level", level);
+        if (toNext && state.cid == next) {
+          xml.attribute("content", "true");
+        } else if (element instanceof Heading) {
+          xml.attribute("uriid", Long.toString(id));
+        }
       }
     }
 

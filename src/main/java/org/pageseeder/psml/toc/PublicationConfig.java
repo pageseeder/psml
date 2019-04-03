@@ -19,10 +19,12 @@ import java.util.List;
  *
  * <pre>{@code
  * <publication-config>
- *   <toc title-collapse="[always*|auto|never]" />
+ *   <toc title-collapse="[always*|auto|never]"
+ *       para-indents="[comma separated numbers]"
+ *       block-labels="[comma separated labels]" />
  *
  *   <levels xref-relative-to="[heading*|document]"
- *       para-relative-to="[heading*|document]"
+ *       para-relative-to="[heading*|document|5|6|7|8|9]"
  *       para-adjust="[numbering*|content]"
  *       heading-adjust="[numbering*|content]" />
  *
@@ -51,7 +53,7 @@ import java.util.List;
  *
  * @author Philip Rutherford
  */
-public final class PublicationConfig {
+public final class PublicationConfig implements Cloneable {
 
   /**
    * An enumeration for what xref/para level is relative to
@@ -152,6 +154,16 @@ public final class PublicationConfig {
   private TitleCollapse tocTitleCollapse = TitleCollapse.always;
 
   /**
+   * A comma separated list of numbered paragraph indents to include in the toc (with trailing comma)
+   */
+  private String tocParaIndents = ",";
+
+  /**
+   * A comma separated list of numbered block labels to include in the toc (with trailing comma)
+   */
+  private String tocBlockLabels = ",";
+
+  /**
    * An enumeration for what xref level is relative to
    */
   private LevelRelativeTo xrefLevelRelativeTo = LevelRelativeTo.HEADING;
@@ -181,6 +193,20 @@ public final class PublicationConfig {
    */
   public void setTocTitleCollapse(TitleCollapse tocTitleCollapse) {
     this.tocTitleCollapse = tocTitleCollapse;
+  }
+
+  /**
+   * @param tocParaLevels comma separated list of numbered paragraph indents to include in the toc
+   */
+  public void setTocParaIndents(String tocParaIndents) {
+    this.tocParaIndents = (tocParaIndents == null ? ""  : tocParaIndents) + ",";
+  }
+
+  /**
+   * @param tocBlockLabels comma separated list of numbered block labels to include in the toc
+   */
+  public void setTocBlockLabels(String tocBlockLabels) {
+    this.tocBlockLabels = (tocBlockLabels == null ? ""  : tocBlockLabels) + ",";
   }
 
   /**
@@ -337,6 +363,8 @@ public final class PublicationConfig {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if ("toc".equals(qName)) {
         this.config.tocTitleCollapse = TitleCollapse.fromString(attributes.getValue("title-collapse"));
+        this.config.setTocParaIndents(attributes.getValue("para-indents"));
+        this.config.setTocBlockLabels(attributes.getValue("block-labels"));
       } else if ("levels".equals(qName)) {
         this.config.xrefLevelRelativeTo = LevelRelativeTo.fromString(attributes.getValue("xref-relative-to"));
         if (this.config.xrefLevelRelativeTo.getLevel() > 0 ) this.config.xrefLevelRelativeTo = LevelRelativeTo.HEADING;
@@ -380,6 +408,20 @@ public final class PublicationConfig {
    */
   public TitleCollapse getTocTitleCollapse() {
     return this.tocTitleCollapse;
+  }
+
+  /**
+   * @return the tocParaIndents (with trailing comma)
+   */
+  public String getTocParaIndents() {
+    return this.tocParaIndents;
+  }
+
+  /**
+   * @return the tocBlockLabels (with trailing comma)
+   */
+  public String getTocBlockLabels() {
+    return this.tocBlockLabels;
   }
 
   /**

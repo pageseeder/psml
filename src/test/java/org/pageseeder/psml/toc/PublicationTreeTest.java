@@ -157,9 +157,9 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
-    Tests.print(publication, 1000, 2, numbering, true);
-    Tests.print(publication, 1002, -1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
+    Tests.print(publication, 1000, 2, numbering, null, true);
+    Tests.print(publication, 1002, -1, numbering, null, true);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -259,8 +259,8 @@ public final class PublicationTreeTest {
     // Generate fragment numbering
     Map<Long,List<Long>> transclusions = new HashMap<>();
     FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>(), transclusions);
-    Tests.print(publication, -1, -1, numbering, true);
-    Tests.print(publication, 101, 1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
+    Tests.print(publication, 101, 1, numbering, null, true);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
@@ -362,8 +362,8 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-xrefs-relative.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
-    Tests.print(publication, 1000, 2, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
+    Tests.print(publication, 1000, 2, numbering, null, true);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -434,7 +434,7 @@ public final class PublicationTreeTest {
     // Generate fragment numbering
     List<Long> unusedIds = new ArrayList<>();
     FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds, new HashMap<Long,List<Long>>());
-    Tests.print(publication, -1, -1, numbering, false);
+    Tests.print(publication, -1, -1, numbering, null, false);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -487,7 +487,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-block-labels.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, false);
+    Tests.print(publication, -1, -1, numbering, config, false);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -546,7 +546,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-blank-format.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, false);
+    Tests.print(publication, -1, -1, numbering, null, false);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -597,7 +597,7 @@ public final class PublicationTreeTest {
     // Generate fragment numbering
     List<Long> unusedIds = new ArrayList<>();
     FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds, new HashMap<Long,List<Long>>());
-    Tests.print(publication, -1, -1, numbering, false);
+    Tests.print(publication, -1, -1, numbering, null, false);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -671,7 +671,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -782,7 +782,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-paras.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
     tree.print(System.out);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -868,7 +868,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-paras-fixed.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, config, true);
     tree.print(System.out);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -964,7 +964,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-paras-relative.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
     tree.print(System.out);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -1053,7 +1053,7 @@ public final class PublicationTreeTest {
         .collect(Collectors.joining("\n"));
     System.out.println(result);
     long pstart = System.currentTimeMillis();
-    Tests.print(publication, 1499, -1, numbering, true);
+    Tests.print(publication, 1499, -1, numbering, null, true);
     long pend = System.currentTimeMillis();
     System.out.println("Number of prefixes: " + prefixes.size());
     System.out.println("Number of transclude prefixes: " + numbering.getAllTranscludedPrefixes().size());
@@ -1085,7 +1085,7 @@ public final class PublicationTreeTest {
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(inter2);
-    Tests.print(publication, -1, -1, null, true);
+    Tests.print(publication, -1, -1, null, null, true);
   }
 
   @Test(expected = IllegalStateException.class)
@@ -1157,7 +1157,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
     tree.print(System.out);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
@@ -1192,7 +1192,7 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, true);
+    Tests.print(publication, -1, -1, numbering, null, true);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())

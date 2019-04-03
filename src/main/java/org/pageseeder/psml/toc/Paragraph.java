@@ -1,10 +1,11 @@
 package org.pageseeder.psml.toc;
 
+import org.eclipse.jdt.annotation.Nullable;
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+import org.pageseeder.xmlwriter.XMLWriter;
+
 import java.io.IOException;
 import java.io.Serializable;
-
-import org.eclipse.jdt.annotation.Nullable;
-import org.pageseeder.xmlwriter.XMLWriter;
 
 /**
  * A paragraph in the content.
@@ -168,15 +169,27 @@ public final class Paragraph extends Element implements Serializable {
 
   @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
-    xml.openElement("para", false);
+    xml.openElement("para-ref", false);
     xml.attribute("level", this.level());
+    if (!Element.NO_TITLE.equals(title())) {
+      xml.attribute("title", title());
+    }
     xml.attribute("fragment", fragment());
     xml.attribute("index", this._index);
     if (this._numbered) {
       xml.attribute("numbered", "true");
     }
-    if (!NO_PREFIX.equals(this._prefix)) {
-      xml.attribute("prefix", this._prefix);
+    if (this._numbered && number != null) {
+      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index);
+      if (pref != null) {
+        xml.attribute("part-level", pref.level);
+        xml.attribute("prefix", pref.value);
+        xml.attribute("canonical", pref.canonical);
+      }
+    } else {
+      if (!NO_PREFIX.equals(this._prefix)) {
+        xml.attribute("prefix", this._prefix);
+      }
     }
     xml.closeElement();
   }
