@@ -1,24 +1,15 @@
 package org.pageseeder.psml.toc;
 
-import static org.pageseeder.psml.toc.Tests.h1;
-import static org.pageseeder.psml.toc.Tests.h2;
-import static org.pageseeder.psml.toc.Tests.h3;
-import static org.pageseeder.psml.toc.Tests.h4;
-import static org.pageseeder.psml.toc.Tests.h5;
-import static org.pageseeder.psml.toc.Tests.h6;
-import static org.pageseeder.psml.toc.Tests.parse;
-import static org.pageseeder.psml.toc.Tests.phantom;
-import static org.pageseeder.psml.toc.Tests.ref;
-import static org.pageseeder.psml.toc.Tests.tend;
+import static org.pageseeder.psml.toc.Tests.*;
+
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.junit.Test;
-import org.xml.sax.SAXException;
 
 public final class DocumentTreeHandlerTest {
 
@@ -274,7 +265,10 @@ public final class DocumentTreeHandlerTest {
         ref(1, "Another heading 2", 199328),
         ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
           ref(2, "Another heading 2a", 199326))),
-      h2("Related", "default", 1));
+      h2("Related", "default", 1,
+          p(1, "A numbered para", "4", 2, true, "", ""),
+          p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
+          p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
     List<Long> reverse = new ArrayList<>();
     DocumentTree expected = new DocumentTree(4, "Test doc 1", "", reverse, Collections.singletonList(p),
         Collections.emptyMap(), Collections.emptyMap());
@@ -288,7 +282,10 @@ public final class DocumentTreeHandlerTest {
           ref(1, "Another heading 2", 199328),
           ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
             ref(2, "Another heading 2a", 199326))),
-        h2("Related", "default", 1));
+        h2("Related", "default", 1,
+            p(1, "A numbered para", "4", 2, true, "", ""),
+            p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
+            p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
     expected = new DocumentTree(4, "Test doc 1", "", reverse, parts,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);

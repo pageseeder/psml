@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <publication-config>
+  <toc para-indents="1,2" />
   <!-- <numbering [document-label="xyz"]> -->
   <numbering skipped-levels="strip">
     <schemes>

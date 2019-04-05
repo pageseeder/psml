@@ -315,6 +315,21 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param cid           The ID of the content tree (leaf). If -1 output all.
    * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
    * @param number        The fragment numbering for the publication (optional)
+   * @param externalrefs  Whether to output references to IDs not in this publication tree.
+   *
+   * @throws IOException If thrown by XML writer
+   */
+  public void toXML(XMLWriter xml, long cid, int cposition, @Nullable FragmentNumbering number, boolean externalrefs) throws IOException {
+    toXML(xml, cid, cposition, number, null, externalrefs);
+  }
+
+  /**
+   * Serialize the partial tree down to content ID.
+   *
+   * @param xml           The XML writer
+   * @param cid           The ID of the content tree (leaf). If -1 output all.
+   * @param cposition     If not -1 output content tree only at this position (occurrence number) in the tree.
+   * @param number        The fragment numbering for the publication (optional)
    * @param config        The config for the publication (optional)
    * @param externalrefs  Whether to output references to IDs not in this publication tree.
    *
@@ -327,6 +342,9 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (root != null) {
       xml.attribute("uriid", Long.toString(root.id()));
       xml.attribute("title", root.title());
+      if (!"".equals(root.labels())) {
+        xml.attribute("labels", root.labels());
+      }
       if (this._map.size() == 1 || cposition != -1) {
         xml.attribute("content", "true");
       }
@@ -453,14 +471,15 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
         nextcount = nextcount == null ? 1 : nextcount + 1;
         state.doccount.put(next, nextcount);
       }
+      Reference ref = (Reference)element;
       if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
-          if (output) element.toXML(xml, level, state.number, next, nextcount,
-              nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null));
+          if (output) ref.toXML(xml, level, state.number, next, nextcount,
+              nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null), nextTree.labels());
         } else {
           // single embedded fragments can't be numbered
-          if (output) element.toXML(xml, level, state.number, id, count,
-              false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment));
+          if (output) ref.toXML(xml, level, state.number, id, count,
+              false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment), nextTree.labels());
         }
       }
     } else if (element instanceof Reference && !state.externalrefs) {

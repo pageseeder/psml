@@ -3,13 +3,13 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.io.IOException;
-import java.io.Serializable;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.xmlwriter.XMLWriter;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * A embed block reference.
@@ -191,13 +191,22 @@ public final class Reference extends Element implements Serializable {
   }
 
   @Override
-  public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count, boolean numbered, String prefix, boolean children) throws IOException {
+  public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
+      boolean numbered, String prefix, boolean children) throws IOException {
+    toXML(xml, level, number, treeid, count, numbered, prefix, children, "");
+  }
+
+  public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
+      boolean numbered, String prefix, boolean children, String labels) throws IOException {
     toXMLNoClose(xml, level, count);
     if (numbered) {
       xml.attribute("numbered", "true");
     }
     if (children) {
       xml.attribute("children", "true");
+    }
+    if (!"".equals(labels)) {
+      xml.attribute("labels", labels);
     }
     if (numbered && number != null) {
       Prefix pref = number.getPrefix(treeid, count);

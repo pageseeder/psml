@@ -226,6 +226,10 @@ public class Tests {
     return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix).blocklabel(blocklabel));
   }
 
+  public static Part<Paragraph> p(int level,  String title, String fragment, int index, boolean numbered, String prefix, String blocklabel) {
+    return new Part<>(new Paragraph(level, fragment, fragment, index).title(title).numbered(numbered).prefix(prefix).blocklabel(blocklabel));
+  }
+
   public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix), parts);
   }

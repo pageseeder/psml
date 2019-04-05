@@ -3,13 +3,13 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Objects;
-
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.xml.BasicHandler;
 import org.xml.sax.Attributes;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Objects;
 
 /**
  * Parse the document content to generate the document tree.
@@ -62,6 +62,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    * The last reference being processed
    */
   private @Nullable Reference currentReference = null;
+
+  /**
+   * The last paragraph being processed
+   */
+  private @Nullable Paragraph currentParagraph = null;
 
   /**
    * Whether this is the first heading in fragment (not preceded by para)
@@ -211,7 +216,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       if (isParent("block") && this.currentBlockLabel != null) {
         para = para.blocklabel(this.currentBlockLabel);
       }
-      this._expander.addLeaf(para);
+      this.currentParagraph = para;
+      newBuffer();
     }
     this.firstHeading = false;
     this.counter++;
@@ -332,6 +338,19 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
         }
         this._expander.add(heading);
       }
+
+    } else if ("para".equals(element) && this.currentParagraph != null) {
+      String title = buffer(true);
+      Paragraph para = this.currentParagraph;
+      if (title != null) {
+        // if no wrapping blocklabel truncate title
+        if ("".equals(para.blocklabel()) && title.length() > 40) {
+          title = title.substring(0, 40) + "...";
+        }
+        para = para.title(title);
+      }
+      this._expander.addLeaf(para);
+      this.currentParagraph = null;
 
     } else if ("displaytitle".equals(element) && !hasAncestor("blockxref")) {
       String title = buffer(true);

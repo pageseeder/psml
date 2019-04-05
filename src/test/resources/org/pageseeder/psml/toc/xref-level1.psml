@@ -8,6 +8,7 @@
       created="2017-09-15T12:09:31+10:00" modified="2018-01-24T09:41:15+11:00"
       title="Test doc 1">
       <displaytitle>Test doc 1</displaytitle>
+      <labels>doc1,doc2</labels>
     </uri>
   </documentinfo>
   <fragmentinfo>
@@ -50,5 +51,13 @@
     <properties-fragment id="3">
       <property name="link-text" title="Link text" value="My link" />
     </properties-fragment>
+    <fragment id="4">
+      <para indent="1">Ignore</para>
+      <para numbered="true" indent="1">A numbered para</para>
+      <para numbered="true" indent="1">A long long long long long long long long long long long numbered para</para>
+      <block label="block1">
+        <para numbered="true" indent="1">A long long long long long long long long long long long block labeled numbered para</para>
+      </block>
+    </fragment>
   </section>
 </document>

@@ -8,9 +8,12 @@ import org.junit.Test;
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.toc.DocumentTree.Builder;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+import org.pageseeder.xmlwriter.XML.NamespaceAware;
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -667,11 +670,11 @@ public final class PublicationTreeTest {
     Assert.assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
-    //assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering, null, true);
+    assertValidPublication(publication, numbering, config);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -1157,8 +1160,9 @@ public final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, true);
+    Tests.print(publication, -1, -1, numbering, config, true);
     tree.print(System.out);
+    assertValidPublication(publication, numbering, config);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -1216,6 +1220,23 @@ public final class PublicationTreeTest {
   private static void assertValidPublication(PublicationTree publication) {
     try {
       Assert.assertThat(Tests.toDOMSource(publication), Tests.validates("publication-tree.xsd"));
+    } catch (AssertionError ex) {
+      Tests.print(publication);
+      throw ex;
+    }
+  }
+
+  private static void assertValidPublication(PublicationTree publication, @Nullable FragmentNumbering number,
+      @Nullable PublicationConfig config) {
+    try {
+      XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
+      try {
+        publication.toXML(xml, -1, -1, number, config, true);
+      } catch (IOException ex) {
+        // Won't happen
+      }
+      xml.flush();
+      Assert.assertThat(toDOMSource(new StringReader(xml.toString())), Tests.validates("publication-tree.xsd"));
     } catch (AssertionError ex) {
       Tests.print(publication);
       throw ex;

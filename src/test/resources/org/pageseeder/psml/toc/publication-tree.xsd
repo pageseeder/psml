@@ -3,11 +3,13 @@
 
 <xs:element name="publication-tree">
   <xs:complexType>
-    <xs:sequence>
-      <xs:element name="part" type="part" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="part" type="part" />
+      <xs:element name="para-ref" type="para-ref" />
+    </xs:choice>
     <xs:attribute name="uriid"    type="xs:integer" use="required"/>
     <xs:attribute name="title"    type="xs:string"  use="required"/>
+    <xs:attribute name="labels"   type="label-list" />
     <xs:attribute name="content"  type="xs:boolean"/>
   </xs:complexType>
 </xs:element>
@@ -22,7 +24,10 @@
       <xs:element name="document-ref" type="document-ref"/>
       <xs:element name="heading-ref"  type="heading-ref"/>
     </xs:choice>
-    <xs:element name="part" type="part" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="part" type="part" />
+      <xs:element name="para-ref" type="para-ref" />
+    </xs:choice>
   </xs:sequence>
   <xs:attribute name="level"    type="level" use="required"/>
   <xs:attribute name="content"  type="xs:boolean"/>
@@ -33,6 +38,7 @@
   <xs:attribute name="level"          type="level"        use="required"/>
   <xs:attribute name="title"          type="xs:string"    use="required"/>
   <xs:attribute name="uriid"          type="uriid"        use="required"/>
+  <xs:attribute name="labels"         type="label-list" />
   <xs:attribute name="documenttype"   type="documenttype" />
   <xs:attribute name="targetfragment" type="fragment"/>  
   <xs:attribute name="canonical"      type="xs:string"/>
@@ -50,6 +56,17 @@
   <xs:attribute name="canonical"  type="xs:string"/>
   <xs:attribute name="prefix"     type="xs:string"/>
   <xs:attribute name="numbered"   type="xs:boolean"/>
+</xs:complexType>
+
+<xs:complexType name="para-ref">
+  <xs:attribute name="level"       type="level"     use="required"/>
+  <xs:attribute name="fragment"    type="fragment"  use="required"/>
+  <xs:attribute name="index"       type="index"     use="required"/>
+  <xs:attribute name="title"       type="xs:string"/>
+  <xs:attribute name="canonical"   type="xs:string"/>
+  <xs:attribute name="prefix"      type="xs:string"/>
+  <xs:attribute name="numbered"    type="xs:boolean"/>
+  <xs:attribute name="block-label" type="label"/>
 </xs:complexType>
 
 <!-- ====================================================================== -->
@@ -72,6 +89,18 @@
 <xs:simpleType name="index">
   <xs:restriction base="xs:int">
     <xs:minInclusive value="1"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="label">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="[a-zA-Z0-9_\-]+"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="label-list">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="[a-zA-Z0-9_\-,]*"/>
   </xs:restriction>
 </xs:simpleType>
 

@@ -179,6 +179,9 @@ public final class Paragraph extends Element implements Serializable {
     if (this._numbered) {
       xml.attribute("numbered", "true");
     }
+    if (!Paragraph.NO_BLOCK_LABEL.equals(this._blocklabel)) {
+      xml.attribute("block-label", this._blocklabel);
+    }
     if (this._numbered && number != null) {
       Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index);
       if (pref != null) {
