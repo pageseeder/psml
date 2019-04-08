@@ -94,7 +94,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumbering() throws SAXException, IOException {
+  public void testAutoNumbering() throws SAXException, IOException, XRefLoopException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -208,7 +208,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingTranscluded() throws SAXException, IOException {
+  public void testAutoNumberingTranscluded() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -322,7 +322,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingXRefsRelative() throws SAXException, IOException {
+  public void testAutoNumberingXRefsRelative() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -406,7 +406,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingBlank() throws SAXException, IOException {
+  public void testAutoNumberingBlank() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -455,7 +455,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingBlockLabels() throws SAXException, IOException {
+  public void testAutoNumberingBlockLabels() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
               ref(0, "X", 1000L),
@@ -520,7 +520,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingBlankFormat() throws SAXException, IOException {
+  public void testAutoNumberingBlankFormat() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
               ref(0, "X", 1000L),
@@ -571,7 +571,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingSkippedLevels() throws SAXException, IOException {
+  public void testAutoNumberingSkippedLevels() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("X", "1", 1, true, "",
             h2("a", "2", 1, true, "x.x.x"),
@@ -625,7 +625,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingLabels() throws SAXException, IOException {
+  public void testAutoNumberingLabels() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1, true, "",
             phantom(2,
@@ -717,7 +717,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingParas() throws SAXException, IOException {
+  public void testAutoNumberingParas() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -837,7 +837,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingParasFixed() throws SAXException, IOException {
+  public void testAutoNumberingParasFixed() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -909,7 +909,7 @@ public final class PublicationTreeTest {
     Assert.assertEquals(27, prefixes.size());  }
 
   @Test
-  public void testAutoNumberingParasRelative() throws SAXException, IOException {
+  public void testAutoNumberingParasRelative() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -1011,7 +1011,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingPerformance() throws SAXException, IOException {
+  public void testAutoNumberingPerformance() throws SAXException, IOException, XRefLoopException {
     Builder builder = new DocumentTree.Builder(1).title("T");
     for(int i = 0; i < 500; i++) {
       builder = builder.part(ref(2, "A", 1000L + i));
@@ -1091,8 +1091,8 @@ public final class PublicationTreeTest {
     Tests.print(publication, -1, -1, null, null, true);
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void testLoopDetectionAutonumber() throws SAXException, IOException {
+  @Test(expected = XRefLoopException.class)
+  public void testLoopDetectionAutonumber() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -1130,7 +1130,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testParseXrefLevel1() throws SAXException, IOException {
+  public void testParseXrefLevel1() throws SAXException, IOException, XRefLoopException {
     DocumentTree tree = parse(1, "xref-level1.psml");
     Tests.print(tree);
     tree = tree.normalize(TitleCollapse.auto);
@@ -1185,7 +1185,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testParseCompareRef() throws SAXException, IOException {
+  public void testParseCompareRef() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = parse(69152, "compare_ref.psml").normalize(TitleCollapse.always);
     DocumentTree tree1 = parse(69153, "compare_1.psml").normalize(TitleCollapse.always);
     DocumentTree tree2 = parse(69154, "compare_2.psml").normalize(TitleCollapse.always);

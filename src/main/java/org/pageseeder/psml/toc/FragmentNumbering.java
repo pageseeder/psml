@@ -89,8 +89,10 @@ public final class FragmentNumbering implements Serializable {
    *
    * @param pub              The publication tree
    * @param config           The publication config
+   *
+   * @throws XRefLoopException if an XRef loop is detected
    */
-  public FragmentNumbering(PublicationTree pub, PublicationConfig config) {
+  public FragmentNumbering(PublicationTree pub, PublicationConfig config) throws XRefLoopException {
     this(pub, config, new ArrayList<Long>(), new HashMap<Long,List<Long>>());
   }
 
@@ -102,9 +104,11 @@ public final class FragmentNumbering implements Serializable {
    * @param unusedIds        Any tree IDs that are unreachable will be added to this list (supply empty list)
    * @param transclusions    Map of transcluded Id to a list of it's parent Ids.
    *                         If list contains -1 then Id is also embedded (supply empty map).
+   *
+   * @throws XRefLoopException if an XRef loop is detected
    */
   public FragmentNumbering(PublicationTree pub, PublicationConfig config,
-      List<Long> unusedIds, Map<Long,List<Long>> transclusions) {
+      List<Long> unusedIds, Map<Long,List<Long>> transclusions) throws XRefLoopException {
     Map<Long,Integer> doccount = new HashMap<>();
     DocumentTree root = pub.root();
     if (root != null) {
@@ -166,12 +170,14 @@ public final class FragmentNumbering implements Serializable {
    * @param ancestors     List of the current ancestor tree IDs
    * @param fragment      The document fragment to serialize
    * @param transclusions Map of transcluded Id to a list of it's parent Ids
+   *
+   * @throws XRefLoopException if an XRef loop is detected
    */
   private void processTree(PublicationTree pub, long id, int level, int treelevel, PublicationConfig config,
       @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
-      String fragment, Map<Long,List<Long>> transclusions) {
+      String fragment, Map<Long,List<Long>> transclusions) throws XRefLoopException {
     String key = id + "-" + fragment;
-    if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID " + id);
+    if (ancestors.contains(key)) throw new XRefLoopException("XRef loop detected on URIID " + id);
     ancestors.add(key);
     DocumentTree current = pub.tree(id);
     if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
@@ -206,10 +212,12 @@ public final class FragmentNumbering implements Serializable {
    * @param ancestors     List of the current ancestor tree IDs
    * @param location      The original location for transcluded content
    * @param transclusions Map of transcluded Id to a list of it's parent Ids
+   *
+   * @throws XRefLoopException if an XRef loop is detected
    */
   private void processPart(PublicationTree pub, long id, int level, int treeLevel, Part<?> part, PublicationConfig config,
       @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
-      Location location, Map<Long,List<Long>> transclusions) {
+      Location location, Map<Long,List<Long>> transclusions) throws XRefLoopException {
     Element element = part.element();
     Long next = null;
     DocumentTree nextTree = null;

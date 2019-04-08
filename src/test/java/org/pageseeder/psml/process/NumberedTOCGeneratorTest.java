@@ -1,34 +1,21 @@
 package org.pageseeder.psml.process;
 
-import static org.pageseeder.psml.toc.Tests.h1;
-import static org.pageseeder.psml.toc.Tests.h2;
-import static org.pageseeder.psml.toc.Tests.h3;
-import static org.pageseeder.psml.toc.Tests.h4;
-import static org.pageseeder.psml.toc.Tests.h5;
-import static org.pageseeder.psml.toc.Tests.phantom;
-import static org.pageseeder.psml.toc.Tests.ref;
-import static org.pageseeder.psml.toc.Tests.tend;
+import static org.pageseeder.psml.toc.Tests.*;
+
+import org.junit.Test;
+import org.pageseeder.psml.toc.*;
+import org.pageseeder.xmlwriter.XML.NamespaceAware;
+import org.pageseeder.xmlwriter.XMLStringWriter;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
-import org.pageseeder.psml.toc.DocumentTree;
-import org.pageseeder.psml.toc.FragmentNumbering;
-import org.pageseeder.psml.toc.PublicationConfig;
-import org.pageseeder.psml.toc.PublicationTree;
-import org.pageseeder.psml.toc.Reference;
-import org.pageseeder.psml.toc.Tests;
-import org.pageseeder.psml.toc.TitleCollapse;
-import org.pageseeder.xmlwriter.XML.NamespaceAware;
-import org.pageseeder.xmlwriter.XMLStringWriter;
-import org.xml.sax.SAXException;
-
 public class NumberedTOCGeneratorTest {
 
   @Test
-  public void testAutoNumbering() throws SAXException, IOException {
+  public void testAutoNumbering() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
