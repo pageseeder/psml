@@ -188,6 +188,15 @@ public final class PublicationConfig implements Cloneable {
    */
   private List<PublicationNumbering> numberingConfigs = new ArrayList<>();
 
+  @Override
+  public PublicationConfig clone() {
+    try{
+       return (PublicationConfig) super.clone();
+    } catch(Exception e){
+       return null;
+    }
+  }
+
   /**
    * @param tocTitleCollapse the tocTitleCollapse to set
    */
