@@ -867,12 +867,12 @@ public final class PublicationTreeTest {
     Assert.assertEquals(root.id(), publication.id());
     Assert.assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
-    assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-paras-fixed.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering, config, true);
-    tree.print(System.out);
+    //tree.print(System.out);
+    assertValidPublication(publication, numbering, config);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
     String result = prefixes.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -1066,8 +1066,8 @@ public final class PublicationTreeTest {
     System.out.println("Print time: " + ptime);
     Assert.assertEquals(10501, prefixes.size());
     Assert.assertEquals(10000, numbering.getAllTranscludedPrefixes().size());
-    Assert.assertTrue(gtime < 400);
-    Assert.assertTrue(ptime < 40);
+    Assert.assertTrue("Generation time: " + gtime, gtime < 400);
+    Assert.assertTrue("Print time: " + ptime, ptime < 40);
   }
 
   @Test(expected = IllegalStateException.class)

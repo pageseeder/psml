@@ -66,6 +66,7 @@
   <xs:attribute name="canonical"   type="xs:string"/>
   <xs:attribute name="prefix"      type="xs:string"/>
   <xs:attribute name="numbered"    type="xs:boolean"/>
+  <xs:attribute name="part-level"  type="level"/>
   <xs:attribute name="block-label" type="label"/>
 </xs:complexType>
 
