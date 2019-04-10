@@ -183,11 +183,14 @@ public final class Paragraph extends Element implements Serializable {
       xml.attribute("block-label", this._blocklabel);
     }
     if (this._numbered && number != null) {
-      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index);
+      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index, true);
       if (pref != null) {
         xml.attribute("part-level", pref.level);
-        xml.attribute("prefix", pref.value);
-        xml.attribute("canonical", pref.canonical);
+        // don't output undefined prefixes
+        if (!"".equals(pref.value) || pref.canonical != null) {
+          xml.attribute("prefix", pref.value);
+          xml.attribute("canonical", pref.canonical);
+        }
       }
     } else {
       if (!NO_PREFIX.equals(this._prefix)) {

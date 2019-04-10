@@ -224,7 +224,8 @@ public final class FragmentNumbering implements Serializable {
     Integer nextCount = 1;
     NumberingGenerator nextNumber = number;
     int nextLevel = level + 1;
-    int nextTreeLevel = treeLevel;
+    int nextTreeLevel = PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo()) ?
+        treeLevel : nextLevel;
     String targetFragment = Reference.DEFAULT_FRAGMENT;
     Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
@@ -273,7 +274,7 @@ public final class FragmentNumbering implements Serializable {
       processHeading((Heading)element, level, id, number, count, location);
     } else if (element instanceof Paragraph) {
       int paralevel = config.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.DOCUMENT ?
-          treeLevel + 3 - pub.tree(id).level() : // adjust by tree level for collapse/phantom removal
+          treeLevel + 1 - pub.tree(id).level() : // adjust by tree level for collapse/phantom removal
           config.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.HEADING ? level :
           config.getParaLevelRelativeTo().getLevel() + 1;
       processParagraph((Paragraph)element, paralevel, id, number, count, location);
@@ -479,10 +480,25 @@ public final class FragmentNumbering implements Serializable {
    * @return the prefix
    */
   public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index) {
+    return getTranscludedPrefix(uriid, position, fragment, index, false);
+  }
+
+  /**
+   * Get prefix for a heading/para in a fragment (for transcluded location where applicable).
+   *
+   * @param uriid     the URI ID of the document
+   * @param position  the document position (occurrence number) in the tree
+   * @param fragment  the fragment ID
+   * @param index     the heading/para number within the fragment
+   * @param undefined whether to return undefined prefixes
+   *
+   * @return the prefix
+   */
+  public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index, boolean undefined) {
     Prefix pref = this.transcludedNumbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
-    if (pref == null) {
-      LOGGER.debug("Numbering not found for uriid: {}, position: {}, fragment: {}, index: {}",
-          uriid, position, fragment, index);
+    // don't return undefined prefix unless required
+    if (pref != null && "".equals(pref.value) && pref.canonical == null && !undefined) {
+      return null;
     }
     return pref;
   }

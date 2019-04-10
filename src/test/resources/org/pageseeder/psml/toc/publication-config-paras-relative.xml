@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <publication-config >
 
-  <levels para-relative-to="document" />
+  <levels para-relative-to="document" xrefs-relative-to="document"/>
   
   <numbering skipped-levels="strip">
     <schemes>
