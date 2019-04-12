@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <publication-config >
 
-  <levels xref-relative-to="document" />
+  <levels xref-relative-to="document" para-relative-to="document"/>
   
   <numbering skipped-levels="strip">
     <schemes>
       <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
-      <scheme level="1" type="decimal" format="[1.]" />
-      <scheme level="2" type="decimal" format="[1.][2.]" />
-      <scheme level="3" type="decimal" format="[1.][2.][3.]" />
+      <scheme level="1" type="decimal" format="[1.]" element="any"/>
+      <scheme level="2" type="decimal" format="[1.][2.]" element="any" />
+      <scheme level="3" type="decimal" format="[1.][2.][3.]" element="any" />
       <scheme level="4" type="decimal" format="[1.][2.][3.][4.]" />
       <scheme level="5" type="loweralpha" format="[(5)]" />
       <scheme level="6" type="lowerroman" format="[(6)]" />

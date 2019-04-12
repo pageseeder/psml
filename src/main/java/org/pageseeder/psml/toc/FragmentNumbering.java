@@ -225,7 +225,7 @@ public final class FragmentNumbering implements Serializable {
     NumberingGenerator nextNumber = number;
     int nextLevel = level + 1;
     int nextTreeLevel = PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo()) ?
-        treeLevel : nextLevel;
+        treeLevel : level;
     String targetFragment = Reference.DEFAULT_FRAGMENT;
     Reference.Type refType = Reference.Type.EMBED;
     if (element instanceof Reference) {
@@ -274,7 +274,7 @@ public final class FragmentNumbering implements Serializable {
       processHeading((Heading)element, level, id, number, count, location);
     } else if (element instanceof Paragraph) {
       int paralevel = config.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.DOCUMENT ?
-          treeLevel + 1 - pub.tree(id).level() : // adjust by tree level for collapse/phantom removal
+          treeLevel + 2 - pub.tree(id).level() : // adjust by tree level for collapse/phantom removal
           config.getParaLevelRelativeTo() == PublicationConfig.LevelRelativeTo.HEADING ? level :
           config.getParaLevelRelativeTo().getLevel() + 1;
       processParagraph((Paragraph)element, paralevel, id, number, count, location);
@@ -409,8 +409,8 @@ public final class FragmentNumbering implements Serializable {
   public void processParagraph(Paragraph para, int level, long id, NumberingGenerator number, int count, Location location) {
     String p = para.prefix();
     Prefix pref = null;
-    // adjust level minus 1 as level is already incremented
-    int adjusted_level = level + para.level() - 1;
+    // adjust level minus 1 as level is already incremented (can't be less than 0)
+    int adjusted_level = (level + para.level() < 1) ? 0 : level + para.level() - 1;
     if (para.numbered() && number != null) {
       pref = number.generateNumbering(adjusted_level, "para", para.blocklabel());
       // if numbering undefined create empty prefix so adjusted level can be output for checking

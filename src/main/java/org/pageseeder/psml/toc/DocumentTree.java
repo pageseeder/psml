@@ -3,18 +3,14 @@
  */
 package org.pageseeder.psml.toc;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Represents the internal hierarchy of a document independently of its
@@ -64,7 +60,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   private final long _id;
 
   /**
-   * The actual level of this tree, it should always be 1 for a normalized tree.
+   * The actual level of this tree (i.e. the level of the first heading left in the tree after normalization).
    */
   private final transient int _level;
 
