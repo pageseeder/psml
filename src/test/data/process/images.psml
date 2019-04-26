@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21940" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="21940" scheme="http" host="localhost" port="80"
+      path="/ps/test/local1/documents/process/content/images.psml"
+      decodedpath="/ps/test/local1/documents/process/content/images.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2017-06-23T16:31:36+10:00" modified="2017-06-23T16:41:37+10:00"
+      title="Images">
+      <displaytitle>Images</displaytitle>
+    </uri>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Images</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>diagram1.jpg
+        <image uriid="21941" src="images/diagram1.jpg" />
+      </para>
+      <para>test/diagram1.jpg
+        <image uriid="21942" src="images/test/diagram1.jpg" />
+      </para>
+      <para>test/diagram2.jpg
+        <image uriid="21943" src="images/test/diagram2.jpg" />
+      </para>
+      <para>test2/diagram1.jpg
+        <image uriid="21944" src="images/test2/diagram1.jpg" />
+      </para>
+    </fragment>
+  </section>
+</document>

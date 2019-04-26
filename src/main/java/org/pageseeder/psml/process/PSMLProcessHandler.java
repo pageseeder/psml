@@ -1157,7 +1157,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
           finalSrc = (this.imageSrc == ImageSrc.PERMALINK ? this.sitePrefix + "/uri/" : "")
               + suffix;
         this.logger.debug("Rewriting image src " + relativePath + " to " + finalSrc);
-      } else {
+      } else if (this.imageCache != null) {
+        this.imageCache.cacheImagePath(relativePath);
         // add an href att to rewrite the path later
         write(" " + (alternateXRef ? "xhref" : "href") + "=\""
             + XMLUtils.escapeForAttribute(URLEncodeFilepath(relativePath)) + "\"");

@@ -59,13 +59,18 @@ public class Images extends IncludeExcludeConfig {
     /**
      * Default is location (@src attribute is not changed).
      */
-    LOCATION;
+    LOCATION,
+
+    /**
+     * If filename use [filename].
+     */
+    FILENAME;
 
     /**
      * Returns the image src corresponding to the given name.
      *
      * @param name The name of image src (uriid, uriidfolders, permalink or location).
-     * 
+     *
      * @return The corresponding image src.
      */
     public static ImageSrc forName(String name) {

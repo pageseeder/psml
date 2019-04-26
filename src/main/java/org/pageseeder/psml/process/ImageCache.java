@@ -3,15 +3,16 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Jean-Baptiste Reure
@@ -28,7 +29,7 @@ public final class ImageCache {
   /**
    * The cache.
    */
-  private final Map<String, String> cache = new HashMap<String, String>();
+  private final Map<String, String> cache = new HashMap<>();
 
   /**
    * @param metainf The folder where the metadata files are located.
@@ -45,7 +46,7 @@ public final class ImageCache {
    * @return <code>true</code> if the image is in the cache
    */
   public boolean isCached(String relativePath) {
-    return cache.containsKey(relativePath);
+    return this.cache.containsKey(relativePath);
   }
 
   /**
@@ -56,9 +57,9 @@ public final class ImageCache {
    * @return the new path
    */
   public String getImageNewPath(String relativePath) {
-    return cache.get(relativePath);
+    return this.cache.get(relativePath);
   }
-  
+
   /**
    * Get the new path for the image defined by the relative path.
    *
@@ -70,7 +71,7 @@ public final class ImageCache {
    * @throws PageseederException if loading the metadata file failed
    */
   public String getImageNewPath(String relativePath, ImageSrc src) throws ProcessException {
-    String newpath = cache.get(relativePath);
+    String newpath = this.cache.get(relativePath);
     if (newpath == null) {
       // ok find the metadata file
       File metadata = new File(this.metaInfFolder, relativePath+".psml");
@@ -79,51 +80,68 @@ public final class ImageCache {
       // load path from the metadata file
       MetadataFileHandler handler = new MetadataFileHandler();
       XMLUtils.parse(metadata, handler);
-      if (src == ImageSrc.URIIDFOLDERS) {
+      if (src == ImageSrc.FILENAME) {
+        int lastSlash = relativePath.lastIndexOf('/');
+        String filename = lastSlash != -1 ? relativePath.substring(lastSlash + 1) : relativePath;
+        newpath = buildUniqueFilename(filename);
+      } else if (src == ImageSrc.URIIDFOLDERS) {
         newpath = buildURIIDFoldersPath(handler.getUriID()) + handler.getUriID() + '.' + handler.getUriExtension();
       } else {
         newpath = handler.getUriID() + '.' + handler.getUriExtension();
       }
-      cache.put(relativePath, newpath);
+      this.cache.put(relativePath, newpath);
     }
     return newpath;
   }
 
   /**
    * Get the new path for the image defined by the relative path.
-   * 
+   *
    * @param relativePath the image's relative path
    * @param src          how to rewrite image src
    * @param uriid        the image's URI ID
-   * 
+   *
    * @return the new path
    */
   public String getImageNewPath(String relativePath, ImageSrc src, String uriid) {
-    String newpath = cache.get(relativePath);
+    String newpath = this.cache.get(relativePath);
     if (newpath == null) {
       int lastDot = relativePath.lastIndexOf('.');
       String extension = lastDot != -1 ? relativePath.substring(lastDot) : "";
-      if (src == ImageSrc.URIIDFOLDERS) {
+      if (src == ImageSrc.FILENAME) {
+        int lastSlash = relativePath.lastIndexOf('/');
+        String filename = lastSlash != -1 ? relativePath.substring(lastSlash + 1) : relativePath;
+        newpath = buildUniqueFilename(filename);
+      } else if (src == ImageSrc.URIIDFOLDERS) {
         newpath = buildURIIDFoldersPath(uriid) + uriid + extension;
       } else {
         newpath = uriid + extension;
       }
-      cache.put(relativePath, newpath);
+      this.cache.put(relativePath, newpath);
     }
     return newpath;
   }
 
-  
+  /**
+   * Cache the image path.
+   *
+   * @param relativePath the image's relative path
+   *
+   */
+  public void cacheImagePath(String relativePath) {
+    this.cache.put(relativePath, relativePath);
+  }
+
   /**
    * Build the path [uriid billions]/[uriid millions]/[uriid thousands]/
    * with leading zeros on folders and overflow on first folder e.g.
-   * 
+   *
    *  - uriid 123 would be            000/000/000/
    *  - uriid 12345678 would be       000/012/345/
    *  - uriid 1234567890123 would be 1234/567/890/
-   *  
+   *
    *  @param uriid the URI ID of the image
-   *  
+   *
    *  @return the folder path
    */
   public static String buildURIIDFoldersPath(String uriid) {
@@ -140,7 +158,32 @@ public final class ImageCache {
     }
     return overflow + uriid.substring(0, 3) + "/" + uriid.substring(3, 6) + "/" + uriid.substring(6, 9) + "/";
   }
-  
+
+  /**
+   * Build a unique filename by adding '-n' suffix if required
+   * where n is the number of times filename appears in the cache plus one.
+   *
+   *  @param filename  the image filename
+   *
+   *  @return the unique filename
+   */
+  public String buildUniqueFilename(String filename) {
+    int lastDot = filename.lastIndexOf('.');
+    String extension = lastDot != -1 ? filename.substring(lastDot) : "";
+    String name = lastDot != -1 ? filename.substring(0, lastDot) : filename;
+    String namePrefix = name + "-";
+    Set<String> keys = this.cache.keySet();
+    int count = 0;
+    for (String key : keys) {
+      int lastSlash = key.lastIndexOf('/');
+      String keyname = lastSlash != -1 ? key.substring(lastSlash + 1) : key;
+      // count same name or name with potential clash
+      if (keyname.equals(filename) || keyname.startsWith(namePrefix)) count++;
+    }
+    if (count == 0) return filename;
+    return namePrefix + (count + 1) + extension;
+  }
+
   /**
    * Handler used to load URI details from an image metadata file.
    *

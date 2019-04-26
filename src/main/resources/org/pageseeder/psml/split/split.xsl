@@ -15,6 +15,9 @@
   <!-- Output filename -->
   <xsl:param name="_outputfilename" as="xs:string"/>
   
+  <!-- Media folder name -->
+  <xsl:param name="_mediafoldername" as="xs:string"/>
+   
   <!-- Process main document -->
   <xsl:template match="/">
     <document>
@@ -100,7 +103,9 @@
   <xsl:template match="image">
     <xsl:copy>
       <xsl:copy-of select="@*[not(name()='src')]" />
-      <xsl:attribute name="src" select="concat(if ((ancestor::document)[last()][@folder]) then '../' else '', @src)" />
+      <!-- when splitting PSML processed with ImageSrc.FILENAME the media folder needs to be added -->
+      <xsl:variable name="src" select="concat(if (starts-with(@src, concat($_mediafoldername,'/'))) then '' else concat($_mediafoldername,'/'), @src)" />
+      <xsl:attribute name="src" select="concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $src)" />
       <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>

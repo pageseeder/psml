@@ -21,10 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
-import org.pageseeder.psml.process.config.ErrorHandling;
-import org.pageseeder.psml.process.config.Strip;
-import org.pageseeder.psml.process.config.XRefsTransclude;
-import org.pageseeder.psml.process.config.XSLTTransformation;
+import org.pageseeder.psml.process.config.*;
+import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.psml.toc.Tests.Validates;
@@ -49,6 +47,7 @@ public class ProcessTest {
   private static final String DEST_FOLDER = "build/test/process/xrefs";
   private static final String MATH_FOLDER = "build/test/process/math";
   private static final String COPY_FOLDER = "build/test/process/copy";
+  private static final String IMAGE_FOLDER = "build/test/process/image";
 
   public ProcessTest() {
   }
@@ -602,6 +601,187 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//diff//xref)[8]", equalTo("3.2. Compare 2content.")));
     Assert.assertThat(xml, hasXPath("(//diff//xref)[9]", equalTo("3.2. Compare 2content.")));
    }
+
+  @Test
+  public void testProcessImagesFilename() throws IOException, ProcessException {
+    String filename = "images.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    Images images = new Images();
+    images.setImageSrc(ImageSrc.FILENAME);
+    File image = new File(IMAGE_FOLDER);
+    if (image.exists())
+      FileUtils.deleteDirectory(image);
+    images.setLocation(image.getAbsolutePath());
+    images.setIncludes(filename);
+    p.setImages(images);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("diagram1.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("diagram1-2.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("diagram2.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("diagram1-3.jpg")));
+
+    // check files
+    Assert.assertTrue("Image 1 missing", new File(image, "diagram1.jpg").exists());
+    Assert.assertTrue("Image 2 missing", new File(image, "diagram1-2.jpg").exists());
+    Assert.assertTrue("Image 3 missing", new File(image, "diagram2.jpg").exists());
+    Assert.assertTrue("Image 4 missing", new File(image, "diagram1-3.jpg").exists());
+  }
+
+  @Test
+  public void testProcessImagesLocation() throws IOException, ProcessException {
+    String filename = "images.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    Images images = new Images();
+    images.setImageSrc(ImageSrc.LOCATION);
+    File image = new File(IMAGE_FOLDER);
+    if (image.exists())
+      FileUtils.deleteDirectory(image);
+    images.setLocation(image.getAbsolutePath());
+    images.setIncludes(filename);
+    p.setImages(images);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("images/diagram1.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("images/test/diagram1.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("images/test/diagram2.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("images/test2/diagram1.jpg")));
+
+    // check files
+    Assert.assertTrue("Image 1 missing", new File(image, "images/diagram1.jpg").exists());
+    Assert.assertTrue("Image 2 missing", new File(image, "images/test/diagram1.jpg").exists());
+    Assert.assertTrue("Image 3 missing", new File(image, "images/test/diagram2.jpg").exists());
+    Assert.assertTrue("Image 4 missing", new File(image, "images/test2/diagram1.jpg").exists());
+  }
+
+  @Test
+  public void testProcessImagesPermalink() throws IOException, ProcessException {
+    String filename = "images.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    Images images = new Images();
+    images.setImageSrc(ImageSrc.PERMALINK);
+    File image = new File(IMAGE_FOLDER);
+    if (image.exists())
+      FileUtils.deleteDirectory(image);
+    images.setLocation(image.getAbsolutePath());
+    images.setSitePrefix("/ps");
+    images.setIncludes(filename);
+    p.setImages(images);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("/ps/uri/21941.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("/ps/uri/21942.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("/ps/uri/21943.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("/ps/uri/21944.jpg")));
+
+    // check files
+    Assert.assertTrue("Image 1 missing", new File(image, "21941.jpg").exists());
+    Assert.assertTrue("Image 2 missing", new File(image, "21942.jpg").exists());
+    Assert.assertTrue("Image 3 missing", new File(image, "21943.jpg").exists());
+    Assert.assertTrue("Image 4 missing", new File(image, "21944.jpg").exists());
+  }
+
+  @Test
+  public void testProcessImagesUriid() throws IOException, ProcessException {
+    String filename = "images.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    Images images = new Images();
+    images.setImageSrc(ImageSrc.URIID);
+    File image = new File(IMAGE_FOLDER);
+    if (image.exists())
+      FileUtils.deleteDirectory(image);
+    images.setLocation(image.getAbsolutePath());
+    images.setIncludes(filename);
+    p.setImages(images);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("21941.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("21942.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("21943.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("21944.jpg")));
+
+    // check files
+    Assert.assertTrue("Image 1 missing", new File(image, "21941.jpg").exists());
+    Assert.assertTrue("Image 2 missing", new File(image, "21942.jpg").exists());
+    Assert.assertTrue("Image 3 missing", new File(image, "21943.jpg").exists());
+    Assert.assertTrue("Image 4 missing", new File(image, "21944.jpg").exists());
+  }
+
+  @Test
+  public void testProcessImagesUriidFolders() throws IOException, ProcessException {
+    String filename = "images.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    Images images = new Images();
+    images.setImageSrc(ImageSrc.URIIDFOLDERS);
+    File image = new File(IMAGE_FOLDER);
+    if (image.exists())
+      FileUtils.deleteDirectory(image);
+    images.setLocation(image.getAbsolutePath());
+    images.setIncludes(filename);
+    p.setImages(images);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("000/000/021/21941.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("000/000/021/21942.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("000/000/021/21943.jpg")));
+    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("000/000/021/21944.jpg")));
+
+    // check files
+    Assert.assertTrue("Image 1 missing", new File(image, "000/000/021/21941.jpg").exists());
+    Assert.assertTrue("Image 2 missing", new File(image, "000/000/021/21942.jpg").exists());
+    Assert.assertTrue("Image 3 missing", new File(image, "000/000/021/21943.jpg").exists());
+    Assert.assertTrue("Image 4 missing", new File(image, "000/000/021/21944.jpg").exists());
+  }
 
   @Test
   public void testProcessXRefs() throws IOException, ProcessException {
