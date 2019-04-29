@@ -87,18 +87,34 @@
       </block>
       <para>G1 content</para>
       <blockxref frag="1" display="document" type="embed" href="common.psml">
-        <fragment id="1">
-          <para>Embedded content</para>
-        </fragment>
+        <xref-fragment id="96530-1">
+          <blockxref frag="1" display="document" type="embed" href="common.psml">
+            <fragment id="96534-1">
+              <para>Embedded content</para>
+            </fragment>
+          </blockxref>
+        </xref-fragment>
       </blockxref>
       <blockxref frag="2" display="document" type="transclude" href="common.psml">
-        <fragment id="2">
+        <fragment id="96535-1">
           <para>Transcluded content</para>
         </fragment>
       </blockxref>
       <block label="block3">
         <para indent="1" numbered="true">G1-1 clause</para>
+        <blockxref frag="1" display="document" type="embed" href="common.psml">
+          <fragment id="96536-1">
+            <para>Embedded content 2</para>
+          </fragment>
+        </blockxref>
+        <blockxref frag="2" display="document" type="transclude" href="common.psml">
+          <fragment id="96537-1">
+            <para>Transcluded content 2</para>
+          </fragment>
+        </blockxref>
       </block>
+      <blockxref frag="1" display="document" type="embed" href="common.psml" />
+      <blockxref frag="1" display="document" type="transclude" href="common.psml" />
     </fragment>
   </section>
 </document>

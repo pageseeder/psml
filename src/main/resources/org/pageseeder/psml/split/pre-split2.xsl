@@ -257,14 +257,7 @@
       </xsl:choose>
     </xsl:copy>
   </xsl:template> 
-  
-  <!-- ignore xref transclusion content -->
-  <xsl:template match="blockxref[@type='transclude']">
-    <xsl:copy>
-      <xsl:copy-of select="@*" />
-    </xsl:copy>
-  </xsl:template>  
-  
+   
   <!-- copy all other elements removing @start-document -->
   <xsl:template match="*">
     <xsl:copy>

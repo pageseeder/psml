@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><document level="portable"><documentinfo><uri title="Heading G"/></documentinfo><section id="title"><fragment id="1"><block label="block3">
         <heading level="2">Heading G</heading>
         <heading level="1">Heading G1</heading>
-      </block></fragment></section><section id="content"><fragment id="2"><para>G1 content</para><para>Embedded content</para><blockxref frag="2" display="document" type="transclude" href="common.psml"/></fragment><fragment id="3"><block label="block3">
+      </block></fragment></section><section id="content"><fragment id="2"><para>G1 content</para><para>Embedded content</para><para>Transcluded content</para></fragment><fragment id="3"><block label="block3">
         <para indent="1" numbered="true">G1-1 clause</para>
-      </block></fragment></section></document>
+        <para>Embedded content 2</para>
+        <para>Transcluded content 2</para>
+      </block><blockxref frag="1" display="document" type="embed" href="common.psml"/><blockxref frag="1" display="document" type="transclude" href="common.psml"/></fragment></section></document>

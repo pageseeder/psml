@@ -21,8 +21,9 @@
       <xsl:apply-templates select="document/documentinfo" />
       <section>
         <fragment>
-          <xsl:for-each-group select="//fragment/*[not(self::blockxref[@type='embed']
-                or ancestor::blockxref[@type='transclude'])]"
+          <!-- Ignore top level blockxref with content and content of non-top level blockxref -->
+          <xsl:for-each-group select="//fragment/*[not(self::blockxref/*
+                or ancestor::blockxref[not(parent::fragment or parent::xref-fragment)])]"
               group-starting-with="*[config:split-document(.) or config:split-container(.)]">
             <xsl:variable name="first" select="current-group()[1]" />
             <!-- Add start-document attribute if not first group -->
@@ -49,12 +50,10 @@
     </document>
   </xsl:template>
   
-  <!-- Ignore transcluded content -->
-  <xsl:template match="blockxref[@type='transclude']">
-    <xsl:copy>
-      <xsl:copy-of select="@*" />
+  <!-- Remove non-top level blockxref with content but keep it's content -->
+  <xsl:template match="blockxref[*]">
       <xsl:call-template name="add-fragment-anchor" />
-    </xsl:copy>
+      <xsl:apply-templates select=".//fragment/*" />
   </xsl:template>
   
   <!-- Copy all other elements unchanged -->
