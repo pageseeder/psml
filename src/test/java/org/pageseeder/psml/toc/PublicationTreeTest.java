@@ -978,6 +978,8 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
+    // print twice to ensure classes are loaded before timing is done
+    Tests.print(publication, 1499, -1, numbering, null, true);
     long pstart = System.currentTimeMillis();
     Tests.print(publication, 1499, -1, numbering, null, true);
     long pend = System.currentTimeMillis();
