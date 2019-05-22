@@ -116,7 +116,7 @@ public final class FragmentNumbering implements Serializable {
       this.numbering.put(root.id() + "-1-default", new Prefix("", null, 2 - root.level(), null));
       // mark root as embeded
       addTransclusionParents(root.id(), -1, transclusions);
-      processTree(pub, root.id(), 1, 1, config, getNumberingGenerator(config, null, root),
+      processTree(pub, root.id(), 1, 1, config, getNumberingGenerators(config),
           doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT, transclusions);
     }
     List<Long> allIds = new ArrayList<>(pub.ids());
@@ -135,25 +135,38 @@ public final class FragmentNumbering implements Serializable {
   }
 
   /**
-   * Get the new numbering generator for the document tree specified.
-   * If labels haven't changed then returns the current numbering generator.
+   * Get a map of all new numbering generators for the config specified,
+   * keyed on the document-label.
    *
    * @param config   the publication config
-   * @param number   the current numbering generator
+   *
+   * @return the map of generators
+   */
+  private Map<String, NumberingGenerator> getNumberingGenerators(PublicationConfig config) {
+    Map<String, NumberingGenerator> numbers = new HashMap<>();
+    if (config != null) {
+      for (PublicationNumbering numbering : config.getNumberingConfigs()) {
+        numbers.put(numbering.getLabel(), new NumberingGenerator(numbering));
+      }
+    }
+    return numbers;
+  }
+
+  /**
+   * Get the numbering generator for the document tree specified.
+   *
+   * @param config   the publication config
+   * @param numbers  the numbering generators
    * @param tree     the document tree
    *
    * @return
    */
   private NumberingGenerator getNumberingGenerator(PublicationConfig config,
-      NumberingGenerator number, DocumentTree tree) {
+      Map<String, NumberingGenerator> numbers, DocumentTree tree) {
+    // Use config to get the first numbering that matches in config order
     PublicationNumbering numbering = config == null ? null : config.getPublicationNumbering(tree.labels());
-    if (numbering == null) {
-      number = null;
-    // if numbering config has changed then create new numbering generator
-    } else if (number == null || !numbering.getLabel().equals(number.getPublicationNumbering().getLabel())) {
-      number = new NumberingGenerator(numbering);
-    }
-    return number;
+    if (numbering == null) return null;
+    return numbers.get(numbering.getLabel());
   }
 
   /**
@@ -164,7 +177,7 @@ public final class FragmentNumbering implements Serializable {
    * @param level         The heading level that we are currently at
    * @param treelevel     The level of the current tree
    * @param config        The publication config to get numbering config
-   * @param number        The numbering generator (optional)
+   * @param numbers       The numbering generators
    * @param doccount      Map of [uriid], [number of uses]
    * @param count         No. of times ID has been used.
    * @param ancestors     List of the current ancestor tree IDs
@@ -174,7 +187,7 @@ public final class FragmentNumbering implements Serializable {
    * @throws XRefLoopException if an XRef loop is detected
    */
   private void processTree(PublicationTree pub, long id, int level, int treelevel, PublicationConfig config,
-      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
+      Map<String, NumberingGenerator> numbers, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
       String fragment, Map<Long,List<Long>> transclusions) throws XRefLoopException {
     String key = id + "-" + fragment;
     if (ancestors.contains(key)) throw new XRefLoopException("XRef loop detected on URIID " + id);
@@ -183,16 +196,9 @@ public final class FragmentNumbering implements Serializable {
     if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
       current = current.singleFragmentTree(fragment);
     }
-    PublicationNumbering numbering = config.getPublicationNumbering(current.labels());
-    if (numbering == null) {
-      number = null;
-    // if numbering config has changed then create new numbering generator
-    } else if (number == null || !numbering.getLabel().equals(number.getPublicationNumbering().getLabel())) {
-      number = new NumberingGenerator(numbering);
-    }
     Location location = new Location(id, count);
     for (Part<?> part : current.parts()) {
-      processPart(pub, id, level, treelevel, part, config, number, doccount, count, ancestors, location, transclusions);
+      processPart(pub, id, level, treelevel, part, config, numbers, doccount, count, ancestors, location, transclusions);
     }
     ancestors.remove(key);
   }
@@ -206,7 +212,7 @@ public final class FragmentNumbering implements Serializable {
    * @param treeLevel     The level of the current tree
    * @param part          The part to process
    * @param config        The publication config to get numbering config
-   * @param number        The numbering generator (optional)
+   * @param numbers       The numbering generators
    * @param doccount      Map of [uriid], [number of uses]
    * @param count         No. of times ID has been used.
    * @param ancestors     List of the current ancestor tree IDs
@@ -216,13 +222,13 @@ public final class FragmentNumbering implements Serializable {
    * @throws XRefLoopException if an XRef loop is detected
    */
   private void processPart(PublicationTree pub, long id, int level, int treeLevel, Part<?> part, PublicationConfig config,
-      @Nullable NumberingGenerator number, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
+      Map<String, NumberingGenerator> numbers, Map<Long,Integer> doccount, Integer count, List<String> ancestors,
       Location location, Map<Long,List<Long>> transclusions) throws XRefLoopException {
     Element element = part.element();
     Long next = null;
     DocumentTree nextTree = null;
     Integer nextCount = 1;
-    NumberingGenerator nextNumber = number;
+    NumberingGenerator number = getNumberingGenerator(config, numbers, pub.tree(id));
     int nextLevel = level + 1;
     int nextTreeLevel = PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo()) ?
         treeLevel : level;
@@ -242,7 +248,7 @@ public final class FragmentNumbering implements Serializable {
           doccount.put(next, nextCount);
         }
         if (Reference.Type.EMBED.equals(refType)) {
-          nextNumber = getNumberingGenerator(config, nextNumber, nextTree);
+          NumberingGenerator nextNumber = getNumberingGenerator(config, numbers, nextTree);
           if (PublicationConfig.LevelRelativeTo.DOCUMENT.equals(config.getXRefLevelRelativeTo())) {
             nextTreeLevel = treeLevel + ref.level();
             nextLevel = nextTreeLevel + 1;
@@ -292,13 +298,13 @@ public final class FragmentNumbering implements Serializable {
     // Expand found reference
     if (nextTree != null && Reference.Type.EMBED.equals(refType)) {
       // Moving to the next tree (use next level)
-      processTree(pub, next, nextLevel, nextTreeLevel, config, nextNumber, doccount, nextCount, ancestors,
+      processTree(pub, next, nextLevel, nextTreeLevel, config, numbers, doccount, nextCount, ancestors,
           targetFragment, transclusions);
     }
 
     // Process all child parts
     for (Part<?> r : part.parts()) {
-      processPart(pub, id, level + 1, treeLevel, r, config, number, doccount, count, ancestors, location, transclusions);
+      processPart(pub, id, level + 1, treeLevel, r, config, numbers, doccount, count, ancestors, location, transclusions);
     }
   }
 

@@ -255,6 +255,13 @@ public final class PublicationConfig implements Cloneable {
   }
 
   /**
+   * @returnthe the numberingConfigs
+   */
+  public List<PublicationNumbering> getNumberingConfigs() {
+    return this.numberingConfigs;
+  }
+
+  /**
    * Return the first numbering config with one of the specified labels.
    * If none found return the first config with no label, otherwise <code>null<code>.
    *
