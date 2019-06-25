@@ -1157,11 +1157,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
           finalSrc = (this.imageSrc == ImageSrc.PERMALINK ? this.sitePrefix + "/uri/" : "")
               + suffix;
         this.logger.debug("Rewriting image src " + relativePath + " to " + finalSrc);
-      } else if (this.imageCache != null) {
-        this.imageCache.cacheImagePath(relativePath);
+      } else {
+        if (this.imageCache != null) this.imageCache.cacheImagePath(relativePath);
         // add an href att to rewrite the path later
         write(" " + (alternateXRef ? "xhref" : "href") + "=\""
-            + XMLUtils.escapeForAttribute(URLEncodeFilepath(relativePath)) + "\"");
+            + XMLUtils.escapeForAttribute(relativePath) + "\"");
       }
     }
     write(" " + (alternateXRef ? "href" : "src") + "=\""
@@ -1174,7 +1174,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param filepath the path
    * @return the encoded path
    */
-  public String URLEncodeFilepath(String filepath) {
+  public static String URLEncodeFilepath(String filepath) {
     StringBuilder path = new StringBuilder();
     String fp = filepath;
     try {
@@ -1186,7 +1186,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
       return path.append(URLEncoder.encode(fp, "UTF-8")).toString().replace("+", "%20");
     } catch (UnsupportedEncodingException ex) {
       // extremely unlikely...
-      this.logger.error("Unknown encoding UTF-8 when encoding image path");
       return null;
     }
   }

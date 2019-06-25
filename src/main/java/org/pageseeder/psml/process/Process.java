@@ -568,6 +568,7 @@ public final class Process {
       //  }
       //}
       // ok second pass now
+      this.logger.debug("Second pass file "+relPath);
       try {
         File output = new File(destination, relPath);
         // just in case

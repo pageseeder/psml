@@ -356,6 +356,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       if ((isImage && HREF_ATTRIBUTE.equals(name)) ||
           (isXRef && "xhref".equals(name))) {
         continue;
+      // if image or alternate xref to image
       } else if ((isImage && "src".equals(name)) || (isXRef && HREF_ATTRIBUTE.equals(name) && xhref != null)) {
         try {
           value = handleImage(atts.getValue(i), isImage ? atts.getValue(HREF_ATTRIBUTE) : xhref);
@@ -373,7 +374,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         // make it relative
         String relpath = atts.getValue("relpath");
         if (relpath == null) value = atts.getValue(i);
-        else value = relativisePath(relpath, this.sourceRelativePath);
+        else value = PSMLProcessHandler.URLEncodeFilepath(relativisePath(relpath, this.sourceRelativePath));
       } else if (isXRef && HREF_ATTRIBUTE.equals(name)) {
         try {
           value = handleXRef(atts);
@@ -636,10 +637,13 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    * @throws ProcessException If the metadata file is invlaid or couldn't be parsed
    */
   private String handleImage(String src, String href) throws ProcessException {
+    this.logger.debug("Image temp href={}", href);
     // make sure we have to do something
     if (!this.relativiseImagePaths || href == null) return src;
     // build relative path
-    return relativisePath(href, this.sourceRelativePath);
+    String rel = PSMLProcessHandler.URLEncodeFilepath(relativisePath(href, this.sourceRelativePath));
+    this.logger.debug("Image relative path={}", rel);
+    return rel;
   }
 
   /**
@@ -710,7 +714,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       // external, make it relative
       String relpath = atts.getValue("relpath");
       if (relpath == null) return atts.getValue(HREF_ATTRIBUTE);
-      return relativisePath(relpath, this.sourceRelativePath);
+      return PSMLProcessHandler.URLEncodeFilepath(relativisePath(relpath, this.sourceRelativePath));
     }
   }
 
