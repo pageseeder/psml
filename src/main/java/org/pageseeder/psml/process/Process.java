@@ -587,6 +587,7 @@ public final class Process {
       handler2.setErrorOnAmbiguous(this.error != null && this.error.getXrefAmbiguous());
       handler2.setHierarchyUriFragIDs(handler1.getHierarchyUriFragIDs());
       handler2.setRelativiseImagePaths(imageSrc == ImageSrc.LOCATION);
+      handler2.setProcessed(this.processed);
       handler2.setProcessXRefs(xrefsTypes != null);
       try {
         // generate numbering

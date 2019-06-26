@@ -98,6 +98,11 @@ public class Strip {
   private boolean stripNotFoundXRefs = false;
 
   /**
+   * Remove reversexref elements.
+   */
+  private boolean stripReverseXRefs = false;
+
+  /**
    * @param stripDocumentInfo the stripDocumentInfo to set
    */
   public void setStripDocumentInfo(boolean stripDocumentInfo) {
@@ -182,6 +187,13 @@ public class Strip {
   }
 
   /**
+   * @param stripReverseXRefs the stripReverseXRefs to set
+   */
+  public void setStripReverseXRefs(boolean stripReverseXRefs) {
+    this.stripReverseXRefs = stripReverseXRefs;
+  }
+
+  /**
    * @param deleteManifest the manifest to set
    */
   public void setManifest(boolean deleteManifest) {
@@ -259,6 +271,13 @@ public class Strip {
   }
 
   /**
+   * @return the stripReverseXRefs
+   */
+  public boolean stripReverseXRefs() {
+    return this.stripReverseXRefs;
+  }
+
+  /**
    * @return the stripUnresolvedXRefs
    */
   public boolean stripUnresolvedXRefs() {
@@ -294,6 +313,7 @@ public class Strip {
     s.stripFragmentInfo = this.stripFragmentInfo;
     s.stripFragmentInfoLabels = this.stripFragmentInfoLabels;
     s.stripNotFoundXRefs = this.stripNotFoundXRefs;
+    s.stripReverseXRefs = this.stripReverseXRefs;
     s.stripUnresolvedXRefs = this.stripUnresolvedXRefs;
     s.stripXRefsDocID = this.stripXRefsDocID;
     s.stripXRefsURIID = this.stripXRefsURIID;

@@ -316,6 +316,41 @@ public class ProcessTest {
   }
 
   @Test
+  public void testStripReverseXRefs() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripReverseXRefs(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/content/content_3.psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
+    Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/images/diagram1.jpg.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
+    Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
+  }
+
+  @Test
   public void testMathMLNsPrefix() throws IOException, ProcessException {
     String filename = "mathml_ns_prefix.psml";
     Process p = new Process();

@@ -106,6 +106,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    */
   private boolean errorOnAmbiguous = false;
 
+
+  /**
+   * Whether to change attribute level to "processed" and URL decode @href and @src
+   */
+  private boolean processed = true;
+
   /**
    * Process XRefs.
    */
@@ -252,6 +258,13 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   }
 
   /**
+   * @param processed the processed value to set (id <code>true</code> URL decode @href and @src)
+   */
+  public void setProcessed(boolean processed) {
+    this.processed = processed;
+  }
+
+  /**
    * @param process if XRefs targets should be processed (i.e. make fragment IDs unique)
    */
   public void setProcessXRefs(boolean process) {
@@ -386,7 +399,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         // make it relative
         String relpath = atts.getValue("relpath");
         if (relpath == null) value = atts.getValue(i);
-        else value = PSMLProcessHandler.URLEncodeFilepath(relativisePath(relpath, this.sourceRelativePath));
+        else value = URLEncodeIfNotProcessed(relativisePath(relpath, this.sourceRelativePath));
       } else if (isXRef && HREF_ATTRIBUTE.equals(name) && this.processXRefs) {
         try {
           value = handleXRef(atts);
@@ -655,7 +668,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     // make sure we have to do something
     if (!this.relativiseImagePaths || href == null) return src;
     // build relative path
-    String rel = PSMLProcessHandler.URLEncodeFilepath(relativisePath(href, this.sourceRelativePath));
+    String rel = URLEncodeIfNotProcessed(relativisePath(href, this.sourceRelativePath));
     this.logger.debug("Image relative path={}", rel);
     return rel;
   }
@@ -728,7 +741,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       // external, make it relative
       String relpath = atts.getValue("relpath");
       if (relpath == null) return atts.getValue(HREF_ATTRIBUTE);
-      return PSMLProcessHandler.URLEncodeFilepath(relativisePath(relpath, this.sourceRelativePath));
+      return URLEncodeIfNotProcessed(relativisePath(relpath, this.sourceRelativePath));
     }
   }
 
@@ -753,5 +766,17 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       break;
     }
     return relative.length() == 0 ? "" : relative.substring(1);
+  }
+
+  /**
+   * URL encode path if level is portable (i.e. not processed)
+   *
+   * @param path  the path
+   *
+   * @return the path encoded if required
+   */
+  private String URLEncodeIfNotProcessed(String path) {
+    if (this.processed) return PSMLProcessHandler.URLEncodeFilepath(path);
+    else return path;
   }
 }

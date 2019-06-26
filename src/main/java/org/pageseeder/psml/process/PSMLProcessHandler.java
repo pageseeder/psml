@@ -72,7 +72,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private boolean failOnError = false;
 
   /**
-   * Whether to change attribute level to "processed".
+   * Whether to change attribute level to "processed" and URL decode @href and @src
    */
   private boolean processed = true;
 
@@ -670,6 +670,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
         } else if (this.processed && "level".equals(name) && "document".equals(qName)) {
           // change document level to processed
           value = "processed";
+        } else if (this.processed && "href".equals(name) && (isXRef || isReverseXRef)) {
+          // decode href
+          try {
+            value = URLDecoder.decode(atts.getValue(i), "UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            value = null;
+          }
         } else if ("level".equals(name) && "heading".equals(qName)) {
           headingLevel = Integer.parseInt(atts.getValue(name));
           // increase level with our start value
@@ -1046,11 +1053,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
     // strip fraginfo
     if (this.strip.stripFragmentInfo() && "fragmentinfo".equals(elemName))
       return true;
-    // strip element in docinfo or fraginfo
+    // strip reversexrefs (check ancestors incase they have been stripped)
     String dad = this.elements.isEmpty() ? null : this.elements.pop();
     String granddad = this.elements.isEmpty() ? null : this.elements.peek();
     // put it back
     this.elements.push(dad);
+    if ((this.strip.stripReverseXRefs() || this.strip.stripAllXRefs()) && "reversexrefs".equals(elemName) &&
+        ("documentinfo".equals(dad) || "fragmentinfo".equals(granddad)))
+      return true;
+    // strip element in docinfo or fraginfo
     // check values
     if ("documentinfo".equals(granddad) && "uri".equals(dad)) {
       if (this.strip.stripDocumentInfoDescription() && "description".equals(elemName))
@@ -1165,8 +1176,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
             + XMLUtils.escapeForAttribute(relativePath) + "\"");
       }
     }
-    write(" " + (alternateXRef ? "href" : "src") + "=\""
-        + XMLUtils.escapeForAttribute(URLEncodeFilepath(finalSrc)) + "\"");
+    if (!this.processed) finalSrc = URLEncodeFilepath(finalSrc);
+    write(" " + (alternateXRef ? "href" : "src") + "=\"" + XMLUtils.escapeForAttribute(finalSrc) + "\"");
   }
 
   /**
