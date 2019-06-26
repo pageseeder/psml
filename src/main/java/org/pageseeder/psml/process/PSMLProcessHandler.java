@@ -617,7 +617,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.convertContent = new StringBuilder();
       return;
     } else if (this.convertAsciiMath && noNamespace && "media-fragment".equals(qName) && "text/asciimath".equals(atts.getValue("mediatype"))) {
-      String id = this.uriID == null ? atts.getValue("id") : (this.uriID + "-" + atts.getValue("id"));
+      String id = (this.uriID == null || !this.transcluder.isTranscluding()) ?
+          atts.getValue("id") : (this.uriID + "-" + atts.getValue("id"));
       write("<media-fragment id=\""+XMLUtils.escapeForAttribute(id)+"\" mediatype=\"application/mathml+xml\">");
       this.convertContent = new StringBuilder();
       return;
@@ -657,13 +658,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
         }
       } else {
         String value;
-        if ("fragment".equals(name) && noNamespace && "locator".equals(qName)) {
+        if ("fragment".equals(name) && noNamespace && "locator".equals(qName) && this.transcluder.isTranscluding()) {
           // modify value of locator fragment
           value = this.uriID == null ? atts.getValue(i) : (this.uriID + "-" + atts.getValue(i));
-        } else if ("id".equals(name) && noNamespace && "section".equals(qName)) {
+        } else if ("id".equals(name) && noNamespace && "section".equals(qName) && this.transcluder.isTranscluding()) {
           // modify value of section id
           value = this.uriID == null ? atts.getValue(i) : (this.uriID + "-" + atts.getValue(i));
-        } else if ("id".equals(name) && isFragment) {
+        } else if ("id".equals(name) && isFragment && this.transcluder.isTranscluding()) {
           // modify value of fragment id
           value = this.uriID == null ? atts.getValue(i) : (this.uriID + "-" + atts.getValue(i));
         } else if (this.processed && "level".equals(name) && "document".equals(qName)) {

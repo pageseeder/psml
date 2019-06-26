@@ -107,6 +107,11 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   private boolean errorOnAmbiguous = false;
 
   /**
+   * Process XRefs.
+   */
+  private boolean processXRefs = true;
+
+  /**
    * If the images path should be rewritten to permalinks.
    */
   private boolean relativiseImagePaths = true;
@@ -247,6 +252,13 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   }
 
   /**
+   * @param process if XRefs targets should be processed (i.e. make fragment IDs unique)
+   */
+  public void setProcessXRefs(boolean process) {
+    this.processXRefs = process;
+  }
+
+  /**
    * @param relativise if the image paths should be relativised.
    */
   public void setRelativiseImagePaths(boolean relativise) {
@@ -370,18 +382,18 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         }
       } else if ((isXRef || isReverseXRef) && "relpath".equals(name)) {
         continue;
-      } else if (isReverseXRef && HREF_ATTRIBUTE.equals(name)) {
+      } else if (isReverseXRef && HREF_ATTRIBUTE.equals(name) && this.processXRefs) {
         // make it relative
         String relpath = atts.getValue("relpath");
         if (relpath == null) value = atts.getValue(i);
         else value = PSMLProcessHandler.URLEncodeFilepath(relativisePath(relpath, this.sourceRelativePath));
-      } else if (isXRef && HREF_ATTRIBUTE.equals(name)) {
+      } else if (isXRef && HREF_ATTRIBUTE.equals(name) && this.processXRefs) {
         try {
           value = handleXRef(atts);
         } catch (ProcessException e) {
           throw new SAXException(e.getMessage(), e);
         }
-      } else if (isSection && "id".equals(name) && this.alternateXRefs == 0) {
+      } else if (isSection && "id".equals(name) && this.alternateXRefs == 0 && this.processXRefs) {
         String id = atts.getValue(i);
         // get uriid and make id unique
         int j = id.indexOf('-');
@@ -398,7 +410,8 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         Integer count = this.uriIDsAlreadyFound.get(id);
         if (count == null) count = 0;
         count++;
-        value = count != 1 ? count + "_" + id : id;
+        if (this.processXRefs) value = count != 1 ? count + "_" + id : id;
+        else value = id;
         this.uriIDsAlreadyFound.put(id, count);
         this.ancestorUriIDs.push(count + "_" + id);
         if (!this.lastXRefTransclude) {
@@ -428,7 +441,8 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
             }
             String uriid = id.substring(0, j);
             Integer count = this.uriIDsAlreadyFound.get(uriid);
-            value = count != 1 ? count + "_" + id : id;
+            if (this.processXRefs) value = count != 1 ? count + "_" + id : id;
+            else value = id;
           // shouldn't happen
           } else {
             // if not inside a transclusion, update fragment ID
