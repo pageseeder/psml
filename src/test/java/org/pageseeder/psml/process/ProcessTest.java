@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
@@ -50,6 +51,11 @@ public class ProcessTest {
   private static final String IMAGE_FOLDER = "build/test/process/image";
 
   public ProcessTest() {
+  }
+
+  @BeforeClass
+  public static void setup() {
+    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
   }
 
   @Test
@@ -340,12 +346,14 @@ public class ProcessTest {
     // check result
     File result = new File(DEST_FOLDER + "/content/content_3.psml");
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
     Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
     Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/images/diagram1.jpg.psml");
     xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
     Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
     Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
   }
@@ -372,6 +380,80 @@ public class ProcessTest {
     // validate
     Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     Assert.assertThat(xml, hasXPath("namespace-uri(//*[local-name()='math'])", equalTo("http://www.w3.org/1998/Math/MathML")));
+  }
+
+  @Test
+  public void testLevelProcessed() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    p.setProcessed(true);
+    Strip strip = new Strip();
+    p.setStrip(strip); // set empty strip so metadata is processed
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/images space.psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images space.psml")));
+    Assert.assertThat(xml, hasXPath("//image[1]/@src", equalTo("images/diagram space.jpg")));
+    Assert.assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images space.psml")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/images/diagram space.jpg.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("../images space.psml")));
+  }
+
+  @Test
+  public void testLevelPortable() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    p.setProcessed(false);
+    Strip strip = new Strip();
+    p.setStrip(strip); // set empty strip so metadata is processed
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/images space.psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("portable")));
+    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images%20space.psml")));
+    Assert.assertThat(xml, hasXPath("//image[1]/@src", equalTo("images/diagram%20space.jpg")));
+    Assert.assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images%20space.psml")));
+
+    // check metadata result
+    result = new File(DEST_FOLDER + "/META-INF/images/diagram space.jpg.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("metadata")));
+    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("../images%20space.psml")));
   }
 
   @Test

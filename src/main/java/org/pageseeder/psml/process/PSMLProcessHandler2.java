@@ -776,7 +776,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    * @return the path encoded if required
    */
   private String URLEncodeIfNotProcessed(String path) {
-    if (this.processed) return PSMLProcessHandler.URLEncodeFilepath(path);
+    if (!this.processed) return PSMLProcessHandler.URLEncodeFilepath(path);
     else return path;
   }
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21940" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="21940" scheme="http" host="localhost" port="80"
+      path="/ps/test/local1/documents/process/content/images%20space.psml"
+      decodedpath="/ps/test/local1/documents/process/content/images space.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2017-06-23T16:31:36+10:00" modified="2017-06-23T16:41:37+10:00"
+      title="Images space">
+      <displaytitle>Images space</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="21940" href="images%20space.psml" frag="3"
+        urititle="Images space" mediatype="application/vnd.pageseeder.psml+xml"
+        id="394390" title="Content" type="none"
+        forwardtype="none" forwarddisplay="document" forwardfrag="default" />
+    </reversexrefs>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Images space</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>diagram space.jpg
+        <image uriid="21941" src="images/diagram%20space.jpg" />
+      </para>
+    </fragment>
+    <fragment id="3">
+      <para><xref id="39455" frag="default" reversefrag="3"
+        reversetitle="Content" reverselink="true" reversetype="none"
+        display="document"
+        type="none" uriid="21940" href="images%20space.psml"
+        urititle="Images space" mediatype="application/vnd.pageseeder.psml+xml">Images space</xref></para>
+    </fragment>
+  </section>
+</document>
