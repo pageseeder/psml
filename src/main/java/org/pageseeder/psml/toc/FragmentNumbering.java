@@ -85,6 +85,12 @@ public final class FragmentNumbering implements Serializable {
   private final Map<String,Prefix> transcludedNumbering = new HashMap<>();
 
   /**
+   * Constructor for blank instance
+   */
+  public FragmentNumbering() {
+  }
+
+  /**
    * Constructor
    *
    * @param pub              The publication tree

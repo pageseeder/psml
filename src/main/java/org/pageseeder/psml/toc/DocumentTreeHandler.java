@@ -54,6 +54,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private final Deque<String> _fragmentIDs = new ArrayDeque<>();
 
   /**
+   * Whether to store paragraph titles (turn off to save memory)
+   */
+  private boolean paraTitles = true;
+
+  /**
    * The last heading being processed
    */
   private @Nullable Heading currentHeading = null;
@@ -130,6 +135,13 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   public DocumentTreeHandler(long uri) {
     this._tree = new DocumentTree.Builder(uri);
     this._fragmentIDs.push(DEFAULT_FRAGMENT);
+  }
+
+  /**
+   * @param store  Whether to store paragraph titles (default true, turn off to save memory)
+   */
+  public void setParaTitles(boolean store) {
+    this.paraTitles = store;
   }
 
   @Override
@@ -342,10 +354,14 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     } else if ("para".equals(element) && this.currentParagraph != null) {
       String title = buffer(true);
       Paragraph para = this.currentParagraph;
-      if (title != null) {
-        // if no wrapping blocklabel truncate title
+      // only store content for numbered paras to save memory
+      if (title != null && para.numbered() && this.paraTitles) {
+        // if no wrapping blocklabel truncate title to 40 chars
         if ("".equals(para.blocklabel()) && title.length() > 40) {
           title = title.substring(0, 40) + "...";
+        // else truncate title to 100 chars to save memory
+        } else if (title.length() > 100) {
+          title = title.substring(0, 100) + "...";
         }
         para = para.title(title);
       }
