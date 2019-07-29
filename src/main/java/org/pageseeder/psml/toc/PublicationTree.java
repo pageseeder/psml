@@ -106,11 +106,18 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   private final Map<Long, DocumentTree> _map;
 
   /**
+   * Map of transcluded Id to a list of it's parent Ids in this publication.
+   * If list contains -1 then Id is also embedded.
+   */
+  private final Map<Long,List<Long>> _transclusions;
+
+  /**
    * Creates a blank publication tree
    */
   public PublicationTree() {
     this._map = Collections.emptyMap();
     this._rootid = -1;
+    this._transclusions = new HashMap<>();
   }
 
   /**
@@ -121,6 +128,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   public PublicationTree(DocumentTree tree) {
     this._map = Collections.singletonMap(tree.id(), tree);
     this._rootid = tree.id();
+    this._transclusions = new HashMap<>();
   }
 
   /**
@@ -136,6 +144,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     map.put(parent.id(), parent);
     this._map = Collections.unmodifiableMap(map);
     this._rootid = parent.id();
+    this._transclusions = new HashMap<>();
   }
 
   /**
@@ -151,6 +160,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     map.put(tree.id(), tree);
     this._map = Collections.unmodifiableMap(map);
     this._rootid = trunk._rootid;
+    this._transclusions = Collections.unmodifiableMap(trunk.transclusions());
   }
 
   /**
@@ -172,6 +182,32 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     map.putAll(trees);
     this._map = Collections.unmodifiableMap(map);
     this._rootid = rootid;
+    this._transclusions = Collections.unmodifiableMap(pub.transclusions());
+  }
+
+  /**
+   * Creates a new publication from an existing publication by first removing trees with specified IDs,
+   * then adding new trees provided.
+   *
+   * <p>Note: the trees should have at least one reference from the existing publication.
+   *
+   * @param pub           The existing publication
+   * @param removeIds     The IDs of trees to remove
+   * @param trees         The map of new document trees to add
+   * @param transclusions Map of transcluded Id to a list of it's parent Ids in this publication.
+   *                      If list contains -1 then Id is also embedded.
+   * @param rootid        The ID of the root tree for this publication
+   */
+  private PublicationTree(PublicationTree pub, List<Long> removeIds, Map<Long, DocumentTree> trees,
+      Map<Long,List<Long>> transclusions, long rootid) {
+    Map<Long, DocumentTree> map = new HashMap<>(pub._map);
+    for (Long id : removeIds) {
+      map.remove(id);
+    }
+    map.putAll(trees);
+    this._map = Collections.unmodifiableMap(map);
+    this._rootid = rootid;
+    this._transclusions = Collections.unmodifiableMap(transclusions);
   }
 
   /**
@@ -239,6 +275,15 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     return this._map.get(this._rootid);
   }
 
+
+  /**
+   * @return the map of transcluded Id to a list of it's parent Ids in this publication.
+   *         If list contains -1 then Id is also embedded.
+   */
+  public Map<Long,List<Long>> transclusions() {
+    return this._transclusions;
+  }
+
   /**
    * @param id  the tree ID
    *
@@ -271,6 +316,23 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    */
   public PublicationTree modify(List<Long> removeIds, Map<Long, DocumentTree> trees, long rootid) {
     return new PublicationTree(this, removeIds, trees, rootid);
+  }
+
+  /**
+   * Creates a new publication tree by first removing trees with the specified IDs,
+   * then adding the new trees provided.
+   *
+   * <p>Note: the trees should have at least one reference from the existing publication.
+   *
+   * @param removeIds     The IDs of trees to remove
+   * @param trees         The map of new document trees to add
+   * @param transclusions Map of transcluded Id to a list of it's parent Ids in this publication.
+   *                      If list contains -1 then Id is also embedded.
+   * @param rootid        The ID of the root tree for this publication
+   */
+  public PublicationTree modify(List<Long> removeIds, Map<Long, DocumentTree> trees,
+      Map<Long,List<Long>> transclusions, long rootid) {
+    return new PublicationTree(this, removeIds, trees, transclusions, rootid);
   }
 
   /**
@@ -355,7 +417,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
         if (cposition != -1) {
           trees.add(cid);
         } else {
-          collectReferences(tree(cid), trees);
+          collectReferences(cid, trees);
         }
       }
       toXML(xml, this._rootid, 1, 1, Reference.DEFAULT_FRAGMENT,
@@ -367,21 +429,34 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * Collect all the ancestor references to a tree.
    *
-   * @param t      the tree
+   * @param id     the tree ID
    * @param trees  the list of ancestor IDs
+   *
+   * @return whether ID is embedded/transcluded in publication
    */
-  private void collectReferences(DocumentTree t, List<Long> trees) {
-    if (t == null || trees.contains(t.id())) return;
-    trees.add(t.id());
+  private boolean collectReferences(long id, List<Long> trees) {
+    if (trees.contains(id)) return true;
     int count = 0;
-    for (Long ref : t.listReverseReferences()) {
-      DocumentTree r = tree(ref);
-      if (r != null) {
-        collectReferences(tree(ref), trees);
-        count++;
+    DocumentTree t = tree(id);
+    if (t != null) {
+      for (Long ref : t.listReverseReferences()) {
+        if (collectReferences(ref, trees)) count++;
+        if (count >= MAX_REVERSE_FOLLOW) break;
       }
-      if (count >= MAX_REVERSE_FOLLOW) break;
-    };
+      trees.add(id);
+      return true;
+    } else {
+      List<Long> transcluded = this._transclusions.get(id);
+      if (!transcluded.isEmpty()) {
+        for (Long ref : transcluded) {
+          if (collectReferences(ref, trees)) count++;
+          if (count >= MAX_REVERSE_FOLLOW) break;
+        }
+        trees.add(id);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
