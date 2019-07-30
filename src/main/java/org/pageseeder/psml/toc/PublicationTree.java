@@ -281,7 +281,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *         If list contains -1 then Id is also embedded.
    */
   public Map<Long,List<Long>> transclusions() {
-    return this._transclusions;
+    return new HashMap<>(this._transclusions);
   }
 
   /**

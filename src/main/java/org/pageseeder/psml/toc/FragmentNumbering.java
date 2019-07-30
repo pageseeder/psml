@@ -120,24 +120,27 @@ public final class FragmentNumbering implements Serializable {
     if (root != null) {
       // store prefix on default fragment of root with level as an adjustment to the first heading in the document
       this.numbering.put(root.id() + "-1-default", new Prefix("", null, 2 - root.level(), null));
-      // mark root as embeded
+      // mark root as embedded
       addTransclusionParents(root.id(), -1, transclusions);
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerators(config),
           doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT, transclusions);
     }
     List<Long> allIds = new ArrayList<>(pub.ids());
-    allIds.remove(root.id());
-    allIds.removeAll(doccount.keySet());
-    unusedIds.addAll(allIds);
     // remove IDs that are not transcluded from transclusions map
     Iterator<Entry<Long, List<Long>>> entryIt = transclusions.entrySet().iterator();
     while (entryIt.hasNext()) {
       Entry<Long, List<Long>> entry = entryIt.next();
       List<Long> value = entry.getValue();
-      if (value.size() == 1 && value.get(0) == -1) {
-        entryIt.remove();
+      // if embedded
+      if (value.contains(-1L)) {
+        if (value.size() == 1) {
+          entryIt.remove();
+        }
+        // mark as used
+        allIds.remove(entry.getKey());
       }
     }
+    unusedIds.addAll(allIds);
   }
 
   /**
