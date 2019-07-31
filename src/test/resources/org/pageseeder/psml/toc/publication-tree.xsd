@@ -4,8 +4,9 @@
 <xs:element name="publication-tree">
   <xs:complexType>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="part" type="part" />
-      <xs:element name="para-ref" type="para-ref" />
+      <xs:element name="part"         type="part" />
+      <xs:element name="para-ref"     type="para-ref" />
+      <xs:element name="transclusion" type="transclusion" />
     </xs:choice>
     <xs:attribute name="uriid"    type="xs:integer" use="required"/>
     <xs:attribute name="title"    type="xs:string"  use="required"/>
@@ -25,8 +26,9 @@
       <xs:element name="heading-ref"  type="heading-ref"/>
     </xs:choice>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="part" type="part" />
-      <xs:element name="para-ref" type="para-ref" />
+      <xs:element name="part"         type="part" />
+      <xs:element name="para-ref"     type="para-ref" />
+      <xs:element name="transclusion" type="transclusion" />
     </xs:choice>
   </xs:sequence>
   <xs:attribute name="level"    type="level" use="required"/>
@@ -69,6 +71,12 @@
   <xs:attribute name="part-level"  type="level"/>
   <xs:attribute name="block-label" type="label"/>
 </xs:complexType>
+
+<xs:complexType name="transclusion">
+  <xs:attribute name="uriid"          type="uriid"        use="required"/>
+  <xs:attribute name="fragment"       type="fragment"     use="required"/>  
+</xs:complexType>
+
 
 <!-- ====================================================================== -->
 <!-- Attribute types                                                        -->

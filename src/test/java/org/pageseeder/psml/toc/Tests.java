@@ -46,6 +46,10 @@ public class Tests {
     return new Part<>(element, parts);
   }
 
+  public static Part<Toc> toc() {
+    return new Part<>(new Toc());
+  }
+
   public static Part<Reference> ref(int level, String title, long uri) {
     return new Part<>(new Reference(level, title, "", "", uri));
   }
@@ -120,6 +124,10 @@ public class Tests {
 
   public static Part<Heading> heading(int level,  String title, String fragment, int index, @NonNull Part<?>... parts) {
     return new Part<>(new Heading(level, title, fragment, fragment, index), parts);
+  }
+
+  public static Part<Heading> heading(int level,  String title, String fragment, int index, String blocklabel, @NonNull Part<?>... parts) {
+    return new Part<>(new Heading(level, title, fragment, fragment, index).blocklabel(blocklabel), parts);
   }
 
   public static Part<Phantom> phantom(int level, @NonNull Part<?>... parts) {

@@ -154,6 +154,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       this.ignore = true;
     } else if (isElement("document")) {
       startDocument(attributes);
+    } else if (isElement("toc")) {
+      this._expander.addLeaf(new Toc());
     } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
     } else if (isElement("property")) {

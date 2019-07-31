@@ -556,6 +556,11 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
           if (output) ref.toXML(xml, level, state.number, id, count,
               false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment), nextTree.labels());
         }
+      } else {
+        xml.openElement("transclusion");
+        xml.attribute("uriid", Long.toString(ref.uri()));
+        xml.attribute("fragment", ref.targetfragment());
+        xml.closeElement();
       }
     } else if (element instanceof Reference && !state.externalrefs) {
       // external reference not allowed so don't output XML

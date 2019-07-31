@@ -1,18 +1,13 @@
 package org.pageseeder.psml.toc;
 
-import static org.pageseeder.psml.toc.Tests.h1;
-import static org.pageseeder.psml.toc.Tests.h2;
-import static org.pageseeder.psml.toc.Tests.h3;
-import static org.pageseeder.psml.toc.Tests.h4;
-import static org.pageseeder.psml.toc.Tests.phantom;
-import static org.pageseeder.psml.toc.Tests.ref;
+import static org.pageseeder.psml.toc.Tests.*;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 public final class DocumentTreeTest {
 
@@ -312,6 +307,7 @@ public final class DocumentTreeTest {
     DocumentTree normalized = tree.normalize(TitleCollapse.auto);
     Assert.assertEquals(1, tree.parts().size());
     Assert.assertEquals(2, normalized.parts().size());
+    Assert.assertEquals(DocumentTree.NO_BLOCK_LABEL, normalized.blocklabel());
   }
 
   @Test
@@ -336,6 +332,24 @@ public final class DocumentTreeTest {
     Assert.assertEquals(1, tree.parts().get(0).level());
     Assert.assertEquals(Element.NO_TITLE, tree.parts().get(0).title());
     Assert.assertEquals(0, normalized.parts().size());
+  }
+
+  @Test
+  public void testNormalize_5() throws IOException {
+    Part<Heading> p1 = heading(1, "Hello", "1", 1, "myblock",
+                         h2("I", "2", 2,
+                           h3("A", "2", 3),
+                           h3("B", "2", 2)),
+                         h2("II", "2", 5,
+                           h3("A", "2", 6),
+                           h3("B", "2", 7)));
+    DocumentTree tree = new DocumentTree.Builder(123L, "Hello")
+        .part(p1)
+        .build();
+    DocumentTree normalized = tree.normalize(TitleCollapse.auto);
+    Assert.assertEquals(1, tree.parts().size());
+    Assert.assertEquals(2, normalized.parts().size());
+    Assert.assertEquals("myblock", normalized.blocklabel());
   }
 
   // Forward references

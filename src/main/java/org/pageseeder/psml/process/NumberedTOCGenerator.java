@@ -3,24 +3,12 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.pageseeder.psml.toc.DocumentTree;
-import org.pageseeder.psml.toc.Element;
-import org.pageseeder.psml.toc.FragmentNumbering;
+import org.pageseeder.psml.toc.*;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
-import org.pageseeder.psml.toc.Heading;
-import org.pageseeder.psml.toc.Paragraph;
-import org.pageseeder.psml.toc.Part;
-import org.pageseeder.psml.toc.PublicationTree;
-import org.pageseeder.psml.toc.Reference;
-import org.pageseeder.psml.toc.TransclusionEnd;
 import org.pageseeder.xmlwriter.XMLWriter;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Container for publication tree and fragment numbering.
@@ -155,8 +143,8 @@ public class NumberedTOCGenerator {
   private void toXML(XMLWriter xml, long id, int level, Part<?> part,
       Map<Long,Integer> doccount, Integer count, List<String> ancestors) throws IOException {
     Element element = part.element();
-    // ignore paragraphs
-    if (element instanceof Paragraph || element instanceof TransclusionEnd) return;
+    // ignore paragraphs, transclusion end and toc marker
+    if (element instanceof Paragraph || element instanceof TransclusionEnd || element instanceof Toc) return;
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;

@@ -152,6 +152,7 @@ public final class DocumentTreeHandlerTest {
   public void testParseReferences1() throws SAXException, IOException {
     DocumentTree tree = parse(1, "references1.psml");
     Part<Heading> p = h1("A", "1", 1,
+        toc(),
         ref(0, "B", 101),
         ref(0, "C", 102));
     List<Long> reverse = Arrays.asList(1L, 2L);
@@ -163,10 +164,13 @@ public final class DocumentTreeHandlerTest {
   @Test
   public void testParseReferences1_normalizeAuto() throws SAXException, IOException {
     DocumentTree tree = parse(1, "references1.psml");
-    List<Part<?>> parts = Arrays.asList(ref(0, "B", 101), ref(0, "C", 102));
+    List<Part<?>> parts = Arrays.asList(
+        toc(),
+        ref(0, "B", 101),
+        ref(0, "C", 102));
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, 2, "A", "", reverse,
-        DocumentTree.NO_FRAGMENT, false, DocumentTree.NO_PREFIX,
+        DocumentTree.NO_FRAGMENT, false, DocumentTree.NO_PREFIX, DocumentTree.NO_BLOCK_LABEL,
         parts, Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
@@ -175,6 +179,7 @@ public final class DocumentTreeHandlerTest {
   public void testParseReferences2() throws SAXException, IOException {
     DocumentTree tree = parse(1, "references2.psml");
     Part<Heading> p = h1("Test References #2", "1", 1,
+        toc(),
         ref(0, "Alpha", 101),
         ref(0, "Bravo", 102,
             ref(1, "Bravo 1", 103),
@@ -205,6 +210,7 @@ public final class DocumentTreeHandlerTest {
     DocumentTree tree = parse(1, "transclusions.psml");
     List<Part<?>> p = Arrays.asList(
         h1("Assembly", "1", 1,
+            toc(),
             ref(1, "Part A", "2", 186250L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
             h2("Part A", "2", 1,
                 tend("2"),
@@ -223,6 +229,7 @@ public final class DocumentTreeHandlerTest {
   public void testParseTransclusions_normalizedAuto() throws SAXException, IOException {
     DocumentTree tree = parse(6, "transclusions.psml");
     List<Part<?>> p = Arrays.asList(
+        toc(),
         ref(1, "Part A", "2", 186250L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
         h2("Part A", "2", 1,
             tend("2"),
@@ -234,10 +241,15 @@ public final class DocumentTreeHandlerTest {
     Tests.print(tree);
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(6, 2, "Assembly", "", Collections.emptyList(),
-        DocumentTree.NO_FRAGMENT, false, DocumentTree.NO_PREFIX,
+        DocumentTree.NO_FRAGMENT, false, DocumentTree.NO_PREFIX, DocumentTree.NO_BLOCK_LABEL,
         p, Collections.emptyMap(), Collections.emptyMap());
     Tests.print(tree.normalize(TitleCollapse.auto));
-    Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
+    DocumentTree normalized = tree.normalize(TitleCollapse.auto);
+    Tests.assertDocumentTreeEquals(expected, normalized);
+    PublicationTree publication = new PublicationTree(normalized);
+    Tests.print(publication, -1, -1, null, null, true);
+
+
   }
 
   @Test

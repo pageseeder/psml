@@ -51,6 +51,9 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   /** When there is no title */
   public static final String NO_PREFIX = "";
 
+  /** When there is no block label */
+  public static final String NO_BLOCK_LABEL = "";
+
   /** When there is no first heading fragment stored */
   public static final String NO_FRAGMENT = "";
 
@@ -99,6 +102,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   private final String _prefix;
 
+
+  /**
+   * Parent block label if any
+   */
+  private final String _blocklabel;
+
   /**
    * Map of fragment ID to the first heading in the fragment,
    * otherwise the first preceding heading or section title (within the current section).
@@ -121,12 +130,13 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param titlefragment     The fragment ID of first (title) heading (only if numbered or prefixed)
    * @param numbered          Whether the heading is auto-numbered
    * @param prefix            Any prefix given to the title.
+   * @param blocklabel        The parent block label (from first heading)
    * @param parts             The list of parts.
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    * @param fragmentlevels    Map of fragment ID to the level of the fragment
    */
   public DocumentTree(long id, int level, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
-      String prefix, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
+      String prefix, String blocklabel, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
     this._id = id;
     this._title = title;
     this._labels = labels;
@@ -136,6 +146,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     this._titlefragment = titlefragment;
     this._numbered = numbered;
     this._prefix = prefix;
+    this._blocklabel = blocklabel;
     this._fragmentheadings = Collections.unmodifiableMap(fragmentheadings);
     this._fragmentlevels = Collections.unmodifiableMap(fragmentlevels);
   }
@@ -152,7 +163,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   public DocumentTree(long id, String title, String labels, List<Long> reverse,
       List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
     this(id, calculateLevel(parts), title, labels, reverse,
-        NO_FRAGMENT, false, NO_PREFIX, parts, fragmentheadings, fragmentlevels);
+        NO_FRAGMENT, false, NO_PREFIX, NO_BLOCK_LABEL, parts, fragmentheadings, fragmentlevels);
   }
 
   @Override
@@ -192,6 +203,13 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public String prefix() {
     return this._prefix;
+  }
+
+  /**
+   * @return The blocklabel parent of this heading or empty if none.
+   */
+  public String blocklabel() {
+    return this._blocklabel;
   }
 
   /**
@@ -458,7 +476,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       }
       normalized = new DocumentTree(tree._id,  calculateLevel(unwrapped),
           tree._title, tree._labels, tree._reverse, tree._titlefragment,
-          tree._numbered, tree._prefix, unwrapped, tree._fragmentheadings, tree._fragmentlevels);
+          tree._numbered, tree._prefix, tree._blocklabel, unwrapped, tree._fragmentheadings, tree._fragmentlevels);
     }
     return normalized;
   }
@@ -510,7 +528,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       }
       // Move the numbered and prefix from the first heading to the tree
       return new DocumentTree(tree._id, firstHeading.level() + 1, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
-          firstHeading.numbered(), firstHeading.prefix(), children, tree._fragmentheadings, tree._fragmentlevels);
+          firstHeading.numbered(), firstHeading.prefix(), firstHeading.blocklabel(), children, tree._fragmentheadings, tree._fragmentlevels);
     }
     return tree;
   }
