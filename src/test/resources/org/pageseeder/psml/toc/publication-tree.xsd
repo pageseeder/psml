@@ -75,6 +75,7 @@
 <xs:complexType name="transclusion">
   <xs:attribute name="uriid"          type="uriid"        use="required"/>
   <xs:attribute name="fragment"       type="fragment"     use="required"/>  
+  <xs:attribute name="position"       type="xs:integer"/>
 </xs:complexType>
 
 

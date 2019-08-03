@@ -262,8 +262,10 @@ public final class PublicationTreeTest {
     // Generate fragment numbering
     Map<Long,List<Long>> transclusions = new HashMap<>();
     FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>(), transclusions);
+    publication = publication.modify(new ArrayList<>(), new HashMap<>(), transclusions, publication.id());
     Tests.print(publication, -1, -1, numbering, null, true);
     Tests.print(publication, 101, 1, numbering, null, true);
+    Tests.print(publication, 1001, -1, numbering, null, true);
     String result = numbering.getAllPrefixes().entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())

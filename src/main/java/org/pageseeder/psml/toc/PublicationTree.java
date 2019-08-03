@@ -541,11 +541,9 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     // Output the element
     Integer nextcount = null;
     if (nextTree != null || Reference.Type.TRANSCLUDE.equals(refType)) {
-      if (nextTree != null) {
-        nextcount = state.doccount.get(next);
-        nextcount = nextcount == null ? 1 : nextcount + 1;
-        state.doccount.put(next, nextcount);
-      }
+      nextcount = state.doccount.get(next);
+      nextcount = nextcount == null ? 1 : nextcount + 1;
+      state.doccount.put(next, nextcount);
       Reference ref = (Reference)element;
       if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
@@ -553,13 +551,14 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
               nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null), nextTree.labels());
         } else {
           // single embedded fragments can't be numbered
-          if (output) ref.toXML(xml, level, state.number, id, count,
+          if (output) ref.toXML(xml, level, state.number, next, nextcount,
               false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment), nextTree.labels());
         }
-      } else {
+      } else if (output) {
         xml.openElement("transclusion");
         xml.attribute("uriid", Long.toString(ref.uri()));
         xml.attribute("fragment", ref.targetfragment());
+        xml.attribute("position", nextcount);
         xml.closeElement();
       }
     } else if (element instanceof Reference && !state.externalrefs) {
