@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?stylesheet format="schema" xsl-rootelement="root"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="1.1">
 
   <xs:annotation>
     <xs:documentation>This is the XML schema for PSML document processed content.</xs:documentation>
@@ -1706,6 +1706,7 @@
       <xs:element ref="link" />
       <xs:element ref="anchor" />
       <xs:element ref="inline" />
+      <xs:element ref="placeholder" />
       <xs:element ref="monospace" />
     </xs:choice>
   </xs:group>
@@ -1739,6 +1740,25 @@
           <xs:documentation>Label of this inline content</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <!--
+   =================================================================
+       placeholder element
+   =================================================================
+  -->
+  <xs:element name="placeholder">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="ref" type="label" use="required">
+            <xs:annotation>
+              <xs:documentation>Placeholder for dynamic content</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
     </xs:complexType>
   </xs:element>
 
