@@ -83,6 +83,11 @@ public final class Process {
   private boolean convertAsciiMath = false;
 
   /**
+   * If placeholder elements are resolved
+   */
+  private boolean placeholders = false;
+
+  /**
    * If we should process the XML content.
    */
   private boolean processXML = false;
@@ -172,6 +177,14 @@ public final class Process {
    */
   public void setConvertAsciiMath(boolean convert) {
     this.convertAsciiMath = convert;
+    this.processXML = true;
+  }
+
+  /**
+   * @param resolve If placeholder elements are resolved
+   */
+  public void setPlaceholders(boolean resolve) {
+    this.placeholders = resolve;
     this.processXML = true;
   }
 
@@ -499,6 +512,7 @@ public final class Process {
       handler1.setProcessed(this.processed);
       handler1.setConvertMarkdown(this.convertMarkdown);
       handler1.setConvertAsciiMath(this.convertAsciiMath);
+      handler1.setPlaceholders(this.placeholders);
       // add xrefs handling details
       List<String> xrefsTypes = null;
       boolean excludeXRefFrag = false;

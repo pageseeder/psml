@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21930" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="21930" scheme="http" host="localhost" port="80"
+      path="/ps/test/local1/documents/process/content/placeholder_1.psml"
+      decodedpath="/ps/test/local1/documents/process/content/placeholder_1.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2017-06-23T16:31:36+10:00" modified="2017-06-23T16:41:37+10:00"
+      title="Placeholder 1">
+      <displaytitle>Placeholder 1</displaytitle>
+    </uri>
+    <publication id="placeholder1" hostid="1" rooturiid="21930" title="Placeholder 1" defaultgroupid="6849" type="default"/>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="14934" fragment="2" editid="39449"
+      modified="2017-06-23T16:39:20+10:00">
+      <compare>
+        <content>
+          <fragment id="2">
+            <para>Placeholder 1 <placeholder name="my-prop1"></placeholder> here.</para>
+            <para>Placeholder 2 <placeholder name="my-prop2">[my-prop2]</placeholder> here.</para>
+            <para>Placeholder 3 <placeholder name="my-prop3">[my-prop3]</placeholder> here.</para>
+            <para>Placeholder 4 <placeholder name="my-prop4">[my-prop4]</placeholder> here.</para>
+            <para>Placeholder 5 <placeholder name="my-prop5">[my-prop5]</placeholder> here.</para>
+          </fragment>
+        </content>
+        <diff>
+          <fragment id="2" xmlns:dfx="http://www.topologi.com/2005/Diff-X">
+            <para>Placeholder 1 <placeholder name="my-prop1"><dfx:ins>[my-prop1]</dfx:ins></placeholder> here.</para>
+            <para>Placeholder 2 <placeholder name="my-prop2">[my-prop2]</placeholder> here.</para>
+            <para>Placeholder 3 <placeholder name="my-prop3">[my-prop3]</placeholder> here.</para>
+            <para>Placeholder 4 <placeholder name="my-prop4">[my-prop4]</placeholder> here.</para>
+            <para>Placeholder 5 <placeholder name="my-prop5">[my-prop5]</placeholder> here.</para>
+          </fragment>
+        </diff>
+      </compare>
+    </locator>
+  </fragmentinfo>
+  <metadata>
+    <properties>
+      <property name="my-prop1" value="doc first" />
+      <property name="my-prop2" value="doc second" />
+      <property name="my-prop3" value="doc third" />
+      <property name="my-prop5" count="n">
+        <value>doc fifth</value>
+      </property>
+    </properties>
+  </metadata>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1" numbered="true">Content 1</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>Placeholder 1 <placeholder name="my-prop1">[my-prop1]</placeholder> here.</para>
+      <para>Placeholder 2 <placeholder name="my-prop2">[my-prop2]</placeholder> here.</para>
+      <para>Placeholder 3 <placeholder name="my-prop3">[my-prop3]</placeholder> here.</para>
+      <para>Placeholder 4 <placeholder name="my-prop4">[my-prop4]</placeholder> here.</para>
+      <para>Placeholder 5 <placeholder name="my-prop5">[my-prop5]</placeholder> here.</para>
+    </fragment>
+  </section>
+</document>

@@ -447,7 +447,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       return true;
     } else {
       List<Long> transcluded = this._transclusions.get(id);
-      if (!transcluded.isEmpty()) {
+      if (transcluded != null && !transcluded.isEmpty()) {
         for (Long ref : transcluded) {
           if (collectReferences(ref, trees)) count++;
           if (count >= MAX_REVERSE_FOLLOW) break;

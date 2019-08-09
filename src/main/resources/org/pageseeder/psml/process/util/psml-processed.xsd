@@ -1752,9 +1752,9 @@
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="xs:string">
-          <xs:attribute name="ref" type="label" use="required">
+          <xs:attribute name="name" type="label" use="required">
             <xs:annotation>
-              <xs:documentation>Placeholder for dynamic content</xs:documentation>
+              <xs:documentation>The name of the metadata property containing the resolved content.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
         </xs:extension>

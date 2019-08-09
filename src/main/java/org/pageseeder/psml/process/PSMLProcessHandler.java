@@ -107,6 +107,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private boolean embedImageMetadata = false;
 
   /**
+   * Whether to resolve placeholder elements
+   */
+  private boolean placeholders = false;
+
+  /**
    * How images src should be rewritten.
    */
   private ImageSrc imageSrc = ImageSrc.LOCATION;
@@ -190,6 +195,16 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private Map<String, Map<String, Integer[]>> hierarchyUriFragIDs = new HashMap<>();
 
   /**
+   * Publication metadata (for placeholders)
+   */
+  private Map<String,String> publicationMetadata = null;
+
+  /**
+   * Document metadata (for placeholders)
+   */
+  private Map<String,String> documentMetadata = new HashMap<>();
+
+  /**
    * If parsing root or in hierarchy of all embed XRefs
    */
   private boolean inEmbedHierarchy = true;
@@ -244,6 +259,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * The current fragment being processed.
    */
   private String currentFragment = null;
+
+  /**
+   * The resolve content for the current placeholder
+   */
+  private String placeholderContent = null;
 
   /**
    * @param out            where the resulting XML should be written.
@@ -506,6 +526,27 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
+   * @param resolve  if placeholder elements are resolved
+   */
+  public void setPlaceholders(boolean resolve) {
+    this.placeholders = resolve;
+  }
+
+  /**
+   * @param metadata  the publication metadata
+   */
+  public void setPublicationMetadata(Map<String,String> metadata) {
+    this.publicationMetadata = metadata;
+  }
+
+  /**
+   * @param metadata  the document metadata
+   */
+  public void setDocumentMetadata(Map<String,String> metadata) {
+    this.documentMetadata = metadata;
+  }
+
+  /**
    * @return the binaryRepository
    */
   public File getBinaryRepository() {
@@ -598,6 +639,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     boolean isXRef = noNamespace && ("blockxref".equals(qName) || "xref".equals(qName));
     boolean isReverseXRef = noNamespace && "reversexref".equals(qName);
     boolean isImage = noNamespace && "image".equals(qName);
+    boolean isMetadataProperty  = noNamespace && "property".equals(qName) && "properties".equals(this.elements.peek());
     // currently stripping?
     if (this.ignore)
       return;
@@ -623,6 +665,35 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.convertContent = new StringBuilder();
       return;
     }
+
+    // resolve placeholders
+    if (this.placeholders) {
+      // ignore diff elements inside placeholder when resolving
+      if (this.placeholderContent != null) return;
+      // if root document is a publication, start collecting metadata
+      if ("publication".equals(qName) && this.parent == null) {
+        this.publicationMetadata = new HashMap<>();
+        this.documentMetadata = null;
+      // if metadata property, collect metadata
+      } else if (isMetadataProperty && !this.inTranscludedContent &&
+          atts.getValue("name") != null && atts.getValue("value") != null) {
+        if (this.documentMetadata == null) {
+          this.publicationMetadata.put(atts.getValue("name"), atts.getValue("value"));
+        } else {
+          this.documentMetadata.put(atts.getValue("name"), atts.getValue("value"));
+        }
+      // if place holder, try to resolve
+      } else if ("placeholder".equals(qName) && atts.getValue("name") != null) {
+        String ref = atts.getValue("name");
+        if (this.publicationMetadata != null) {
+          this.placeholderContent = this.publicationMetadata.get(ref);
+        }
+        if (this.placeholderContent == null && this.documentMetadata != null) {
+          this.placeholderContent = this.documentMetadata.get(ref);
+        }
+      }
+    }
+
     // store current fragment
     if (isFragment && !this.elements.contains("compare"))
       this.currentFragment = atts.getValue("id");
@@ -716,6 +787,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   @Override
   public void endElement(String uri, String localName, String qName) throws SAXException {
+    // placeholder content
+    if (this.placeholderContent != null) {
+      if ("placeholder".equals(qName)) {
+        write(XMLUtils.escape(this.placeholderContent));
+        this.placeholderContent = null;
+      } else {
+        return;
+      }
+    }
     // if fragment loading close temporary document element (stripped out later)
     if (this.fragmentToLoad != null && "document".equals(qName)) {
       write("</document-fragment>");
@@ -757,14 +837,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
       }
       return;
     }
-      // otherwise print close tag
-    this.elements.pop();
     // handle markdown
     if (this.convertMarkdown && (uri == null || uri.isEmpty()) && "markdown".equals(qName) && this.convertContent != null) {
       // convert to PSML
       write(markdownToPSML(this.convertContent.toString()));
       this.convertContent = null;
     }
+    // print close tag
+    this.elements.pop();
     write("</" + qName + ">");
     // handle fragment ending (not the compare fragments!)
     if (isFragment(qName) && !this.elements.contains("compare")) {
@@ -783,7 +863,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   @Override
   public void characters(char[] ch, int start, int length) throws SAXException {
-    if (this.ignore || !this.inRequiredFragment || this.inTranscludedXRef) {
+    if (this.ignore || !this.inRequiredFragment || this.inTranscludedXRef || this.placeholderContent != null) {
       return;
     }
     // markdown
@@ -862,6 +942,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.publicationConfig = this.publicationConfig;
     handler.setConvertMarkdown(this.convertMarkdown);
     handler.setConvertAsciiMath(this.convertAsciiMath);
+    handler.setPlaceholders(this.placeholders);
+    handler.setPublicationMetadata(this.publicationMetadata);
+    if (transclude) {
+      handler.setDocumentMetadata(this.documentMetadata);
+    }
     // load only one fragment?
     if (fragment != null && !"default".equals(fragment)) {
       handler.setFragment(fragment);

@@ -1082,6 +1082,179 @@ public class ProcessTest {
   }
 
   @Test
+  public void testPlaceholders() throws IOException, ProcessException {
+    String filename = "placeholders.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    p.setXrefs(xrefs);
+    p.setPlaceholders(true);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    //System.out.println(xml);
+    Assert.assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[3]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[4]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[5]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[6]", equalTo("[my-prop1]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[7]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[8]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[9]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[10]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("doc first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("doc second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("doc third")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[14]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[15]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[18]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[19]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[20]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[23]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[24]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[25]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[28]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[29]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[30]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[33]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[34]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[35]", equalTo("[my-prop5]")));
+  }
+
+  @Test
+  public void testPlaceholdersPub() throws IOException, ProcessException {
+    String filename = "placeholders_pub.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    p.setXrefs(xrefs);
+    p.setPlaceholders(true);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    //System.out.println(xml);
+    Assert.assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[3]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[4]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[5]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[6]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[7]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[8]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[9]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[10]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("doc third")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[14]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[15]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[18]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[19]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[20]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[23]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[24]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[25]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[28]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[29]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[30]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("root first")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("root second")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[33]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[34]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[35]", equalTo("[my-prop5]")));
+  }
+
+  @Test
+  public void testPlaceholdersUnresolved() throws IOException, ProcessException {
+    String filename = "placeholders.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    //System.out.println(xml);
+    Assert.assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[3]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[4]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[5]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[6]", equalTo("[my-prop1]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[7]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[8]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[9]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[10]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("[my-prop1]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[14]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[15]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[18]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[19]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[20]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("[my-prop1]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[23]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[24]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[25]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("[my-prop1]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[28]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[29]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[30]", equalTo("[my-prop5]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("[my-prop1]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("[my-prop2]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[33]", equalTo("[my-prop3]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[34]", equalTo("[my-prop4]")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[35]", equalTo("[my-prop5]")));
+  }
+
+  @Test
   public void testPostTransform() throws IOException, ProcessException {
     String filename = "content_2.psml";
     Process p = new Process();
