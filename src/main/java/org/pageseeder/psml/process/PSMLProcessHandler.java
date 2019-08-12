@@ -675,21 +675,23 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.publicationMetadata = new HashMap<>();
         this.documentMetadata = null;
       // if metadata property, collect metadata
-      } else if (isMetadataProperty && !this.inTranscludedContent &&
-          atts.getValue("name") != null && atts.getValue("value") != null) {
+      } else if (isMetadataProperty && !this.inTranscludedContent && atts.getValue("name") != null &&
+          !"xref".equals(atts.getValue("datatype")) && !"markdown".equals(atts.getValue("datatype")) &&
+          (atts.getValue("count") == null || "1".equals(atts.getValue("count")))) {
+        String value = atts.getValue("value") == null ? "" : atts.getValue("value");
         if (this.documentMetadata == null) {
-          this.publicationMetadata.put(atts.getValue("name"), atts.getValue("value"));
+          this.publicationMetadata.put(atts.getValue("name"), value);
         } else {
-          this.documentMetadata.put(atts.getValue("name"), atts.getValue("value"));
+          this.documentMetadata.put(atts.getValue("name"), value);
         }
       // if place holder, try to resolve
       } else if ("placeholder".equals(qName) && atts.getValue("name") != null) {
-        String ref = atts.getValue("name");
+        String name = atts.getValue("name");
         if (this.publicationMetadata != null) {
-          this.placeholderContent = this.publicationMetadata.get(ref);
+          this.placeholderContent = this.publicationMetadata.get(name);
         }
         if (this.placeholderContent == null && this.documentMetadata != null) {
-          this.placeholderContent = this.documentMetadata.get(ref);
+          this.placeholderContent = this.documentMetadata.get(name);
         }
       }
     }
@@ -769,6 +771,10 @@ public final class PSMLProcessHandler extends DefaultHandler {
       String relpath = this.transcluder.findXRefRelativePath(atts.getValue("href"));
       if (relpath != null)
         write(" relpath=\"" + XMLUtils.escapeForAttribute(relpath) + "\"");
+    }
+    // unresolved placeholder
+    if (this.placeholders && "placeholder".equals(qName) && this.placeholderContent == null) {
+      write(" unresolved=\"true\"");
     }
     write(">");
     this.elements.push(qName);

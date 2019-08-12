@@ -19,19 +19,19 @@
         <content>
           <fragment id="2">
             <para>Placeholder 1 <placeholder name="my-prop1"></placeholder> here.</para>
-            <para>Placeholder 2 <placeholder name="my-prop2">[my-prop2]</placeholder> here.</para>
-            <para>Placeholder 3 <placeholder name="my-prop3">[my-prop3]</placeholder> here.</para>
-            <para>Placeholder 4 <placeholder name="my-prop4">[my-prop4]</placeholder> here.</para>
-            <para>Placeholder 5 <placeholder name="my-prop5">[my-prop5]</placeholder> here.</para>
+            <para>Placeholder 2 <placeholder name="my-prop2">my-prop2</placeholder> here.</para>
+            <para>Placeholder 3 <placeholder name="my-prop3">my-prop3</placeholder> here.</para>
+            <para>Placeholder 4 <placeholder name="my-prop4">my-prop4</placeholder> here.</para>
+            <para>Placeholder 5 <placeholder name="my-prop5">my-prop5</placeholder> here.</para>
           </fragment>
         </content>
         <diff>
           <fragment id="2" xmlns:dfx="http://www.topologi.com/2005/Diff-X">
-            <para>Placeholder 1 <placeholder name="my-prop1"><dfx:ins>[my-prop1]</dfx:ins></placeholder> here.</para>
-            <para>Placeholder 2 <placeholder name="my-prop2">[my-prop2]</placeholder> here.</para>
-            <para>Placeholder 3 <placeholder name="my-prop3">[my-prop3]</placeholder> here.</para>
-            <para>Placeholder 4 <placeholder name="my-prop4">[my-prop4]</placeholder> here.</para>
-            <para>Placeholder 5 <placeholder name="my-prop5">[my-prop5]</placeholder> here.</para>
+            <para>Placeholder 1 <placeholder name="my-prop1"><dfx:ins>my-prop1</dfx:ins></placeholder> here.</para>
+            <para>Placeholder 2 <placeholder name="my-prop2">my-prop2</placeholder> here.</para>
+            <para>Placeholder 3 <placeholder name="my-prop3">my-prop3</placeholder> here.</para>
+            <para>Placeholder 4 <placeholder name="my-prop4">my-prop4</placeholder> here.</para>
+            <para>Placeholder 5 <placeholder name="my-prop5">my-prop5</placeholder> here.</para>
           </fragment>
         </diff>
       </compare>
@@ -39,11 +39,11 @@
   </fragmentinfo>
   <metadata>
     <properties>
-      <property name="my-prop1" value="doc first" />
-      <property name="my-prop2" value="doc second" />
-      <property name="my-prop3" value="doc third" />
-      <property name="my-prop5" count="n">
-        <value>doc fifth</value>
+      <property name="my-prop1" value="doc first" count="1"/>
+      <property name="my-prop2" />
+      <property name="my-prop3" />
+      <property name="my-prop4" datatype="markdown" />
+      <property name="my-prop5" datatype="xref">
       </property>
     </properties>
   </metadata>
@@ -54,11 +54,11 @@
   </section>
   <section id="content">
     <fragment id="2">
-      <para>Placeholder 1 <placeholder name="my-prop1">[my-prop1]</placeholder> here.</para>
-      <para>Placeholder 2 <placeholder name="my-prop2">[my-prop2]</placeholder> here.</para>
-      <para>Placeholder 3 <placeholder name="my-prop3">[my-prop3]</placeholder> here.</para>
-      <para>Placeholder 4 <placeholder name="my-prop4">[my-prop4]</placeholder> here.</para>
-      <para>Placeholder 5 <placeholder name="my-prop5">[my-prop5]</placeholder> here.</para>
+      <para>Placeholder 1 <placeholder name="my-prop1">my-prop1</placeholder> here.</para>
+      <para>Placeholder 2 <placeholder name="my-prop2">my-prop2</placeholder> here.</para>
+      <para>Placeholder 3 <placeholder name="my-prop3">my-prop3</placeholder> here.</para>
+      <para>Placeholder 4 <placeholder name="my-prop4">my-prop4</placeholder> here.</para>
+      <para>Placeholder 5 <placeholder name="my-prop5">my-prop5</placeholder> here.</para>
     </fragment>
   </section>
 </document>

@@ -1757,6 +1757,11 @@
               <xs:documentation>The name of the metadata property containing the resolved content.</xs:documentation>
             </xs:annotation>
           </xs:attribute>
+          <xs:attribute name="unresolved" type="xs:boolean" fixed="true">
+            <xs:annotation>
+              <xs:documentation>Present when the placeholder cannot be resolved to a property.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>

@@ -10,10 +10,6 @@
       <displaytitle>Placeholders</displaytitle>
     </uri>
   </documentinfo>
-  <fragmentinfo>
-    <locator id="14930" fragment="2" editid="39451"
-      modified="2017-06-23T16:39:57+10:00" />
-  </fragmentinfo>
   <metadata>
     <properties>
       <property name="my-prop1" value="root first" />
@@ -45,11 +41,11 @@
   </section>
   <section id="content">
     <fragment id="3">
-      <para>Placeholder 1 <placeholder name="my-prop1">[my-prop1]</placeholder> here.</para>
-      <para>Placeholder 2 <placeholder name="my-prop2">[my-prop2]</placeholder> here.</para>
-      <para>Placeholder 3 <placeholder name="my-prop3">[my-prop3]</placeholder> here.</para>
-      <para>Placeholder 4 <placeholder name="my-prop4">[my-prop4]</placeholder> here.</para>
-      <para>Placeholder 5 <placeholder name="my-prop5">[my-prop5]</placeholder> here.</para>
+      <para>Placeholder 1 <placeholder name="my-prop1">my-prop1</placeholder> here.</para>
+      <para>Placeholder 2 <placeholder name="my-prop2">my-prop2</placeholder> here.</para>
+      <para>Placeholder 3 <placeholder name="my-prop3">my-prop3</placeholder> here.</para>
+      <para>Placeholder 4 <placeholder name="my-prop4">my-prop4</placeholder> here.</para>
+      <para>Placeholder 5 <placeholder name="my-prop5">my-prop5</placeholder> here.</para>
     </fragment>
   </section>
 </document>
