@@ -1161,7 +1161,7 @@ public class ProcessTest {
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     //System.out.println(xml);
-    Assert.assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("20")));
+    Assert.assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("21")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("root first")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("root second")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[3][@unresolved='true']", equalTo("my-prop3")));
@@ -1174,7 +1174,7 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//placeholder)[10][@unresolved='true']", equalTo("my-prop5")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("root first")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("")));
+    Assert.assertThat(xml, hasXPath("(//placeholder)[13][@unresolved='true']", equalTo("my-prop3")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[14][@unresolved='true']", equalTo("my-prop4")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[15][@unresolved='true']", equalTo("my-prop5")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("root first")));

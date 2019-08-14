@@ -677,7 +677,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       // if metadata property, collect metadata
       } else if (isMetadataProperty && !this.inTranscludedContent && atts.getValue("name") != null &&
           !"xref".equals(atts.getValue("datatype")) && !"markdown".equals(atts.getValue("datatype")) &&
-          (atts.getValue("count") == null || "1".equals(atts.getValue("count")))) {
+          (atts.getValue("count") == null || "1".equals(atts.getValue("count"))) &&
+           atts.getValue("multiple") == null) {
         String value = atts.getValue("value") == null ? "" : atts.getValue("value");
         if (this.documentMetadata == null) {
           this.publicationMetadata.put(atts.getValue("name"), value);
@@ -689,8 +690,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         String name = atts.getValue("name");
         if (this.publicationMetadata != null) {
           this.placeholderContent = this.publicationMetadata.get(name);
-        }
-        if (this.placeholderContent == null && this.documentMetadata != null) {
+        } else if (this.documentMetadata != null) {
           this.placeholderContent = this.documentMetadata.get(name);
         }
       }

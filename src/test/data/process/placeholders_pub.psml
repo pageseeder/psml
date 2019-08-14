@@ -15,7 +15,7 @@
     <properties>
       <property name="my-prop1" value="root first" />
       <property name="my-prop2" value="root second" />
-      <property name="my-prop5" count="n">
+      <property name="my-prop5" multiple="true">
         <value>root fifth</value>
       </property>
     </properties>
