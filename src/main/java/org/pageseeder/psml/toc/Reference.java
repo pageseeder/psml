@@ -79,24 +79,31 @@ public final class Reference extends Element implements Serializable {
   private final String _targetfragment;
 
   /**
+   * Whether the XRef has display="document"
+   */
+  private final Boolean _displaydocument;
+
+  /**
    * Creates a new reference at the specified level for a given URI.
    *
-   * @param level         The level.
-   * @param title         The title of the reference.
-   * @param fragment      The Fragment identifier where the reference was found.
-   * @param originalfrag  The original (untranscluded) fragment.
-   * @param uri           The URI ID.
-   * @param type          The XRef type.
-   * @param documenttype  The document type of the target.
-   * @param targetfrag    The target fragment ID.
+   * @param level           The level.
+   * @param title           The title of the reference.
+   * @param fragment        The Fragment identifier where the reference was found.
+   * @param originalfrag    The original (untranscluded) fragment.
+   * @param uri             The URI ID.
+   * @param type            The XRef type.
+   * @param documenttype    The document type of the target.
+   * @param targetfrag      The target fragment ID.
+   * @param displaydocument Whether the XRef has display="document"
    */
   public Reference(int level, String title, String fragment, String originalfrag,
-      Long uri, Type type, @Nullable String documenttype, String targetfrag) {
+      Long uri, Type type, @Nullable String documenttype, String targetfrag, Boolean displaydocument) {
     super(level, title, fragment, originalfrag);
     this._uri = uri;
     this._type = type;
     this._documenttype = documenttype;
     this._targetfragment = DEFAULT_FRAGMENT.equals(targetfrag) ? DEFAULT_FRAGMENT : targetfrag;
+    this._displaydocument = displaydocument;
   }
 
   /**
@@ -109,7 +116,7 @@ public final class Reference extends Element implements Serializable {
    * @param uri        The URI ID.
    */
   public Reference(int level, String title, String fragment, String originalfrag, Long uri) {
-    this(level, title, fragment, originalfrag, uri, Type.EMBED, DEFAULT_TYPE, DEFAULT_FRAGMENT);
+    this(level, title, fragment, originalfrag, uri, Type.EMBED, DEFAULT_TYPE, DEFAULT_FRAGMENT, Boolean.TRUE);
   }
 
   /**
@@ -134,6 +141,13 @@ public final class Reference extends Element implements Serializable {
   }
 
   /**
+   * @return Whether the XRef has display="document".
+   */
+  public Boolean displaydocument() {
+    return this._displaydocument;
+  }
+
+  /**
    * @return The target fragment ID.
    */
   public String targetfragment() {
@@ -150,7 +164,7 @@ public final class Reference extends Element implements Serializable {
   public Reference title(String title) {
     if (title.equals(title())) return this;
     return new Reference(level(), title, fragment(), originalFragment(), this._uri, this._type,
-        this._documenttype, this._targetfragment);
+        this._documenttype, this._targetfragment, this._displaydocument);
   }
 
   @Override
@@ -169,15 +183,15 @@ public final class Reference extends Element implements Serializable {
   @Override
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     toXMLNoClose(xml, level, count);
+    if (!Element.NO_TITLE.equals(title())) {
+      xml.attribute("title", title());
+    }
     xml.closeElement();
   }
 
   public void toXMLNoClose(@NonNull XMLWriter xml, int level, int count) throws IOException {
     xml.openElement("document-ref");
     xml.attribute("level", this.level());
-    if (!Element.NO_TITLE.equals(title())) {
-      xml.attribute("title", title());
-    }
     if (this._documenttype != null) {
       xml.attribute("documenttype", this._documenttype);
     }
@@ -193,12 +207,18 @@ public final class Reference extends Element implements Serializable {
   @Override
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
       boolean numbered, String prefix, boolean children) throws IOException {
-    toXML(xml, level, number, treeid, count, numbered, prefix, children, "");
+    toXML(xml, level, number, treeid, count, title(), numbered, prefix, children, "");
   }
 
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
-      boolean numbered, String prefix, boolean children, String labels) throws IOException {
+      String title, boolean numbered, String prefix, boolean children, String labels) throws IOException {
     toXMLNoClose(xml, level, count);
+    // if display="document" use title from target document
+    if (this._displaydocument != null && this._displaydocument) {
+      xml.attribute("title", title);
+    } else {
+      xml.attribute("title", title());
+    }
     if (numbered) {
       xml.attribute("numbered", "true");
     }

@@ -526,8 +526,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       for (Part<?> p : firstPart.parts()) {
         children.add(p);//.adjustLevel(-1));
       }
-      // Move the numbered and prefix from the first heading to the tree
-      return new DocumentTree(tree._id, firstHeading.level() + 1, tree._title, tree._labels, tree._reverse, firstHeading.fragment(),
+      // Move the title, numbered and prefix from the first heading to the tree
+      return new DocumentTree(tree._id, firstHeading.level() + 1, firstHeading.title(), tree._labels, tree._reverse, firstHeading.fragment(),
           firstHeading.numbered(), firstHeading.prefix(), firstHeading.blocklabel(), children, tree._fragmentheadings, tree._fragmentlevels);
     }
     return tree;

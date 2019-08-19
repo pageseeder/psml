@@ -228,7 +228,10 @@ public class NumberedTOCGenerator {
       DocumentTree target, boolean children) throws IOException {
     xml.openElement("toc-part", children);
     xml.attribute("level", level);
-    if (!Element.NO_TITLE.equals(ref.title())) {
+    // if display="document" use title from target document
+    if (ref.displaydocument() != null && ref.displaydocument()) {
+      xml.attribute("title", target.title());
+    } else {
       xml.attribute("title", ref.title());
     }
     if (target.numbered() && this._fragmentNumbering != null) {

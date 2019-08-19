@@ -288,9 +288,12 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       String documenttype = PSML_MEDIATYPE.equals(attributes.getValue("mediatype")) ?
           getString(attributes, "documenttype", Reference.DEFAULT_TYPE) : null;
       Reference.Type type = Reference.Type.fromString(attributes.getValue("type"));
+      // get the fallback title - actual title is taken from XRef content if not empty
       String title = computeReferenceTitle(attributes);
+      String display = attributes.getValue("display");
       Reference reference = new Reference(level, title, this.fragment, this._fragmentIDs.peek(),
-          uriid, type, documenttype, attributes.getValue("frag"));
+          uriid, type, documenttype, attributes.getValue("frag"),
+          display == null || "document".equals(display) ? Boolean.TRUE : Boolean.FALSE);
       if (Reference.Type.EMBED.equals(type)) {
         // use PageSeeder generated title
         newBuffer();

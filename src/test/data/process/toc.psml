@@ -26,37 +26,37 @@
   <toc />
   <section id="xrefs">
     <xref-fragment id="2">
-      <blockxref id="39416" frag="default" reversefrag="2"
+      <blockxref id="39416" frag="default" reversefrag="2" title="Ref 1 embed"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="embed" uriid="21927" href="ref_1.psml"
+        display="manual" type="embed" uriid="21927" href="ref_1.psml"
         urititle="Ref 1" mediatype="application/vnd.pageseeder.psml+xml"
         documenttype="references">Ref 1 embed</blockxref>
-      <blockxref id="39450" frag="1" level="1" reversefrag="2"
+      <blockxref id="39450" frag="1" level="1" reversefrag="2" title="Content 1 transclude"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="transclude" uriid="21930" href="content/content_1.psml"
+        display="manual" type="transclude" uriid="21930" href="content/content_1.psml"
         urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Content 1 transclude</blockxref>
-      <blockxref id="39450" frag="1" level="2" reversefrag="2"
+      <blockxref id="39450" frag="1" level="2" reversefrag="2" title="Content 1 transclude level 1"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="transclude" uriid="21930" href="content/content_1.psml"
+        display="manual" type="transclude" uriid="21930" href="content/content_1.psml"
         urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Content 1 transclude level 1</blockxref>
-      <blockxref id="39417" frag="default" reversefrag="2" level="2"
+      <blockxref id="39417" frag="default" reversefrag="2" level="2" title="Ref 2 embed"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="embed" uriid="21928" href="ref_2.psml"
+        display="manual" type="embed" uriid="21928" href="ref_2.psml"
         urititle="Ref 2" mediatype="application/vnd.pageseeder.psml+xml"
         documenttype="references">Ref 2 embed</blockxref>
-      <blockxref id="39418" frag="default" level="1" reversefrag="2"
+      <blockxref id="39418" frag="default" level="1" reversefrag="2" title="Ref 1 transclude"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="transclude" uriid="21927" href="ref_1.psml"
+        display="manual" type="transclude" uriid="21927" href="ref_1.psml"
         urititle="Ref 1" mediatype="application/vnd.pageseeder.psml+xml"
         documenttype="references">Ref 1 transclude</blockxref>
-      <blockxref id="39419" frag="1" reversefrag="2"
+      <blockxref id="39419" frag="1" reversefrag="2" title="Content 4 embed frag"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="embed" uriid="219350" href="content/content_4.psml"
+        display="manual" type="embed" uriid="219350" href="content/content_4.psml"
         urititle="Content 4" mediatype="application/vnd.pageseeder.psml+xml"
         documenttype="references">Content 4 embed frag</blockxref>
-      <blockxref id="39419" frag="default" reversefrag="2"
+      <blockxref id="39419" frag="default" reversefrag="2" title="Content 4 embed"
         reversetitle="References" reverselink="true" reversetype="none"
-        display="document" type="embed" uriid="219350" href="content/content_4.psml"
+        display="manual" type="embed" uriid="219350" href="content/content_4.psml"
         urititle="Content 4" mediatype="application/vnd.pageseeder.psml+xml"
         documenttype="references">Content 4 embed</blockxref>
     </xref-fragment>

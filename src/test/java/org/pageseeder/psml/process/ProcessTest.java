@@ -535,7 +535,7 @@ public class ProcessTest {
     Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     // test xpaths
     Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC Test")));
+    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC test")));
     Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("22")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title",  equalTo("Ref 1 embed")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title",  equalTo("Ref 1")));
@@ -623,7 +623,7 @@ public class ProcessTest {
     Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     // test xpaths
     Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC Test")));
+    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC test")));
     Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("22")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title",  equalTo("Ref 1 embed")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title",  equalTo("Ref 1")));
@@ -1155,12 +1155,14 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     p.setXrefs(xrefs);
     p.setPlaceholders(true);
+    PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
+    p.setPublicationConfig(config, filename, true);
     p.process();
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    //System.out.println(xml);
+    System.out.println(xml);
     Assert.assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("21")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("root first")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("root second")));

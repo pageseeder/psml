@@ -514,7 +514,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     }
     // write toc if needed
     if (isTOC && this.generateTOC && !this.tocWritten) {
-      XMLWriter xmlwriter = new XMLWriterImpl(this.xml);
+      XMLWriter xmlwriter = new XMLWriterImpl(this.xml, true);
       try {
         this.numberingAndTOC.toXML(xmlwriter);
         xmlwriter.flush();

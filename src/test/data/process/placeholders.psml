@@ -41,7 +41,7 @@
   </section>
   <section id="content">
     <fragment id="3">
-      <para>Placeholder 1 <placeholder name="my-prop1">my-prop1</placeholder> here.</para>
+      <heading level="2">Placeholder 1 <placeholder name="my-prop1">my-prop1</placeholder> here.</heading>
       <para>Placeholder 2 <placeholder name="my-prop2">my-prop2</placeholder> here.</para>
       <para>Placeholder 3 <placeholder name="my-prop3">my-prop3</placeholder> here.</para>
       <para>Placeholder 4 <placeholder name="my-prop4">my-prop4</placeholder> here.</para>
