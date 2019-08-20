@@ -119,6 +119,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private int fragmentLevel = 0;
 
   /**
+   * Buffer for placeholder content
+   */
+  private @Nullable StringBuilder placeholderContent = null;
+
+  /**
    * Constructor (URI id set by handler)
    *
    */
@@ -175,6 +180,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       newBuffer();
     } else if (isElement("labels") && !hasAncestor("blockxref")) {
       newBuffer();
+    } else if (isElement("placeholder")) {
+      startPlaceholder(attributes);
     }
   }
 
@@ -235,6 +242,20 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     }
     this.firstHeading = false;
     this.counter++;
+  }
+
+  /**
+   * Found `placeholder` element
+   *
+   * @param attributes The attributes
+   */
+  private void startPlaceholder(Attributes attributes) {
+    // if placeholder not resolved or unresolved, then replace content with [my-property] so it can be resolved later
+    String name = attributes.getValue("name");
+    if (attributes.getValue("resolved") == null && attributes.getValue("unresolved") == null &&
+        buffer() != null && name != null) {
+      this.placeholderContent = new StringBuilder().append(buffer(true)).append("[").append(name).append("]");
+    }
   }
 
   /**
@@ -341,7 +362,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       this.ignore = false;
     }
     if (this.ignore) return;
-    if ("heading".equals(element) || (isElement("title") && isParent("section"))) {
+    if ("placeholder".equals(element) && this.placeholderContent != null) {
+      newBuffer();
+      append(this.placeholderContent.toString());
+      this.placeholderContent = null;
+    } else if ("heading".equals(element) || (isElement("title") && isParent("section"))) {
       // Set the title of the current part (top of stack)
       Heading heading = this.currentHeading;
       if (heading != null) {

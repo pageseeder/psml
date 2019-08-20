@@ -160,18 +160,15 @@ public class TransclusionHandler extends DefaultHandler {
       }
     }
     // unresolved placeholder
-    if ("placeholder".equals(qName) && this.placeholderContent == null) {
-      if (this.parentHandler.resolvePlaceholders()) {
-        try {
+    if (this.parentHandler.resolvePlaceholders() && "placeholder".equals(qName)) {
+      try {
+        if (this.placeholderContent == null) {
           this.xml.attribute("unresolved","true");
-        } catch (IOException ex) {
-          throw new SAXException("Failed to add attribute \"unresolved\" to element "+qName, ex);
+        } else {
+          this.xml.attribute("resolved","true");
         }
-      }
-      // set content to property name so it can be resolved later
-      String name = atts.getValue("name");
-      if (name != null) {
-        this.placeholderContent = "[" + name + "]";
+      } catch (IOException ex) {
+        throw new SAXException("Failed to add attribute \"unresolved\" to element "+qName, ex);
       }
     }
     // handle transclusions now
