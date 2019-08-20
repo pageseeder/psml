@@ -261,7 +261,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private String currentFragment = null;
 
   /**
-   * The resolve content for the current placeholder
+   * The resolved content for the current placeholder
    */
   private String placeholderContent = null;
 
@@ -332,6 +332,21 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   public PublicationConfig getPublicationConfig() {
     return this.publicationConfig;
+  }
+
+  /**
+   * @return Publication metadata
+   */
+  public Map<String,String> getPublicationMetadata() {
+    return this.publicationMetadata;
+  }
+
+  /**
+   *
+   * @return Whether placeholders should be resolved.
+   */
+  public boolean resolvePlaceholders() {
+    return this.placeholders;
   }
 
   /**
@@ -486,6 +501,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
     XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
     TransclusionHandler thandler = new TransclusionHandler(out, "default", true, this);
     XMLUtils.parse(root, thandler);
+    // load metadata now so it can be used in compare content
+    this.publicationMetadata = thandler.getPublicationMetadata();
     // parse document tree
     DocumentTreeHandler tochandler = new DocumentTreeHandler();
     XMLUtils.parse(new InputSource(new StringReader(out.toString())), tochandler, null, null);

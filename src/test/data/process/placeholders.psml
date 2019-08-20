@@ -35,17 +35,17 @@
       <blockxref id="39451" frag="default" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="document" type="transclude" uriid="21930"
-        href="content/placeholder_1.psml" urititle="Placeholder 1"
+        href="content/placeholder_1.psml" urititle="Placeholder 1" level="1"
         mediatype="application/vnd.pageseeder.psml+xml">Placeholder 1</blockxref>
     </xref-fragment>
   </section>
   <section id="content">
     <fragment id="3">
-      <heading level="2">Placeholder 1 <placeholder name="my-prop1">my-prop1</placeholder> here.</heading>
-      <para>Placeholder 2 <placeholder name="my-prop2">my-prop2</placeholder> here.</para>
-      <para>Placeholder 3 <placeholder name="my-prop3">my-prop3</placeholder> here.</para>
-      <para>Placeholder 4 <placeholder name="my-prop4">my-prop4</placeholder> here.</para>
-      <para>Placeholder 5 <placeholder name="my-prop5">my-prop5</placeholder> here.</para>
+      <heading level="2">Placeholder 1 <placeholder name="my-prop1">my prop1</placeholder> here.</heading>
+      <para>Placeholder 2 <placeholder name="my-prop2">my prop2</placeholder> here.</para>
+      <para>Placeholder 3 <placeholder name="my-prop3">my prop3</placeholder> here.</para>
+      <para>Placeholder 4 <placeholder name="my-prop4">my prop4</placeholder> here.</para>
+      <para>Placeholder 5 <placeholder name="my-prop5">my prop5</placeholder> here.</para>
     </fragment>
   </section>
 </document>

@@ -994,7 +994,7 @@ public final class PublicationTreeTest {
     Assert.assertEquals(10501, prefixes.size());
     Assert.assertEquals(10000, numbering.getAllTranscludedPrefixes().size());
     Assert.assertTrue("Generation time: " + gtime, gtime < 400);
-    Assert.assertTrue("Print time: " + ptime, ptime < 50);
+    Assert.assertTrue("Print time: " + ptime, ptime < 100);
   }
 
   @Test(expected = IllegalStateException.class)

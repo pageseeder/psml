@@ -3,16 +3,18 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Transcludes one level of <blockxref> with type="transclude" and href ending in ".psml".
@@ -58,12 +60,33 @@ public class TransclusionHandler extends DefaultHandler {
   private boolean inCompare = false;
 
   /**
+   * A flag to specify if inside metadata properties element
+   */
+  private boolean inMetadata = false;
+
+  /**
+   * A flag to specify if this document is a publication root
+   */
+  private boolean publication = false;
+
+  /**
+   * The resolved content for the current placeholder
+   */
+  private String placeholderContent = null;
+
+  /**
+   * Document metadata (for placeholders)
+   */
+  private Map<String,String> documentMetadata = new HashMap<>();
+
+  /**
    * @param out        where the resulting XML should be written.
    * @param fragment   the fragment to include or "default" for whole document
    * @param transclude whether to transclude next level
    * @param parent     the parent handler.
    */
-  public TransclusionHandler(XMLWriter out, String fragment, boolean transclude, PSMLProcessHandler parent) {
+  public TransclusionHandler(XMLWriter out, String fragment, boolean transclude,
+      PSMLProcessHandler parent) {
     this.xml = out;
     this.fragment = fragment;
     this.transclude = transclude;
@@ -74,16 +97,51 @@ public class TransclusionHandler extends DefaultHandler {
     }
   }
 
+  /**
+   * @return Publication metadata
+   */
+  public Map<String,String> getPublicationMetadata() {
+    return this.publication ? this.documentMetadata : null;
+  }
+
   @Override
   public final void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
     if ("compare".equals(qName)) {
       this.inCompare = true;
+    }
+    if ("properties".equals(qName)) {
+      this.inMetadata = true;
+    }
+    if ("publication".equals(qName)) {
+      this.publication = true;
     }
     if (!this.inCompare && this.parentHandler.isFragment(qName) && this.fragment.equals(atts.getValue("id"))) {
       this.ignoreElements = false;
       this.ignoreText = false;
     }
     if (this.ignoreElements) return;
+
+    // resolve placeholders
+    if (this.parentHandler.resolvePlaceholders()) {
+      // if metadata property, collect metadata
+      if (this.inMetadata && "property".equals(qName) && this.transclude && atts.getValue("name") != null &&
+          !"xref".equals(atts.getValue("datatype")) && !"markdown".equals(atts.getValue("datatype")) &&
+          (atts.getValue("count") == null || "1".equals(atts.getValue("count"))) &&
+           atts.getValue("multiple") == null) {
+        String value = atts.getValue("value") == null ? "" : atts.getValue("value");
+        this.documentMetadata.put(atts.getValue("name"), value);
+
+      // if place holder, try to resolve
+      } else if ("placeholder".equals(qName) && atts.getValue("name") != null) {
+        String name = atts.getValue("name");
+        if (this.parentHandler.getPublicationMetadata() != null) {
+          this.placeholderContent = this.parentHandler.getPublicationMetadata().get(name);
+        } else if (this.documentMetadata != null) {
+          this.placeholderContent = this.documentMetadata.get(name);
+        }
+      }
+    }
+
     try {
       this.xml.openElement(qName, true);
     } catch (IOException ex) {
@@ -99,6 +157,21 @@ public class TransclusionHandler extends DefaultHandler {
         this.xml.attribute(atts.getQName(i), atts.getValue(i));
       } catch (IOException ex) {
         throw new SAXException("Failed to add attribute \""+atts.getLocalName(i)+"\" to element "+qName, ex);
+      }
+    }
+    // unresolved placeholder
+    if ("placeholder".equals(qName) && this.placeholderContent == null) {
+      if (this.parentHandler.resolvePlaceholders()) {
+        try {
+          this.xml.attribute("unresolved","true");
+        } catch (IOException ex) {
+          throw new SAXException("Failed to add attribute \"unresolved\" to element "+qName, ex);
+        }
+      }
+      // set content to property name so it can be resolved later
+      String name = atts.getValue("name");
+      if (name != null) {
+        this.placeholderContent = "[" + name + "]";
       }
     }
     // handle transclusions now
@@ -117,12 +190,20 @@ public class TransclusionHandler extends DefaultHandler {
   @Override
   public final void endElement(String uri, String localName, String qName) throws SAXException {
     try {
+      // placeholder content
+      if (this.placeholderContent != null && "placeholder".equals(qName)) {
+          this.xml.writeText(this.placeholderContent);
+          this.placeholderContent = null;
+      }
       if (!this.ignoreElements) this.xml.closeElement();
     } catch (IOException ex) {
       throw new SAXException("Failed to close element "+qName, ex);
     }
     if ("compare".equals(qName)) {
       this.inCompare = false;
+    }
+    if ("properties".equals(qName)) {
+      this.inMetadata = false;
     }
     if (this.parentHandler.isFragment(qName) && !"default".equals(this.fragment)) {
       this.ignoreElements = true;
@@ -132,7 +213,7 @@ public class TransclusionHandler extends DefaultHandler {
 
   @Override
   public final void characters(char[] ch, int start, int length) throws SAXException {
-    if (this.ignoreText) return;
+    if (this.ignoreText || this.placeholderContent != null) return;
     try {
       this.xml.writeText(ch, start, length);
     } catch (IOException ex) {
@@ -168,6 +249,7 @@ public class TransclusionHandler extends DefaultHandler {
       throw new TransclusionException("XRef target not found for path: " + dadPath + '/' + href);
     // parse target
     TransclusionHandler handler = new TransclusionHandler(this.xml, fragment, false, this.parentHandler);
+    handler.documentMetadata = this.documentMetadata;
     try {
       XMLUtils.parse(target, handler);
     } catch (ProcessException ex) {
