@@ -689,6 +689,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     Integer global_count = 0;
     Integer local_count = 0;
     Integer embed_count = 0;
+    Integer[] uri_counts = null;
 
     // if resolved and type is none try to find targets in ancestor sub-hierarchies
     if (uriid != null && "none".equals(type)) {
@@ -696,7 +697,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       for (int i = ancestors.size() - 1; i >= 0; i--) {
         String id = ancestors.get(i);
         Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs.get(id);
-        Integer[] uri_counts = sub_hierarchy.get(uriid);
+        uri_counts = sub_hierarchy.get(uriid);
         if (uri_counts != null) {
           global_count = uri_counts[0];
           local_count = uri_counts[1];
@@ -711,7 +712,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
             global_count = frag_counts[0];
             local_count = local_count + frag_counts[1];
             embed_count = embed_count + frag_counts[2];
-            this.logger.debug("Hierarchy {} found ID {}-{} globally {} times, locally {} times",
+            this.logger.debug("Hierarchy {} found ID {}-{} globally {} times, locally {} and embedded {} times",
                 id, uriid, frag, frag_counts[0], frag_counts[1], frag_counts[2]);
           }
         }
@@ -733,6 +734,10 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         } else {
           this.logger.warn(message);
         }
+      }
+      // if target document is embedded, use that instead of transcluded fragment
+      if (uri_counts != null && uri_counts[2] > 0) {
+        global_count = uri_counts[0];
       }
       this.xrefTargetPosition = global_count;
       if ("default".equals(frag)) return "#" + (global_count != 1 ? global_count + "_" : "") + uriid;

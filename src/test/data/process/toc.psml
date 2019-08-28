@@ -25,6 +25,18 @@
   </section>
   <toc />
   <section id="xrefs">
+    <fragment id="4">
+      <para><xref id="39455" frag="default" reversefrag="2"
+        reversetitle="References" reverselink="true" reversetype="none"
+        display="template" title="Parentnumber {parentnumber} Prefix {prefix}"
+        type="none" uriid="21930" href="content/content_1.psml"
+        urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Parentnumber x Prefix x</xref></para>
+      <para><xref id="394561" frag="1" reversefrag="2"
+        reversetitle="References" reverselink="true" reversetype="none"
+        display="template" title="{parentnumber}{prefix} {heading}"
+        type="alternate" uriid="21934" href="content/content_3.psml"
+        urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx x</xref></para>
+    </fragment>
     <xref-fragment id="2">
       <blockxref id="39416" frag="default" reversefrag="2" title="Ref 1 embed"
         reversetitle="References" reverselink="true" reversetype="none"
@@ -61,16 +73,6 @@
         documenttype="references">Content 4 embed</blockxref>
     </xref-fragment>
     <fragment id="3">
-      <para><xref id="39455" frag="default" reversefrag="2"
-        reversetitle="References" reverselink="true" reversetype="none"
-        display="template" title="Parentnumber {parentnumber} Prefix {prefix}"
-        type="none" uriid="21930" href="content/content_1.psml"
-        urititle="Content 1" mediatype="application/vnd.pageseeder.psml+xml">Parentnumber x Prefix x</xref></para>
-      <para><xref id="394561" frag="1" reversefrag="2"
-        reversetitle="References" reverselink="true" reversetype="none"
-        display="template" title="{parentnumber}{prefix} {heading}"
-        type="alternate" uriid="21934" href="content/content_3.psml"
-        urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx x</xref></para>
       <para><xref id="39456" frag="2" reversefrag="2"
         reversetitle="References" reverselink="true" reversetype="none"
         display="template" title="{parentnumber}{prefix}"
@@ -82,6 +84,11 @@
         type="none" uriid="21934" href="content/content_3.psml"
         urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">xx x</xref></para>
       <heading level="2" numbered="true">TOC heading 2</heading>
+      <blockxref id="39456" frag="2" reversefrag="2"
+        reversetitle="References" reverselink="true" reversetype="none"
+        display="manual" title="Content 3 transclude"
+        type="transclude" uriid="21934" href="content/content_3.psml"
+        urititle="Content 3" mediatype="application/vnd.pageseeder.psml+xml">Content 3 transclude</blockxref>
     </fragment>
   </section>
 </document>

@@ -930,10 +930,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
                                   int lvl, boolean fromImage, boolean embed, boolean transclude, boolean alternate) {
     // update uri count
     Integer count = this.allUriIDs.get(uriid);
-    if (count == null)
-      count = 0;
-    count++;
-    this.allUriIDs.put(uriid, count);
+    if (count == null) count = 0;
+    if (!alternate && !this.inAlternateXRef) {
+      count++;
+      this.allUriIDs.put(uriid, count);
+    }
 
     // clone this handler
     PSMLProcessHandler handler = new PSMLProcessHandler(this.xml, this, toParse, this.psmlRoot,
