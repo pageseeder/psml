@@ -15,15 +15,15 @@
  */
 package org.pageseeder.psml.md;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.html.HTMLElement.Name;
 import org.pageseeder.psml.html.HTMLNode;
 import org.pageseeder.psml.html.HTMLText;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This simple parser can produce a list of HTML nodes from textual content
@@ -115,7 +115,14 @@ public class HTMLInlineParser {
       // Any text before a match
       if (m.start() > previousEnd) {
         String text = content.substring(previousEnd, m.start());
-        nodes.add(new HTMLText(text));
+        // if there is an escape character don't interpret the token
+        if (text.endsWith("\\")) {
+          nodes.add(new HTMLText(InlineParser.unescape(text + content.substring(m.start(), m.end()))));
+          previousEnd = m.end();
+          continue;
+        } else {
+          nodes.add(new HTMLText(InlineParser.unescape(text)));
+        }
       }
       previousEnd = m.end();
       // Strong emphases with '**' (appear in bold)
@@ -207,9 +214,8 @@ public class HTMLInlineParser {
     // Add the tail end
     if (previousEnd < content.length()) {
       String text = content.substring(previousEnd);
-      nodes.add(new HTMLText(text));
+      nodes.add(new HTMLText(InlineParser.unescape(text)));
     }
     return nodes;
   }
-
 }

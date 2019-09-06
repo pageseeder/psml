@@ -72,6 +72,12 @@ function() {
       <heading level="2">Background</heading>
       <para>We've used this API for over 15 years and it used to be included in Diff-X.
 We decided to split it off so that we would not have to include Diff-X in all our projects.</para>
+      <para>Escape ~ ` ! @ # $ % ^ &amp; * ( ) _ - + = { [ } ] | \ : ; " ' &lt; , &gt; . ? / text</para>
+      <para>This is *escaped star*</para>
+      <para>This is [escaped brackets]</para>
+      <para>- Red<br/>
+- Green<br/>
+- Blue</para>
     </fragment>
   </section>
 </document>

@@ -15,15 +15,15 @@
  */
 package org.pageseeder.psml.md;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
 import org.pageseeder.psml.model.PSMLText;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This simple parser can produce a list of PSML nodes from textual content
@@ -94,6 +94,11 @@ public class InlineParser {
    */
   private static final Pattern TOKENS = Pattern.compile(DOUBLE_EMPHASIS+"|"+DOUBLE_UNDERSCORE+"|"+EMPHASIS+"|"+UNDERSCORE+"|"+CODE_ESCAPE+"|"+CODE+"|"+IMAGE+"|"+REF+"|"+LINK+"|"+LINK_AUTO);
 
+  /**
+   * Define the pattern to match escaped characters in markdown.
+   */
+  private static final Pattern ESCAPED = Pattern.compile("\\\\(-|`|\\*|_|\\[|\\]|\\\\|!|<|>)");
+
   public InlineParser() {
   }
 
@@ -112,7 +117,14 @@ public class InlineParser {
       // Any text before a match
       if (m.start() > previousEnd) {
         String text = content.substring(previousEnd, m.start());
-        nodes.add(new PSMLText(text));
+        // if there is an escape character don't interpret the token
+        if (text.endsWith("\\")) {
+          nodes.add(new PSMLText(unescape(text + content.substring(m.start(), m.end()))));
+          previousEnd = m.end();
+          continue;
+        } else {
+          nodes.add(new PSMLText(unescape(text)));
+        }
       }
       previousEnd = m.end();
       // Strong emphases with '**' (appear in bold)
@@ -219,9 +231,27 @@ public class InlineParser {
     // Add the tail end
     if (previousEnd < content.length()) {
       String text = content.substring(previousEnd);
-      nodes.add(new PSMLText(text));
+      nodes.add(new PSMLText(unescape(text)));
     }
     return nodes;
+  }
+
+  /**
+   * Removes the first '\' from '\-', '\`', '\*', '\_', '\[', '\]', '\\', '\!', '\<', '\>'.
+   *
+   * @param text  the original text
+   *
+   * @return the unescaped text
+   */
+  public static String unescape(String text) {
+    if (text.indexOf('\\') == -1) return text;
+    Matcher m = ESCAPED.matcher(text);
+    StringBuffer sb = new StringBuffer();
+    while (m.find()) {
+        m.appendReplacement(sb, "$1");
+    }
+    m.appendTail(sb);
+    return sb.toString();
   }
 
 }
