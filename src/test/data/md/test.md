@@ -94,7 +94,15 @@ The XML Writer defines an API and implementations to write XML out to a reading,
 We've used this API for over 15 years and it used to be included in Diff-X.
 We decided to split it off so that we would not have to include Diff-X in all our projects.
 
+Escape ~ \` \! @ # $ % ^ & \* ( ) \_ - + = { \[ } \] | \\ : ; " ' \< , \> . ? / text
 
+This is \*escaped star\*
+
+This is \[escaped brackets\]
+
+ \- Red
+ \- Green
+ \- Blue
 
 
 

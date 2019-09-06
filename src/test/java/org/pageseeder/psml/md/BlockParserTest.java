@@ -15,10 +15,6 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.md.BlockParser.State;
@@ -27,9 +23,23 @@ import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 public class BlockParserTest {
 
   public BlockParserTest() {
+  }
+
+  @Test
+  public void testEscaping() throws Exception {
+    List<String> e1 = Arrays.asList("This is \\*escaped star\\*");
+    List<String> e2 = Arrays.asList("This is \\[escaped brackets\\]");
+    List<String> e3 = Arrays.asList(" \\- Red", " \\- Green", " \\- Blue");
+    Assert.assertEquals("<para>This is *escaped star*</para>", toPSML(e1));
+    Assert.assertEquals("<para>This is [escaped brackets]</para>", toPSML(e2));
+    Assert.assertEquals("<para>- Red<br/>\n- Green<br/>\n- Blue</para>", toPSML(e3));
   }
 
   @Test

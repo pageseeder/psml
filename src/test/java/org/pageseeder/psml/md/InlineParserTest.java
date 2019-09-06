@@ -15,15 +15,34 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.model.PSMLNode;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 
+import java.io.IOException;
+import java.util.List;
+
 public final class InlineParserTest {
+
+
+  @Test
+  public void testUnescaping() {
+    Assert.assertEquals("Escape ~ ` ! @ # $ % ^ & * ( ) _ - + = { [ } ] | \\ : ; \" ' < , > . ? / text",
+        InlineParser.unescape("Escape ~ \\` \\! @ # $ % ^ & \\* ( ) \\_ - + = { \\[ } \\] | \\\\ : ; \" ' \\< , \\> . ? / text"));
+  }
+
+  @Test
+  public void testEscaping() {
+    Assert.assertEquals("*test*", toPSML("\\*test\\*"));
+    Assert.assertEquals("**test**", toPSML("\\*\\*test\\*\\*"));
+    Assert.assertEquals("_test_", toPSML("\\_test\\_"));
+    Assert.assertEquals("__test__", toPSML("\\_\\_test\\_\\_"));
+    Assert.assertEquals("`test`", toPSML("\\`test\\`"));
+    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toPSML("\\!\\[Alt text\\](/path/to/img.jpg)"));
+    Assert.assertEquals("[test](http://example.net/)", toPSML("\\[test\\](http://example.net/)"));
+    Assert.assertEquals("&lt;http://example.org&gt;", toPSML("\\<http://example.org\\>"));
+  }
 
   @Test
   public void testDoubleEmphasis() {

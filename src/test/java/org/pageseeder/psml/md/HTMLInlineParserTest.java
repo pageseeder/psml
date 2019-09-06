@@ -15,16 +15,28 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.html.HTMLNode;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 
+import java.io.IOException;
+import java.util.List;
+
 public final class HTMLInlineParserTest {
+
+  @Test
+  public void testEscaping() {
+    Assert.assertEquals("*test*", toHTML("\\*test\\*"));
+    Assert.assertEquals("**test**", toHTML("\\*\\*test\\*\\*"));
+    Assert.assertEquals("_test_", toHTML("\\_test\\_"));
+    Assert.assertEquals("__test__", toHTML("\\_\\_test\\_\\_"));
+    Assert.assertEquals("`test`", toHTML("\\`test\\`"));
+    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toHTML("\\!\\[Alt text\\](/path/to/img.jpg)"));
+    Assert.assertEquals("[test](http://example.net/)", toHTML("\\[test\\](http://example.net/)"));
+    Assert.assertEquals("&lt;http://example.org&gt;", toHTML("\\<http://example.org\\>"));
+  }
 
   @Test
   public void testDoubleEmphasis() {
