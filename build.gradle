@@ -44,7 +44,7 @@ dependencies {
   )
 
   testRuntime (
-    'net.sf.saxon:Saxon-HE:9.7.0-2',   
+    'net.sf.saxon:Saxon-HE:9.9.1-5',
   )
 
 }
