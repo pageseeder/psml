@@ -27,6 +27,8 @@
   <section id="title">
     <fragment id="1">
       <heading level="1">Compare Ref</heading>
+      <heading level="2">Front matter 1</heading>
+      <heading level="3">Front matter 2</heading>
     </fragment>
   </section>
   <toc />

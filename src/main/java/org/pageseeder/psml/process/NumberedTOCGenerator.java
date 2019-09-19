@@ -5,6 +5,8 @@ package org.pageseeder.psml.process;
 
 import org.pageseeder.psml.toc.*;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+import org.pageseeder.xmlwriter.XML;
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 import java.io.IOException;
@@ -34,10 +36,19 @@ public class NumberedTOCGenerator {
   private Map<Long,DocumentTree> _addTrees = new HashMap<>();
 
   /**
+   * Whether the first toc element has been reached
+   */
+  private boolean _afterTocElement = false;
+
+  /**
+   * Number of elements currently open
+   */
+  private int _openElements = 0;
+
+  /**
    * Constructor
    *
    * @param tree            The tree for the TOC
-   * @param numbering       The numbering for the TOC
    */
   public NumberedTOCGenerator(PublicationTree tree) {
     this._publicationTree = tree;
@@ -90,6 +101,8 @@ public class NumberedTOCGenerator {
    */
   public void toXML(XMLWriter xml) throws IOException {
     xml.openElement("toc-tree", true);
+    this._afterTocElement = false;
+    this._openElements = 0;
     DocumentTree root = this._publicationTree.root();
     if (root != null) {
       xml.attribute("title", root.title());
@@ -144,7 +157,11 @@ public class NumberedTOCGenerator {
       Map<Long,Integer> doccount, Integer count, List<String> ancestors) throws IOException {
     Element element = part.element();
     // ignore paragraphs, transclusion end and toc marker
-    if (element instanceof Paragraph || element instanceof TransclusionEnd || element instanceof Toc) return;
+    if (element instanceof Paragraph || element instanceof TransclusionEnd) return;
+    if (element instanceof Toc) {
+      this._afterTocElement = true;
+      return;
+    }
     boolean toNext = false;
     Long next = null;
     DocumentTree nextTree = null;
@@ -192,7 +209,8 @@ public class NumberedTOCGenerator {
     for (Part<?> r : part.parts()) {
       toXML(xml, id, level+1, r, doccount, count, ancestors);
     }
-    if (!Reference.Type.TRANSCLUDE.equals(refType)) {
+    if (!Reference.Type.TRANSCLUDE.equals(refType) && this._openElements > 0) {
+      _openElements--;
       xml.closeElement();
     }
   }
@@ -207,6 +225,8 @@ public class NumberedTOCGenerator {
    * @throws IOException if problem writing XML
    */
   public void partToXML(XMLWriter xml, int level,boolean children) throws IOException {
+    if (!this._afterTocElement) return;
+    _openElements++;
     xml.openElement("toc-part", children);
     xml.attribute("level", level);
   }
@@ -226,6 +246,8 @@ public class NumberedTOCGenerator {
    */
   public void referenceToXML(XMLWriter xml, int level, Reference ref, long treeid, int count,
       DocumentTree target, boolean children) throws IOException {
+    if (!this._afterTocElement) return;
+    _openElements++;
     xml.openElement("toc-part", children);
     xml.attribute("level", level);
     // if display="document" use title from target document
@@ -264,6 +286,8 @@ public class NumberedTOCGenerator {
    * @throws IOException if problem writing XML
    */
   public void headingToXML(XMLWriter xml, int level, Heading head, long treeid, int count, boolean children) throws IOException {
+    if (!this._afterTocElement) return;
+    _openElements++;
     xml.openElement("toc-part", children);
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(head.title())) {
