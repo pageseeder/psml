@@ -161,6 +161,10 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startDocument(attributes);
     } else if (isElement("toc")) {
       this._expander.addLeaf(new Toc());
+      // if not inside a transclusion reset heading level to 1 so front matter doesn't affect levels
+      if (!hasAncestor("blockxref") && this.currentHeading != null) {
+        this.currentHeading = Heading.untitled(1, DEFAULT_FRAGMENT, DEFAULT_FRAGMENT, 1);
+      }
     } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
     } else if (isElement("property")) {
