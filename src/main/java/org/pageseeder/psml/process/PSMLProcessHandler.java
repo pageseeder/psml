@@ -1103,8 +1103,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
         src = this.sourceFile.getName();
         tgt = href;
       }
-      throw new SAXException("Reference loop detected when resolving XRef from " + src + " to "
-          + tgt + " (see Dev > References check for " + root + ").");
+      String error = "Reference loop detected when resolving XRef from " + src + " to "
+          + tgt + " (see Dev > References check for " + root + ").";
+      if (this.failOnError) {
+        throw new SAXException(error);
+      } else {
+        this.logger.error(error);
+      }
     } catch (TooDeepException ex) {
       String src, tgt;
       try {

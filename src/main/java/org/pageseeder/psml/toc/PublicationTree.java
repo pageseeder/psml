@@ -501,7 +501,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   private void toXML(XMLWriter xml, long id, int level, Part<?> part, Integer count, TOCState state) throws IOException {
     Element element = part.element();
     // ignore paragraphs
-    if (element instanceof TransclusionEnd) return;
+    if (element instanceof TransclusionEnd || element instanceof Toc) return;
     boolean output = (state.trees == null || state.trees.contains(id)) &&
         (state.cposition == -1 || state.cposition == count);
     boolean toNext = false;

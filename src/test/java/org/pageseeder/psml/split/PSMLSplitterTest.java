@@ -151,6 +151,9 @@ public class PSMLSplitterTest {
         Assert.assertTrue("Expected file does not exist:\n" + actual_file.getAbsolutePath() + "\n", actual_file.exists());
         String expected_cont = new String (Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
         String actual_cont = new String (Files.readAllBytes(actual_file.toPath()), StandardCharsets.UTF_8);
+        // normalize EOL chars
+        expected_cont = expected_cont.replaceAll("\\r\\n", "\n");
+        actual_cont = actual_cont.replaceAll("\\r\\n", "\n");
         Assert.assertEquals("Expected file does not match:\n" + actual_file.getAbsolutePath() + "\n", expected_cont, actual_cont);
       } else {
         Assert.assertTrue("Expected file does not exist:\n" + actual_file.getAbsolutePath() + "\n", actual_file.exists());
