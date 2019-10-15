@@ -323,6 +323,7 @@ public class ProcessTest {
 
   @Test
   public void testStripReverseXRefs() throws IOException, ProcessException {
+    String filename = "ref_0.psml";
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -338,20 +339,31 @@ public class ProcessTest {
     p.setPreserveSrc(false);
     p.setSrc(copy);
     p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude,math");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
     Strip strip = new Strip();
     strip.setStripReverseXRefs(true);
     p.setStrip(strip);
     p.process();
 
-    // check result
-    File result = new File(DEST_FOLDER + "/content/content_3.psml");
+    // check xref result
+    File result = new File(dest, filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
     Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
     Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
 
+    // check document result
+    result = new File(dest, "/content/content_3.psml");
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
+    Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
+
     // check metadata result
-    result = new File(DEST_FOLDER + "/META-INF/images/diagram1.jpg.psml");
+    result = new File(dest,"/META-INF/images/diagram1.jpg.psml");
     xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
     Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
