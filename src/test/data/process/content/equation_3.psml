@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <document id="21937" schemaversion="0.12" version="current" level="portable">
-  <fragmentinfo/>
+  <fragmentinfo>
+    <locator fragment="mathml">
+      <reversexrefs>
+        <reversexref uriid="21926" href="../ref_3.psml" frag="3"
+                     urititle="Ref 3" mediatype="application/vnd.pageseeder.psml+xml"
+                     documenttype="references" id="394561" type="none"
+                     forwardtype="math" forwarddisplay="document" forwardfrag="2" />
+      </reversexrefs>
+    </locator>
+  </fragmentinfo>
   <metadata/>
   <section id="mathml">
     <media-fragment id="mathml" mediatype="application/mathml+xml">

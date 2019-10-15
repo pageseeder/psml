@@ -1173,7 +1173,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     // put it back
     this.elements.push(dad);
     if ((this.strip.stripReverseXRefs() || this.strip.stripAllXRefs()) && "reversexrefs".equals(elemName) &&
-        ("documentinfo".equals(dad) || "fragmentinfo".equals(granddad)))
+        ("documentinfo".equals(dad) || "locator".equals(dad)))
       return true;
     // strip element in docinfo or fraginfo
     // check values
@@ -1184,7 +1184,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         return true;
       if (this.strip.stripDocumentInfoTitle() && "displaytitle".equals(elemName))
         return true;
-    } else if ("fragmentinfo".equals(granddad) && "locator".equals(dad)) {
+    } else if ("locator".equals(dad)) {
       if (this.strip.stripFragmentInfoLabels() && "labels".equals(elemName))
         return true;
     }
