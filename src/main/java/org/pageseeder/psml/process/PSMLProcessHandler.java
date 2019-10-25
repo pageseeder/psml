@@ -846,7 +846,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
     // convert ascii?
     if (this.convertAsciiMath && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
-      write("<xref frag=\"media\" type=\"math\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
+      write("<xref frag=\"media\" type=\"math\" config=\"mathml\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
       write(AsciiMathConverter.convert(this.convertContent.toString()));
       write("</media-fragment></xref>");
       this.convertContent = null;
