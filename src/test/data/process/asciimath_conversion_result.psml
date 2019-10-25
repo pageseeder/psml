@@ -2,7 +2,7 @@
 <document id="1" level="processed">
   <section id="1">
     <fragment id="1">
-      <para>You can use the following ASCIIMathML constructs: <xref frag="media" type="math">
+      <para>You can use the following ASCIIMathML constructs: <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -66,7 +66,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Operation symbols <xref frag="media" type="math">
+      <para>Operation symbols <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -96,7 +96,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Relation symbols <xref frag="media" type="math">
+      <para>Relation symbols <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -122,7 +122,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Logical symbols <xref frag="media" type="math">
+      <para>Logical symbols <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -162,7 +162,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Miscellaneous symbols <xref frag="media" type="math">
+      <para>Miscellaneous symbols <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -194,7 +194,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Standard functions <xref frag="media" type="math">
+      <para>Standard functions <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -248,7 +248,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Grouping brackets <xref frag="media" type="math">
+      <para>Grouping brackets <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -274,7 +274,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Arrows <xref frag="media" type="math">
+      <para>Arrows <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -291,7 +291,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Accents <xref frag="media" type="math">
+      <para>Accents <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -323,7 +323,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Font commands <xref frag="media" type="math">
+      <para>Font commands <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -349,7 +349,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para>Matrices <xref frag="media" type="math">
+      <para>Matrices <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -401,7 +401,7 @@
           </math>
         </media-fragment>
       </xref></para>
-    <para>Greek letters <xref frag="media" type="math">
+    <para>Greek letters <xref frag="media" type="math" config="mathml">
       <media-fragment id="media" mediatype="application/mathml+xml">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
           <mstyle displaystyle="true">
@@ -444,7 +444,7 @@
     </xref></para>
     </fragment>
     <fragment id="2">
-      <para><xref frag="media" type="math">
+      <para><xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
@@ -481,7 +481,7 @@
           </math>
         </media-fragment>
       </xref></para>
-      <para><xref frag="media" type="math">
+      <para><xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <mstyle displaystyle="true">
