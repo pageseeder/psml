@@ -111,14 +111,24 @@
                   
                     <!-- output container end matter -->
                     <section id="content">
-                      <fragment id="3">
-                        <xsl:for-each-group select="current-group()"
-                            group-starting-with="*[config:split-document(.) or config:continue-container(.)]">
-                          <xsl:if test="position() = last() and $endmatter">
-                             <xsl:apply-templates select="current-group()" />
-                          </xsl:if>
-                        </xsl:for-each-group>
-                      </fragment>
+                      <xsl:for-each-group select="current-group()"
+                          group-starting-with="*[config:split-document(.) or config:continue-container(.)]">
+                        <xsl:if test="position() = last() and $endmatter">
+                          <xsl:for-each-group select="current-group()"
+                                              group-starting-with="*[config:split-fragment(.)]">
+                            <xsl:variable name="config-frag" select="config:split-fragment(current-group()[1])" />
+                            <fragment id="{position() + 2}">
+                              <xsl:if test="$config-frag/@type != ''">
+                                <xsl:attribute name="type" select="$config-frag/@type"/>
+                              </xsl:if>
+                              <xsl:if test="$config-frag/@labels != ''">
+                                <xsl:attribute name="labels" select="$config-frag/@labels"/>
+                              </xsl:if>
+                              <xsl:apply-templates select="current-group()" />
+                            </fragment>
+                          </xsl:for-each-group>
+                        </xsl:if>
+                      </xsl:for-each-group>
                     </section>
                   </document>
                 </xsl:otherwise>

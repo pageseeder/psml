@@ -55,11 +55,11 @@
       <heading level="3" numbered="true">Heading D2</heading>
       <para>D2 content</para>
       <heading level="4" numbered="true">Heading D2-1</heading>
-      <para>D2-1 content</para>>
+      <para>D2-1 content</para>
       <block label="block5">
         <para>Definition end 1</para>
       </block>
-      <para>Definition end 2</para>
+      <para numbered="true" indent="1">Definition end 2</para>
       <block label="block2">
         <heading level="2">Heading E</heading>
       </block>

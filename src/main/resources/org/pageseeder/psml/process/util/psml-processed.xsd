@@ -1259,7 +1259,7 @@
   <xs:element name="heading">
     <xs:complexType mixed="true">
       <xs:group ref="character-style-group" minOccurs="0" maxOccurs="unbounded" />
-      <xs:attribute name="level" type="xs:positiveInteger">
+      <xs:attribute name="level" type="xs:positiveInteger" use="required">
         <xs:annotation>
           <xs:documentation>The level of the heading.</xs:documentation>
         </xs:annotation>
