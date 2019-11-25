@@ -184,9 +184,11 @@ public final class XSLTTransformer {
         throw new ProcessException("Failed to copy file "+from.getAbsolutePath()+" to "+to.getAbsolutePath(), ex);
       }
     } else {
-      // move file
-      if (!from.renameTo(to))
-        throw new ProcessException("Failed to move file "+from.getAbsolutePath()+" to "+to.getAbsolutePath());
+      try {
+        java.nio.file.Files.move(from.toPath(), to.toPath());
+      } catch (IOException ex) {
+        throw new ProcessException("Failed to move file "+from.getAbsolutePath()+" to "+to.getAbsolutePath(), ex);
+      }
     }
   }
 

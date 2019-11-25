@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.split;
 
+import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.util.XSLT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,7 @@ public final class PSMLSplitter {
     String mediaFolderName = this._builder.media() == null ? "images" : this._builder.media();
     File mediaFolder = new File(source.getParentFile(), mediaFolderName);
     if (mediaFolder.exists()) {
-      mediaFolder.renameTo(new File(destination, mediaFolderName));
+      java.nio.file.Files.move(mediaFolder.toPath(), new File(destination, mediaFolderName).toPath());
     }
 
     // Initiate parameters

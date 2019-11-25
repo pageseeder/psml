@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -670,8 +671,11 @@ public final class Process {
       }
     } else {
       // move file
-      if (!from.renameTo(to))
-        throw new ProcessException("Failed to move file "+from.getAbsolutePath()+" to "+to.getAbsolutePath());
+      try {
+        java.nio.file.Files.move(from.toPath(), to.toPath());
+      } catch (IOException ex) {
+        throw new ProcessException("Failed to move file "+from.getAbsolutePath()+" to "+to.getAbsolutePath(), ex);
+      }
     }
   }
 
