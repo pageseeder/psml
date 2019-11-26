@@ -133,7 +133,7 @@ public class HTMLBlockParserTest {
     List<String> list1 = Arrays.asList(" 1986. What a great season.");
     List<String> list2 = Arrays.asList(" 1986\\. What a great season.");
     Assert.assertEquals("<ol start=\"1986\"><li>What a great season.</li></ol>", toHTML(list1));
-    Assert.assertEquals("<p>1986\\. What a great season.</p>", toHTML(list2));
+    Assert.assertEquals("<p>1986. What a great season.</p>", toHTML(list2));
   }
 
   @Test

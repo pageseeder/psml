@@ -134,7 +134,7 @@ public class BlockParserTest {
     List<String> list1 = Arrays.asList(" 1986. What a great season.");
     List<String> list2 = Arrays.asList(" 1986\\. What a great season.");
     Assert.assertEquals("<nlist start=\"1986\"><item>What a great season.</item></nlist>", toPSML(list1));
-    Assert.assertEquals("<para>1986\\. What a great season.</para>", toPSML(list2));
+    Assert.assertEquals("<para>1986. What a great season.</para>", toPSML(list2));
   }
 
   @Test
