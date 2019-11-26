@@ -97,7 +97,7 @@ public class InlineParser {
   /**
    * Define the pattern to match escaped characters in markdown.
    */
-  private static final Pattern ESCAPED = Pattern.compile("\\\\(-|`|\\*|_|\\[|\\]|\\\\|!|<|>)");
+  private static final Pattern ESCAPED = Pattern.compile("\\\\(-|`|\\*|_|\\[|\\]|\\\\|!|<|>|\\.)");
 
   public InlineParser() {
   }
@@ -237,7 +237,7 @@ public class InlineParser {
   }
 
   /**
-   * Removes the first '\' from '\-', '\`', '\*', '\_', '\[', '\]', '\\', '\!', '\<', '\>'.
+   * Removes the first '\' from '\-', '\`', '\*', '\_', '\[', '\]', '\\', '\!', '\<', '\>', '\.'.
    *
    * @param text  the original text
    *
