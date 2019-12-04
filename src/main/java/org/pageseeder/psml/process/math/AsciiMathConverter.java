@@ -1,11 +1,9 @@
 package org.pageseeder.psml.process.math;
 
 import org.pageseeder.psml.process.util.WrappingReader;
+import org.pageseeder.psml.util.PSCache;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -14,6 +12,8 @@ public class AsciiMathConverter {
   private static final String JS_SCRIPT = "/org/pageseeder/psml/process/math/ASCIIMathML.js";
 
   private static Invocable SCRIPT = null;
+
+  private static PSCache<String, String> cache = new PSCache<>(100);
 
   public static String convert(String asciimath) {
     // sanity check
@@ -24,34 +24,43 @@ public class AsciiMathConverter {
     if (am.charAt(0) == '`' && am.charAt(am.length()-1) == '`')
       am = am.substring(1, am.length()-1);
 
-    // invoke the function named "parse" with the ascii math as the argument
-    try {
-      return script().invokeFunction("parse", am).toString();
-    } catch (ScriptException | NoSuchMethodException ex) {
-      System.err.println("Failed to run ASCIIMath to MathML JS script: "+ex.getMessage());
-      ex.printStackTrace();
-      return "Failed to run ASCIIMath to MathML JS script";
+    // check cache
+    String result = cache.get(am);
+    if (result == null) {
+
+      // invoke the function named "parse" with the ascii math as the argument
+      try {
+        result = script().invokeFunction("parse", am).toString();
+        cache.put(am, result);
+      } catch (ScriptException | NoSuchMethodException | IOException ex) {
+        System.err.println("Failed to run ASCIIMath to MathML JS script: " + ex.getMessage());
+        ex.printStackTrace();
+        return "Failed to run ASCIIMath to MathML JS script";
+      }
     }
+    return result;
   }
 
-  private static Invocable script() {
+  private static Invocable script() throws ScriptException, IOException {
     if (SCRIPT == null) {
       // load script
       ScriptEngineManager manager = new ScriptEngineManager();
       ScriptEngine engine = manager.getEngineByName("nashorn");
+      Compilable cengine = (Compilable) engine;
 
       // evaluate JavaScript code
       try {
-        engine.eval(new WrappingReader(
+        CompiledScript cscript = cengine.compile(new WrappingReader(
             new InputStreamReader(AsciiMathConverter.class.getResourceAsStream(JS_SCRIPT)),
             prefix(), "var parse = function(str) {asciimath.initSymbols(); return asciimath.parseMath(str, false).toXML();};"));
+        cscript.eval();
+        // create an Invocable object by casting the script engine object
+        SCRIPT = (Invocable) cscript.getEngine();
       } catch (ScriptException | IOException ex) {
         System.err.println("Failed to load ASCIIMath to MathML JS script: "+ex.getMessage());
-        ex.printStackTrace();
+        throw ex;
       }
 
-      // create an Invocable object by casting the script engine object
-      SCRIPT = (Invocable) engine;
     }
     return SCRIPT;
   }
