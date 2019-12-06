@@ -6,6 +6,8 @@ import org.pageseeder.psml.util.PSCache;
 import javax.script.*;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.Map;
 
 public class AsciiMathConverter {
 
@@ -13,7 +15,7 @@ public class AsciiMathConverter {
 
   private static Invocable SCRIPT = null;
 
-  private static PSCache<String, String> cache = new PSCache<>(100);
+  private static Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(100));
 
   public static String convert(String asciimath) {
     // sanity check
