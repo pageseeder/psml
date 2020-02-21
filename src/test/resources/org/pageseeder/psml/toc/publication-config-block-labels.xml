@@ -1,21 +1,29 @@
 <?xml version="1.0"?>
 <publication-config>
   <toc block-labels="table-caption" />
-  
-  <numbering skipped-levels="1">
+
+  <levels para-relative-to="6" />
+
+  <numbering skipped-levels="strip">
     <schemes>
       <!-- type="decimal|upperalpha|loweralpha|upperroman|lowerroman" -->
-      <scheme level="1" type="decimal" format="[1.]" />
-      <scheme level="2" type="decimal" format="[1.][2.]" />
-      <scheme level="2" type="decimal" format="[Table 1-][2]" block-label="table-caption" element="para"/>
-      <scheme level="2" type="upperalpha" format="[Fig 1-][2]" block-label="figure-caption" element="para" />
-      <scheme level="3" type="decimal" format="[1.][2.][3.]" element="para" />
-      <scheme level="4" type="decimal" format="[1.][2.][3.][4.]" element="para" />
-      <scheme level="5" type="loweralpha" format="[(5)]" />
-      <scheme level="6" type="lowerroman" format="[(6)]" />
-      <scheme level="7" type="upperalpha" format="[(7)]" />
-      <scheme level="8" type="upperroman" format="[(8)]" />
-      <scheme level="9" type="loweralpha" format="[9]" />
+      <scheme level="1" type="decimal"    format="[1.]" />
+      <scheme level="1" type="loweralpha" format="[1.]" block-label="issue" />
+      <scheme level="2" type="decimal"    format="[1.][2.]" />
+      <scheme level="2" type="loweralpha" format="[2.]" block-label="issue" />
+      <scheme level="3" type="decimal"    format="[1.][2.][3.]" element="all" />
+      <scheme level="3" type="loweralpha" format="[2.][3.]" block-label="issue" />
+      <scheme level="4" type="decimal"    format="[1.][2.][3.][4.]" element="all" />
+      <scheme level="4" type="loweralpha" format="[2.][3.][4.]" block-label="issue" />
+      <scheme level="5" type="decimal"    format="[1.][2.][3.][4.][5.]" />
+      <scheme level="6" type="decimal"    format="[1.][2.][3.][4.][5.][6.]" />
+      <scheme level="7" type="loweralpha" format="[(7)]" element="para" />
+      <scheme level="8" type="lowerroman" format="[(8)]" element="para" />
+      <scheme level="8" type="decimal"    format="[Table 1-][8]" block-label="table-caption" element="para"/>
+      <scheme level="8" type="upperalpha" format="[Fig 1-][8]" block-label="figure-caption" element="para" />
+      <scheme level="9" type="upperroman" format="[(9)]" element="para" />
+      <scheme level="10" type="upperalpha" format="[(10)]" element="para" />
+
     </schemes>
   </numbering>
 </publication-config>

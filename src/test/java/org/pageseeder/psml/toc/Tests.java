@@ -154,6 +154,10 @@ public class Tests {
     return heading(1, title, fragment, origfrag, index, numbered, prefix, parts);
   }
 
+  public static Part<Heading> h1(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, String blocklabel, @NonNull Part<?>... parts) {
+    return heading(1, title, fragment, origfrag, index, numbered, prefix, blocklabel, parts);
+  }
+
   public static Part<Heading> h2(String title, String fragment, int index, boolean numbered, String prefix) {
     return heading(2, title, fragment, index, numbered, prefix);
   }
@@ -170,6 +174,10 @@ public class Tests {
     return heading(2, title, fragment, origfrag, index, numbered, prefix, parts);
   }
 
+  public static Part<Heading> h2(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, String blocklabel, @NonNull Part<?>... parts) {
+    return heading(2, title, fragment, origfrag, index, numbered, prefix, blocklabel, parts);
+  }
+
   public static Part<Heading> h3(String title, String fragment, int index, boolean numbered, String prefix) {
     return heading(3, title, fragment, index, numbered, prefix);
   }
@@ -180,6 +188,10 @@ public class Tests {
 
   public static Part<Heading> h3(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return heading(3, title, fragment, origfrag, index, numbered, prefix, parts);
+  }
+
+  public static Part<Heading> h3(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, String blocklabel, @NonNull Part<?>... parts) {
+    return heading(3, title, fragment, origfrag, index, numbered, prefix, blocklabel, parts);
   }
 
   public static Part<Heading> h4(String title, String fragment, int index, boolean numbered, String prefix) {
@@ -224,6 +236,10 @@ public class Tests {
 
   public static Part<Heading> heading(int level,  String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return new Part<>(new Heading(level, title, fragment, origfrag, index).numbered(numbered).prefix(prefix), parts);
+  }
+
+  public static Part<Heading> heading(int level,  String title, String fragment, String origfrag, int index, boolean numbered, String prefix, String blocklabel, @NonNull Part<?>... parts) {
+    return new Part<>(new Heading(level, title, fragment, origfrag, index).numbered(numbered).prefix(prefix).blocklabel(blocklabel), parts);
   }
 
   public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix) {

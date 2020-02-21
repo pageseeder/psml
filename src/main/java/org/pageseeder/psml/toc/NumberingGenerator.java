@@ -53,12 +53,11 @@ public final class NumberingGenerator {
    * @return the numbering prefix
    */
   public Prefix generateNumbering(int level, String element, String blocklabel) {
-    int found_level = (this.numberConfig != null) ? this.numberConfig.elementLevel(level, blocklabel, element) : 0;
-    if (found_level != 0) {
+    if (this.numberConfig != null && this.numberConfig.hasScheme(level, blocklabel, element)) {
       // if blocklabel not defined, use empty
-      String label = this.numberConfig.getNumberFormat(found_level, blocklabel) == null ? "" : blocklabel;
+      String label = this.numberConfig.getNumberFormat(level, blocklabel) == null ? "" : blocklabel;
       // add it to current levels
-      this.addNewLevel(found_level, label);
+      this.addNewLevel(level, label);
       // compute canonical numbering
       String canonical = canonicalLabel(label);
       // compute prefix

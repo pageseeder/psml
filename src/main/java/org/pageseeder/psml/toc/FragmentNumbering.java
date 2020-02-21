@@ -347,7 +347,7 @@ public final class FragmentNumbering implements Serializable {
     String p = target.prefix();
     Prefix pref = null;
     if (target.numbered() && number != null && Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
-      pref = number.generateNumbering(level, "heading", "");
+      pref = number.generateNumbering(level, "heading", target.blocklabel());
     }
     if (pref == null) {
       pref = new Prefix(p, null, level, null);
@@ -375,7 +375,7 @@ public final class FragmentNumbering implements Serializable {
     String p = h.prefix();
     Prefix pref = null;
     if (h.numbered() && number != null) {
-      pref = number.generateNumbering(level, "heading", "");
+      pref = number.generateNumbering(level, "heading", h.blocklabel());
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, level, null);
     }
