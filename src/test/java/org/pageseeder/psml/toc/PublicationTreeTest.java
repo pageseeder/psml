@@ -384,7 +384,7 @@ public final class PublicationTreeTest {
         .part(h1("X", "1", 1, true, "",
             p(2, "1a", 1, true, ""),
             p(2, "1b", 1, true, "", "table-caption"),
-            p(2, "1c", 1, true, ""),
+            p(1, "1c", 1, true, ""),
             p(2, "1d", 1, true, "", "table-caption"),
             p(2, "1e", 1, true, "", "figure-caption"),
             p(2, "1f", 1, true, "", "table-caption"),
@@ -431,12 +431,12 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-1-1-1",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"1000-1-1a-1","1.","(i)",8,"1.0.0.0.0.0.0.1.");
     assertHasPrefix(prefixes,"1000-1-1b-1",null,"Table 1-1",8,"1.0.0.0.0.0.0.1.");
-    assertHasPrefix(prefixes,"1000-1-1c-1","1.","(ii)",8,"1.0.0.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1000-1-1c-1","1.","(a)",7,"1.0.0.0.0.0.1.");
     assertHasPrefix(prefixes,"1000-1-1d-1",null,"Table 1-2",8,"1.0.0.0.0.0.0.2.");
-    assertHasPrefix(prefixes,"1000-1-1e-1",null,"Fig 1-A",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-1-1e-1",null,"Fig 1-A",8,"1.0.0.0.0.0.1.1.");
     assertHasPrefix(prefixes,"1000-1-1f-1",null,"Table 1-3",8,"1.0.0.0.0.0.0.3.");
     assertHasPrefix(prefixes,"1000-1-1g-1",null,"Table 1-4",8,"1.0.0.0.0.0.0.4.");
-    assertHasPrefix(prefixes,"1000-1-1h-1","1.(ii)","(I)",9,"1.0.0.0.0.0.0.2.1.");
+    assertHasPrefix(prefixes,"1000-1-1h-1","1.(a)","(I)",9,"1.0.0.0.0.0.1.0.1.");
     assertHasPrefix(prefixes,"1000-1-default",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"1001-1-1-1","1.","a.",2,"1.1.");
     assertHasPrefix(prefixes,"1001-1-2-1",null,"1.1.",3,"1.0.1.");
