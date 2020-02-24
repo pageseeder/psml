@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?stylesheet format="schema" xsl-rootelement="root"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="1.1">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="1.2">
 
   <xs:annotation>
     <xs:documentation>This is the XML schema for PSML document processed content.</xs:documentation>
@@ -361,7 +361,7 @@
   -->
   <xs:element name="property">
     <xs:complexType>
-      <xs:sequence>
+      <xs:choice>
         <xs:element name="value" minOccurs="0" maxOccurs="unbounded" type="xs:string">
           <xs:annotation>
             <xs:documentation>The property's values (if multiple)</xs:documentation>
@@ -369,7 +369,14 @@
         </xs:element>
         <xs:element ref="xref" minOccurs="0" maxOccurs="unbounded" />
         <xs:element ref="markdown" minOccurs="0" maxOccurs="1" />
-      </xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="heading" />
+          <xs:element ref="para" />
+          <xs:element ref="list" />
+          <xs:element ref="nlist" />
+          <xs:element ref="preformat" />
+        </xs:choice>
+      </xs:choice>
       <xs:attribute name="title" type="xs:string">
         <xs:annotation>
           <xs:documentation>The property's title (for UI).</xs:documentation>
@@ -387,7 +394,7 @@
       </xs:attribute>
       <xs:attribute name="datatype" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The property's data type (e.g. date, xref or markdown).</xs:documentation>
+          <xs:documentation>The property's data type (e.g. date, xref, markup or markdown).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="count" default="1">

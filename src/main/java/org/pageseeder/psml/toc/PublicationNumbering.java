@@ -261,43 +261,22 @@ public final class PublicationNumbering {
   }
 
   /**
-   * Finds the level that numbering for an element is defined at.
-   * For non-empty blocklabel it ignores the given level and searches all levels.
-   * If none found for blocklabel it, returns the result for no blocklabel.
+   * Checks if a numbering scheme has been defined for these parameters
    *
    * @param level      the level of the scheme
    * @param blocklabel the parent block label name
-   * @param name       the element name
+   * @param name       the element name (heading, para, any)
    *
-   * @return level element was found at
+   * @return <code>true</code> if there is a matching scheme
    */
-  public int elementLevel(int level, String blocklabel, String name) {
-    String key = "";
-    // search for blocklabel at any level
-    if (!"".equals(blocklabel)) {
-      Set<String> keys = this.elements.keySet();
-      String suffix = "-" + blocklabel;
-      for (String k : keys) {
-        if (k.endsWith(suffix)) {
-          if ("".equals(key)) {
-            key = k;
-          // if found twice it is invalid
-          } else {
-            key = "";
-            break;
-          }
-        }
-      }
-    } else {
-      key = level + "-" + blocklabel;
-    }
+  public boolean hasScheme(int level, String blocklabel, String name) {
+    String key = level + "-" + blocklabel;
     ElementName element = this.elements.get(key);
     if (element == null) {
       key = level + "-";
       element = this.elements.get(key);
     }
-    int l = Integer.parseInt(key.substring(0, key.indexOf('-')));
-    return (ElementName.ANY.equals(element) || (element != null && element.toString().equals(name))) ? l : 0;
+    return (ElementName.ANY.equals(element) || (element != null && element.toString().equals(name))) ;
   }
 
   /**

@@ -53,12 +53,11 @@ public final class NumberingGenerator {
    * @return the numbering prefix
    */
   public Prefix generateNumbering(int level, String element, String blocklabel) {
-    int found_level = (this.numberConfig != null) ? this.numberConfig.elementLevel(level, blocklabel, element) : 0;
-    if (found_level != 0) {
+    if (this.numberConfig != null && this.numberConfig.hasScheme(level, blocklabel, element)) {
       // if blocklabel not defined, use empty
-      String label = this.numberConfig.getNumberFormat(found_level, blocklabel) == null ? "" : blocklabel;
+      String label = this.numberConfig.getNumberFormat(level, blocklabel) == null ? "" : blocklabel;
       // add it to current levels
-      this.addNewLevel(found_level, label);
+      this.addNewLevel(level, label);
       // compute canonical numbering
       String canonical = canonicalLabel(label);
       // compute prefix
@@ -93,13 +92,28 @@ public final class NumberingGenerator {
         } else if (levels.size() + 1 == level) {
           levels.push(1);
         } else {
-          while (levels.size() > level) levels.pop();
+          while (levels.size() > level) {
+            // reset numbering if default block
+            if ("".equals(label)) {
+              levels.pop();
+            // reset numbering if block format contains this level
+            } else {
+              String format = this.numberConfig.getNumberFormat(levels.size(), label);
+              if (format == null || format.matches("\\[(.*?)" + level + "(.*?)\\]")) {
+                levels.pop();
+              } else {
+                break;
+              }
+            }
+          };
           while (levels.size() < level) {
             // if skipped levels set to one and not a block stack push 1
             levels.push(this.numberConfig.getSkippedLevels() == PublicationNumbering.SkippedLevels.ONE &&
                 levels.size() < level - 1 && "".equals(label) ? 1 : 0);
           }
-          levels.push(levels.pop() + 1);
+          if (levels.size() == level) {
+            levels.push(levels.pop() + 1);
+          }
         }
       }
     }

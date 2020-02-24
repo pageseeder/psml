@@ -172,7 +172,15 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
+  <!-- adjust relative xref targets to other documents -->
+  <xsl:template match="xref[not(starts-with(@href,'#') or starts-with(@href,'/') or @external='true')]">
+    <xref href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', @href)}">
+      <xsl:copy-of select="@*[name()!='href']" />
+      <xsl:value-of select="." />
+    </xref>
+  </xsl:template>
+
   <!-- remove anchors -->
   <xsl:template match="anchor">
     <xsl:apply-templates select="node()" />
