@@ -283,7 +283,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     String fragment = getString(attributes, "id");
     this._fragmentIDs.push(fragment);
     // Only if not within a transclusion
-    if (!hasAncestor("blockxref")) {
+    if (!hasAncestor("blockxref") && !hasAncestor("xref")) { // xref with math type can be transcluded
       this.fragment = fragment;
       this._tree.putFragmentLevel(this.fragment, this.fragmentLevel);
       this.counter = 1;
