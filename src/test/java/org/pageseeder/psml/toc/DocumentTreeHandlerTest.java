@@ -218,7 +218,8 @@ public final class DocumentTreeHandlerTest {
                 h3("Sub-part 1", "2", 3,
                     tend("2"),
                     ref(3, "Division a", "2", 186252L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
-                    h4("Division a", "2", 5, tend("2"))))));
+                    h4("Division a", "2", 5, tend("2")))),
+             h2("Part B", "2", 7)));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", Collections.emptyList(), p,
         Collections.emptyMap(), Collections.emptyMap());
@@ -237,7 +238,8 @@ public final class DocumentTreeHandlerTest {
             h3("Sub-part 1", "2", 3,
                 tend("2"),
                 ref(3, "Division a", "2", 186252L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
-                h4("Division a", "2", 5, tend("2")))));
+                h4("Division a", "2", 5, tend("2")))),
+         h2("Part B", "2", 7));
     Tests.print(tree);
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(6, 2, "Assembly", "", Collections.emptyList(),
