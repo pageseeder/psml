@@ -311,6 +311,7 @@ public class Tests {
       Assert.assertEquals("Document levels don't match", p.level(), q.level());
       Assert.assertEquals("Document prefixes don't match", p.prefix(), q.prefix());
       Assert.assertEquals("Document numbereds don't match", p.numbered(), q.numbered());
+      Assert.assertEquals("Document labels don't match", p.labels(), q.labels());
       Assert.assertEquals("Document parts size don't match", p.parts().size(), q.parts().size());
       Assert.assertEquals("Forward references don't match", p.listForwardReferences(), q.listForwardReferences());
       Assert.assertEquals("Reverse references don't match", p.listReverseReferences(), q.listReverseReferences());
