@@ -21,7 +21,7 @@
   </section>
   <toc />
   <section id="xrefs">
-    <xref-fragment id="2">
+    <fragment id="2">
       <blockxref id="939311" title="" frag="default" level="1"
         reversefrag="2" reversetitle="References" reverselink="true"
         reversetype="none" display="document" type="transclude" uriid="186250"
@@ -49,12 +49,12 @@
           <fragmentinfo />
           <metadata />
           <section id="title">
-            <fragment id="1">
+            <fragment id="2">
               <heading level="1">Part A</heading>
             </fragment>
           </section>
           <section id="content">
-            <fragment id="2">
+            <fragment id="1">
               <para />
             </fragment>
           </section>
@@ -88,12 +88,12 @@
           <fragmentinfo />
           <metadata />
           <section id="title">
-            <fragment id="1">
+            <fragment id="2">
               <heading level="1">Sub-part 1</heading>
             </fragment>
           </section>
           <section id="content">
-            <fragment id="2">
+            <fragment id="1">
               <para />
             </fragment>
           </section>
@@ -127,17 +127,19 @@
           <fragmentinfo />
           <metadata />
           <section id="title">
-            <fragment id="1">
+            <fragment id="2">
               <heading level="1">Division a</heading>
             </fragment>
           </section>
           <section id="content">
-            <fragment id="2">
+            <fragment id="1">
               <para />
             </fragment>
+            <properties-fragment id="3" />
           </section>
         </document>
       </blockxref>
-    </xref-fragment>
+      <heading level="2">Part B</heading>
+    </fragment>
   </section>
 </document>

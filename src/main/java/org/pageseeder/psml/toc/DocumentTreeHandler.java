@@ -84,6 +84,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private boolean ignore = false;
 
   /**
+   * If larger than 0 then inside a media-fragment
+   * **/
+  private int inMediaFragment = 0;
+
+  /**
    * The content tree being built.
    */
   private final DocumentTree.Builder _tree;
@@ -151,11 +156,14 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void startElement(String element, Attributes attributes) {
-    if (this.ignore) return;
+    if (isElement("media-fragment")) {
+      this.inMediaFragment++;
+    }
+    if (this.ignore || this.inMediaFragment > 0) return;
     if ("blockxref".equals(element)) {
       this._blockxrefs.push("transclude".equals(attributes.getValue("type")));
     }
-    if (isElement("fragmentinfo") || isElement("metadata") || isElement("media-fragment")) {
+    if (isElement("fragmentinfo") || isElement("metadata")) {
       this.ignore = true;
     } else if (isElement("document")) {
       startDocument(attributes);
@@ -362,10 +370,12 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void endElement(String element) {
-    if (isElement("fragmentinfo") || isElement("metadata") || isElement("media-fragment")) {
+    if ((isElement("fragmentinfo") || isElement("metadata")) && this.inMediaFragment == 0) {
       this.ignore = false;
+    } else if (isElement("media-fragment")) {
+      this.inMediaFragment--;
     }
-    if (this.ignore) return;
+    if (this.ignore || this.inMediaFragment > 0) return;
     if ("placeholder".equals(element) && this.placeholderContent != null) {
       newBuffer();
       append(this.placeholderContent.toString());
@@ -437,7 +447,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
         this._expander.addLeaf(new TransclusionEnd(this.fragment, this._fragmentIDs.peek()));
       }
       this._blockxrefs.pop();
-    } else if ("fragment".equals(element)) {
+    } else if ("fragment".equals(element) || "xref-fragment".equals(element) || "properties-fragment".equals(element)) {
       this._fragmentIDs.pop();
     } else if ("document".equals(element) && !hasAncestor("blockxref")) {
       this._tree.parts(this._expander.parts());

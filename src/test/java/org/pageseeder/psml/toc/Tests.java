@@ -274,6 +274,7 @@ public class Tests {
     Assert.assertEquals("Heading levels don't match", e.level(), f.level());
     Assert.assertEquals("Heading titles don't match", e.title(), f.title());
     Assert.assertEquals("Heading fragments don't match", e.fragment(), f.fragment());
+    Assert.assertEquals("Heading original fragments don't match", e.originalFragment(), f.originalFragment());
     Assert.assertEquals("Heading prefixes don't match", e.prefix(), f.prefix());
     Assert.assertEquals("Heading indexes don't match", e.index(), f.index());
   }

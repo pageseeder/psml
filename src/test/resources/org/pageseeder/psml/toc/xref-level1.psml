@@ -81,6 +81,7 @@
     <media-fragment id="5" mediatype="application/xml">
       <document id="199324" schemaversion="0.11" date="2018-01-24T09:41:15+11:00"
                 version="current" level="portable">
+        <media-fragment />
         <documentinfo>
           <uri id="199324" scheme="https" host="ps.pageseeder.com" port="443"
                path="/ps/test/philipr2/documents/word3/Test%20doc%201.psml"
