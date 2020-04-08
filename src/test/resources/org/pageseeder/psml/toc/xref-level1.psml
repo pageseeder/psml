@@ -52,12 +52,50 @@
       <property name="link-text" title="Link text" value="My link" />
     </properties-fragment>
     <fragment id="4">
-      <para indent="1">Ignore</para>
+      <para indent="1">Ignore <xref id="1208156" frag="1" reversefrag="1-1" reversetitle="This section describes the functional re…" reverselink="true" reversetype="none" display="document" config="asciimath" type="math" uriid="348835" href="_local/documents/asciimath/asciimath-009.psml" urititle="Simple" mediatype="application/vnd.pageseeder.psml+xml" documenttype="asciimath">
+        <locator id="528421" fragment="348835-1">
+          <labels>frag1</labels>
+          <reversexrefs>
+            <reversexref uriid="348275" href="_local/documents/system_report/components/system_report-10.psml" frag="1-1" urititle="Functionality" mediatype="application/vnd.pageseeder.psml+xml" documenttype="component" id="1208156" title="This section describes the functional re…" type="none" forwardtype="math" forwarddisplay="document" forwardfrag="1"/>
+          </reversexrefs>
+        </locator>
+        <media-fragment id="348835-1" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mstyle displaystyle="true">
+              <mi>y</mi>
+              <mo>=</mo>
+              <msup>
+                <mi>x</mi>
+                <mn>2</mn>
+              </msup>
+            </mstyle>
+          </math>
+        </media-fragment>
+      </xref></para>
       <para numbered="true" indent="1">A numbered para</para>
       <para numbered="true" indent="1">A long long long long long long long long long long long numbered para</para>
       <block label="block1">
         <para numbered="true" indent="1">A long long long long long long long long long long long block labeled numbered para</para>
       </block>
     </fragment>
+    <media-fragment id="5" mediatype="application/xml">
+      <document id="199324" schemaversion="0.11" date="2018-01-24T09:41:15+11:00"
+                version="current" level="portable">
+        <documentinfo>
+          <uri id="199324" scheme="https" host="ps.pageseeder.com" port="443"
+               path="/ps/test/philipr2/documents/word3/Test%20doc%201.psml"
+               decodedpath="/ps/test/philipr2/documents/word3/Test doc 1.psml"
+               external="false" mediatype="application/vnd.pageseeder.psml+xml"
+               created="2017-09-15T12:09:31+10:00" modified="2018-01-24T09:41:15+11:00"
+               title="Test doc 1">
+            <displaytitle>Test doc 3</displaytitle>
+            <labels>doc3</labels>
+          </uri>
+          <reversexrefs>
+            <reversexref uriid="348275" href="_local/documents/system_report/components/system_report-10.psml" frag="1-1" urititle="Functionality" mediatype="application/vnd.pageseeder.psml+xml" documenttype="component" id="1208156" title="This section describes the functional re…" type="none" forwardtype="embed" forwarddisplay="document" forwardfrag="1"/>
+          </reversexrefs>
+        </documentinfo>
+      </document>
+    </media-fragment>
   </section>
 </document>

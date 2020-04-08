@@ -155,7 +155,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     if ("blockxref".equals(element)) {
       this._blockxrefs.push("transclude".equals(attributes.getValue("type")));
     }
-    if (isElement("fragmentinfo") || isElement("metadata")) {
+    if (isElement("fragmentinfo") || isElement("metadata") || isElement("media-fragment")) {
       this.ignore = true;
     } else if (isElement("document")) {
       startDocument(attributes);
@@ -171,7 +171,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startProperty(attributes);
     } else if (isElement("para")) {
       startPara(attributes);
-    } else if (isAny("fragment", "xref-fragment", "properties-fragment", "media-fragment")) {
+    } else if (isAny("fragment", "xref-fragment", "properties-fragment")) {
       startFragment(attributes);
     } else if ("block".equals(element)) {
       startBlock(attributes);
@@ -182,7 +182,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startReverseRef(attributes);
     } else if (isElement("displaytitle") && !hasAncestor("blockxref")) {
       newBuffer();
-    } else if (isElement("labels") && !hasAncestor("blockxref")) {
+    } else if (isElement("labels") && !hasAncestor("blockxref") && !hasAncestor("xref")) { // handle xref with type="math"
       newBuffer();
     } else if (isElement("placeholder")) {
       startPlaceholder(attributes);
@@ -362,7 +362,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
   @Override
   public void endElement(String element) {
-    if (isElement("fragmentinfo") || isElement("metadata")) {
+    if (isElement("fragmentinfo") || isElement("metadata") || isElement("media-fragment")) {
       this.ignore = false;
     }
     if (this.ignore) return;
@@ -408,7 +408,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
         this._tree.title(title);
       }
 
-    } else if ("labels".equals(element) && !hasAncestor("blockxref")) {
+    } else if ("labels".equals(element) && !hasAncestor("blockxref") && !hasAncestor("xref")) { // handle xref with type="math"
       String labels = buffer(true);
       if (labels != null) {
         this._tree.labels(labels);

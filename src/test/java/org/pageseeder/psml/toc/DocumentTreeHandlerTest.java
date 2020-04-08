@@ -282,7 +282,7 @@ public final class DocumentTreeHandlerTest {
           p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
           p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
     List<Long> reverse = new ArrayList<>();
-    DocumentTree expected = new DocumentTree(4, "Test doc 1", "", reverse, Collections.singletonList(p),
+    DocumentTree expected = new DocumentTree(4, "Test doc 1", "doc1,doc2", reverse, Collections.singletonList(p),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     tree = tree.normalize(TitleCollapse.auto);
@@ -298,7 +298,7 @@ public final class DocumentTreeHandlerTest {
             p(1, "A numbered para", "4", 2, true, "", ""),
             p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
             p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
-    expected = new DocumentTree(4, "Test doc 1", "", reverse, parts,
+    expected = new DocumentTree(4, "Test doc 1", "doc1,doc2", reverse, parts,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
