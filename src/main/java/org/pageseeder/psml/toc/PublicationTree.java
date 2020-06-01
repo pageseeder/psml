@@ -215,7 +215,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    */
   @Override
   public long id() {
-    return root().id();
+    return this._rootid;
   }
 
   /**
