@@ -14,10 +14,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class PublicationTreeTest {
@@ -70,6 +67,26 @@ public final class PublicationTreeTest {
     Assert.assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(100));
     Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+//    Tests.print(publication);
+//    Tests.print(tree);
+  }
+
+  @Test
+  public void testModify() throws SAXException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 101L)).build();
+    DocumentTree tree = new DocumentTree.Builder(100).title("T").part(h1("T", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
+    DocumentTree tree2 = new DocumentTree.Builder(101).title("B").part(h1("B", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
+    PublicationTree publication = new PublicationTree(tree);
+    publication = publication.root(root);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(tree, publication.tree(100));
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    publication = publication.modify(Arrays.asList(1L, 100L), Collections.singletonMap(101L, tree2), Collections.emptyMap(), 1L);
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    Assert.assertNull(publication.tree(100));
+    Tests.assertDocumentTreeEquals(tree2, publication.tree(101));
     assertValidPublication(publication);
 //    Tests.print(publication);
 //    Tests.print(tree);

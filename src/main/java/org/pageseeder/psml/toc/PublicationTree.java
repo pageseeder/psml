@@ -6,6 +6,8 @@ package org.pageseeder.psml.toc;
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -19,6 +21,9 @@ import java.util.*;
  * @author Philip Rutherford
  */
 public final class PublicationTree implements Tree, Serializable, XMLWritable {
+
+  /** Logger for this class. */
+  private static final Logger LOGGER = LoggerFactory.getLogger(PublicationTree.class);
 
   /** As per requirement for Serializable */
   private static final long serialVersionUID = 4L;
@@ -175,9 +180,17 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param rootid      The ID of the root tree for this publication
    */
   private PublicationTree(PublicationTree pub, List<Long> removeIds, Map<Long, DocumentTree> trees, long rootid) {
+    if (pub.id() != rootid) {
+      LOGGER.error("Changing publication root id from " + pub.id() + " to " + rootid);
+    }
     Map<Long, DocumentTree> map = new HashMap<>(pub._map);
     for (Long id : removeIds) {
-      map.remove(id);
+      if (id == rootid) {
+        LOGGER.error("Attempt to remove publication root id " + pub.id() +
+                ", removeIds " + removeIds + ", addIds " + trees.keySet());
+      } else {
+        map.remove(id);
+      }
     }
     map.putAll(trees);
     this._map = Collections.unmodifiableMap(map);
@@ -200,9 +213,17 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    */
   private PublicationTree(PublicationTree pub, List<Long> removeIds, Map<Long, DocumentTree> trees,
       Map<Long,List<Long>> transclusions, long rootid) {
+    if (pub.id() != rootid) {
+      LOGGER.error("Changing publication root id from " + pub.id() + " to " + rootid);
+    }
     Map<Long, DocumentTree> map = new HashMap<>(pub._map);
     for (Long id : removeIds) {
-      map.remove(id);
+      if (id == rootid) {
+        LOGGER.error("Attempt to remove publication root id " + pub.id() +
+                ", removeIds " + removeIds + ", addIds " + trees.keySet());
+      } else {
+        map.remove(id);
+      }
     }
     map.putAll(trees);
     this._map = Collections.unmodifiableMap(map);
