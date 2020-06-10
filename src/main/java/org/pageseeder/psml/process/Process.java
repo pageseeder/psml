@@ -5,6 +5,7 @@ package org.pageseeder.psml.process;
 
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
+import org.pageseeder.psml.process.math.AsciiMathConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -490,6 +491,7 @@ public final class Process {
       ImageCache cache) throws ProcessException {
     // make sure we've got something to do
     if (!this.processXML) return;
+    AsciiMathConverter.reset();
     IncludesExcludesMatcher xrefsMatcher = this.xrefs == null ? null : this.xrefs.buildMatcher();
     for (String relPath : psmlFiles.keySet()) {
       // log
