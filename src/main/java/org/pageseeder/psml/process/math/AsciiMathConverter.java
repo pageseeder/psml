@@ -15,7 +15,7 @@ public class AsciiMathConverter {
 
   private static Invocable SCRIPT = null;
 
-  private static Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(100));
+  private static Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
 
   public static String convert(String asciimath) {
     // sanity check
@@ -32,7 +32,10 @@ public class AsciiMathConverter {
 
       // invoke the function named "parse" with the ascii math as the argument
       try {
-        result = script().invokeFunction("parse", am).toString();
+        long before = System.currentTimeMillis();
+        synchronized (AsciiMathConverter.class) {
+          result = script().invokeFunction("parse", am).toString();
+        }
         cache.put(am, result);
       } catch (ScriptException | NoSuchMethodException | IOException ex) {
         System.err.println("Failed to run ASCIIMath to MathML JS script: " + ex.getMessage());
@@ -43,28 +46,40 @@ public class AsciiMathConverter {
     return result;
   }
 
-  private static Invocable script() throws ScriptException, IOException {
-    if (SCRIPT == null) {
-      // load script
-      ScriptEngineManager manager = new ScriptEngineManager();
-      ScriptEngine engine = manager.getEngineByName("nashorn");
-      Compilable cengine = (Compilable) engine;
-
-      // evaluate JavaScript code
-      try {
-        CompiledScript cscript = cengine.compile(new WrappingReader(
-            new InputStreamReader(AsciiMathConverter.class.getResourceAsStream(JS_SCRIPT)),
-            prefix(), "var parse = function(str) {asciimath.initSymbols(); return asciimath.parseMath(str, false).toXML();};"));
-        cscript.eval();
-        // create an Invocable object by casting the script engine object
-        SCRIPT = (Invocable) cscript.getEngine();
-      } catch (ScriptException | IOException ex) {
-        System.err.println("Failed to load ASCIIMath to MathML JS script: "+ex.getMessage());
-        throw ex;
-      }
-
+  /**
+   * Clears the script engine.
+   * This should be done before each process,
+   * otherwise the conversion will get slower over time.
+   */
+  public static void reset() {
+    synchronized (AsciiMathConverter.class) {
+      SCRIPT = null;
     }
-    return SCRIPT;
+  }
+
+  private static Invocable script() throws ScriptException, IOException {
+    synchronized (AsciiMathConverter.class) {
+      if (SCRIPT != null) return SCRIPT;
+    }
+
+    // load script
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("nashorn");
+    Compilable cengine = (Compilable) engine;
+
+    // evaluate JavaScript code
+    try {
+      CompiledScript cscript = cengine.compile(new WrappingReader(
+          new InputStreamReader(AsciiMathConverter.class.getResourceAsStream(JS_SCRIPT)),
+          prefix(), "var parse = function(str) {asciimath.initSymbols(); return asciimath.parseMath(str, false).toXML();};"));
+      cscript.eval();
+      // create an Invocable object by casting the script engine object
+      SCRIPT = (Invocable) cscript.getEngine();
+      return (Invocable) cscript.getEngine(); // don't return SCRIPT as it may have been reset by another thread
+    } catch (ScriptException | IOException ex) {
+      System.err.println("Failed to load ASCIIMath to MathML JS script: "+ex.getMessage());
+      throw ex;
+    }
   }
 
   private static String prefix() {
