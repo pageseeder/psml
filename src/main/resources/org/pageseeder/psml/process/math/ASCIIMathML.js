@@ -36,6 +36,9 @@ THE SOFTWARE.
 */
 var asciimath = {};
 
+// NOTES FOR PS: Source code retrieved from github (https://github.com/asciimath/asciimathml) on 12/06/2020
+// CHANGES FOR PS: variables below + lines 59, 745, 789, 1033 and 1199 and below
+
 (function(){
 var mathcolor = "";            // change it to "" (to inherit) or another color  // XXX changed by JB
 var mathfontsize = "";         // change to e.g. 1.2em for larger math           // XXX changed by JB
@@ -45,7 +48,7 @@ var automathrecognize = false; // writing "amath" on page makes this true
 var checkForMathML = false;    // check if browser can display MathML            // XXX changed by JB
 var notifyIfNoMathML = false;  // display note at top if no MathML capability    // XXX changed by JB
 var alertIfNoMathML = false;   // show alert box if no MathML capability
-var translateOnLoad = false;   // set to false to do call translators from js    // XXX changed by JB, other changes are lines 58, 737, 1022 and 1191
+var translateOnLoad = false;   // set to false to do call translators from js    // XXX changed by JB
 var translateASCIIMath = true; // false to preserve `..`
 var displaystyle = true;       // puts limits above and below large operators
 var showasciiformulaonhover = false; // helps students learn ASCIIMath           // XXX changed by JB because of a bug with '<' or '"' characters in attribute value
@@ -183,11 +186,11 @@ function AMcreateElementMathML(t) {
 }
 
 function createMmlNode(t,frag) {
-  var snode;
-  if (isIE) { snode = document.createElement("m:"+t); }
-  else { snode = document.createElementNS(AMmathml,t); }
-  if (frag) snode.appendChild(frag);
-  return snode;
+  var node;
+  if (isIE) node = document.createElement("m:"+t);
+  else node = document.createElementNS(AMmathml,t);
+  if (frag) node.appendChild(frag);
+  return node;
 }
 
 function newcommand(oldstr,newstr) {
@@ -692,8 +695,15 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
   case UNARY:
       str = AMremoveCharsAndBlanks(str,symbol.input.length);
       result = AMparseSexpr(str);
-      if (result[0]==null) return [createMmlNode(symbol.tag,
-                             document.createTextNode(symbol.output)),str];
+
+      if (result[0]==null) {
+      	if (symbol.tag=="mi" || symbol.tag=="mo") {
+      	  return [createMmlNode(symbol.tag,
+                    document.createTextNode(symbol.output)),str];
+      	} else {
+      	  result[0] = createMmlNode("mi", "");
+      	}
+      }
       if (typeof symbol.func == "boolean" && symbol.func) { // functions hack
         st = str.charAt(0);
           if (st=="^" || st=="_" || st=="/" || st=="|" || st=="," ||
@@ -741,8 +751,8 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
                               result[0].childNodes[i].firstChild.nodeValue);
               var newst = [];
               for (var j=0; j<st.length; j++)
-		  if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91)
-		  	newst = newst + symbol.codes[st.charCodeAt(j)-65];
+                if (st.charCodeAt(j)>64 && st.charCodeAt(j)<91)
+                  newst = newst + symbol.codes[st.charCodeAt(j)-65];
                 else if (st.charCodeAt(j)>96 && st.charCodeAt(j)<123)
                 	newst = newst + symbol.codes[st.charCodeAt(j)-71];
                 else newst = newst + st.charAt(j);
@@ -779,6 +789,7 @@ function AMparseSexpr(str) { //parses str and returns [node,tailstr]
       // Make a mathml node
     	node = createMmlNode(symbol.tag,result2[0]);
 
+    	// MODIFIED BY JB: escape quotes in attributes to create well-formed HTML
       // Set the correct attribute
       if (symbol.input === "color") node.setAttribute("mathcolor", st)
       else if (symbol.input === "class") node.setAttribute("class", st)
@@ -848,9 +859,9 @@ function AMparseIexpr(str) {
     else AMremoveBrackets(result[0]);
     str = result[1];
 //    if (symbol.input == "/") AMremoveBrackets(node);
-    underover = (sym1.ttype == UNDEROVER || sym1.ttype == UNARYUNDEROVER);
     if (symbol.input == "_") {
       sym2 = AMgetSymbol(str);
+      underover = (sym1.ttype == UNDEROVER);
       if (sym2.input == "^") {
         str = AMremoveCharsAndBlanks(str,sym2.input.length);
         var res2 = AMparseSexpr(str);
@@ -934,7 +945,9 @@ function AMparseExpr(str,rightbracket) {
           if (matrix) matrix = node.nodeName=="mrow" &&
             (i==m-1 || node.nextSibling.nodeName=="mo" &&
             node.nextSibling.firstChild.nodeValue==",")&&
+            node.firstChild.firstChild &&
             node.firstChild.firstChild.nodeValue==left &&
+            node.lastChild.firstChild &&
             node.lastChild.firstChild.nodeValue==right;
           if (matrix)
             for (var j=0; j<node.childNodes.length; j++)
@@ -1145,16 +1158,16 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
   }
 }
 
-function generic(go){
+function generic(){
   if(!init()) return;
-  if (translateOnLoad || go) {
+  if (translateOnLoad) {
       translate();
   }
 };
 //setup onload function
 if(typeof window.addEventListener != 'undefined'){
   //.. gecko, safari, konqueror and standard
-  window.addEventListener('load', function() { return generic(true); }, false);
+  window.addEventListener('load', generic, false);
 }
 else if(typeof document.addEventListener != 'undefined'){
   //.. opera 7

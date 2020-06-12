@@ -15,7 +15,7 @@ public class AsciiMathConverter {
 
   private static Invocable SCRIPT = null;
 
-  private static Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
+  private final static Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
 
   public static String convert(String asciimath) {
     // sanity check
@@ -26,13 +26,18 @@ public class AsciiMathConverter {
     if (am.charAt(0) == '`' && am.charAt(am.length()-1) == '`')
       am = am.substring(1, am.length()-1);
 
+    // disable 'id' and 'class' as they are not handled properly in MathJax
+    if (am.contains("class"))
+      return "The AsciiMath \""+am+"\" could not be converted to MathML because \"class\" is not supported.";
+    if (am.contains("id"))
+      return "The AsciiMath \""+am+"\" could not be converted to MathML because \"id\" is not supported.";
+
     // check cache
     String result = cache.get(am);
     if (result == null) {
 
       // invoke the function named "parse" with the ascii math as the argument
       try {
-        long before = System.currentTimeMillis();
         synchronized (AsciiMathConverter.class) {
           result = script().invokeFunction("parse", am).toString();
         }
@@ -153,7 +158,8 @@ public class AsciiMathConverter {
            "        xml += ' xmlns=\"' + this.namespace + '\"';" +
            "      }" +
            "      for (var i = 0; i < this.atts.length; i++) {" +
-           "        xml += ' ' + this.atts[i].name + '=\"' + this.atts[i].value + '\"';" +
+           "        var value = this.atts[i].value.toString().replace(/(\")|(&#34;)/g, '&quot;');" +
+           "        xml += ' ' + this.atts[i].name + '=\"' + value + '\"';" +
            "      }" +
            "      xml += '>';" +
            "    }" +

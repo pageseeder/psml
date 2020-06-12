@@ -521,6 +521,42 @@ public class ProcessTest {
     Assert.assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace());
   }
 
+  @Test(expected=ProcessException.class)
+  public void testAsciiMathConvertClassFail() throws IOException, ProcessException {
+    String filename = "asciimath_conversion_class_fail.psml";
+    Process p = new Process();
+    p.setConvertAsciiMath(true);
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER, filename));
+    p.setPreserveSrc(true);
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    ErrorHandling error = new ErrorHandling();
+    p.setError(error);
+    p.process();
+  }
+
+  @Test(expected=ProcessException.class)
+  public void testAsciiMathConvertIDFail() throws IOException, ProcessException {
+    String filename = "asciimath_conversion_id_fail.psml";
+    Process p = new Process();
+    p.setConvertAsciiMath(true);
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER, filename));
+    p.setPreserveSrc(true);
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    ErrorHandling error = new ErrorHandling();
+    p.setError(error);
+    p.process();
+  }
+
   @Test
   public void testGenerateTOC() throws IOException, ProcessException {
     String filename = "toc.psml";
