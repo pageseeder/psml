@@ -563,6 +563,8 @@ public final class Process {
       } catch (ProcessException e) {
         if (this.failOnError) throw e;
         else this.logger.error(e.getMessage());
+      } catch (Throwable e) {
+        throw new ProcessException("Failed to process " + relPath + ": " + e.getMessage());
       } finally {
         try {
           fos.close();
