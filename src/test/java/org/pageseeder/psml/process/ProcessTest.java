@@ -523,13 +523,12 @@ public class ProcessTest {
 
   @Test(expected=ProcessException.class)
   public void testAsciiMathConvertClassFail() throws IOException, ProcessException {
-    String filename = "asciimath_conversion_class_fail.psml";
     Process p = new Process();
     p.setConvertAsciiMath(true);
     p.setPreserveSrc(true);
-    p.setSrc(new File(SOURCE_FOLDER, filename));
+    p.setSrc(new File(SOURCE_FOLDER + "error", "math1"));
     p.setPreserveSrc(true);
-    File dest = new File(DEST_FOLDER);
+    File dest = new File(MATH_FOLDER);
     if (dest.exists())
       FileUtils.deleteDirectory(dest);
     dest.mkdirs();
@@ -541,13 +540,12 @@ public class ProcessTest {
 
   @Test(expected=ProcessException.class)
   public void testAsciiMathConvertIDFail() throws IOException, ProcessException {
-    String filename = "asciimath_conversion_id_fail.psml";
     Process p = new Process();
     p.setConvertAsciiMath(true);
     p.setPreserveSrc(true);
-    p.setSrc(new File(SOURCE_FOLDER, filename));
+    p.setSrc(new File(SOURCE_FOLDER + "error", "math2"));
     p.setPreserveSrc(true);
-    File dest = new File(DEST_FOLDER);
+    File dest = new File(MATH_FOLDER);
     if (dest.exists())
       FileUtils.deleteDirectory(dest);
     dest.mkdirs();

@@ -26,14 +26,17 @@ public class AsciiMathConverter {
     if (am.charAt(0) == '`' && am.charAt(am.length()-1) == '`')
       am = am.substring(1, am.length()-1);
 
-    // disable 'id' and 'class' as they are not handled properly in MathJax
-    if (am.contains("class"))
-      return "The AsciiMath \""+am+"\" could not be converted to MathML because \"class\" is not supported.";
-    if (am.contains("id"))
-      return "The AsciiMath \""+am+"\" could not be converted to MathML because \"id\" is not supported.";
-
     // check cache
     String result = cache.get(am);
+
+    // disable 'id' and 'class' as they are not handled properly in MathJax
+    if (am.contains("class"))
+      throw new IllegalArgumentException(
+              "The AsciiMath \""+am+"\" could not be converted to MathML because \"class\" is not supported.");
+    if (am.contains("id"))
+      throw new IllegalArgumentException(
+              "The AsciiMath \""+am+"\" could not be converted to MathML because \"id\" is not supported.");
+
     if (result == null) {
 
       // invoke the function named "parse" with the ascii math as the argument
@@ -43,9 +46,9 @@ public class AsciiMathConverter {
         }
         cache.put(am, result);
       } catch (ScriptException | NoSuchMethodException | IOException ex) {
-        System.err.println("Failed to run ASCIIMath to MathML JS script: " + ex.getMessage());
         ex.printStackTrace();
-        return "Failed to run ASCIIMath to MathML JS script";
+        throw new IllegalArgumentException(
+                "Failed to run ASCIIMath to MathML JS script: " + ex.getMessage());
       }
     }
     return result;
