@@ -108,6 +108,18 @@ public class HTMLInlineParser {
    * @return
    */
   public List<HTMLNode> parse(String content) {
+    return parse(content, false);
+  }
+
+  /**
+   * Parses the text content and returns the corresponding list of nodes.
+   *
+   * @param content The text content to parse.
+   * @param inLink  Whether parsing text inside a link
+   *
+   * @return
+   */
+  private List<HTMLNode> parse(String content, boolean inLink) {
     List<HTMLNode> nodes = new ArrayList<>();
     Matcher m = TOKENS.matcher(content);
     int previousEnd = 0;
@@ -168,14 +180,14 @@ public class HTMLInlineParser {
         nodes.add(monospace);
       }
       // Images as '![alt](src)'
-      else if (m.group(13) != null) {
+      else if (m.group(13) != null && !inLink) {
         String alt = m.group(14);
         String src = m.group(15);
         if (src.startsWith("http")) {
           // PageSeeder does not support external images
           HTMLElement link = new HTMLElement(Name.a);
           link.setAttribute("href", InlineParser.unescape(src));
-          link.addNodes(parse(alt));
+          link.addNodes(parse(alt, true));
           nodes.add(link);
         } else {
           HTMLElement image = new HTMLElement(Name.img);
@@ -185,30 +197,34 @@ public class HTMLInlineParser {
         }
       }
       // References as '[title](url)'
-      else if (m.group(16) != null) {
+      else if (m.group(16) != null && !inLink) {
         String ref = m.group(18);
         String text = m.group(17);
         HTMLElement link = new HTMLElement(Name.a);
         link.setAttribute("href", InlineParser.unescape(ref));
-        link.addNodes(parse(text));
+        link.addNodes(parse(text, true));
         nodes.add(link);
       }
       // Explicit links
-      else if (m.group(19) != null) {
+      else if (m.group(19) != null && !inLink) {
         String url = m.group(20);
         String text = m.group(22);
         HTMLElement link = new HTMLElement(Name.a);
         link.setAttribute("href", InlineParser.unescape(url));
-        link.addNode(new HTMLText(text));
+        link.addNode(new HTMLText(InlineParser.unescape(text)));
         nodes.add(link);
       }
       //  Auto links
-      else if (m.group(23) != null) {
+      else if (m.group(23) != null && !inLink) {
         String url = m.group(23);
         HTMLElement link = new HTMLElement(Name.a);
         link.setAttribute("href", InlineParser.unescape(url));
-        link.addNode(new HTMLText(url));
+        link.addNode(new HTMLText(InlineParser.unescape(url)));
         nodes.add(link);
+      }
+      // Links inside links as text
+      else if (inLink) {
+        nodes.add(new HTMLText(InlineParser.unescape(content)));
       }
     }
     // Add the tail end
