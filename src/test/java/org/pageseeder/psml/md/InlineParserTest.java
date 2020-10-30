@@ -41,6 +41,7 @@ public final class InlineParserTest {
     Assert.assertEquals("`test`", toPSML("\\`test\\`"));
     Assert.assertEquals("![Alt text](/path/to/img.jpg)", toPSML("\\!\\[Alt text\\](/path/to/img.jpg)"));
     Assert.assertEquals("[test](http://example.net/)", toPSML("\\[test\\](http://example.net/)"));
+    Assert.assertEquals("<link href=\"http://example.net/my_doc.html\">my_doc</link>", toPSML("[my\\_doc](http://example.net/my\\_doc.html)"));
     Assert.assertEquals("&lt;http://example.org&gt;", toPSML("\\<http://example.org\\>"));
   }
 
