@@ -35,7 +35,14 @@ public final class HTMLInlineParserTest {
     Assert.assertEquals("`test`", toHTML("\\`test\\`"));
     Assert.assertEquals("![Alt text](/path/to/img.jpg)", toHTML("\\!\\[Alt text\\](/path/to/img.jpg)"));
     Assert.assertEquals("[test](http://example.net/)", toHTML("\\[test\\](http://example.net/)"));
-    Assert.assertEquals("<a href=\"http://example.net/my_doc.html\">my_doc</a>", toHTML("[my\\_doc](http://example.net/my\\_doc.html)"));
+    Assert.assertEquals("<a href=\"http://example.net/my_doc.html\">my_doc</a>",
+            toHTML("[my\\_doc](http://example.net/my\\_doc.html)"));
+    Assert.assertEquals("<a href=\"http://example.net/my_doc.html\">http://example.net/my_doc.html</a>",
+            toHTML("[http://example.net/my\\_doc.html](http://example.net/my\\_doc.html)"));
+    Assert.assertEquals("<a href=\"http://example.net/my_doc.html\">example.net/my_doc.html</a>",
+            toHTML("<http://example.net/my\\_doc.html>"));
+    Assert.assertEquals("<a href=\"http://example.net/my_doc.html\">http://example.net/my_doc.html</a>",
+            toHTML("http://example.net/my\\_doc.html"));
     Assert.assertEquals("&lt;http://example.org&gt;", toHTML("\\<http://example.org\\>"));
   }
 
