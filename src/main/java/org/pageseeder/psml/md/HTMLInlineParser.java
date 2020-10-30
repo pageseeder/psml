@@ -174,13 +174,13 @@ public class HTMLInlineParser {
         if (src.startsWith("http")) {
           // PageSeeder does not support external images
           HTMLElement link = new HTMLElement(Name.a);
-          link.setAttribute("href", src);
+          link.setAttribute("href", InlineParser.unescape(src));
           link.addNodes(parse(alt));
           nodes.add(link);
         } else {
           HTMLElement image = new HTMLElement(Name.img);
-          image.setAttribute("alt", alt);
-          image.setAttribute("src", src);
+          image.setAttribute("alt", InlineParser.unescape(alt));
+          image.setAttribute("src", InlineParser.unescape(src));
           nodes.add(image);
         }
       }
@@ -189,7 +189,7 @@ public class HTMLInlineParser {
         String ref = m.group(18);
         String text = m.group(17);
         HTMLElement link = new HTMLElement(Name.a);
-        link.setAttribute("href", ref);
+        link.setAttribute("href", InlineParser.unescape(ref));
         link.addNodes(parse(text));
         nodes.add(link);
       }
@@ -198,7 +198,7 @@ public class HTMLInlineParser {
         String url = m.group(20);
         String text = m.group(22);
         HTMLElement link = new HTMLElement(Name.a);
-        link.setAttribute("href", url);
+        link.setAttribute("href", InlineParser.unescape(url));
         link.addNode(new HTMLText(text));
         nodes.add(link);
       }
@@ -206,7 +206,7 @@ public class HTMLInlineParser {
       else if (m.group(23) != null) {
         String url = m.group(23);
         HTMLElement link = new HTMLElement(Name.a);
-        link.setAttribute("href", url);
+        link.setAttribute("href", InlineParser.unescape(url));
         link.addNode(new HTMLText(url));
         nodes.add(link);
       }

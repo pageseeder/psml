@@ -176,13 +176,13 @@ public class InlineParser {
         if (src.startsWith("http")) {
           // PageSeeder does not support external images
           PSMLElement link = new PSMLElement(Name.Link);
-          link.setAttribute("href", src);
+          link.setAttribute("href", unescape(src));
           link.addNodes(parse(alt));
           nodes.add(link);
         } else {
           PSMLElement image = new PSMLElement(Name.Image);
-          image.setAttribute("alt", alt);
-          image.setAttribute("src", src);
+          image.setAttribute("alt", unescape(alt));
+          image.setAttribute("src", unescape(src));
           nodes.add(image);
         }
       }
@@ -192,7 +192,7 @@ public class InlineParser {
         String text = m.group(17);
         if (ref.startsWith("http")) {
           PSMLElement link = new PSMLElement(Name.Link);
-          link.setAttribute("href", ref);
+          link.setAttribute("href", unescape(ref));
           link.addNodes(parse(text));
           nodes.add(link);
         } else {
@@ -203,9 +203,9 @@ public class InlineParser {
           // TODO Config
           xref.setAttribute("display", "manual");
           xref.setAttribute("reverselink", "true");
-          xref.setAttribute("title", text);
-          xref.setAttribute("href", url);
-          xref.setAttribute("frag", fragment);
+          xref.setAttribute("title", unescape(text));
+          xref.setAttribute("href", unescape(url));
+          xref.setAttribute("frag", unescape(fragment));
           xref.addNode(new PSMLText(text));
           nodes.add(xref);
         }
@@ -215,7 +215,7 @@ public class InlineParser {
         String url = m.group(20);
         String text = m.group(22);
         PSMLElement link = new PSMLElement(Name.Link);
-        link.setAttribute("href", url);
+        link.setAttribute("href", unescape(url));
         link.addNode(new PSMLText(text));
         nodes.add(link);
       }
@@ -223,7 +223,7 @@ public class InlineParser {
       else if (m.group(23) != null) {
         String url = m.group(23);
         PSMLElement link = new PSMLElement(Name.Link);
-        link.setAttribute("href", url);
+        link.setAttribute("href", unescape(url));
         link.addNode(new PSMLText(url));
         nodes.add(link);
       }
