@@ -981,6 +981,11 @@
           <xs:documentation>The XLink ID for the latest edit. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="checked" type="xs:dateTime">
+        <xs:annotation>
+          <xs:documentation>The last date the URL metadata was checked, for URLs only. INFORMATIONAL - ignored by upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
