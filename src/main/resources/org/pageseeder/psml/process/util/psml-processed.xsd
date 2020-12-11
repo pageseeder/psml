@@ -532,6 +532,11 @@
           <xs:documentation>Document type (aka document config). Used by upload if no document/@type.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="urltype" type="document-type">
+        <xs:annotation>
+          <xs:documentation>URL type. Used by upload if no document/@type.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="mediatype" type="xs:string">
         <xs:annotation>
           <xs:documentation>Document media type (e.g. text/html). INFORMATIONAL - ignored by upload.</xs:documentation>
@@ -906,6 +911,11 @@
       <xs:attribute name="documenttype" type="xs:string">
         <xs:annotation>
           <xs:documentation>The source document type.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="urltype" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The source URL type.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
