@@ -746,7 +746,7 @@
           <xs:documentation>The version (e.g. 0.01)</xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="publicationid" type="xs:string">
+      <xs:attribute name="publicationid" type="publication-id">
         <xs:annotation>
           <xs:documentation>The publication ID</xs:documentation>
         </xs:annotation>
