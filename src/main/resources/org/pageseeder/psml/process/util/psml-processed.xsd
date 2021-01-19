@@ -1822,7 +1822,7 @@
       </xs:attribute>
       <xs:attribute name="role" type="role">
         <xs:annotation>
-          <xs:documentation>Custom value that can be used for formatting.</xs:documentation>
+          <xs:documentation>Custom value that can be used for formatting (deprecated, use @labels instead).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="uriid" type="xs:long">
