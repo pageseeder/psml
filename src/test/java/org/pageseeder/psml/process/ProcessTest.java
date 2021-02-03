@@ -15,8 +15,6 @@
  */
 package org.pageseeder.psml.process;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
@@ -32,7 +30,6 @@ import org.xmlunit.matchers.EvaluateXPathMatcher;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -40,6 +37,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class ProcessTest {
 
@@ -950,6 +949,28 @@ public class ProcessTest {
     Assert.assertTrue("Image 2 missing", new File(image, "000/000/021/21942.jpg").exists());
     Assert.assertTrue("Image 3 missing", new File(image, "000/000/021/21943.jpg").exists());
     Assert.assertTrue("Image 4 missing", new File(image, "000/000/021/21944.jpg").exists());
+  }
+
+  @Test
+  public void testProcessEmbedLinkMetadata() throws IOException, ProcessException {
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER + "/links"));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    p.setEmbedLinkMetadata(true);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/links.psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//link)[1]/document/documentinfo/uri/@id", equalTo("475607")));
+    Assert.assertThat(xml, hasXPath("(//link)[2]/document/documentinfo/uri/@id", equalTo("475600")));
+    Assert.assertThat(xml, hasXPath("(//link)[3]/document/documentinfo/uri/@id", equalTo("475609")));
+    Assert.assertThat(xml, hasXPath("(//link)[4]/document/documentinfo/uri/@id", equalTo("475616")));
   }
 
   @Test

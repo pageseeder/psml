@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="475616" schemaversion="1.2" date="2020-11-25T11:39:46+11:00" version="current" level="metadata">
+  <documentinfo>
+    <uri id="475616" scheme="https" host="localhost" port="443" path="/ps/ui/g/jb-group1/d/475611.html"
+         decodedpath="/ps/ui/g/jb-group1/d/475611.html" external="true" created="2020-11-25T11:39:46+11:00"
+         modified="2020-11-25T11:39:46+11:00" source="pageseeder">
+      <displaytitle>https://localhost/ps/ui/g/jb-group1/d/475611.html</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="475608" href="xrefs_to_urls.psml" frag="2" urititle="links to urls"
+                   mediatype="application/vnd.pageseeder.psml+xml" id="2937844" title="" type="none" forwardtype="link"
+                   forwardfrag="default"/>
+    </reversexrefs>
+  </documentinfo>
+  <fragmentinfo/>
+  <metadata/>
+</document>

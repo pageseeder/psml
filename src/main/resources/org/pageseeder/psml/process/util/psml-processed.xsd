@@ -1814,6 +1814,7 @@
         <xs:element ref="inline" />
         <xs:element ref="placeholder" />
         <xs:element ref="monospace" />
+        <xs:element ref="document" />
       </xs:choice>
       <xs:attribute name="href" type="xs:string" use="required">
         <xs:annotation>

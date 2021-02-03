@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -73,6 +72,11 @@ public final class Process {
    * If source documents are preserved or not
    */
   private boolean preservesrc = false;
+
+  /**
+   * If URL metadata is embedde din link elements
+   */
+  private boolean embedLinkMetadata = false;
 
   /**
    * If markdown properties are converted to PSML
@@ -171,6 +175,14 @@ public final class Process {
    */
   public void setConvertMarkdown(boolean convert) {
     this.convertMarkdown = convert;
+    this.processXML = true;
+  }
+
+  /**
+   * @param embed If URL metadata is embedded in link elements
+   */
+  public void setEmbedLinkMetadata(boolean embed) {
+    this.embedLinkMetadata = embed;
     this.processXML = true;
   }
 
@@ -534,6 +546,7 @@ public final class Process {
       }
       handler1.setXRefsHandling(xrefsTypes, excludeXRefFrag, onlyXRefFrag,
           this.error != null && this.error.getXrefNotFound());
+      handler1.setEmbedLinkMetadata(this.embedLinkMetadata);
       // add images paths processing details
       boolean logImagesNotFound = false;
       boolean embedMetadata = false;
