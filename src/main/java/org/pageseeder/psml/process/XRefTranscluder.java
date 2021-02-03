@@ -184,7 +184,6 @@ public final class XRefTranscluder {
       File target = findXRefTarget(href, atts.getValue("uriid"), link);
       // make sure it's valid
       if (target == null || !target.exists() ||!target.isFile()) {
-        System.out.println(target == null ? null : target.getAbsolutePath());
         throw new XRefNotFoundException();
       }
       boolean mathTarget = "math".equalsIgnoreCase(type) && "default".equals(atts.getValue("frag"));
