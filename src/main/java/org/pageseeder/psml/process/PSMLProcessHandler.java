@@ -1087,7 +1087,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       // retrieve target document
       if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, link, this.inEmbedHierarchy)) {
         // then ignore content of XRef
-        this.inTranscludedXRef = true;
+        this.inTranscludedXRef = !link;
       }
     } catch (InfiniteLoopException ex) {
       File root_src = this.sourceFile;
