@@ -392,6 +392,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
+   * @param embed if URL metadata is embedded in link elements
+   */
+  public void setEmbedLinkMetadata(boolean embed) {
+    this.transcluder.setTranscludeLinks(embed);
+  }
+
+  /**
    * @param convert if ascii math content converted to MathJax
    */
   public void setConvertAsciiMath(boolean convert) {
@@ -656,6 +663,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     boolean isXRef = noNamespace && ("blockxref".equals(qName) || "xref".equals(qName));
     boolean isReverseXRef = noNamespace && "reversexref".equals(qName);
     boolean isImage = noNamespace && "image".equals(qName);
+    boolean isLink = noNamespace && "link".equals(qName);
     boolean isMetadataProperty  = noNamespace && "property".equals(qName) && "properties".equals(this.elements.peek());
     // currently stripping?
     if (this.ignore)
@@ -800,8 +808,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.convertContent = new StringBuilder();
     }
     // add transcluded content now
-    if ((isXRef || isImage) && !this.elements.contains("compare")) {
-      transcludeXRef(atts, isImage);
+    if ((isXRef || isImage || isLink) && !this.elements.contains("compare")) {
+      transcludeXRef(atts, isImage, isLink);
     }
   }
 
@@ -1060,14 +1068,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param atts the attributes on the xref element
    * @throws SAXException if something went wrong
    */
-  private void transcludeXRef(Attributes atts, boolean image) throws SAXException {
+  private void transcludeXRef(Attributes atts, boolean image, boolean link) throws SAXException {
     // ignore nested transclude
     if ("transclude".equals(atts.getValue("type")) && this.inTranscludedContent) return;
     String href = atts.getValue(image ? "src" : "href");
     try {
       // find out if the fragment we're in is an xref-fragment
       boolean isInXRefFragment = false;
-      if (!image) {
+      if (!image && !link) {
         for (int i = this.elements.size() - 1; i >= 0; i--) {
           String elem = this.elements.elementAt(i);
           if (isFragment(elem)) {
@@ -1077,7 +1085,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         }
       }
       // retrieve target document
-      if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, this.inEmbedHierarchy)) {
+      if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, link, this.inEmbedHierarchy)) {
         // then ignore content of XRef
         this.inTranscludedXRef = true;
       }

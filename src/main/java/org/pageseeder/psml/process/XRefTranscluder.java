@@ -3,16 +3,6 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
@@ -22,6 +12,18 @@ import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jean-Baptiste Reure
@@ -71,6 +73,11 @@ public final class XRefTranscluder {
   private boolean transcludeImages = false;
 
   /**
+   * If URL metadata is included in link elements.
+   */
+  private boolean transcludeLinks = false;
+
+  /**
    * Whether or not any transclusion will happen.
    */
   private boolean isTranscluding = false;
@@ -109,6 +116,13 @@ public final class XRefTranscluder {
   }
 
   /**
+   * @param transclude if links are transcluded
+   */
+  public void setTranscludeLinks(boolean transclude) {
+    this.transcludeLinks = transclude;
+  }
+
+  /**
    * @return <code>true</code> if there could be any transclusions
    */
   public boolean isTranscluding() {
@@ -139,7 +153,7 @@ public final class XRefTranscluder {
    * @return <code>true</code> if the target document is not found
    */
   public boolean isNotFoundXRef(String href) {
-    File target = findXRefTarget(href);
+    File target = findXRefTarget(href, null, false);
     return target == null || !target.exists() || !target.isFile();
   }
 
@@ -151,26 +165,29 @@ public final class XRefTranscluder {
    * @param atts             The attributes on the XRef
    * @param inXrefFragment   If this XRef is in an XRefFragment
    * @param image            If this is an image
+   * @param link             If this is a link
    * @param inEmbedHierarchy If hierarchy has all embed XRefs
    *
    * @return <code>true</code> if the XRef is transcluded, false otherwise
    *
    * @throws ProcessException if the target is invalid or could not be read
    */
-  public boolean transcludeXRef(Attributes atts, boolean inXrefFragment, boolean image, boolean inEmbedHierarchy) throws ProcessException {
+  public boolean transcludeXRef(Attributes atts, boolean inXrefFragment, boolean image, boolean link, boolean inEmbedHierarchy) throws ProcessException {
     // should transclude?
-    if (!image &&
+    if (!image && !link &&
        ((inXrefFragment && this.excludeXRefFragment) ||
        (!inXrefFragment && this.onlyXRefFrament))) return false;
     String href = atts.getValue(image ? "src" : "href");
-    String type = image ? "image" : atts.getValue("type");
-    boolean transclude = image ? this.transcludeImages : this.xrefsTranscludeTypes.contains(type);
+    String type = image ? "image" : link ? "link" : atts.getValue("type");
+    boolean transclude = image ? this.transcludeImages : link ? this.transcludeLinks : this.xrefsTranscludeTypes.contains(type);
     if (transclude && !"true".equals(atts.getValue("external"))) {
-      File target = findXRefTarget(href);
+      File target = findXRefTarget(href, atts.getValue("uriid"), link);
       // make sure it's valid
-      if (target == null || !target.exists() ||!target.isFile())
+      if (target == null || !target.exists() ||!target.isFile()) {
+        System.out.println(target == null ? null : target.getAbsolutePath());
         throw new XRefNotFoundException();
-      boolean mathTarget = "math".equalsIgnoreCase(atts.getValue("type")) && "default".equals(atts.getValue("frag"));
+      }
+      boolean mathTarget = "math".equalsIgnoreCase(type) && "default".equals(atts.getValue("frag"));
       // ensure PSML or mathml for math xrefs
       if ((!mathTarget && !target.getName().endsWith(".psml")) ||
           (mathTarget  && !target.getName().endsWith(".mml") && !target.getName().endsWith(".mathml")))
@@ -202,7 +219,7 @@ public final class XRefTranscluder {
         return true;
       }
       // loop?
-      String fragment = image ? "default" : atts.getValue("frag");
+      String fragment = image || link ? "default" : atts.getValue("frag");
       List<String> fragments = this.parentFiles.get(target);
       if (fragments != null && fragments.contains(fragment)) {
         throw new InfiniteLoopException();
@@ -213,7 +230,7 @@ public final class XRefTranscluder {
       String levelAtt = atts.getValue("level");
       // use level if it exists and a transclude or no publication specified (for backward compatibility)
       int level = levelAtt != null && !levelAtt.isEmpty() &&
-          ("transclude".equals(atts.getValue("type")) || numberingAndTOC == null) ?
+          ("transclude".equals(type) || numberingAndTOC == null) ?
           Integer.parseInt(levelAtt) : 0;
       PSMLProcessHandler handler = this.parentHandler.cloneForTransclusion(
           target, atts.getValue("uriid"), fragment, level, image,
@@ -247,7 +264,7 @@ public final class XRefTranscluder {
    *
    * @return the target file object
    */
-  public File findXRefTarget(String href) {
+  public File findXRefTarget(String href, String uriid, boolean link) {
     if (href == null) return null;
     String path = href.replaceFirst("\\?(.*?)?$", ""); // remove fragment from href
     try {
@@ -258,8 +275,20 @@ public final class XRefTranscluder {
     String dadPath = this.parentHandler.getParentFolderRelativePath();
     // find target file
     File target;
-    if (path.endsWith(".psml")) {
-       target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
+    if (link) {
+      try {
+        URL u = new URL(href);
+        String scheme = u.getProtocol();
+        int port = u.getPort();
+        if (port == -1) port = "https".equals(scheme) ? 443 : "http".equals(scheme) ? 80 : -1;
+        target = new File(this.parentHandler.getBinaryRepository(),
+            "META-INF/_urls/" + scheme + '/' + u.getHost() + '/' + port + '/' + uriid + ".psml");
+      } catch (MalformedURLException ex) {
+        this.parentHandler.getLogger().error("Invalid link URL: " + ex.getMessage(), ex);
+        target = null;
+      }
+    } else if (path.endsWith(".psml")) {
+      target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
     } else if (path.endsWith(".mml") || path.endsWith(".mathml")) {
       target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
     } else {
