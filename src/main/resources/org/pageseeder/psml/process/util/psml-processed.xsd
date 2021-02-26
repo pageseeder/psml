@@ -111,6 +111,11 @@
           <xs:element ref="properties-fragment" minOccurs="0" />
         </xs:choice>
       </xs:sequence>
+      <xs:attribute name="overwrite" type="xs:boolean" default="true">
+        <xs:annotation>
+          <xs:documentation>Whether or not the fragments can be overwritten on an upload (new ones will always be created).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
