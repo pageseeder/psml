@@ -1026,6 +1026,11 @@
       <xs:sequence>
         <xs:element ref="locator" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
+      <xs:attribute name="structure-modified" type="xs:dateTime">
+        <xs:annotation>
+          <xs:documentation>The last date the document structure was modified. INFORMATIONAL - ignored by upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
