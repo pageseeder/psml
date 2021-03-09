@@ -791,6 +791,11 @@
       <xs:documentation>A cross-reference from another document. INFORMATIONAL - ignored by upload.</xs:documentation>
     </xs:annotation>
     <xs:complexType>
+      <xs:attribute name="archived" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Whether the source document is archived</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="uriid" type="xs:long">
         <xs:annotation>
           <xs:documentation>The ID of the source document</xs:documentation>
@@ -1331,6 +1336,11 @@
       <xs:sequence>
         <xs:element ref="document" minOccurs="0" maxOccurs="1" />
       </xs:sequence>
+      <xs:attribute name="archived" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Whether the image is archived. INFORMATIONAL - ignored by upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="src" type="xs:string">
         <xs:annotation>
           <xs:documentation>Path for image (overrides docid and uriid).</xs:documentation>
@@ -1827,6 +1837,11 @@
         <xs:element ref="monospace" />
         <xs:element ref="document" />
       </xs:choice>
+      <xs:attribute name="archived" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Whether the URL is archived. INFORMATIONAL - ignored by upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="href" type="xs:string" use="required">
         <xs:annotation>
           <xs:documentation>URL for link target.</xs:documentation>
@@ -1940,6 +1955,11 @@
       <xs:element ref="xref-fragment" />
       <xs:element ref="properties-fragment" />
     </xs:choice>
+    <xs:attribute name="archived" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>Whether the target document is archived. INFORMATIONAL - ignored by upload.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
     <xs:attribute name="id" type="xs:long">
       <xs:annotation>
         <xs:documentation>XLink ID of the cross reference. INFORMATIONAL - ignored by upload.</xs:documentation>
