@@ -483,6 +483,11 @@
         </xs:element>
         <xs:element ref="labels" minOccurs="0" />
       </xs:all>
+      <xs:attribute name="archived" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>Whether the document is archived. INFORMATIONAL - ignored by upload.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="id" type="xs:long">
         <xs:annotation>
           <xs:documentation>Unique and permanent URI identifier. INFORMATIONAL - ignored by upload.</xs:documentation>
