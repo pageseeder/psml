@@ -1381,6 +1381,11 @@
           <xs:documentation>If 'true' the target image doesn't exsist. INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="labels" type="label-list">
+        <xs:annotation>
+          <xs:documentation>Image labels.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
