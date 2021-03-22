@@ -370,6 +370,36 @@ public class ProcessTest {
   }
 
   @Test
+  public void testStripImageURIIDs() throws IOException, ProcessException {
+    String filename = "images.psml";
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripImagesURIID(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check xref result
+    File result = new File(dest, filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("count(//image/@src)", equalTo("4")));
+    Assert.assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("0")));
+  }
+
+  @Test
   public void testMathMLNsPrefix() throws IOException, ProcessException {
     String filename = "mathml_ns_prefix.psml";
     Process p = new Process();
@@ -798,6 +828,7 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("diagram1-2.jpg")));
     Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("diagram2.jpg")));
     Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("diagram1-3.jpg")));
+    Assert.assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("4")));
 
     // check files
     Assert.assertTrue("Image 1 missing", new File(image, "diagram1.jpg").exists());
