@@ -560,7 +560,7 @@
       </xs:attribute>
       <xs:attribute name="folder" type="xs:boolean">
         <xs:annotation>
-          <xs:documentation>If 'true' this is a folder (for external URI only).</xs:documentation>
+          <xs:documentation>If 'true' this is a folder (for external URI only). DEPRECATED.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="size" type="xs:long">

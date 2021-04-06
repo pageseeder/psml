@@ -38,24 +38,29 @@ public class Strip {
   private boolean stripDocumentInfo = false;
 
   /**
-   * Strip the documentinfo element
+   * Strip the documentinfo/uri/docid attribute
    */
   private boolean stripDocumentInfoDocID = false;
 
   /**
-   * Strip the documentinfo element
+   * Strip the documentinfo/uri/displaytitle element and uri/@title attribute
    */
   private boolean stripDocumentInfoTitle = false;
 
   /**
-   * Strip the documentinfo element
+   * Strip the documentinfo/uri/description element
    */
   private boolean stripDocumentInfoDescription = false;
 
   /**
-   * Strip the documentinfo element
+   * Strip the documentinfo/uri/labels element
    */
   private boolean stripDocumentInfoLabels = false;
+
+  /**
+   * Strip the documentinfo/publication element
+   */
+  private boolean stripDocumentInfoPublication = false;
 
   /**
    * Strip the documentinfo element
@@ -140,6 +145,13 @@ public class Strip {
    */
   public void setStripDocumentInfoLabels(boolean stripDocumentInfoLabels) {
     this.stripDocumentInfoLabels = stripDocumentInfoLabels;
+  }
+
+  /**
+   * @param stripDocumentInfoPublication the stripDocumentInfoPublication to set
+   */
+  public void setStripDocumentInfoPublication(boolean stripDocumentInfoPublication) {
+    this.stripDocumentInfoPublication = stripDocumentInfoPublication;
   }
 
   /**
@@ -252,6 +264,13 @@ public class Strip {
    */
   public boolean stripDocumentInfoLabels() {
     return this.stripDocumentInfoLabels;
+  }
+
+  /**
+   * @return the stripDocumentInfoPublication
+   */
+  public boolean stripDocumentInfoPublication() {
+    return this.stripDocumentInfoPublication;
   }
 
   /**

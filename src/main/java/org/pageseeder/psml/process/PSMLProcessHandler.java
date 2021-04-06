@@ -1192,9 +1192,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
         return true;
       if (this.strip.stripDocumentInfoTitle() && "displaytitle".equals(elemName))
         return true;
-    } else if ("locator".equals(dad)) {
-      if (this.strip.stripFragmentInfoLabels() && "labels".equals(elemName))
+    } else if ("documentinfo".equals(dad)) {
+      if (this.strip.stripDocumentInfoPublication() && "publication".equals(elemName))
         return true;
+    } else if ("locator".equals(dad)) {
+        if (this.strip.stripFragmentInfoLabels() && "labels".equals(elemName))
+          return true;
     }
     return false;
   }
