@@ -283,6 +283,35 @@ public class ProcessTest {
   }
 
   @Test
+  public void testStripDocumentInfoPublication() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "placeholders_pub.psml";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setPreserveSrc(false);
+    p.setSrc(copy);
+    p.setDest(dest);
+    Strip strip = new Strip();
+    strip.setStripDocumentInfoPublication(true);
+    p.setStrip(strip);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("count(/document/documentinfo/publication)", equalTo("0")));
+  }
+
+  @Test
   public void testStripDocumentInfoTitle() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
@@ -1275,6 +1304,7 @@ public class ProcessTest {
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     //System.out.println(xml);
+    Assert.assertThat(xml, hasXPath("count(/document/documentinfo/publication)", equalTo("1")));
     Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("5")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[1]/@title", equalTo("Content root first 1")));
     Assert.assertThat(xml, hasXPath("(//toc-part)[2]/@title", equalTo("Placeholder 2 root second here.")));
