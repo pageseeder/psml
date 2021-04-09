@@ -568,6 +568,20 @@
           <xs:documentation>The file size in bytes (non PSML only).  INFORMATIONAL - ignored by upload.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="source">
+        <xs:annotation>
+          <xs:documentation>The URL source (for external URI only).  INFORMATIONAL - ignored by upload.:
+            - pageseeder: a URL to the PageSeeder user interface;
+            - virtual: a URL to a virtual host.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="pageseeder" />
+            <xs:enumeration value="virtual" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
@@ -652,6 +666,31 @@
       <xs:attribute name="docid" type="document-id">
         <xs:annotation>
           <xs:documentation>The docid of the compare document.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="scheme" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The scheme of the compare document.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="host" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The host of the compare document.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="port" type="xs:integer">
+        <xs:annotation>
+          <xs:documentation>The port of the compare document.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="path" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The path of the compare document.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="decodedpath" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The decoded path of the compare document.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
