@@ -1254,10 +1254,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
     this.logger.debug("Decoded src is " + finalSrc);
     // find image file
     String relativePath = cleanUpParentFolder() + '/' + finalSrc;
-    if (relativePath.startsWith("META_INF"))
-      this.logger.debug("Image file relative path is " + relativePath);
+    this.logger.debug("Image file relative path is " + relativePath);
     File imageFile = new File(this.binaryRepository, relativePath);
-    this.logger.debug("Image file is " + imageFile.getAbsolutePath());
+    //this.logger.debug("Image file is " + imageFile.getAbsolutePath());
     // log image not found
     if ((!imageFile.exists() || !imageFile.isFile())) {
       if (this.logImageNotFound && this.failOnError)
@@ -1266,7 +1265,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       else if (this.logImageNotFound)
         this.logger.error(
             "Image not found in URI " + this.uriID + " with src " + src + " and URI ID " + uriid);
-      // don't warn as may be export with imagemetadataonly="true"
+      // don't warn as may be export with binarymetadataonly="true"
       // else
       // this.logger.warn("Image not found with src "+src+" and URI ID "+uriid);
     }
@@ -1281,11 +1280,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.logger
           .debug("Could not compute relative path for image src " + finalSrc + " (" + uriid + ")");
     } else {
-      // remove potential META-INF at the start (when coming from alternate XRef
-      // in a PSML metadata file)
-      if (alternateXRef && relativePath.matches("^META-INF(/|\\\\)(.+)$")) {
-        relativePath = relativePath.substring(9);
-      }
       // if processing image paths
       if (this.imageSrc != ImageSrc.LOCATION) {
         String suffix = null;
@@ -1356,7 +1350,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    *
    * @return the clean parent folder
    */
-  private String cleanUpParentFolder() {
-    return this.parentFolderRelativePath.replaceFirst("^/META-INF/", "/");
+  public String cleanUpParentFolder() {
+    return this.parentFolderRelativePath.replaceFirst("^META-INF", "");
   }
 }

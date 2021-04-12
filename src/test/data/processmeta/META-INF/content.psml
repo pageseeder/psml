@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21929" schemaversion="0.10" date="2017-06-23T16:31:15+10:00"
+  version="current" level="metadata">
+  <documentinfo>
+    <uri id="21929" docid="folder1" scheme="http" host="localhost"
+      port="80" path="/ps/test/local1/documents/process/content"
+      decodedpath="/ps/test/local1/documents/process/content" external="false"
+      mediatype="folder" created="2017-06-23T16:31:15+10:00" modified="2017-06-23T16:31:15+10:00"
+      title="content">
+      <displaytitle>content</displaytitle>
+      <labels>doc1</labels> 
+      <description>This is folder content.</description>
+    </uri>
+  </documentinfo>
+  <fragmentinfo />
+  <metadata />
+</document>

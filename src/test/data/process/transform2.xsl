@@ -8,6 +8,11 @@
    </heading>
  </xsl:template>
 
+<!-- change all displaytitle to x element -->
+<xsl:template match="displaytitle">
+    <x>x</x>
+</xsl:template>
+
  <!-- copy all other elements unchanged -->
  <xsl:template match="*">
     <xsl:copy>

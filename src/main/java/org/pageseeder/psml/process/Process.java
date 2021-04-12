@@ -329,14 +329,12 @@ public final class Process {
     // collect files
     this.logger.debug("Collecting PSML files from "+this.src.getAbsolutePath());
     Map<String, File> psml = new HashMap<>();
-    Map<String, File> metadata = new HashMap<>();
     Map<String, File> rest = new HashMap<>();
-    collectAll(this.src, psml, metadata, rest);
+    collectAll(this.src, psml, null, rest);
 
     String processID = "P"+System.currentTimeMillis();
     // start processing
-    this.logger.info("Found "+psml.size()+" PSML content file(s), "+metadata.size()
-        +" PSML metadata file(s) and "+rest.size()+" non PSML file(s)");
+    this.logger.info("Found "+psml.size()+" PSML file(s) and "+rest.size()+" non PSML file(s)");
 
     // create manifest first
     File manifestFile = null;
@@ -397,14 +395,11 @@ public final class Process {
         } else {
           output = this.dest;
         }
-        // add metadata files if they need to be parsed
-        if (parseMetadata) psml.putAll(metadata);
         process(psml, currentSource, output, this.src, imageCache);
         // reload psml source if needed
         if (useOutputToTempDir) {
           psml.clear();
-          if (parseMetadata) collectAll(output, psml, metadata, null);
-          else collectPSML(output, psml);
+          collectPSML(output, psml);
         }
       }
 
@@ -439,14 +434,6 @@ public final class Process {
           target = new File(this.dest, relPath);
         }
         moveFile(other, target);
-      }
-
-      // move metadata files
-      if (!parseMetadata) {
-        this.logger.info("Moving "+metadata.size()+" PSML metadata file(s)");
-        for (String relPath : metadata.keySet()) {
-          moveFile(metadata.get(relPath), new File(this.dest, relPath));
-        }
       }
 
       // remove temp folders
