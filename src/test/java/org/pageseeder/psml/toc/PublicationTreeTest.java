@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1079,9 +1080,14 @@ public final class PublicationTreeTest {
 
   @Test
   public void testParseWACCC() throws SAXException {
-    DocumentTree tree = Tests.parse(1, "waccc.psml").normalize(TitleCollapse.auto);
-    PublicationTree publication = new PublicationTree(tree);
+    DocumentTree root = Tests.parse(1, "waccc.psml").normalize(TitleCollapse.auto);
+    Assert.assertEquals(OffsetDateTime.parse("2017-03-28T16:41:30+10:00"), root.lastedited());
+    PublicationTree publication = new PublicationTree(root);
+    DocumentTree tree = Tests.parse(681724, "test_doc_1.psml").normalize(TitleCollapse.auto);
+    Assert.assertEquals(OffsetDateTime.parse("2021-04-16T15:56:51+10:00"), tree.lastedited());
+    publication = publication.add(tree);
     assertValidPublication(publication);
+    Tests.print(publication);
   }
 
   @Test

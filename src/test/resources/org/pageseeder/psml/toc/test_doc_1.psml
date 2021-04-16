@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="681724" schemaversion="1.3" date="2021-04-16T15:56:58+10:00" status="Initiated" version="current"
+          level="portable">
+    <documentinfo>
+        <uri id="681724" external="false" mediatype="application/vnd.pageseeder.psml+xml"
+             created="2020-02-28T15:35:56+11:00" modified="2021-04-16T15:56:58+10:00" scheme="http" host="localhost"
+             port="80" path="/ps/test/local1/documents/word3/test_doc_1/test_doc_1.psml"
+             decodedpath="/ps/test/local1/documents/word3/test_doc_1/test_doc_1.psml" title="Test doc 1">
+            <displaytitle>Test doc 1</displaytitle>
+        </uri>
+    </documentinfo>
+    <fragmentinfo structure-modified="2021-04-16T15:56:51+10:00">
+        <locator id="2126481" fragment="3" editid="4342659" modified="2021-04-16T15:56:50+10:00"/>
+    </fragmentinfo>
+    <metadata/>
+    <section id="title">
+        <fragment id="1"/>
+    </section>
+    <toc/>
+    <section id="xrefs">
+        <fragment id="3">
+            <para>Some content</para>
+        </fragment>
+    </section>
+</document>

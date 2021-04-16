@@ -10,6 +10,8 @@ import org.pageseeder.xmlwriter.XMLWriter;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * A embed block reference.
@@ -207,11 +209,12 @@ public final class Reference extends Element implements Serializable {
   @Override
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
       boolean numbered, String prefix, boolean children) throws IOException {
-    toXML(xml, level, number, treeid, count, title(), numbered, prefix, children, "");
+    toXML(xml, level, number, treeid, count, title(), numbered, prefix, children, "", null);
   }
 
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
-      String title, boolean numbered, String prefix, boolean children, String labels) throws IOException {
+                    String title, boolean numbered, String prefix, boolean children, String labels,
+                    OffsetDateTime lastedited) throws IOException {
     toXMLNoClose(xml, level, count);
     // if display="document" use title from target document
     if (this._displaydocument != null && this._displaydocument) {
@@ -227,6 +230,9 @@ public final class Reference extends Element implements Serializable {
     }
     if (!"".equals(labels)) {
       xml.attribute("labels", labels);
+    }
+    if (lastedited != null) {
+      xml.attribute("last-edited", lastedited.format(DateTimeFormatter.ISO_DATE_TIME));
     }
     if (numbered && number != null) {
       Prefix pref = number.getPrefix(treeid, count);

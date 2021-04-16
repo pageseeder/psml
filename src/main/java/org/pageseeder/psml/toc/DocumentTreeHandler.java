@@ -7,7 +7,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.xml.BasicHandler;
 import org.xml.sax.Attributes;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.Deque;
 import java.util.Objects;
 
@@ -129,6 +132,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private @Nullable StringBuilder placeholderContent = null;
 
   /**
+   * Last edited date (including transclusions)
+   */
+  private @Nullable OffsetDateTime lastEdited = null;
+
+  /**
    * Constructor (URI id set by handler)
    *
    */
@@ -159,7 +167,22 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     if (isElement("media-fragment")) {
       this.inMediaFragment++;
     }
-    if (this.ignore || this.inMediaFragment > 0) return;
+    if (this.inMediaFragment > 0) return;
+    try {
+      if (isElement("fragmentinfo") && attributes.getValue("structure-modified") != null) {
+        OffsetDateTime modified = OffsetDateTime.parse(attributes.getValue("structure-modified"));
+        if (this.lastEdited == null || this.lastEdited.isBefore(modified)) {
+          this.lastEdited = modified;
+        }
+      } else if (isElement("locator") && attributes.getValue("modified") != null) {
+        OffsetDateTime modified = OffsetDateTime.parse(attributes.getValue("modified"));
+        if (this.lastEdited == null || this.lastEdited.isBefore(modified)) {
+          this.lastEdited = modified;
+        }
+      }
+    } catch (DateTimeParseException ex) {
+    }
+    if (this.ignore) return;
     if ("blockxref".equals(element)) {
       this._blockxrefs.push("transclude".equals(attributes.getValue("type")));
     }
@@ -450,6 +473,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     } else if ("fragment".equals(element) || "xref-fragment".equals(element) || "properties-fragment".equals(element)) {
       this._fragmentIDs.pop();
     } else if ("document".equals(element) && !hasAncestor("blockxref")) {
+      this._tree.lastedited(this.lastEdited);
       this._tree.parts(this._expander.parts());
       add(this._tree.build());
     }

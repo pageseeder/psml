@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -429,6 +430,9 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       if (!"".equals(root.labels())) {
         xml.attribute("labels", root.labels());
       }
+      if (root.lastedited() != null) {
+        xml.attribute("last-edited", root.lastedited().format(DateTimeFormatter.ISO_DATE_TIME));
+      }
       if (this._map.size() == 1 || cposition != -1) {
         xml.attribute("content", "true");
       }
@@ -570,11 +574,13 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           if (output) ref.toXML(xml, level, state.number, next, nextcount, nextTree.title(),
-              nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null), nextTree.labels());
+              nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null),
+              nextTree.labels(), nextTree.lastedited());
         } else {
           // single embedded fragments can't be numbered
           if (output) ref.toXML(xml, level, state.number, next, nextcount, ref.title(),
-              false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment), nextTree.labels());
+              false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment),
+                  nextTree.labels(), nextTree.lastedited());
         }
       } else if (output) {
         xml.openElement("transclusion");

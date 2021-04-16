@@ -8,10 +8,11 @@
       <xs:element name="para-ref"     type="para-ref" />
       <xs:element name="transclusion" type="transclusion" />
     </xs:choice>
-    <xs:attribute name="uriid"    type="xs:integer" use="required"/>
-    <xs:attribute name="title"    type="xs:string"  use="required"/>
-    <xs:attribute name="labels"   type="label-list" />
-    <xs:attribute name="content"  type="xs:boolean"/>
+    <xs:attribute name="uriid"       type="xs:integer" use="required"/>
+    <xs:attribute name="title"       type="xs:string"  use="required"/>
+    <xs:attribute name="labels"      type="label-list" />
+    <xs:attribute name="last-edited" type="xs:dateTime"/>
+    <xs:attribute name="content"     type="xs:boolean"/>
   </xs:complexType>
 </xs:element>
 
@@ -41,10 +42,11 @@
   <xs:attribute name="title"          type="xs:string"    use="required"/>
   <xs:attribute name="uriid"          type="uriid"        use="required"/>
   <xs:attribute name="labels"         type="label-list" />
+  <xs:attribute name="last-edited"    type="xs:dateTime"/>
   <xs:attribute name="documenttype"   type="documenttype" />
-  <xs:attribute name="targetfragment" type="fragment"/>  
+  <xs:attribute name="targetfragment" type="fragment"/>
   <xs:attribute name="canonical"      type="xs:string"/>
-  <xs:attribute name="prefix"         type="xs:string"/>  
+  <xs:attribute name="prefix"         type="xs:string"/>
   <xs:attribute name="numbered"       type="xs:boolean"/>
   <xs:attribute name="position"       type="xs:integer"/>
   <xs:attribute name="children"       type="xs:boolean"/>
@@ -74,7 +76,7 @@
 
 <xs:complexType name="transclusion">
   <xs:attribute name="uriid"          type="uriid"        use="required"/>
-  <xs:attribute name="fragment"       type="fragment"     use="required"/>  
+  <xs:attribute name="fragment"       type="fragment"     use="required"/>
   <xs:attribute name="position"       type="xs:integer"   use="required"/>
 </xs:complexType>
 

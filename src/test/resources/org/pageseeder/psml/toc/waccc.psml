@@ -7,9 +7,8 @@
       decodedpath="/ps/waccc/legislation/documents/legislation/corruption,_crime_and_misconduct_act_2003/content.psml"
       external="false" mediatype="application/vnd.pageseeder.psml+xml"
       documenttype="act_master" created="2017-03-28T16:41:30+11:00"
-      modified="2017-04-03T18:58:55+10:00" title=" Corruption, Crime and Misconduct Act 2003">
-      <displaytitle> Corruption, Crime and Misconduct Act 2003
-      </displaytitle>
+      modified="2017-04-03T18:58:55+10:00" title="Corruption, Crime and Misconduct Act 2003">
+      <displaytitle>Corruption, Crime and Misconduct Act 2003</displaytitle>
       <description>Corruption, Crime and Misconduct Act 2003
       </description>
       <labels>master_documents,normal</labels>
@@ -38,7 +37,7 @@
   <fragmentinfo>
     <locator id="1095471" fragment="subcontentlinks" editid="2058263"
       modified="2017-03-28T16:41:30+11:00" />
-    <locator id="1096168" fragment="longTitle-1" />
+    <locator id="1096168" fragment="longTitle-1" modified="2017-03-28T16:41:30+10:00" />
   </fragmentinfo>
   <metadata />
   <section id="content-metadata" title="Metadata" overwrite="true"
@@ -106,9 +105,9 @@
         reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
         reverselink="true" reversetype="none" display="document"
         type="embed" labels="toc" uriid="681724"
-        href="/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/pt1.psml"
-        urititle="Part 1 — Preliminary" mediatype="application/vnd.pageseeder.psml+xml"
-        documenttype="section_master">Part 1 — Preliminary</blockxref>
+        href="/ps/test/local1/documents/word3/test_doc_1/test_doc_1.psml"
+        urititle="Test doc 1" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="references">Test doc 1</blockxref>
       <blockxref id="2058242" title="" frag="default"
         reversefrag="subcontentlinks" reversetitle="Corruption, Crime and Misconduct Act 2003"
         reverselink="true" reversetype="none" display="document"
