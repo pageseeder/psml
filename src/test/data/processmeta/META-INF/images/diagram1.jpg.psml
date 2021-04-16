@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="219290" schemaversion="0.10" date="2017-06-23T16:31:15+10:00"
+  version="current" level="metadata">
+  <documentinfo>
+    <uri id="219290" scheme="http" host="localhost"
+      port="80" path="/ps/test/local1/documents/process/images/diagram1.jpg"
+      decodedpath="/ps/test/local1/documents/process/images/diagram1.jpg" external="false"
+      mediatype="image/jpeg" created="2017-06-23T16:31:15+10:00" modified="2017-06-23T16:31:15+10:00">
+      <displaytitle>diagram1.jpg</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="21940" href="../images.psml" frag="2"
+        urititle="Ref 2" mediatype="application/vnd.pageseeder.psml+xml"
+        id="394390" title="References" type="none"
+        forwardtype="image" forwarddisplay="document" forwardfrag="default" />
+    </reversexrefs>
+  </documentinfo>
+  <fragmentinfo />
+  <metadata editid="4342616" modified="2021-04-12T12:07:17+10:00">
+    <properties>
+      <property name="hi-res" title="Hi-res" datatype="xref">
+        <xref id="4342615" frag="default" reversefrag="default" reversetitle=""
+              reverselink="true" reversetype="none" display="document" type="alternate" uriid="219290"
+              href="diagram%20space.jpg" urititle="diagram space.jpg" mediatype="image/jpeg">diagram space.jpg</xref>
+      </property>
+    </properties>
+  </metadata>
+  <fragments>
+    <fragment id="xywh=92,308,96,79" type="xref">
+      <para>
+        <xref id="4342581" frag="default" reversefrag="xywh=92,308,96,79" reversetitle="Image region"
+              reverselink="true" reversetype="none" display="document" type="none" uriid="219290"
+              href="diagram%20space.jpg" urititle="diagram space.jpg" mediatype="image/jpeg">diagram space.jpg</xref>
+      </para>
+    </fragment>
+    <fragment id="xywh=85,76,203,168" type="xref">
+      <para>
+        <xref id="4342577" frag="default" reversefrag="xywh=85,76,203,168" reversetitle="Image region"
+              reverselink="true" reversetype="none" display="document" type="none" uriid="21930"
+              href="../content/content_1.psml" urititle="Content 1"
+              mediatype="application/vnd.pageseeder.psml+xml" documenttype="default">Content 1</xref>
+      </para>
+    </fragment>
+  </fragments>
+</document>

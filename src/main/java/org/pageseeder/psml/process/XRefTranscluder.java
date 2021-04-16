@@ -271,7 +271,7 @@ public final class XRefTranscluder {
     } catch (UnsupportedEncodingException ex) {
       this.parentHandler.getLogger().error(ex.getMessage(), ex);
     }
-    String dadPath = this.parentHandler.getParentFolderRelativePath();
+    String dadPath = this.parentHandler.cleanUpParentFolder();
     // find target file
     File target;
     if (link) {

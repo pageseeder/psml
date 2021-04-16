@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21930" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="21930" scheme="http" host="localhost" port="80"
+      path="/ps/test/local1/documents/process/content/content_1.psml"
+      decodedpath="/ps/test/local1/documents/process/content/content_1.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2017-06-23T16:31:36+10:00" modified="2017-06-23T16:41:37+10:00"
+      title="Content 1">
+      <displaytitle>Content 1</displaytitle>
+    </uri>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="14934" fragment="2" editid="39449"
+      modified="2017-06-23T16:39:20+10:00">
+    </locator>
+  </fragmentinfo>
+  <metadata />
+  <section id="title">
+    <fragment id="1">
+      <heading level="1" numbered="true">Content 1</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>Some content.</para>
+      <image src="../images/diagram1.jpg" width="200" height="100" uriid="219290"/>
+    </fragment>
+  </section>
+</document>

@@ -1,0 +1,16 @@
+<uris>
+    <uri id="21930" scheme="http" host="localhost" port="80"
+         path="/ps/test/local1/documents/process/content/content_1.psml"
+         decodedpath="/ps/test/local1/documents/process/content/content_1.psml" external="false"
+         mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:31:36+10:00"
+         modified="2017-06-23T16:41:37+10:00" title="Content 1">
+        <displaytitle>Content 1</displaytitle>
+    </uri>
+    <uri id="21931" scheme="http" host="localhost" port="80"
+         path="/ps/test/local1/documents/process/images/diagram1.jpg"
+         decodedpath="/ps/test/local1/documents/process/images/diagram1.jpg" external="false"
+         mediatype="inage/jpeg" created="2017-06-23T16:31:56+10:00"
+         modified="2017-06-23T16:35:34+10:00">
+        <displaytitle>diagram1.jpg</displaytitle>
+    </uri>
+</uris>

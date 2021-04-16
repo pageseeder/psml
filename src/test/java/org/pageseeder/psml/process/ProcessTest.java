@@ -44,6 +44,7 @@ public class ProcessTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/process";
   private static final String SOURCE_FOLDER_DIFF = "src/test/data/processdiff";
+  private static final String SOURCE_FOLDER_META = "src/test/data/processmeta";
   private static final String DEST_FOLDER = "build/test/process/xrefs";
   private static final String MATH_FOLDER = "build/test/process/math";
   private static final String COPY_FOLDER = "build/test/process/copy";
@@ -507,8 +508,6 @@ public class ProcessTest {
     p.setSrc(copy);
     p.setDest(dest);
     p.setProcessed(false);
-    Strip strip = new Strip();
-    p.setStrip(strip); // set empty strip so metadata is processed
     p.process();
 
     // check result
@@ -1034,6 +1033,52 @@ public class ProcessTest {
   }
 
   @Test
+  public void testProcessImagesEmbedMetadata() throws IOException, ProcessException {
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER_META));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    Images images = new Images();
+    images.setEmbedMetadata(true);
+    p.setImages(images);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/content/content_1.psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("//image/@src", equalTo("../images/diagram1.jpg")));
+    Assert.assertThat(xml, hasXPath("//image//property[@name='hi-res']/xref/@href",
+            equalTo("../images/diagram space.jpg")));
+  }
+
+  @Test
+  public void testProcessXRefsMetadataLevel() throws IOException, ProcessException {
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER_META));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("none,alternate");
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/META-INF/images/diagram1.jpg.psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//xref)[1]//documentinfo/uri/@id", equalTo("219290")));
+    Assert.assertThat(xml, hasXPath("(//xref)[2]//documentinfo/uri/@id", equalTo("219290")));
+    Assert.assertThat(xml, hasXPath("(//xref)[3]//documentinfo/uri/@id", equalTo("21930")));
+  }
+
+  @Test
   public void testProcessXRefs() throws IOException, ProcessException {
     String filename = "ref_0.psml";
     Process p = new Process();
@@ -1417,10 +1462,11 @@ public class ProcessTest {
 
   @Test
   public void testPostTransform() throws IOException, ProcessException {
-    String filename = "content_2.psml";
+    String path1 = "content/content_2.psml";
+    String path2 = "META-INF/images/diagram1.jpg.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
-    p.setSrc(new File(SOURCE_FOLDER + "/content"));
+    p.setSrc(new File(SOURCE_FOLDER));
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
       FileUtils.deleteDirectory(dest);
@@ -1428,22 +1474,25 @@ public class ProcessTest {
     p.setDest(dest);
     XSLTTransformation xslt = new XSLTTransformation();
     xslt.setXSLT(SOURCE_FOLDER + "/transform1.xsl");
-    xslt.setIncludes(filename);
+    xslt.setIncludes(path1 + "," + path2);
     p.setPostTransform(xslt);
     p.process();
 
     // check result
-    File result = new File(DEST_FOLDER + "/" + filename);
+    File result = new File(DEST_FOLDER + "/" + path1);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     Assert.assertThat(xml, hasXPath("(//heading)[1]/@level", equalTo("3")));
+    result = new File(DEST_FOLDER + "/" + path2);
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
   }
 
   @Test(expected=ProcessException.class)
   public void testPostTransformFail() throws IOException, ProcessException {
-    String filename = "content_2.psml";
+    String path1 = "content/content_2.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
-    p.setSrc(new File(SOURCE_FOLDER + "/content"));
+    p.setSrc(new File(SOURCE_FOLDER));
     File dest = new File(DEST_FOLDER);
     if (dest.exists())
       FileUtils.deleteDirectory(dest);
@@ -1451,7 +1500,25 @@ public class ProcessTest {
     p.setDest(dest);
     XSLTTransformation xslt = new XSLTTransformation();
     xslt.setXSLT(SOURCE_FOLDER + "/transform2.xsl");
-    xslt.setIncludes(filename);
+    xslt.setIncludes(path1);
+    p.setPostTransform(xslt);
+    p.process();
+  }
+
+  @Test(expected=ProcessException.class)
+  public void testPostTransformMetadataFail() throws IOException, ProcessException {
+    String path2 = "META-INF/images/diagram1.jpg.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XSLTTransformation xslt = new XSLTTransformation();
+    xslt.setXSLT(SOURCE_FOLDER + "/transform2.xsl");
+    xslt.setIncludes(path2);
     p.setPostTransform(xslt);
     p.process();
   }
