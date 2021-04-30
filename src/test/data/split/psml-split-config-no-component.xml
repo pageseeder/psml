@@ -1,0 +1,32 @@
+<split-config>
+<!--
+  <container [type="mycontainer"] [labels="mylabel"] [contains="mydoc"]>
+    [<heading level="2" [numbered="true"]>
+    |<block label="mylabel">]
+    ...
+  </container>
+-->
+  <container type="mydefault" />
+
+<!--
+  <document [type="mydoc"] [folder="components"] [labels="mylabel"]>
+    [<heading level="3" [numbered="true"]/>
+    |<block label="mylabel"/>
+    |<inline label="mylabel"/>]
+    ...
+  </document>
+-->
+
+<!--
+  <fragment [type="myfrag"] [labels="mylabel"]>
+    [<heading level="4" [numbered="true"]/>
+    |<block label="mylabel"/>
+    |<para [numbered="true"]/>]
+    ...
+  </fragment>
+-->
+  <fragment>
+    <heading level="2"/>
+    <heading level="3"/>
+  </fragment>
+</split-config>

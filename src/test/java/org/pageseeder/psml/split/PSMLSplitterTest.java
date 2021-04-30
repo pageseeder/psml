@@ -53,6 +53,33 @@ public class PSMLSplitterTest {
   }
 
   @Test
+  public void testConfigNoComponent() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    File copyfile = new File(copy, "split_source_single.psml");
+    File config = new File(src, "psml-split-config-no-component.xml");
+    String config_xml = new String (Files.readAllBytes(config.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(Tests.toDOMSource(new StringReader(config_xml)), new Validates(getSchema("psml-split-config.xsd")));
+    // process
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Builder b = new PSMLSplitter.Builder();
+    b.source(copyfile);
+    b.destination(dest);
+    b.config(config);
+    b.working(new File(WORKING_FOLDER));
+    PSMLSplitter s = b.build();
+    s.process();
+    compareFileTree(new File(SOURCE_FOLDER, "expected/no-component"), new File(DEST_FOLDER));
+  }
+
+  @Test
   public void testConfigSingleContainer() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);

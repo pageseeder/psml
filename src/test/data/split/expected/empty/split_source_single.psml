@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="references"><documentinfo><uri title="Split source 1"/></documentinfo><section id="title"><fragment id="1"><heading level="1">Split source 1</heading><para>Front matter <inline label="inline1">[My field 1]</inline></para><para>Front matter
-        <xref frag="1" display="manual" type="none" href="split_source_single.psml" title="link to B">link to B</xref>
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="default"><documentinfo><uri title="Split source 1"/></documentinfo><section id="title"><fragment id="1"><heading level="1">Split source 1</heading></fragment></section><section id="content"><fragment id="2"><para>Front matter <inline label="inline1">[My field 1]</inline></para><para>Front matter
+        <xref frag="2" display="manual" type="none" href="split_source_single.psml" title="link to B">link to B</xref>
       </para><para>Front matter
         <link href="http://pageseeder.com">link to PageSeeder</link>
       </para><image src="images/diagram1.jpg"/><heading level="2">Heading A</heading><para>A content</para><heading level="2">Heading B</heading><para>B content</para><para>B content <xref frag="1" display="manual" type="none" href="split_source_single.psml" title="link to top">link to top</xref></para><para>B content <inline label="inline2">with inline</inline></para><image width="200" height="100" src="images/diagram1.jpg"/><heading level="3">Heading B1</heading><para>B1 content</para><para indent="1" numbered="true">B1-1 clause</para><para indent="1" numbered="true">B1-2 clause</para><heading level="3">Heading B2</heading><para>B2 content <inline label="inline1">[My field 2]</inline></para><heading level="2">Heading C</heading><para>C content <inline label="inline1">[My field 3]</inline></para><heading numbered="true" level="2">My definitions</heading><para>Definitions front matter</para><heading numbered="true" level="3">Heading D1</heading><para>D1 content</para><heading numbered="true" level="3">Heading D2</heading><para>D2 content</para><heading numbered="true" level="4">Heading D2-1</heading><para>D2-1 content</para><block label="block2">
         <heading level="2">Heading E</heading>
       </block><heading level="1">Heading E0</heading><para>E content</para><heading level="3">Heading E1</heading><para>E1 content
-        <xref frag="1" display="manual" type="none" href="split_source_single.psml" title="link to B">link to B</xref>
+        <xref frag="2" display="manual" type="none" href="split_source_single.psml" title="link to B">link to B</xref>
       </para><heading level="3">Heading E2</heading><para>E2 content
-        <xref frag="1" display="manual" type="none" href="split_source_single.psml" title="link to B1-2">link to B1-2</xref>
+        <xref frag="2" display="manual" type="none" href="split_source_single.psml" title="link to B1-2">link to B1-2</xref>
       </para><block label="block1">Special content</block><para>More special content</para><block label="block2">Heading F</block><para>F content</para><block label="block3">
         <heading level="2">Heading G</heading>
         <heading level="1">Heading G1</heading>
       </block><para>G1 content</para><block label="block3">
         <para indent="1" numbered="true">G1-1 clause</para>
-      </block></fragment></section><toc/><section id="xrefs"><xref-fragment id="2"/></section></document>
+      </block></fragment></section></document>
