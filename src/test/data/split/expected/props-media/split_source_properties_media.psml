@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="contract"><documentinfo><uri title="Split source 1"><labels>mycontract</labels></uri></documentinfo><section id="title"><properties-fragment id="1">
+      <property name="test0" value="myvalue0"/>
+      <property name="markup0" title="My markup" datatype="markup">
+        <heading level="2">Heading 0X</heading>
+        <para>Markup content 0</para>
+      </property>
+    </properties-fragment><fragment id="t2"><heading level="1">Split source 1</heading><para>Front matter <xref frag="default" display="document" type="none" href="fields/field-001.psml" documenttype="field">[My field 1]</xref></para><para>Front matter
+        <xref frag="1" display="manual" type="none" href="components/component-002.psml" title="link to B">link to B</xref>
+      </para><para>Front matter
+        <link href="http://pageseeder.com">link to PageSeeder</link>
+      </para><image src="images/diagram1.jpg"/></fragment><media-fragment mediatype="application/mathml+xml" id="t3">
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mi>y</mi>
+        <mo>=</mo>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>+</mo>
+        <mn>1</mn>
+      </math>
+    </media-fragment></section><toc/><section id="xrefs"><xref-fragment id="2"><blockxref frag="default" display="document" type="embed" href="components/component-001.psml" level="1">Heading A</blockxref><blockxref frag="default" display="document" type="embed" href="components/component-002.psml" level="1">Heading B</blockxref><blockxref frag="default" display="document" type="embed" href="components/component-003.psml" level="1">Heading C</blockxref><blockxref frag="default" display="document" type="embed" href="terms/term-001.psml" documenttype="term" level="1">My definitions</blockxref><blockxref frag="default" display="document" type="embed" href="terms/term-002.psml" documenttype="term" level="2">Heading D1</blockxref><blockxref frag="default" display="document" type="embed" href="terms/term-003.psml" documenttype="term" level="2">Heading D2</blockxref><blockxref frag="default" display="document" type="embed" href="schedules/schedule-001.psml" documenttype="schedule">Heading E</blockxref><blockxref frag="default" display="document" type="embed" href="schedules/schedule-002.psml" documenttype="schedule">Heading F</blockxref><blockxref frag="default" display="document" type="embed" href="components/component-004.psml">Heading G</blockxref></xref-fragment></section></document>

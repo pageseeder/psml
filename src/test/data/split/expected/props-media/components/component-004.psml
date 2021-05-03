@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><document level="portable"><documentinfo><uri title="Heading G"/></documentinfo><section id="title"><fragment id="1"><block label="block3">
+        <heading level="2">Heading G</heading>
+        <heading level="1">Heading G1</heading>
+      </block></fragment></section><section id="content"><fragment id="2"><para>G1 content</para></fragment><fragment id="3"><block label="block3">
+        <para indent="1" numbered="true">G1-1 clause</para>
+      </block></fragment><properties-fragment id="4">
+      <property name="test2" value="myvalue2"/>
+      <property name="markup2" title="My markup" datatype="markup">
+        <heading level="2">Heading GX</heading>
+        <para>Markup content 2</para>
+      </property>
+    </properties-fragment></section></document>

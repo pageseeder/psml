@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="term"><documentinfo><uri title="Heading D2"/></documentinfo><section id="title"><fragment id="1"><heading numbered="true" level="1">Heading D2</heading></fragment></section><section id="content"><fragment id="2"><para>D2 content</para><heading numbered="true" level="2">Heading D2-1</heading><para>D2-1 content</para><block label="block5">
+        <para>Definition end 1</para>
+      </block></fragment><fragment id="3"><para numbered="true" indent="1">Definition end 2</para></fragment><media-fragment mediatype="application/mathml+xml" id="4">
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mi>y</mi>
+        <mo>=</mo>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>+</mo>
+        <mn>1</mn>
+      </math>
+    </media-fragment></section></document>

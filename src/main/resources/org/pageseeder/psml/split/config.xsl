@@ -193,6 +193,10 @@
       <xsl:when test="$para-match">
         <xsl:sequence select="$para-match/.." />
       </xsl:when>
+      <!-- always split properties and media fragments -->
+      <xsl:when test="($el | $el/preceding-sibling::*[1])[self::properties-fragment or self::media-fragment]">
+        <fragment/>
+      </xsl:when>
     </xsl:choose>
   </xsl:function>
 

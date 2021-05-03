@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="term"><documentinfo><uri title="My definitions"/></documentinfo><section id="title"><fragment id="1"><block label="block4">
+        <heading numbered="true" level="1">My definitions</heading>
+      </block></fragment></section><section id="content"><properties-fragment id="2">
+      <property name="test2" value="myvalue2"/>
+      <property name="markup2" title="My markup" datatype="markup">
+        <heading level="1">Heading GX</heading>
+        <para>Markup content 2</para>
+      </property>
+    </properties-fragment><fragment id="3"><para>Definitions front matter</para></fragment></section></document>

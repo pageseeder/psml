@@ -40,13 +40,18 @@
           <xsl:variable name="frontmatter"
                         select="not(config:split-container((//fragment/*)[1]))" />
           <section id="title">
-            <fragment id="1">
-              <xsl:for-each-group select="//fragment/*" group-starting-with="*[config:split-container(.)]">
-                <xsl:if test="position() = 1 and $frontmatter">
-                  <xsl:apply-templates select="current-group()" />
-                </xsl:if>
-              </xsl:for-each-group>
-            </fragment>
+            <xsl:for-each-group select="//fragment/*" group-starting-with="*[config:split-container(.)]">
+              <xsl:if test="position() = 1 and $frontmatter">
+                <xsl:for-each-group select="current-group()"
+                                    group-starting-with="*[config:split-fragment(.)]">
+                  <xsl:call-template name="output-fragment">
+                    <xsl:with-param name="content" select="current-group()"/>
+                    <xsl:with-param name="id" select="if (position() = 1) then '1'
+                                                      else concat('t', position())"/>
+                  </xsl:call-template>
+                </xsl:for-each-group>
+              </xsl:if>
+            </xsl:for-each-group>
           </section>
           <toc/>
 
@@ -86,14 +91,19 @@
 
                         <!-- output container front matter -->
                         <section id="title">
-                          <fragment id="1">
-                            <xsl:for-each-group select="current-group()"
-                                                group-starting-with="*[config:split-document(.) and not(config:split-container(.)/start)]">
-                              <xsl:if test="position() = 1 and $frontmatter">
-                                <xsl:apply-templates select="current-group()" />
-                              </xsl:if>
-                            </xsl:for-each-group>
-                          </fragment>
+                          <xsl:for-each-group select="current-group()"
+                                              group-starting-with="*[config:split-document(.) and not(config:split-container(.)/start)]">
+                            <xsl:if test="position() = 1 and $frontmatter">
+                              <xsl:for-each-group select="current-group()"
+                                                  group-starting-with="*[config:split-fragment(.)]">
+                                <xsl:call-template name="output-fragment">
+                                  <xsl:with-param name="content" select="current-group()"/>
+                                  <xsl:with-param name="id" select="if (position() = 1) then '1'
+                                                                    else concat('t', position())"/>
+                                </xsl:call-template>
+                              </xsl:for-each-group>
+                            </xsl:if>
+                          </xsl:for-each-group>
                         </section>
                         <toc/>
 
@@ -119,16 +129,10 @@
                             <xsl:if test="position() = last() and $endmatter">
                               <xsl:for-each-group select="current-group()"
                                                   group-starting-with="*[config:split-fragment(.)]">
-                                <xsl:variable name="config-frag" select="config:split-fragment(current-group()[1])" />
-                                <fragment id="{position() + 2}">
-                                  <xsl:if test="$config-frag/@type != ''">
-                                    <xsl:attribute name="type" select="$config-frag/@type"/>
-                                  </xsl:if>
-                                  <xsl:if test="$config-frag/@labels != ''">
-                                    <xsl:attribute name="labels" select="$config-frag/@labels"/>
-                                  </xsl:if>
-                                  <xsl:apply-templates select="current-group()" />
-                                </fragment>
+                                <xsl:call-template name="output-fragment">
+                                  <xsl:with-param name="content" select="current-group()"/>
+                                  <xsl:with-param name="id" select="position() + 2"/>
+                                </xsl:call-template>
                               </xsl:for-each-group>
                             </xsl:if>
                           </xsl:for-each-group>
@@ -145,23 +149,18 @@
         <xsl:otherwise>
           <!-- output default document structure -->
           <section id="title">
-            <fragment id="1">
-              <xsl:apply-templates select="(//fragment/*)[1]" />
-            </fragment>
+            <xsl:call-template name="output-fragment">
+              <xsl:with-param name="content" select="(//fragment/*)[1]"/>
+              <xsl:with-param name="id" select="'1'"/>
+            </xsl:call-template>
           </section>
           <section id="content">
             <xsl:for-each-group select="(//fragment/*)[position() > 1]"
                                 group-starting-with="*[config:split-fragment(.)]">
-              <xsl:variable name="config-frag" select="config:split-fragment(current-group()[1])" />
-              <fragment id="{position() + 1}">
-                <xsl:if test="$config-frag/@type != ''">
-                  <xsl:attribute name="type" select="$config-frag/@type"/>
-                </xsl:if>
-                <xsl:if test="$config-frag/@labels != ''">
-                  <xsl:attribute name="labels" select="$config-frag/@labels"/>
-                </xsl:if>
-                <xsl:apply-templates select="current-group()" />
-              </fragment>
+              <xsl:call-template name="output-fragment">
+                <xsl:with-param name="content" select="current-group()"/>
+                <xsl:with-param name="id" select="position() + 1"/>
+              </xsl:call-template>
             </xsl:for-each-group>
           </section>
 
@@ -210,19 +209,43 @@
       <section id="content">
         <xsl:for-each-group select="current-group()[not(position() = 1)]"
               group-starting-with="*[config:split-fragment(.)]">
-          <xsl:variable name="config-frag" select="config:split-fragment(current-group()[1])" />
-          <fragment id="{position() + 1}">
-            <xsl:if test="$config-frag/@type != ''">
-              <xsl:attribute name="type" select="$config-frag/@type"/>
-            </xsl:if>
-            <xsl:if test="$config-frag/@labels != ''">
-              <xsl:attribute name="labels" select="$config-frag/@labels"/>
-            </xsl:if>
-            <xsl:apply-templates select="current-group()" />
-          </fragment>
+          <xsl:call-template name="output-fragment">
+            <xsl:with-param name="content" select="current-group()"/>
+            <xsl:with-param name="id" select="position() + 1"/>
+          </xsl:call-template>
         </xsl:for-each-group>
       </section>
     </document>
+  </xsl:template>
+
+  <!-- output fragment -->
+  <xsl:template name="output-fragment">
+    <xsl:param name="content" />
+    <xsl:param name="id" />
+
+    <xsl:variable name="config-frag" select="config:split-fragment($content[1])" />
+    <xsl:choose>
+      <xsl:when test="$content[1][self::properties-fragment or self::media-fragment]">
+        <xsl:for-each select="$content">
+          <xsl:copy>
+            <xsl:copy-of select="@*[name()!='start-document' and name()!='id']" />
+            <xsl:attribute name="id" select="$id"/>
+            <xsl:apply-templates select="node()" />
+          </xsl:copy>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+        <fragment id="{$id}">
+          <xsl:if test="$config-frag/@type != ''">
+            <xsl:attribute name="type" select="$config-frag/@type"/>
+          </xsl:if>
+          <xsl:if test="$config-frag/@labels != ''">
+            <xsl:attribute name="labels" select="$config-frag/@labels"/>
+          </xsl:if>
+          <xsl:apply-templates select="$content" />
+        </fragment>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- handle inline labels -->

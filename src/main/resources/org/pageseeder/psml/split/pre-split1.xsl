@@ -10,7 +10,7 @@
                 exclude-result-prefixes="#all">
 
   <xsl:import href="config.xsl" />
-  
+
   <!-- Configuration file URL -->
   <xsl:param name="_configfileurl" as="xs:string" />
 
@@ -21,8 +21,9 @@
       <xsl:apply-templates select="document/documentinfo" />
       <section>
         <fragment>
-          <!-- Ignore top level blockxref with content and content of non-top level blockxref -->
-          <xsl:for-each-group select="//fragment/*[not(self::blockxref/*
+          <!-- Ignore top level blockxref with content and content of non-top level blockxref
+               because their fragment content is included elsewhere -->
+          <xsl:for-each-group select="(//fragment/* | //properties-fragment | //media-fragment)[not(self::blockxref/*
                 or ancestor::blockxref[not(parent::fragment or parent::xref-fragment)])]"
               group-starting-with="*[config:split-document(.) or config:split-container(.)]">
             <xsl:variable name="first" select="current-group()[1]" />
@@ -34,7 +35,7 @@
                     <xsl:copy-of select="@*" />
                       <xsl:attribute name="start-document" select="if (config:split-container($first)/@contains)
                           then '-container' else config:split-document($first)/@type" />
-                      <xsl:call-template name="add-fragment-anchor" />         
+                      <xsl:call-template name="add-fragment-anchor" />
                     <xsl:apply-templates select="node()" />
                   </xsl:copy>
                 </xsl:for-each>
@@ -49,13 +50,13 @@
       </section>
     </document>
   </xsl:template>
-  
+
   <!-- Remove non-top level blockxref with content but keep it's content -->
   <xsl:template match="blockxref[*]">
       <xsl:call-template name="add-fragment-anchor" />
       <xsl:apply-templates select=".//fragment/*" />
   </xsl:template>
-  
+
   <!-- Copy all other elements unchanged -->
   <xsl:template match="*">
     <xsl:copy>
@@ -63,13 +64,18 @@
       <xsl:call-template name="add-fragment-anchor" />
       <xsl:apply-templates select="node()" />
     </xsl:copy>
-  </xsl:template>  
+  </xsl:template>
 
   <!-- Adds fragment anchors to preserve xrefs -->
   <xsl:template name="add-fragment-anchor">
-    <xsl:if test="local-name(..) = 'fragment' and not(preceding-sibling::*)">
-      <fragment-anchor id="{../@id}" />
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="self::properties-fragment or self::media-fragment">
+        <fragment-anchor id="{@id}" />
+      </xsl:when>
+      <xsl:when test="local-name(..) = 'fragment' and not(preceding-sibling::*)">
+        <fragment-anchor id="{../@id}" />
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
-  
+
 </xsl:stylesheet>

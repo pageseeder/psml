@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><document level="portable"><documentinfo><uri title="Heading A"/></documentinfo><section id="title"><fragment id="1"><heading level="1">Heading A</heading></fragment></section><section id="content"><properties-fragment id="2">
+      <property name="test1" value="myvalue1"/>
+      <property name="markup1" title="My markup" datatype="markup">
+        <heading level="1">Heading AX</heading>
+        <para>Markup content 1</para>
+      </property>
+    </properties-fragment><media-fragment mediatype="application/mathml+xml" id="3">
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mi>y</mi>
+        <mo>=</mo>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>+</mo>
+        <mn>1</mn>
+      </math>
+    </media-fragment><fragment id="4"><para>A content</para><para>A more content</para></fragment></section></document>
