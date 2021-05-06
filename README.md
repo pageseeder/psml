@@ -1,4 +1,4 @@
-[ ![Download](https://api.bintray.com/packages/pageseeder/maven/psml/images/download.svg) ](https://bintray.com/pageseeder/maven/psml/_latestVersion)
+[![Maven Central](https://img.shields.io/maven-central/v/org.pageseeder/pso-psml.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.pageseeder%22%20AND%20a:%22pso-psml%22)
 
 # PSML
 
