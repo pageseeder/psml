@@ -19,31 +19,6 @@ artifacts {
     archives sourceJar, javadocJar
 }
 
-ext["signing.keyId"] = ''
-ext["signing.password"] = ''
-ext["signing.secretKeyRingFile"] = ''
-ext["ossrhUsername"] = ''
-ext["ossrhPassword"] = ''
-ext["sonatypeStagingProfileId"] = ''
-
-File secretPropsFile = project.rootProject.file('local.properties')
-if (secretPropsFile.exists()) {
-    Properties p = new Properties()
-    new FileInputStream(secretPropsFile).withCloseable { is ->
-        p.load(is)
-    }
-    p.each { name, value ->
-        ext[name] = value
-    }
-} else {
-    ext["signing.keyId"] = project.properties["SIGNING_KEY_ID"]
-    ext["signing.password"] = project.properties["SIGNING_PASSWORD"]
-    ext["signing.secretKeyRingFile"] = project.properties["SIGNING_SECRET_KEY_RING_FILE"]
-    ext["ossrhUsername"] = project.properties["OSSRH_USERNAME"]
-    ext["ossrhPassword"] = project.properties["OSSRH_PASSWORD"]
-    ext["sonatypeStagingProfileId"] = project.properties["SONATYPE_STAGING_PROFILE_ID"]
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -84,9 +59,9 @@ publishing {
 
                     developers {
                         developer {
-                            id 'philipr'
-                            name 'Philip Rutherford'
-                            email 'philipr@weborganic.com'
+                            id 'asantos'
+                            name 'Alberto Santos'
+                            email 'asantos@allette.com.au'
                         }
                     }
 
@@ -104,8 +79,8 @@ publishing {
             url = version.endsWith("SNAPSHOT") ? snapshotRepoUrl : releaseRepoUrl
             name = "sonatype"
             credentials {
-                username ossrhUsername
-                password ossrhPassword
+                username findProperty('sonatypeUsername')
+                password findProperty('sonatypePassword')
             }
         }
     }
@@ -117,8 +92,8 @@ signing {
 
 nexusStaging {
     packageGroup = group
-    stagingProfileId = sonatypeStagingProfileId
+    stagingProfileId = findProperty('sonatypeStagingProfileId')
     serverUrl = "https://s01.oss.sonatype.org/service/local/"
-    username = ossrhUsername
-    password = ossrhPassword
+    username = findProperty('sonatypeUsername')
+    password = findProperty('sonatypePassword')
 }
