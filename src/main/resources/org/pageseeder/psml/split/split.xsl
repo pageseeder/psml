@@ -93,8 +93,22 @@
   <xsl:template match="heading">
     <xsl:param name="level" select="0" tunnel="yes" as="xs:integer"/>
     <xsl:copy>
-      <xsl:copy-of select="@*[not(name()='level')]" />
+      <xsl:copy-of select="@*[not(name()='level' or name()='prefix')]" />
       <xsl:attribute name="level" select="if ($level > 0) then number(@level) - $level else @level" />
+      <xsl:if test="@prefix and not(@numbered = 'true')">
+        <xsl:attribute name="prefix" select="@prefix" />
+      </xsl:if>
+      <xsl:apply-templates select="node()" />
+    </xsl:copy>
+  </xsl:template>
+
+  <!-- remove para prefix in case it was added by process task -->
+  <xsl:template match="para">
+    <xsl:copy>
+      <xsl:copy-of select="@*[not(name()='prefix')]" />
+      <xsl:if test="@prefix and not(@numbered = 'true')">
+        <xsl:attribute name="prefix" select="@prefix" />
+      </xsl:if>
       <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>

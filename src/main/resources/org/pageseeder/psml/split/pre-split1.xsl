@@ -74,6 +74,10 @@
       </xsl:when>
       <xsl:when test="local-name(..) = 'fragment' and not(preceding-sibling::*)">
         <fragment-anchor id="{../@id}" />
+        <!-- if first fragment in document add default anchor -->
+        <xsl:if test="(ancestor::document[1]//fragment)[1]/@id = current()/../@id">
+          <fragment-anchor id="{ancestor::document[1]/@id}" />
+        </xsl:if>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
