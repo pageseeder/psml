@@ -8,20 +8,28 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.List;
 
-import org.pageseeder.diffx.DiffXException;
-import org.pageseeder.diffx.algorithm.GuanoAlgorithm;
-import org.pageseeder.diffx.config.DiffXConfig;
+import org.pageseeder.diffx.DiffException;
+import org.pageseeder.diffx.action.Operation;
+import org.pageseeder.diffx.action.OperationsBuffer;
+import org.pageseeder.diffx.algorithm.*;
+import org.pageseeder.diffx.api.DiffAlgorithm;
+import org.pageseeder.diffx.api.DiffHandler;
+import org.pageseeder.diffx.config.DiffConfig;
 import org.pageseeder.diffx.config.TextGranularity;
 import org.pageseeder.diffx.config.WhiteSpaceProcessing;
-import org.pageseeder.diffx.format.SafeXMLFormatter;
-import org.pageseeder.diffx.load.SAXRecorder;
-import org.pageseeder.diffx.sequence.EventSequence;
-import org.pageseeder.diffx.sequence.SequenceSlicer;
+import org.pageseeder.diffx.format.DefaultXMLDiffOutput;
+import org.pageseeder.diffx.format.XMLDiffOutput;
+import org.pageseeder.diffx.handler.CoalescingFilter;
+import org.pageseeder.diffx.handler.PostXMLFixer;
+import org.pageseeder.diffx.load.SAXLoader;
+import org.pageseeder.diffx.token.XMLToken;
+import org.pageseeder.diffx.xml.NamespaceSet;
+import org.pageseeder.diffx.xml.Sequence;
 import org.pageseeder.xmlwriter.UndeclaredNamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 
 /**
  * PageSeeder wrapper for DiffX.
@@ -30,6 +38,7 @@ import org.xml.sax.InputSource;
  * @author Philip Rutherford
  *
  * @since 0.3.7
+ * @version 0.7.0
  */
 public final class PSMLDiffer {
 
@@ -43,19 +52,15 @@ public final class PSMLDiffer {
    */
   private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
-// class attributes ----------------------------------------------------------------------------
-
   /**
    * The configuration used for Diff-X.
    */
-  private final DiffXConfig config = new DiffXConfig();
+  private DiffConfig config;
 
   /**
    * Threshold to change the granularity of Diff-X.
    */
   private final int maxEvents;
-
-// constructors --------------------------------------------------------------------------------
 
   /**
    * Constructor.
@@ -68,9 +73,9 @@ public final class PSMLDiffer {
    */
   public PSMLDiffer(int maxevents) {
     this.maxEvents = maxevents;
-    this.config.setGranularity(TextGranularity.WORD);
-    this.config.setWhiteSpaceProcessing(WhiteSpaceProcessing.PRESERVE);
-    this.config.setNamespaceAware(false);
+    this.config = DiffConfig.getDefault()
+        .granularity(TextGranularity.SPACE_WORD)
+        .whitespace(WhiteSpaceProcessing.PRESERVE);
   }
 
 // getters and setters -------------------------------------------------------------------------
@@ -81,7 +86,7 @@ public final class PSMLDiffer {
    * @param whitespace how the white spaces should be processed by Diff-X.
    */
   public void setWhiteSpaceProcessing(WhiteSpaceProcessing whitespace) {
-    this.config.setWhiteSpaceProcessing(whitespace);
+    this.config = this.config.whitespace(whitespace);
   }
 
   /**
@@ -90,20 +95,8 @@ public final class PSMLDiffer {
    * @param granularity the granularity of the text compare used by Diff-X.
    */
   public void setGranularity(TextGranularity granularity) {
-    this.config.setGranularity(granularity);
+    this.config = this.config.granularity(granularity);
   }
-
-  /**
-   * Sets whether to process XML namespaces (default false).
-   *
-   * @param aware <code>true</code> to process namespaces;
-   *                 <code>false</code> otherwise.
-   */
-  public void setNamespaceAware(boolean aware) {
-    this.config.setNamespaceAware(aware);
-  }
-
-// methods -------------------------------------------------------------------------------------
 
   /**
    * Compares the two specified pieces of XML and prints the diff onto the given writer.
@@ -112,111 +105,150 @@ public final class PSMLDiffer {
    * @param xml2 The first XML reader to compare.
    * @param out  Where the output goes
    *
-   * @throws DiffXException Should a Diff-X exception occur or if maxevents is reached.
-   * @throws IOException    Should an I/O exception occur.
+   * @throws org.pageseeder.diffx.DiffException Should a Diff-X exception occur or if maxevents is reached.
+   * @throws IOException   Should an I/O exception occur.
    */
-  public void diff(Reader xml1, Reader xml2, Writer out) throws DiffXException, IOException {
-
-    // Records the events from the XML
-    SAXRecorder recorder = new SAXRecorder();
-    recorder.setConfig(this.config);
-    LOGGER.debug("Diff-X config: {} {}", this.config.getGranularity(), this.config.getWhiteSpaceProcessing());
-
-    StringWriter x1 = new StringWriter();
-    StringWriter x2 = new StringWriter();
-    copy(xml1, x1);
-    copy(xml2, x2);
-
-    EventSequence seq1 = recorder.process(new InputSource(new StringReader(x1.toString())));
-    EventSequence seq2 = recorder.process(new InputSource(new StringReader(x2.toString())));
-    LOGGER.debug("Sequence #1: {} (pre-slicing)", seq1.size());
-    LOGGER.debug("Sequence #2: {} (pre-slicing)", seq2.size());
-
-    // start slicing
-    SequenceSlicer slicer = new SequenceSlicer(seq1, seq2);
-    slicer.slice();
-    LOGGER.debug("Sequence #1: {} (post-slicing, granularity={})", seq1.size(), this.config.getGranularity());
-    LOGGER.debug("Sequence #2: {} (post-slicing, granularity={})", seq2.size(), this.config.getGranularity());
-
-    // Check sequences lower than threshold
-    long max = Long.valueOf(seq1.size()) * Long.valueOf(seq2.size());
-    if (max > this.maxEvents) {
-      LOGGER.debug("Threshold reached: {} > {}", max, this.maxEvents);
-
-      // Let's try to change the granularity
-      if (!TextGranularity.TEXT.equals(this.config.getGranularity())) {
-        this.config.setGranularity(TextGranularity.TEXT);
-        LOGGER.debug("Changed granularity to TEXT");
-        seq1 = recorder.process(new InputSource(new StringReader(x1.toString())));
-        seq2 = recorder.process(new InputSource(new StringReader(x2.toString())));
-        slicer = new SequenceSlicer(seq1, seq2);
-        slicer.slice();
-        LOGGER.debug("Sequence #1: {} (post-slicing, granularity={})", seq1.size(), this.config.getGranularity());
-        LOGGER.debug("Sequence #2: {} (post-slicing, granularity={})", seq2.size(), this.config.getGranularity());
-        max = Long.valueOf(seq1.size()) * Long.valueOf(seq2.size());
-      }
-      // Let's check again
-      if (max > this.maxEvents) {
-        throw new DiffXException("There are over "+this.maxEvents+" points of comparison (" +
-            max + "), reducing the fragment size will allow the comparison to be calculated.");
-      }
-    }
-
-    // Diff
-    try {
-      diff(seq1, seq2, slicer, out);
-    } catch (UndeclaredNamespaceException ex) {
-      throw new DiffXException(ex.getMessage(), ex);
+  public void diff(Reader xml1, Reader xml2, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
+    LOGGER.debug("Diff-X config: {} {}", this.config.granularity(), this.config.whitespace());
+    if (LOGGER.isDebugEnabled()) {
+      String source1 = toString(xml1);
+      String source2 = toString(xml2);
+      LOGGER.debug("XML Source B:\n"+source1);
+      LOGGER.debug("XML Source A:\n"+source2);
+      doDiff(new StringReader(source2), new StringReader(source1), out);
+    } else {
+      doDiff(xml2, xml1, out);
     }
   }
 
-  // Private helpers ------------------------------------------------------------------------------
+  private void doDiff(Reader from, Reader to, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
+    // Load tokens from XML
+    SAXLoader loader = new SAXLoader();
+    loader.setConfig(this.config);
+    Sequence seqB = loader.load(to);
+    Sequence seqA = loader.load(from);
+    LOGGER.debug("Sequence A: {} (granularity={})", seqA.size(), this.config.granularity());
+    LOGGER.debug("Sequence B: {} (granularity={})", seqB.size(), this.config.granularity());
+
+    // Diff sequences
+    try {
+      // Since diffx-beta-2 the order has changed to A (from) -> B (to)
+      diff(seqA, seqB, out);
+    } catch (DataLengthException ex) {
+      throw new org.pageseeder.diffx.DiffException("There are over "+ex.getThreshold()+" points of comparison ("+ex.getSize()+") reducing the fragment size will allow the comparison to be calculated.");
+    } catch (UndeclaredNamespaceException ex) {
+      throw new DiffException(ex.getMessage(), ex);
+    }
+  }
 
   /**
    * Compares the two specified pieces of XML and prints the diff onto the given writer.
    *
-   * @param seq1   The first XML sequence to compare.
-   * @param seq2   The second XML sequence to compare.
-   * @param slicer A slicer to avoid having to compare the same events.
-   * @param out    Where the output goes.
-   *
-   * @throws DiffXException Should a Diff-X exception occur.
-   * @throws IOException    Should an I/O exception occur.
+   * @param from The original XML sequence.
+   * @param to   The modified XML sequence.
+   * @param out  Where the output goes.
    */
-  private void diff(EventSequence seq1, EventSequence seq2, SequenceSlicer slicer, Writer out)
-      throws DiffXException, IOException {
-    SafeXMLFormatter formatter = new SafeXMLFormatter(out);
-    // This prefix mapping is needed for DOM namespace prefix mapping
-    seq2.mapPrefix("http://www.w3.org/XML/1998/namespace", "xml");
-    formatter.declarePrefixMapping(seq1.getPrefixMapping());
-    formatter.declarePrefixMapping(seq2.getPrefixMapping());
-    formatter.setConfig(this.config);
+  private void diff(Sequence from, Sequence to, Writer out) throws DataLengthException {
+    DefaultXMLDiffOutput output = new DefaultXMLDiffOutput(out);
+    output.setWriteXMLDeclaration(false);
+    NamespaceSet namespaces = NamespaceSet.merge(to.getNamespaces(), from.getNamespaces());
+    output.setNamespaces(namespaces);
+//    OptimisticXMLProcessor processor = new OptimisticXMLProcessor();
+//    processor.setCoalesce(true);
+//    processor.setFallbackThreshold(this.maxEvents);
+//    processor.setDownscaleAllowed(true);
+//    processor.diff(from.tokens(), to.tokens(), output);
 
-    // Start formatting
-    slicer.formatStart(formatter);
+    diffOptimistic(from, to, output);
+  }
 
-    // Do the diffing
-    GuanoAlgorithm df = new GuanoAlgorithm(seq1, seq2);
-    df.process(formatter);
-
-    // append the remaining XML
-    slicer.formatEnd(formatter);
+  private static String toString(Reader input) throws IOException {
+    StringWriter out = new StringWriter();
+    char[] buffer = new char[1024];
+    int n;
+    while (-1 != (n = input.read(buffer))) {
+      out.write(buffer, 0, n);
+    }
+    return out.toString();
   }
 
   /**
-   * Copy chars from a <code>Reader</code> to a <code>Writer</code>.
-   *
-   * @param input  the <code>Reader</code> to read from
-   * @param output  the <code>Writer</code> to write to
-   *
-   * @throws IOException if read or write error occurs
+   * Similar to optimistic diff from diffx
    */
-  public static void copy(Reader input, Writer output) throws IOException {
-      char[] buffer = new char[DEFAULT_BUFFER_SIZE];
-      int n = 0;
-      while (-1 != (n = input.read(buffer))) {
-          output.write(buffer, 0, n);
+  private void diffOptimistic(Sequence from, Sequence to, XMLDiffOutput output) {
+    // Try with fast diff
+    OperationsBuffer<XMLToken> buffer = new OperationsBuffer<>();
+    boolean successful = diffMyersWithXMLFix(from, to, buffer);
+    if (!successful) {
+      // Fallback on default diff
+      LOGGER.debug("Fast diff failed! Unable to fix XML");
+      long edits = countEdits(buffer);
+      buffer = new OperationsBuffer<>();
+      if (edits * (from.size()+to.size()) < this.maxEvents) {
+        try {
+          LOGGER.debug("Trying with XML diff based on Myers");
+          diffMyersXML(from, to, buffer);
+        } catch (IllegalStateException ex) {
+          buffer = new OperationsBuffer<>();
+          // In some rare cases Myers XML fails, we fallback on the matrix
+          diffMatrixXML(from, to, buffer, false);
+        }
+      } else {
+        diffMatrixXML(from, to, buffer, false);
       }
+    }
+
+    // Apply the results from to the buffer
+    buffer.applyTo(new CoalescingFilter(output));
+  }
+
+  /**
+   * Fast diff uses myers' greedy algorithm with a post-process XML correction filter.
+   *
+   * @return true if successful; false otherwise.
+   */
+  private boolean diffMyersWithXMLFix(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
+    DiffAlgorithm<XMLToken> algorithm = new MyersGreedyAlgorithm<>();
+    PostXMLFixer fixer = new PostXMLFixer(handler);
+    fixer.start();
+    algorithm.diff(from, to, fixer);
+    fixer.end();
+    return !fixer.hasError();
+  }
+
+  /**
+   * Fall back on XML algorithm
+   */
+  private void diffMyersXML(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
+    MyersGreedyXMLAlgorithm algorithm = new MyersGreedyXMLAlgorithm();
+    handler.start();
+    algorithm.diff(from, to, handler);
+    handler.end();
+  }
+
+  /**
+   * Fall back on slower matrix-based algorithm.
+   */
+  private void diffMatrixXML(List<? extends XMLToken> from, List<? extends XMLToken> to, DiffHandler<XMLToken> handler, boolean coalesced) {
+    MatrixXMLAlgorithm algorithm = new MatrixXMLAlgorithm();
+    if (algorithm.isDiffComputable(from, to)) {
+      handler.start();
+      algorithm.diff(from, to, handler);
+      handler.end();
+    } else if (!coalesced) {
+      LOGGER.debug("Coalescing content to");
+      List<? extends XMLToken> a = CoalescingFilter.coalesce(from);
+      List<? extends XMLToken> b = CoalescingFilter.coalesce(to);
+      diffMatrixXML(a, b, handler, true);
+    } else {
+      throw new DataLengthException(from.size() * to.size(), this.maxEvents);
+    }
+  }
+
+  public long countEdits(OperationsBuffer<?> buffer) {
+    long edits = 0;
+    for (Operation<?> op : buffer.getOperations()) if (op.operator().isEdit()) edits++;
+    return edits;
   }
 
 }
