@@ -10,7 +10,6 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 
-import org.pageseeder.diffx.DiffXException;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +134,7 @@ public final class DiffHandler extends DefaultHandler {
             this.xml.write("\n<diff>");
             this.xml.write(diffx);
             this.xml.write("</diff>\n");
-          } catch (DiffXException ex) {
+          } catch (org.pageseeder.diffx.DiffException ex) {
             LOGGER.error("Failed to diff content: "+ex.getMessage());
           } catch (IOException ex) {
             throw new SAXException("Failed to write <diff> element: "+ex.getMessage(), ex);
