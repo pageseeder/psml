@@ -28,11 +28,11 @@ import org.xml.sax.SAXException;
 
 /**
  * Adds <diff> elements to portable PSML files.
- * For more info, see {@link
- * https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_diff.html}
+ *
+ * For more info, see {@link https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_diff.html}
  *
  * @author Philip Rutherford
- *
+ * @author Christophe Lauret
  */
 public final class Diff {
 
@@ -270,9 +270,11 @@ public final class Diff {
   private void collectFiles(File file, File root, Map<String, File> psml, boolean isRoot) {
     if (file.isDirectory()) {
       File[] all = file.listFiles();
-      for (File f : all) {
-        if (!isRoot || !"META-INF".equals(f.getName())) {
-          collectFiles(f, root, psml, false);
+      if (all != null) {
+        for (File f : all) {
+          if (!isRoot || !"META-INF".equals(f.getName())) {
+            collectFiles(f, root, psml, false);
+          }
         }
       }
     } else if (file.isFile() && file.getName().toLowerCase().endsWith(".psml")) {
