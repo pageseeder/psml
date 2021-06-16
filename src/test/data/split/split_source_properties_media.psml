@@ -150,6 +150,7 @@
       <block label="block3">
         <para indent="1" numbered="true">G1-1 clause</para>
       </block>
+      <para indent="2" prefix="1-1-1">G1-1-1 clause</para>
     </fragment>
     <properties-fragment id="3">
       <property name="test2" value="myvalue2" />

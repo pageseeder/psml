@@ -162,8 +162,12 @@
         select="($config-doc/split-config/fragment/para[@numbered='true' and $p/@numbered])[1]" />
     <xsl:variable name="not-numbered-para-match"
         select="($config-doc/split-config/fragment/para[@numbered='false' and $p and not($p/@numbered)])[1]" />
+    <xsl:variable name="prefix-para-match"
+                  select="($config-doc/split-config/fragment/para[@prefix='true' and $p/@prefix])[1]" />
+    <xsl:variable name="not-prefix-para-match"
+                  select="($config-doc/split-config/fragment/para[@prefix='false' and $p and not($p/@prefix)])[1]" />
     <xsl:variable name="para-match"
-        select="($config-doc/split-config/fragment/para[$p and not(@numbered)])[1]" />
+        select="($config-doc/split-config/fragment/para[$p and not(@numbered) and not(@prefix)])[1]" />
     <xsl:choose>
       <!-- check block label -->
       <xsl:when test="local-name($el) = 'block' and $block-match">
@@ -188,6 +192,14 @@
       <!-- check not numbered para -->
       <xsl:when test="$not-numbered-para-match">
         <xsl:sequence select="$not-numbered-para-match/.." />
+      </xsl:when>
+      <!-- check prefix para -->
+      <xsl:when test="$prefix-para-match">
+        <xsl:sequence select="$prefix-para-match/.." />
+      </xsl:when>
+      <!-- check not prefix para -->
+      <xsl:when test="$not-prefix-para-match">
+        <xsl:sequence select="$not-prefix-para-match/.." />
       </xsl:when>
       <!-- check para -->
       <xsl:when test="$para-match">

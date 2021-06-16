@@ -1,5 +1,5 @@
 <split-config>
-<!-- 
+<!--
   <container [type="mycontainer"] [labels="mylabel"] [contains="mydoc"]>
     [<heading level="2" [numbered="true"]>
     |<block label="mylabel">]
@@ -7,7 +7,7 @@
   </container>
 -->
   <container type="contract" labels="mycontract"/>
-<!-- 
+<!--
   <document [type="mydoc"] [folder="components"] [labels="mylabel"]>
     [<heading level="3" [numbered="true"]/>
     |<block label="mylabel"/>
@@ -29,17 +29,18 @@
     <inline label="inline1"/>
   </document>
 
-<!-- 
+<!--
   <fragment [type="myfrag"] [labels="mylabel"]>
     [<heading level="4" [numbered="true"]/>
     |<block label="mylabel"/>
     |<para [numbered="true"]/>]
     ...
   </fragment>
---> 
+-->
   <fragment>
     <heading level="3"/>
     <para numbered="true"/>
+    <para prefix="true"/>
   </fragment>
   <fragment type="special" labels="myspecial">
     <block label="block1"/>
