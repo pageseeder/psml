@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<document xmlns:m="http://www.w3.org/1998/Math/MathML" id="69154" schemaversion="0.12" date="2018-08-29T15:17:55+10:00"
+<document id="69154" schemaversion="0.12" date="2018-08-29T15:17:55+10:00"
   version="current" level="portable">
   <documentinfo>
     <uri id="69154" scheme="http" host="localhost" port="80"
@@ -59,7 +59,7 @@
       <compare>
         <content>
           <media-fragment id="1" mediatype="application/mathml+xml">
-            <math xmlns="http://www.w3.org/1999/xhtml">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
               <mrow>
                 <mn>167</mn>
                 <mo>°</mo>
@@ -80,7 +80,7 @@
       <compare>
         <content>
           <media-fragment id="2" mediatype="application/mathml+xml">
-            <m:math xmlns="http://www.w3.org/1999/xhtml">
+            <m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
               <m:mrow>
                 <m:mn>167</m:mn>
                 <m:mo>°</m:mo>
@@ -93,7 +93,7 @@
   </fragmentinfo>
   <section id="title">
     <media-fragment id="1" mediatype="application/mathml+xml">
-      <math xmlns="http://www.w3.org/1999/xhtml">
+      <math xmlns="http://www.w3.org/1998/Math/MathML">
         <mrow>
           <mn>16</mn>
           <mo>°</mo>
@@ -103,7 +103,7 @@
   </section>
   <section id="content">
     <media-fragment id="2" mediatype="application/mathml+xml">
-      <m:math xmlns="http://www.w3.org/1999/xhtml">
+      <m:math xmlns:m="http://www.w3.org/1998/Math/MathML">
         <m:mrow>
           <m:mn>16</m:mn>
           <m:mo>°</m:mo>
