@@ -27,7 +27,7 @@ dependencies {
   compile (
     'org.slf4j:slf4j-api:1.7.21',
     'org.pageseeder.xmlwriter:pso-xmlwriter:1.0.4',
-    'org.pageseeder.diffx:pso-diffx:0.9+'
+    'org.pageseeder.diffx:pso-diffx:0.9.0-beta-3'
   )
 
   compileOnly 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
