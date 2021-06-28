@@ -440,6 +440,8 @@ public final class TemplateFactory {
       psml.append('<').append(qName);
       int length = attributes.getLength();
       for (int i=0; i < length; i++) {
+        // ingnore template NS attributes
+        if (Constants.NS_URI.equals(attributes.getURI(i))) continue;
         String name = attributes.getQName(i);
         String value = attributes.getValue(i);
         psml.append(' ').append(name).append("=\"");

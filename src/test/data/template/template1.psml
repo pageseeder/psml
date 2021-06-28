@@ -8,10 +8,10 @@
 
   <section id="title">
     <fragment id="1">
-      <heading level="1">Social Security and Tenancy Record</heading> 
+      <heading level="1">Social Security and Tenancy Record</heading>
     </fragment>
     <properties-fragment id="2">
-      <property name="ps.author" title="Answered" value="{$ps.author}" />
+      <property name="ps.author" title="Answered" value="{$ps.author}" t:description="The author"/>
       <property name="ps.title"  title="Contact" value="{$ps.title}" />
       <property name="date"      title="Created" value="{$ps.currentdatetime}" datatype="date" />
       <property name="phone"     title="Phone" value="{$phone}" />
@@ -20,7 +20,7 @@
       <property name="bio"       title="Short bio" datatype="markdown" />
     </properties-fragment>
   </section>
-  
+
   <section id="related">
     <title>Related</title>
     <xref-fragment id="5"/>
