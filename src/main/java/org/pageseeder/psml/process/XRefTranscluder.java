@@ -286,12 +286,14 @@ public final class XRefTranscluder {
         this.parentHandler.getLogger().error("Invalid link URL: " + ex.getMessage(), ex);
         target = null;
       }
-    } else if (path.endsWith(".psml")) {
-      target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
-    } else if (path.endsWith(".mml") || path.endsWith(".mathml")) {
-      target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
     } else {
-      target = new File(this.parentHandler.getBinaryRepository(), "META-INF/" + dadPath + '/' + path + ".psml");
+      if (path.endsWith(".psml")) {
+        target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
+      } else if (path.endsWith(".mml") || path.endsWith(".mathml")) {
+        target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
+      } else {
+        target = new File(this.parentHandler.getBinaryRepository(), "META-INF/" + dadPath + '/' + path + ".psml");
+      }
       try {
         // must use canonical file as some parent folders may not exist under META-INF causing ".." to not resolve on Linux
         target = target.getCanonicalFile();
