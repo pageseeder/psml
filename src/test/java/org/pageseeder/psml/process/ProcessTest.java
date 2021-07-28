@@ -866,6 +866,39 @@ public class ProcessTest {
   }
 
   @Test
+  public void testProcessImagesFilenameEncode() throws IOException, ProcessException {
+    String filename = "images space.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    Images images = new Images();
+    images.setImageSrc(ImageSrc.FILENAMEENCODE);
+    File image = new File(IMAGE_FOLDER);
+    if (image.exists())
+      FileUtils.deleteDirectory(image);
+    images.setLocation(image.getAbsolutePath());
+    images.setIncludes(filename);
+    p.setImages(images);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images space.psml")));
+    Assert.assertThat(xml, hasXPath("//image[1]/@src", equalTo("diagram%20space.jpg")));
+    Assert.assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images space.psml")));
+
+    // check files
+    Assert.assertTrue("Image 1 missing", new File(image, "diagram%20space.jpg").exists());
+  }
+
+  @Test
   public void testProcessImagesLocation() throws IOException, ProcessException {
     String filename = "images.psml";
     Process p = new Process();

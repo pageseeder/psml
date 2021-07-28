@@ -64,7 +64,12 @@ public class Images extends IncludeExcludeConfig {
     /**
      * If filename use [filename].
      */
-    FILENAME;
+    FILENAME,
+
+    /**
+     * If filenameencode use [url encoded filename].
+     */
+    FILENAMEENCODE;
 
     /**
      * Returns the image src corresponding to the given name.
