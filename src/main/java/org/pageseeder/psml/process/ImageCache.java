@@ -10,6 +10,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -68,7 +70,7 @@ public final class ImageCache {
    *
    * @return the new path
    *
-   * @throws PageseederException if loading the metadata file failed
+   * @throws ProcessException if loading the metadata file failed
    */
   public String getImageNewPath(String relativePath, ImageSrc src) throws ProcessException {
     String newpath = this.cache.get(relativePath);
@@ -84,6 +86,9 @@ public final class ImageCache {
         int lastSlash = relativePath.lastIndexOf('/');
         String filename = lastSlash != -1 ? relativePath.substring(lastSlash + 1) : relativePath;
         newpath = buildUniqueFilename(filename);
+        if (src == ImageSrc.FILENAMEENCODE) {
+          newpath = PSMLProcessHandler.URLEncodeFilepath(newpath);
+        }
       } else if (src == ImageSrc.URIIDFOLDERS) {
         newpath = buildURIIDFoldersPath(handler.getUriID()) + handler.getUriID() + '.' + handler.getUriExtension();
       } else {
@@ -108,10 +113,13 @@ public final class ImageCache {
     if (newpath == null) {
       int lastDot = relativePath.lastIndexOf('.');
       String extension = lastDot != -1 ? relativePath.substring(lastDot) : "";
-      if (src == ImageSrc.FILENAME) {
+      if (src == ImageSrc.FILENAME || src == ImageSrc.FILENAMEENCODE) {
         int lastSlash = relativePath.lastIndexOf('/');
         String filename = lastSlash != -1 ? relativePath.substring(lastSlash + 1) : relativePath;
         newpath = buildUniqueFilename(filename);
+        if (src == ImageSrc.FILENAMEENCODE) {
+          newpath = PSMLProcessHandler.URLEncodeFilepath(newpath);
+        }
       } else if (src == ImageSrc.URIIDFOLDERS) {
         newpath = buildURIIDFoldersPath(uriid) + uriid + extension;
       } else {

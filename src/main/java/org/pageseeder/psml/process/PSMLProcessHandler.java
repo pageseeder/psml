@@ -1299,7 +1299,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
             + XMLUtils.escapeForAttribute(relativePath) + "\"");
       }
     }
-    if (!this.processed) finalSrc = URLEncodeFilepath(finalSrc);
+    if (!this.processed && this.imageSrc != ImageSrc.FILENAMEENCODE) {
+      finalSrc = URLEncodeFilepath(finalSrc);
+    }
     write(" " + (alternateXRef ? "href" : "src") + "=\"" + XMLUtils.escapeForAttribute(finalSrc) + "\"");
   }
 
