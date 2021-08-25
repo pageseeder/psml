@@ -14,7 +14,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-  maven { url 'http://dl.bintray.com/pageseeder/maven' }
+  mavenCentral { url 'https://maven-central.storage.googleapis.com/maven2' }
+  maven { url 'https://s01.oss.sonatype.org/content/groups/public/' }
   jcenter()
 }
 
@@ -27,7 +28,7 @@ dependencies {
   compile (
     'org.slf4j:slf4j-api:1.7.21',
     'org.pageseeder.xmlwriter:pso-xmlwriter:1.0.4',
-    'org.pageseeder.diffx:pso-diffx:0.9.0-beta-3'
+    'org.pageseeder.diffx:pso-diffx:0.9.0-beta-4'
   )
 
   compileOnly 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
