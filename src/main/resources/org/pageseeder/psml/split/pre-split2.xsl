@@ -7,6 +7,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:config="http://pageseeder.org/psml/config"
+                xmlns:fn="http://pageseeder.org/psml/function"
                 exclude-result-prefixes="#all">
 
   <xsl:import href="config.xsl" />
@@ -26,7 +27,7 @@
       <documentinfo>
         <uri>
           <xsl:if test="document/documentinfo/uri/@title">
-            <xsl:attribute name="title" select="document/documentinfo/uri/@title"/>
+            <xsl:attribute name="title" select="fn:truncate-title(document/documentinfo/uri/@title)"/>
           </xsl:if>
           <xsl:if test="$main-container/@labels != ''">
             <labels><xsl:value-of select="$main-container/@labels"/></labels>
@@ -80,7 +81,7 @@
                           <xsl:attribute name="folder" select="concat($config/@folder,'/')"/>
                         </xsl:if>
                         <documentinfo>
-                          <uri title="{if (normalize-space($first) != '' and $frontmatter) then normalize-space($first)
+                          <uri title="{if (normalize-space($first) != '' and $frontmatter) then fn:truncate-title(normalize-space($first))
                           else if ($config/@type != '') then concat(upper-case(substring($config/@type,1,1)),substring($config/@type, 2))
                           else 'References'}">
                             <xsl:if test="$config/@labels != ''">
@@ -186,10 +187,10 @@
         <uri>
           <xsl:choose>
             <xsl:when test="$first/heading and normalize-space($first/heading[1]) != ''">
-              <xsl:attribute name="title" select="normalize-space($first/heading[1])"/>
+              <xsl:attribute name="title" select="fn:truncate-title(normalize-space($first/heading[1]))"/>
             </xsl:when>
             <xsl:when test="normalize-space($first) != ''">
-              <xsl:attribute name="title" select="normalize-space($first)"/>
+              <xsl:attribute name="title" select="fn:truncate-title(normalize-space($first))"/>
             </xsl:when>
             </xsl:choose>
           <xsl:if test="$config/@labels != ''">
@@ -301,7 +302,7 @@
               </xsl:variable>
               <uri>
                 <xsl:if test="$title != ''">
-                  <xsl:attribute name="title" select="$title"/>
+                  <xsl:attribute name="title" select="fn:truncate-title($title)"/>
                 </xsl:if>
                 <xsl:if test="$config/@labels != ''">
                   <labels><xsl:value-of select="$config/@labels"/></labels>
@@ -328,5 +329,18 @@
       <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>
+
+  <!-- return the title truncated to 250 chars if required -->
+  <xsl:function name="fn:truncate-title" as="xs:string">
+    <xsl:param name="title" />
+    <xsl:choose>
+      <xsl:when test="string-length($title) gt 250">
+        <xsl:value-of select="normalize-space(substring(string($title), 1, 250))"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="normalize-space($title)"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
 
 </xsl:stylesheet>
