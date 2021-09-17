@@ -49,6 +49,16 @@ public final class XSLTTransformer {
   private boolean failOnError = true;
 
   /**
+   * If the results should be validated with psml-processed.xsd
+   */
+  private boolean validate = true;
+
+  /**
+   * If untransformed files should be moved to destination
+   */
+  private boolean moveall = true;
+
+  /**
    * Build a new transformer.
    *
    * @param xslt the details of the XSLT.
@@ -74,6 +84,20 @@ public final class XSLTTransformer {
   }
 
   /**
+   * @param validate if the results should be validated with psml-processed.xsd
+   */
+  public void setValidate(boolean validate) {
+    this.validate = validate;
+  }
+
+  /**
+   * @param moveall if untransformed files should be moved to destination
+   */
+  public void setMoveAll(boolean moveall) {
+    this.moveall = moveall;
+  }
+
+  /**
    * @return the path to the XSLT script
    */
   public String getXSLT() {
@@ -92,11 +116,10 @@ public final class XSLTTransformer {
    *
    * @param psmlFiles the list of files to transform
    * @param destinationFolder the destination folder, where the output will be saved
-   * @param element name of the ant element, used for warning
    *
    * @throws ProcessException if anything goes wrong
    */
-  public void transform(Map<String, File> psmlFiles, File destinationFolder, String element) throws ProcessException {
+  public void transform(Map<String, File> psmlFiles, File destinationFolder) throws ProcessException {
     // make sure we've got something to do
     if (this.transformationDetails == null) return;
     // create XSLT template
@@ -112,9 +135,12 @@ public final class XSLTTransformer {
       transformer.setParameter(p, params.get(p));
     }
     // find schema to validate output
-    ClassLoader loader = XSLTTransformer.class.getClassLoader();
-    URL schema = loader.getResource(XSLTTransformer.class.getPackage()
-        .getName().replace('.', '/') + "/psml-processed.xsd");
+    URL schema = null;
+    if (validate) {
+      ClassLoader loader = XSLTTransformer.class.getClassLoader();
+      schema = loader.getResource(XSLTTransformer.class.getPackage()
+              .getName().replace('.', '/') + "/psml-processed.xsd");
+    }
     // build the file pattern matcher
     IncludesExcludesMatcher matcher = this.transformationDetails.buildMatcher();
     // loop through file list
@@ -146,7 +172,7 @@ public final class XSLTTransformer {
           if (this.failOnError) throw ex;
           else if (this.logger != null) this.logger.error(ex.getMessage());
         }
-      } else {
+      } else if (moveall) {
         // move/copy it then
         moveFile(psmlFiles.get(relPath), output);
       }
