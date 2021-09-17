@@ -370,7 +370,7 @@ public final class Process {
         } else {
           output = this.dest;
         }
-        this.pretransform.transform(psml, output, "pretransform");
+        this.pretransform.transform(psml, output);
         // reload psml source if needed
         if (useOutputToTempDir) {
           psml.clear();
@@ -409,7 +409,7 @@ public final class Process {
         this.posttransform.setLog(this.logger);
         this.posttransform.setPreserveSrc(this.preservesrc);
         this.posttransform.setFailOnError(this.failOnError);
-        this.posttransform.transform(psml, this.dest, "posttransform");
+        this.posttransform.transform(psml, this.dest);
       } else if (this.pretransform == null && !this.processXML) {
         // move PSML files manually
         this.logger.info("Moving "+psml.size()+" PSML content file(s)");
