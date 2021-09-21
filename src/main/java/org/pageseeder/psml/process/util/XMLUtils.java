@@ -14,12 +14,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -152,15 +147,20 @@ public final class XMLUtils {
   /**
    * Create the templates for the PSML transform.
    *
-   * @param xslt the XSLT script.
+   * @param xslt      the XSLT script
+   * @param listener  an error listener (optional)
    *
    * @return the templates.
    *
    * @throws ProcessException if creating the transformer failed
    */
-  public static Transformer createTransformer(File xslt) throws ProcessException {
+  public static Transformer createTransformer(File xslt, @Nullable ErrorListener listener) throws ProcessException {
     try {
-      return TransformerFactory.newInstance().newTemplates(new StreamSource(xslt)).newTransformer();
+      TransformerFactory factory = TransformerFactory.newInstance();
+      if (listener != null) {
+        factory.setErrorListener(listener);
+      }
+      return factory.newTemplates(new StreamSource(xslt)).newTransformer();
     } catch (TransformerConfigurationException e) {
       throw new ProcessException("Failed to load XSLT stylesheet: " + e.getMessageAndLocation(), e);
     } catch (TransformerFactoryConfigurationError e) {

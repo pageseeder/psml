@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.process.config.XSLTTransformation;
@@ -127,9 +129,12 @@ public final class XSLTTransformer {
     if (!xslt.exists() || !xslt.isFile())
       throw new ProcessException("Invalid XSLT script "+this.transformationDetails.getXSLT());
     // log
-    if (logger != null)
-      logger.debug("Transform: Loading XSLT script "+xslt.getAbsolutePath());
-    Transformer transformer = XMLUtils.createTransformer(xslt);
+    XSLTErrorListener listener = null;
+    if (logger != null) {
+      logger.debug("Transform: Loading XSLT script " + xslt.getAbsolutePath());
+      listener = new XSLTErrorListener(logger);
+    }
+    Transformer transformer = XMLUtils.createTransformer(xslt, listener);
     Map<String, String> params = this.transformationDetails.getParams();
     for (String p : params.keySet()) {
       transformer.setParameter(p, params.get(p));
@@ -215,6 +220,41 @@ public final class XSLTTransformer {
       } catch (IOException ex) {
         throw new ProcessException("Failed to move file "+from.getAbsolutePath()+" to "+to.getAbsolutePath(), ex);
       }
+    }
+  }
+
+  /**
+   * An XSLT error listener .
+   *
+   * @author Philip Rutherford
+   */
+  private static class XSLTErrorListener implements ErrorListener {
+
+    /**
+     * For logging errors
+     */
+    private final Logger log;
+
+    /**
+     * Creates a new XSLT error listener wrapping the specified listener.
+     */
+    XSLTErrorListener(Logger log) {
+      this.log = log;
+    }
+
+    @Override
+    public void fatalError(TransformerException exception) throws TransformerException {
+      this.log.error("Transformer fatal error: {}", exception.getMessageAndLocation());
+    }
+
+    @Override
+    public void warning(TransformerException exception) throws TransformerException {
+      this.log.warn("Transformer warning: {}", exception.getMessageAndLocation());
+    }
+
+    @Override
+    public void error(TransformerException exception) throws TransformerException {
+      this.log.error("Transformer error: {}", exception.getMessageAndLocation());
     }
   }
 
