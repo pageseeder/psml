@@ -44,7 +44,7 @@
       </xsl:choose>
     </xsl:variable>
     <blockxref frag="default" display="document" type="embed"
-        href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
+        href="{concat(fn:path-prefix((ancestor::document)[last()]), $path)}">
       <xsl:if test="@type">
         <xsl:attribute name="documenttype" select="@type" />
       </xsl:if>
@@ -68,7 +68,7 @@
     <xsl:variable name="path" select="concat(document/@folder,
         if (document/@filename) then document/@filename else fn:generate-filename(document))" />
     <xref frag="default" display="document" type="none"
-        href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
+        href="{concat(fn:path-prefix((ancestor::document)[last()]), $path)}">
       <xsl:if test="document/@type">
         <xsl:attribute name="documenttype" select="document/@type" />
       </xsl:if>
@@ -119,7 +119,7 @@
       <xsl:copy-of select="@*[not(name()='src')]" />
       <!-- when splitting PSML processed with ImageSrc.FILENAME the media folder needs to be added -->
       <xsl:variable name="src" select="concat(if (starts-with(@src, concat($_mediafoldername,'/'))) then '' else concat($_mediafoldername,'/'), @src)" />
-      <xsl:attribute name="src" select="concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $src)" />
+      <xsl:attribute name="src" select="concat(fn:path-prefix((ancestor::document)[last()]), $src)" />
       <xsl:apply-templates select="node()" />
     </xsl:copy>
   </xsl:template>
@@ -142,7 +142,7 @@
           </xsl:choose>
         </xsl:variable>
         <xref frag="{($anchor/ancestor::fragment)[last()]/@id}" display="manual" type="none"
-            href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}" title="{normalize-space(.)}">
+            href="{concat(fn:path-prefix((ancestor::document)[last()]), $path)}" title="{normalize-space(.)}">
           <xsl:value-of select="." />
         </xref>
       </xsl:when>
@@ -174,7 +174,7 @@
         </xsl:variable>
         <xref frag="{($anchor/ancestor::fragment | $anchor/ancestor::properties-fragment |
                     $anchor/ancestor::media-fragment)[last()]/@id}"
-            href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', $path)}">
+            href="{concat(fn:path-prefix((ancestor::document)[last()]), $path)}">
           <xsl:copy-of select="@*[name()!='frag' and name()!='href']" />
           <xsl:value-of select="." />
         </xref>
@@ -190,7 +190,7 @@
 
   <!-- adjust relative xref targets to other documents -->
   <xsl:template match="xref[not(starts-with(@href,'#') or starts-with(@href,'/') or @external='true')]">
-    <xref href="{concat(if ((ancestor::document)[last()][@folder]) then '../' else '', @href)}">
+    <xref href="{concat(fn:path-prefix((ancestor::document)[last()]), @href)}">
       <xsl:copy-of select="@*[name()!='href']" />
       <xsl:value-of select="." />
     </xref>
@@ -228,4 +228,16 @@
     </xsl:choose>
   </xsl:function>
 
+  <!-- return path prefix from this document to root (e.g. '', '../', '../../') -->
+  <xsl:function name="fn:path-prefix" as="xs:string">
+    <xsl:param name="doc" as="element(document)?" />
+    <xsl:variable name="prefix">
+      <xsl:if test="$doc/@folder">
+        <xsl:for-each select="tokenize($doc/@folder,'/')[position()!=last()]">
+          <xsl:text>../</xsl:text>
+        </xsl:for-each>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:value-of select="$prefix" />
+  </xsl:function>
 </xsl:stylesheet>
