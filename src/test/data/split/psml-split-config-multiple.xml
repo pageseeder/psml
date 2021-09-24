@@ -1,5 +1,5 @@
 <split-config>
-<!-- 
+<!--
   <container [type="mycontainer"] [labels="mylabel"] [contains="mydoc"]>
     [<heading level="2" [numbered="true"]>
     |<block label="mylabel">]
@@ -16,7 +16,7 @@
     </continue>
   </container>
   <container type="schedules" labels="myschedule" contains="schedule" />
-<!-- 
+<!--
   <document [type="mydoc"] [folder="components"] [labels="mylabel"]>
     [<heading level="3" [numbered="true"]/>
     |<block label="mylabel"/>
@@ -26,6 +26,9 @@
 -->
   <document folder="components">
     <heading level="2" />
+  </document>
+  <document type="subcomponent" folder="components/sub">
+    <heading level="3" numbered="false" />
   </document>
   <document type="term" folder="terms">
     <heading level="3" numbered="true" />
@@ -43,16 +46,16 @@
     </inline>
   </document>
 
-<!-- 
+<!--
   <fragment [type="myfrag"] [labels="mylabel"]>
     [<heading level="4" [numbered="true"]/>
     |<block label="mylabel"/>
     |<para [numbered="true"]/>]
     ...
   </fragment>
---> 
+-->
   <fragment>
-    <heading level="3"/>
+    <!-- <heading level="3"/> -->
     <para numbered="true"/>
   </fragment>
   <fragment type="special" labels="myspecial">

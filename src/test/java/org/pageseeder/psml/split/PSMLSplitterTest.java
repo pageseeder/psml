@@ -142,7 +142,7 @@ public class PSMLSplitterTest {
       FileUtils.deleteDirectory(copy);
     FileUtils.copyDirectory(src, copy);
     File copyfile = new File(copy, "split_source_properties_media.psml");
-    File config = new File(src, "psml-split-config-multiple.xml");
+    File config = new File(src, "psml-split-config-props-media.xml");
     String config_xml = new String (Files.readAllBytes(config.toPath()), StandardCharsets.UTF_8);
     Assert.assertThat(Tests.toDOMSource(new StringReader(config_xml)), new Validates(getSchema("psml-split-config.xsd")));
     // process

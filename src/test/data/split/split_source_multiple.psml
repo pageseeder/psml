@@ -43,6 +43,8 @@
       <para indent="1" numbered="true">B1-2 clause<anchor name="B1-2" /></para>
       <heading level="3">Heading B2</heading>
       <para>B2 content <inline label="inline1"><inline label="inline3">Text123</inline>[My field 2]</inline></para>
+      <para>B2 content <link href="#top">link to top</link></para>
+      <para>E2 content <link href="#B">link to B</link></para>
       <heading level="2">Heading C</heading>
       <para>C content <inline label="inline1"><inline label="inline3">Text 456</inline>[My field 3]</inline> text</para>
       <para>C field2 <inline label="inline4"><inline label="inline3">Text789</inline>[My field 3]</inline> text</para>
@@ -65,11 +67,11 @@
       </block>
       <heading level="1">Heading E0</heading>
       <para>E content</para>
-      <heading level="3">Heading E1</heading>
+      <heading level="4">Heading E1</heading>
       <para>E1 content
         <link href="#B">link to B</link>
       </para>
-      <heading level="3">Heading E2</heading>
+      <heading level="4">Heading E2</heading>
       <para>E2 content
         <link href="#B1-2">link to B1-2</link>
       </para>
