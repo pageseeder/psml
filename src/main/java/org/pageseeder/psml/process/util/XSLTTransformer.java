@@ -135,6 +135,7 @@ public final class XSLTTransformer {
       listener = new XSLTErrorListener(logger);
     }
     Transformer transformer = XMLUtils.createTransformer(xslt, listener);
+    transformer.setErrorListener(listener);
     Map<String, String> params = this.transformationDetails.getParams();
     for (String p : params.keySet()) {
       transformer.setParameter(p, params.get(p));
