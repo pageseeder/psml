@@ -995,7 +995,7 @@
       </xs:sequence>
       <xs:attribute name="id" type="xs:long">
         <xs:annotation>
-          <xs:documentation>The ID of the author member. DEPRECATED for security.</xs:documentation>
+          <xs:documentation>The ID of the author member</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="firstname" type="xs:string">
