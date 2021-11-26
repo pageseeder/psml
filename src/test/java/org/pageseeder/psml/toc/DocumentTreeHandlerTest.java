@@ -74,11 +74,14 @@ public final class DocumentTreeHandlerTest {
                     h4("A.1.a.x", "2", 3)))),
         h1("B", "3", 1,
             phantom(2,
-                h3("B.0.a", "3", 2),
-                h3("B.0.b", "3", 4)),
+                h3("B.0.a", "3", 2,
+                    p(0, "", "3", 3, false, "", "")),
+                h3("B.0.b", "3", 4,
+                    p(0, "", "3", 5, false, "", ""))),
             h2("B.1", "3", 6,
                 h3("B.1.a", "3", 7)),
-            h2("B.2", "4", 1)));
+            h2("B.2", "4", 1,
+                p(0, "", "4", 2, false, "", ""))));
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(2, "test_2.html", "", null, reverse, parts,
         Collections.emptyMap(), Collections.emptyMap());
@@ -100,7 +103,8 @@ public final class DocumentTreeHandlerTest {
               h5("_._._.x", "1.2", 2)),
             h4("_._.a", "1.2", 3)),
           h3("_.0", "1.2", 4)),
-        h2("A", "1.2", 5));
+        h2("A", "1.2", 5,
+          p(0, "", "1.2", 6, false, "", "")));
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(4, "Test 3", "", null, reverse, Collections.singletonList(p1),
         Collections.emptyMap(), Collections.emptyMap());
@@ -119,7 +123,8 @@ public final class DocumentTreeHandlerTest {
               h5("_._._.x", "1.2", 2)),
             h4("_._.a", "1.2", 3)),
           h3("_.0", "1.2", 4));
-    Part<Heading> p2 = h2("A", "1.2", 5);
+    Part<Heading> p2 = h2("A", "1.2", 5,
+        p(0, "", "1.2", 6, false, "", ""));
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(4, "Test 3", "", null, reverse, Arrays.asList(p1, p2),
         Collections.emptyMap(), Collections.emptyMap());
@@ -213,12 +218,16 @@ public final class DocumentTreeHandlerTest {
             toc(),
             ref(1, "Part A", "2", 186250L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
             h2("Part A", "2", 1,
+                p(0, "", "2", 2, false, "", ""),
                 tend("2"),
                 ref(2, "Sub-part 1", "2", 186251L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
                 h3("Sub-part 1", "2", 3,
+                    p(0, "", "2", 4, false, "", ""),
                     tend("2"),
                     ref(3, "Division a", "2", 186252L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
-                    h4("Division a", "2", 5, tend("2")))),
+                    h4("Division a", "2", 5,
+                        p(0, "", "2", 6, false, "", ""),
+                        tend("2")))),
              h2("Part B", "2", 7)));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", null, Collections.emptyList(), p,
@@ -233,12 +242,16 @@ public final class DocumentTreeHandlerTest {
         toc(),
         ref(1, "Part A", "2", 186250L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
         h2("Part A", "2", 1,
+            p(0, "", "2", 2, false, "", ""),
             tend("2"),
             ref(2, "Sub-part 1", "2", 186251L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
             h3("Sub-part 1", "2", 3,
+                p(0, "", "2", 4, false, "", ""),
                 tend("2"),
                 ref(3, "Division a", "2", 186252L, Reference.Type.TRANSCLUDE, Reference.DEFAULT_TYPE, "default"),
-                h4("Division a", "2", 5, tend("2")))),
+                h4("Division a", "2", 5,
+                    p(0, "", "2", 6, false, "", ""),
+                    tend("2")))),
          h2("Part B", "2", 7));
     Tests.print(tree);
     tree.print(System.out);
@@ -278,6 +291,7 @@ public final class DocumentTreeHandlerTest {
         ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
           ref(2, "Another heading 2a", 199326))),
       h2("Related", "default", 1,
+          p(1, "", "4", 1, false, "", ""),
           p(1, "A numbered para", "4", 2, true, "", ""),
           p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
           p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
@@ -295,6 +309,7 @@ public final class DocumentTreeHandlerTest {
           ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
             ref(2, "Another heading 2a", 199326))),
         h2("Related", "default", 1,
+            p(1, "", "4", 1, false, "", ""),
             p(1, "A numbered para", "4", 2, true, "", ""),
             p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
             p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));

@@ -1138,9 +1138,9 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println(result);
-    assertHasPrefix(prefixes,"1-1-4-1",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-4-2",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-4-3",null,"",2,null);
+    assertHasPrefix(prefixes,"1-1-4-4",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     Assert.assertEquals(4, prefixes.size());
   }
