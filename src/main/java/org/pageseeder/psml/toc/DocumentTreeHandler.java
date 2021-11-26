@@ -261,20 +261,18 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private void startPara(Attributes attributes) {
     String prefix = attributes.getValue("prefix");
     String numbered = attributes.getValue("numbered");
-    if ("true".equals(numbered) || (!Paragraph.NO_PREFIX.equals(prefix) && prefix != null)) {
-      Paragraph para = new Paragraph(getInt(attributes, "indent", 0), this.fragment, this._fragmentIDs.peek(), this.counter);
-      if ("true".equals(numbered)) {
-        para = para.numbered(true);
-      }
-      if (prefix != null) {
-        para = para.prefix(prefix);
-      }
-      if (isParent("block") && this.currentBlockLabel != null) {
-        para = para.blocklabel(this.currentBlockLabel);
-      }
-      this.currentParagraph = para;
-      newBuffer();
+    Paragraph para = new Paragraph(getInt(attributes, "indent", 0), this.fragment, this._fragmentIDs.peek(), this.counter);
+    if ("true".equals(numbered)) {
+      para = para.numbered(true);
     }
+    if (prefix != null) {
+      para = para.prefix(prefix);
+    }
+    if (isParent("block") && this.currentBlockLabel != null) {
+      para = para.blocklabel(this.currentBlockLabel);
+    }
+    this.currentParagraph = para;
+    newBuffer();
     this.firstHeading = false;
     this.counter++;
   }
