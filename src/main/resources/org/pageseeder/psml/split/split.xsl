@@ -137,7 +137,7 @@
                 select="concat($document/@folder, fn:generate-filename($document))" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$_outputfilename" />
+              <xsl:value-of select="encode-for-uri($_outputfilename)" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
@@ -168,7 +168,7 @@
                 select="concat($document/@folder, fn:generate-filename($document))" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:value-of select="$_outputfilename" />
+              <xsl:value-of select="encode-for-uri($_outputfilename)" />
             </xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
