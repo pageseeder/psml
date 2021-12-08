@@ -137,6 +137,11 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
   private @Nullable OffsetDateTime lastEdited = null;
 
   /**
+   * URI path
+   */
+  private @Nullable String path = null;
+
+  /**
    * Constructor (URI id set by handler)
    *
    */
@@ -213,6 +218,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       startReverseRef(attributes);
     } else if (isElement("displaytitle") && !hasAncestor("blockxref")) {
       newBuffer();
+    } else if (isElement("uri") && !hasAncestor("blockxref")) {
+      this.path = attributes.getValue("path");
     } else if (isElement("labels") && !hasAncestor("blockxref") && !hasAncestor("xref")) { // handle xref with type="math"
       newBuffer();
     } else if (isElement("placeholder")) {
@@ -472,6 +479,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       this._fragmentIDs.pop();
     } else if ("document".equals(element) && !hasAncestor("blockxref")) {
       this._tree.lastedited(this.lastEdited);
+      this._tree.path(this.path);
       this._tree.parts(this._expander.parts());
       add(this._tree.build());
     }

@@ -433,6 +433,9 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       if (root.lastedited() != null) {
         xml.attribute("last-edited", root.lastedited().format(DateTimeFormatter.ISO_DATE_TIME));
       }
+      if (root.path() != null) {
+        xml.attribute("path", root.path());
+      }
       if (this._map.size() == 1 || cposition != -1) {
         xml.attribute("content", "true");
       }
@@ -575,12 +578,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           if (output) ref.toXML(xml, level, state.number, next, nextcount, nextTree.title(),
               nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null),
-              nextTree.labels(), nextTree.lastedited());
+              nextTree.labels(), nextTree.lastedited(), nextTree.path());
         } else {
           // single embedded fragments can't be numbered
           if (output) ref.toXML(xml, level, state.number, next, nextcount, ref.title(),
               false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment),
-                  nextTree.labels(), nextTree.lastedited());
+                  nextTree.labels(), nextTree.lastedited(), nextTree.path());
         }
       } else if (output) {
         xml.openElement("transclusion");
