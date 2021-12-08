@@ -209,12 +209,12 @@ public final class Reference extends Element implements Serializable {
   @Override
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
       boolean numbered, String prefix, boolean children) throws IOException {
-    toXML(xml, level, number, treeid, count, title(), numbered, prefix, children, "", null);
+    toXML(xml, level, number, treeid, count, title(), numbered, prefix, children, "", null, null);
   }
 
   public void toXML(@NonNull XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count,
                     String title, boolean numbered, String prefix, boolean children, String labels,
-                    OffsetDateTime lastedited) throws IOException {
+                    OffsetDateTime lastedited, String path) throws IOException {
     toXMLNoClose(xml, level, count);
     // if display="document" use title from target document
     if (this._displaydocument != null && this._displaydocument) {
@@ -233,6 +233,9 @@ public final class Reference extends Element implements Serializable {
     }
     if (lastedited != null) {
       xml.attribute("last-edited", lastedited.format(DateTimeFormatter.ISO_DATE_TIME));
+    }
+    if (path != null) {
+      xml.attribute("path", path);
     }
     if (numbered && number != null) {
       Prefix pref = number.getPrefix(treeid, count);

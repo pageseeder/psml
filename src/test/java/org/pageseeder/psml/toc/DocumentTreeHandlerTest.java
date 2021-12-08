@@ -33,7 +33,7 @@ public final class DocumentTreeHandlerTest {
             h3("B.2", "2", 14),
             h3("B.3", "2", 15)),
         h2("C", "2", 16));
-    DocumentTree expected = new DocumentTree(1, "Test", "", null, Collections.emptyList(), Collections.singletonList(p),
+    DocumentTree expected = new DocumentTree(1, "Test", "", null, null, Collections.emptyList(), Collections.singletonList(p),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
@@ -58,7 +58,7 @@ public final class DocumentTreeHandlerTest {
             h3("B.2", "2", 14),
             h3("B.3", "2", 15)),
         h2("C", "2", 16));
-    DocumentTree expected = new DocumentTree(1, "Test", "", null, Collections.emptyList(), parts,
+    DocumentTree expected = new DocumentTree(1, "Test", "", null, null, Collections.emptyList(), parts,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
@@ -83,7 +83,7 @@ public final class DocumentTreeHandlerTest {
             h2("B.2", "4", 1,
                 p(0, "", "4", 2, false, "", ""))));
     List<Long> reverse = Arrays.asList(197490L);
-    DocumentTree expected = new DocumentTree(2, "test_2.html", "", null, reverse, parts,
+    DocumentTree expected = new DocumentTree(2, "test_2.html", "", null, null, reverse, parts,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     // This tree cannot be normalised
@@ -106,7 +106,7 @@ public final class DocumentTreeHandlerTest {
         h2("A", "1.2", 5,
           p(0, "", "1.2", 6, false, "", "")));
     List<Long> reverse = Arrays.asList(197490L);
-    DocumentTree expected = new DocumentTree(4, "Test 3", "", null, reverse, Collections.singletonList(p1),
+    DocumentTree expected = new DocumentTree(4, "Test 3", "", null, null, reverse, Collections.singletonList(p1),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
@@ -126,7 +126,7 @@ public final class DocumentTreeHandlerTest {
     Part<Heading> p2 = h2("A", "1.2", 5,
         p(0, "", "1.2", 6, false, "", ""));
     List<Long> reverse = Arrays.asList(197490L);
-    DocumentTree expected = new DocumentTree(4, "Test 3", "", null, reverse, Arrays.asList(p1, p2),
+    DocumentTree expected = new DocumentTree(4, "Test 3", "", null, null, reverse, Arrays.asList(p1, p2),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
@@ -139,7 +139,7 @@ public final class DocumentTreeHandlerTest {
         phantom(2,
           h3("Test 4", "1", 1,
             h4("Another heading", "2", 1))));
-    DocumentTree expected = new DocumentTree(4, "Test 4", "", null, Collections.emptyList(), Collections.singletonList(p1),
+    DocumentTree expected = new DocumentTree(4, "Test 4", "", null, null, Collections.emptyList(), Collections.singletonList(p1),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
@@ -148,7 +148,7 @@ public final class DocumentTreeHandlerTest {
   public void testParseContent4_normalizedAuto() throws SAXException, IOException {
     DocumentTree tree = parse(4, "content4.psml").normalize(TitleCollapse.auto);
     Part<Heading> p1 = h4("Another heading", "2", 1);
-    DocumentTree expected = new DocumentTree(4, "Test 4", "", null, Collections.emptyList(), Collections.singletonList(p1),
+    DocumentTree expected = new DocumentTree(4, "Test 4", "", null, null, Collections.emptyList(), Collections.singletonList(p1),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
@@ -161,7 +161,7 @@ public final class DocumentTreeHandlerTest {
         ref(0, "B", 101),
         ref(0, "C", 102));
     List<Long> reverse = Arrays.asList(1L, 2L);
-    DocumentTree expected = new DocumentTree(4, "A", "", null, reverse, Collections.singletonList(p),
+    DocumentTree expected = new DocumentTree(4, "A", "", null, null, reverse, Collections.singletonList(p),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
@@ -176,7 +176,7 @@ public final class DocumentTreeHandlerTest {
     List<Long> reverse = Arrays.asList(1L, 2L);
     DocumentTree expected = new DocumentTree(4, 2, "A", "", reverse,
         DocumentTree.NO_FRAGMENT, false, DocumentTree.NO_PREFIX, DocumentTree.NO_BLOCK_LABEL,
-        null, parts, Collections.emptyMap(), Collections.emptyMap());
+        null, null, parts, Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
   }
 
@@ -194,7 +194,7 @@ public final class DocumentTreeHandlerTest {
                 ref(2, "Charlie 1A", 107),
                 ref(2, "Charlie 1B", 108))));
     List<Long> reverse = Arrays.asList(1L, 2L);
-    DocumentTree expected = new DocumentTree(4, "A", "", null, reverse, Collections.singletonList(p),
+    DocumentTree expected = new DocumentTree(4, "A", "", null, null, reverse, Collections.singletonList(p),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
@@ -203,7 +203,7 @@ public final class DocumentTreeHandlerTest {
   @Test
   public void testParseMedia() throws SAXException, IOException {
     DocumentTree tree = parse(1, "media.psml");
-    DocumentTree expected = new DocumentTree(5, "Clipboard01.jpg", "", null, Collections.emptyList(), Collections.emptyList(),
+    DocumentTree expected = new DocumentTree(5, "Clipboard01.jpg", "", null, null, Collections.emptyList(), Collections.emptyList(),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     Tests.assertDocumentTreeEquals(expected, tree.normalize(TitleCollapse.auto));
@@ -230,7 +230,7 @@ public final class DocumentTreeHandlerTest {
                         tend("2")))),
              h2("Part B", "2", 7)));
     tree.print(System.out);
-    DocumentTree expected = new DocumentTree(5, "Assembly", "", null, Collections.emptyList(), p,
+    DocumentTree expected = new DocumentTree(5, "Assembly", "", null, null, Collections.emptyList(), p,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
@@ -257,7 +257,7 @@ public final class DocumentTreeHandlerTest {
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(6, 2, "Assembly", "", Collections.emptyList(),
         DocumentTree.NO_FRAGMENT, false, DocumentTree.NO_PREFIX, DocumentTree.NO_BLOCK_LABEL,
-        null, p, Collections.emptyMap(), Collections.emptyMap());
+        null, null, p, Collections.emptyMap(), Collections.emptyMap());
     Tests.print(tree.normalize(TitleCollapse.auto));
     DocumentTree normalized = tree.normalize(TitleCollapse.auto);
     Tests.assertDocumentTreeEquals(expected, normalized);
@@ -296,7 +296,7 @@ public final class DocumentTreeHandlerTest {
           p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
           p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
     List<Long> reverse = new ArrayList<>();
-    DocumentTree expected = new DocumentTree(4, "Test doc 1", "doc1,doc2", null, reverse, Collections.singletonList(p),
+    DocumentTree expected = new DocumentTree(4, "Test doc 1", "doc1,doc2", null, null, reverse, Collections.singletonList(p),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     tree = tree.normalize(TitleCollapse.auto);
@@ -306,14 +306,14 @@ public final class DocumentTreeHandlerTest {
           phantom(3,
             ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
           ref(1, "Another heading 2", 199328),
-          ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
+          ref(1, "Test doc 1.pdf", "content", 6173, null, null, "default",
             ref(2, "Another heading 2a", 199326))),
         h2("Related", "default", 1,
             p(1, "", "4", 1, false, "", ""),
             p(1, "A numbered para", "4", 2, true, "", ""),
             p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
             p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
-    expected = new DocumentTree(4, "Test doc 1", "doc1,doc2", null, reverse, parts,
+    expected = new DocumentTree(4, "Test doc 1", "doc1,doc2", null, null, reverse, parts,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }

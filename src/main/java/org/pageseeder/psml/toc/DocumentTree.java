@@ -114,6 +114,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   private final OffsetDateTime _lastedited;
 
   /**
+   * Document's path
+   */
+  private final String _path;
+
+  /**
    * Map of fragment ID to the first heading in the fragment,
    * otherwise the first preceding heading or section title (within the current section).
    */
@@ -137,12 +142,14 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param prefix            Any prefix given to the title.
    * @param blocklabel        The parent block label (from first heading)
    * @param lastedited        The document's last edited date (including transclusion edited dates)
+   * @param path              The document's path
    * @param parts             The list of parts.
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    * @param fragmentlevels    Map of fragment ID to the level of the fragment
    */
   public DocumentTree(long id, int level, String title, String labels, List<Long> reverse, String titlefragment, boolean numbered,
-      String prefix, String blocklabel, OffsetDateTime lastedited, List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
+      String prefix, String blocklabel, OffsetDateTime lastedited, String path,
+      List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
     this._id = id;
     this._title = title;
     this._labels = labels;
@@ -154,6 +161,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     this._prefix = prefix;
     this._blocklabel = blocklabel;
     this._lastedited = lastedited;
+    this._path = path;
     this._fragmentheadings = Collections.unmodifiableMap(fragmentheadings);
     this._fragmentlevels = Collections.unmodifiableMap(fragmentlevels);
   }
@@ -163,15 +171,16 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * @param title             The title the document.
    * @param labels            The document labels
    * @param lastedited        The document's last edited date (including transclusion edited dates)
+   * @param path              The document's path
    * @param reverse           The list of reverse references.
    * @param parts             The list of parts.
    * @param fragmentheadings  Map of fragment ID to the heading for the fragment
    * @param fragmentlevels    Map of fragment ID to the level of the fragment
    */
-  public DocumentTree(long id, String title, String labels, OffsetDateTime lastedited, List<Long> reverse,
+  public DocumentTree(long id, String title, String labels, OffsetDateTime lastedited, String path, List<Long> reverse,
       List<Part<?>> parts, Map<String,String> fragmentheadings, Map<String,Integer> fragmentlevels) {
     this(id, calculateLevel(parts), title, labels, reverse,
-        NO_FRAGMENT, false, NO_PREFIX, NO_BLOCK_LABEL, lastedited, parts, fragmentheadings, fragmentlevels);
+        NO_FRAGMENT, false, NO_PREFIX, NO_BLOCK_LABEL, lastedited, path, parts, fragmentheadings, fragmentlevels);
   }
 
   @Override
@@ -225,6 +234,13 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   public @Nullable OffsetDateTime lastedited() {
     return this._lastedited;
+  }
+
+  /**
+   * @return The document's path.
+   */
+  public String path() {
+    return this._path;
   }
 
   /**
@@ -390,7 +406,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     List<Part<?>> parts = removeOtherFragments(this.parts(), fragment, false);
     if (parts == null) parts = new ArrayList<>();
     DocumentTree tree = new DocumentTree(this._id, this._title, this._labels, this._lastedited,
-            this._reverse, parts, this._fragmentheadings, this._fragmentlevels);
+            this._path, this._reverse, parts, this._fragmentheadings, this._fragmentlevels);
     return removePhantomParts(tree);
   }
 
@@ -475,7 +491,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       normalized = new DocumentTree(tree._id,  calculateLevel(unwrapped),
           tree._title, tree._labels, tree._reverse, tree._titlefragment,
           tree._numbered, tree._prefix, tree._blocklabel, tree._lastedited,
-              unwrapped, tree._fragmentheadings, tree._fragmentlevels);
+          tree._path, unwrapped, tree._fragmentheadings, tree._fragmentlevels);
     }
     return normalized;
   }
@@ -529,7 +545,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       return new DocumentTree(tree._id, firstHeading.level() + 1, firstHeading.title(),
               tree._labels, tree._reverse, firstHeading.fragment(),
               firstHeading.numbered(), firstHeading.prefix(), firstHeading.blocklabel(),
-              tree._lastedited, children, tree._fragmentheadings, tree._fragmentlevels);
+              tree._lastedited, tree._path, children, tree._fragmentheadings, tree._fragmentlevels);
     }
     return tree;
   }
@@ -582,6 +598,9 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
     /** Document last edited date (including transclusions). */
     private OffsetDateTime _lastedited = null;
+
+    /** Document URI path. */
+    private String _path = "";
 
     /** List of parts in this tree. */
     private final List<Part<?>> _parts = new ArrayList<>();
@@ -652,6 +671,11 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       return this;
     }
 
+    public Builder path(String path) {
+      this._path = path;
+      return this;
+    }
+
     public Builder parts(List<Part<?>> parts) {
       // XXX Should only be Level 1
       this._parts.addAll(parts);
@@ -694,7 +718,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       Map<String,String> fragmentheadings = new HashMap<>(this._fragmentheadings);
       Map<String,Integer> fragmentlevels = new HashMap<>(this._fragmentlevels);
       return new DocumentTree(this._id, this._title, this._labels, this._lastedited,
-              reverse, parts, fragmentheadings, fragmentlevels);
+              this._path, reverse, parts, fragmentheadings, fragmentlevels);
     }
 
   }

@@ -1082,9 +1082,15 @@ public final class PublicationTreeTest {
   public void testParseWACCC() throws SAXException {
     DocumentTree root = Tests.parse(1, "waccc.psml").normalize(TitleCollapse.auto);
     Assert.assertEquals(OffsetDateTime.parse("2017-03-28T16:41:30+10:00"), root.lastedited());
+    Assert.assertEquals(
+            "/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/content.psml",
+            root.path());
     PublicationTree publication = new PublicationTree(root);
     DocumentTree tree = Tests.parse(681724, "test_doc_1.psml").normalize(TitleCollapse.auto);
     Assert.assertEquals(OffsetDateTime.parse("2021-04-16T15:56:51+10:00"), tree.lastedited());
+    Assert.assertEquals(
+            "/ps/test/local1/documents/word3/test_doc_1/test_doc_1.psml",
+             tree.path());
     publication = publication.add(tree);
     assertValidPublication(publication);
     Tests.print(publication);
