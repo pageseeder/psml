@@ -169,6 +169,8 @@ public final class Paragraph extends Element implements Serializable {
 
   @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
+    // don't output if not numbered and no prefix
+    if (!this._numbered && (NO_PREFIX.equals(this._prefix) || this._prefix == null)) return;
     xml.openElement("para-ref", false);
     xml.attribute("level", this.level());
     if (!Element.NO_TITLE.equals(title())) {
