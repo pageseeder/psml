@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21930" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="21930" scheme="http" host="localhost" port="80"
+      path="/ps/test/local1/documents/process/content/content_5.psml"
+      decodedpath="/ps/test/local1/documents/process/content/content_5.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      created="2017-06-23T16:31:36+10:00" modified="2017-06-23T16:41:37+10:00"
+      title="Content 5">
+      <displaytitle>Content 5</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="21954" href="ref_5.psml" frag="2"
+        urititle="Ref 2" mediatype="application/vnd.pageseeder.psml+xml"
+        documenttype="references" id="39439" title="References" type="none"
+        forwardtype="embed" forwarddisplay="document" forwardfrag="default" />
+    </reversexrefs>
+  </documentinfo>
+  <metadata />
+  <section id="title">
+    <fragment id="1">
+      <heading level="1" numbered="true">Content 5</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <blockxref id="39443" frag="default" reversefrag="2"
+          reversetitle="" reverselink="true" reversetype="none" display="document"
+          type="embed" uriid="21954" href="ref_5.psml" urititle="Ref 5"
+          mediatype="application/vnd.pageseeder.psml+xml">Content 2</blockxref>
+    </fragment>
+  </section>
+</document>

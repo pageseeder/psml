@@ -1259,6 +1259,24 @@ public class ProcessTest {
     p.process();
   }
 
+  @Test(expected=ProcessException.class)
+  public void testProcessXRefsLoopFail() throws IOException, ProcessException {
+    String filename = "ref_5.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER + "error/loop"));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
+    p.process();
+  }
+
   @Test
   public void testProcessXRefsMathml() throws IOException, ProcessException {
     String filename = "ref_3.psml";
