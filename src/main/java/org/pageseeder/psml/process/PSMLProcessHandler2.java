@@ -549,6 +549,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           // compute adjusted values
           FragmentNumbering.Prefix prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
               targeturiid, this.xrefTargetPosition, targetfrag, 1);
+          // if first para is not numbered try the second para as often an image will have a caption after it
+          if (prefix == null) prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
+                  targeturiid, this.xrefTargetPosition, targetfrag, 2);
           String newPrefix       = prefix == null ? null : prefix.value;
           DocumentTree tree      = this.numberingAndTOC.publicationTree().tree(targeturiid);
           String newHeading      = tree == null ? null : tree.fragmentheadings().get(targetfrag);
