@@ -549,6 +549,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           // compute adjusted values
           FragmentNumbering.Prefix prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
               targeturiid, this.xrefTargetPosition, targetfrag, 1);
+          // if first para is not numbered try the second para as often an image will have a caption after it
+          if (prefix == null) prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
+                  targeturiid, this.xrefTargetPosition, targetfrag, 2);
           String newPrefix       = prefix == null ? null : prefix.value;
           DocumentTree tree      = this.numberingAndTOC.publicationTree().tree(targeturiid);
           String newHeading      = tree == null ? null : tree.fragmentheadings().get(targetfrag);
@@ -725,9 +728,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     if (local_count > 0) {
       // if more than 1 embedded target or only multiple transcluded targets generate error
       if (embed_count > 1 || (embed_count == 0 && local_count > 1)) {
-        String message = "Internal link pointing to URI "+uriid+
-            " fragment "+frag+" is ambiguous because this content appears in multiple locations (see Dev > References check for "+
-            this.sourceRelativePath+").";
+        String message = "Internal link pointing to " + atts.getValue("href") + " (URIID " + uriid +
+            ") fragment "+frag+" is ambiguous because this content appears in multiple locations. See xref" +
+            (atts.getValue("title") == null ? "" : (" " + atts.getValue("title"))) +
+            " in document " +  this.sourceRelativePath +
+            (this.ancestorUriIDs.isEmpty() ? "" : (" (URIID " + this.ancestorUriIDs.peek() + ")")) +
+            ". This can be fixed by having the content embedded in one location and transcluded in the others.";
         if (this.errorOnAmbiguous) {
           if (this.failOnError) throw new ProcessException(message);
           else this.logger.error(message);

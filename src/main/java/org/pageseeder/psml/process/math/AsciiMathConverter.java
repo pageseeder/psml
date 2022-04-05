@@ -26,9 +26,6 @@ public class AsciiMathConverter {
     if (am.charAt(0) == '`' && am.charAt(am.length()-1) == '`')
       am = am.substring(1, am.length()-1);
 
-    // check cache
-    String result = cache.get(am);
-
     // disable 'id' and 'class' as they are not handled properly in MathJax
     if (am.contains("class"))
       throw new IllegalArgumentException(
@@ -37,6 +34,8 @@ public class AsciiMathConverter {
       throw new IllegalArgumentException(
               "The AsciiMath \""+am+"\" could not be converted to MathML because \"id\" is not supported.");
 
+    // check cache
+    String result = cache.get(am);
     if (result == null) {
 
       // invoke the function named "parse" with the ascii math as the argument
@@ -72,7 +71,7 @@ public class AsciiMathConverter {
 
     // load script
     ScriptEngineManager manager = new ScriptEngineManager();
-    ScriptEngine engine = manager.getEngineByName("nashorn");
+    ScriptEngine engine = manager.getEngineByName("javascript");
     Compilable cengine = (Compilable) engine;
 
     // evaluate JavaScript code
