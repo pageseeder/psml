@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="default"><documentinfo><uri title="Split source 1"/></documentinfo><section id="title"><fragment id="1"><heading level="1">Split source 1</heading></fragment></section><section id="content"><fragment id="2"><para>Front matter <inline label="inline1">[My field 1]</inline></para><para>Front matter
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="default"><documentinfo><uri title="Split source 1"/></documentinfo><metadata/><section id="title"><fragment id="1"><heading level="1">Split source 1</heading></fragment></section><section id="content"><fragment id="2"><para>Front matter <inline label="inline1">[My field 1]</inline></para><para>Front matter
         <xref frag="2" display="manual" type="none" href="split_source_single.psml" title="link to B">link to B</xref>
       </para><para>Front matter
         <link href="http://pageseeder.com">link to PageSeeder</link>

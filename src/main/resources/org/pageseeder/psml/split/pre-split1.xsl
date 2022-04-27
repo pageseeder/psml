@@ -19,6 +19,7 @@
     <document>
       <xsl:copy-of select="document/@*" />
       <xsl:apply-templates select="document/documentinfo" />
+      <xsl:apply-templates select="document/metadata" />
       <section>
         <fragment>
           <!-- Ignore top level blockxref with content and content of non-top level blockxref
