@@ -14,7 +14,13 @@
     <locator id="70781" fragment="2" editid="201737"
       modified="2019-03-19T12:43:31+11:00" />
   </fragmentinfo>
-  <metadata />
+  <metadata>
+    <property name="test1" value="myvalue1" />
+    <property name="markup1" title="My markup" datatype="markup">
+      <heading level="2">Heading AX</heading>
+      <para>Markup content 1</para>
+    </property>
+  </metadata>
   <section id="title">
     <fragment id="96533-top">
       <heading level="1">Split source 2</heading>
@@ -121,6 +127,13 @@
                 <displaytitle>Common 7</displaytitle>
               </uri>
             </documentinfo>
+            <metadata>
+              <property name="test2" value="myvalue2" />
+              <property name="markup2" title="My markup" datatype="markup">
+                <heading level="2">Heading BX</heading>
+                <para>Markup content 2</para>
+              </property>
+            </metadata>
             <section id="content">
               <fragment id="96537-1">
                 <para>Transcluded content 2</para>

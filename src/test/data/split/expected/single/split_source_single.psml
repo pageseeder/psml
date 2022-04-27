@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="contract"><documentinfo><uri title="Split source 1"><labels>mycontract</labels></uri></documentinfo><section id="title"><fragment id="1"><heading level="1">Split source 1</heading><para>Front matter <xref frag="default" display="document" type="none" href="fields/field-001.psml" documenttype="field">[My field 1]</xref></para><para>Front matter
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="contract"><documentinfo><uri title="Split source 1"><labels>mycontract</labels></uri></documentinfo><metadata/><section id="title"><fragment id="1"><heading level="1">Split source 1</heading><para>Front matter <xref frag="default" display="document" type="none" href="fields/field-001.psml" documenttype="field">[My field 1]</xref></para><para>Front matter
         <xref frag="1" display="manual" type="none" href="components/component-002.psml" title="link to B">link to B</xref>
       </para><para>Front matter
         <link href="http://pageseeder.com">link to PageSeeder</link>

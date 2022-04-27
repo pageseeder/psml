@@ -1,4 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="contract"><documentinfo><uri title="Split source 2"><labels>mycontract</labels></uri></documentinfo><section id="title"><fragment id="1"><heading level="1">Split source 2</heading><para>Front matter <xref frag="default" display="document" type="none" href="fields/text123.psml" documenttype="field">[Text123]</xref></para><para>Front matter
+<?xml version="1.0" encoding="UTF-8"?><document level="portable" type="contract"><documentinfo><uri title="Split source 2"><labels>mycontract</labels></uri></documentinfo><metadata>
+    <property name="test1" value="myvalue1"/>
+    <property name="markup1" title="My markup" datatype="markup">
+      <heading level="2">Heading AX</heading>
+      <para>Markup content 1</para>
+    </property>
+  </metadata><section id="title"><fragment id="1"><heading level="1">Split source 2</heading><para>Front matter <xref frag="default" display="document" type="none" href="fields/text123.psml" documenttype="field">[Text123]</xref></para><para>Front matter
         <xref frag="1" href="components/component-002.psml" display="manual" type="none" title="link to B">link to B</xref>
       </para><para>Front matter
         <link href="http://pageseeder.com">link to PageSeeder</link>

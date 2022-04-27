@@ -34,7 +34,7 @@
           </xsl:if>
         </uri>
       </documentinfo>
-
+      <xsl:apply-templates select="document/metadata" />
       <xsl:choose>
         <xsl:when test="config:has-document()">
           <!-- output front matter -->
