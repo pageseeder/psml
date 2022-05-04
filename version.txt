@@ -1,1 +1,1 @@
-0.7.0-beta-16-SNAPSHOT
+0.7.0-beta-16-SNAPSHOT3
