@@ -25,9 +25,11 @@ public final class Files {
    * @param file the file to compute the relative path for
    * @param root the root that the path will be relative to
    *
-   * @return the relative path if files are related, <code>null</code> otherwise.
+   * @return the relative path between file and root
+   *
+   * @throws IllegalArgumentException if file is not a descendant of root
    */
-  public static String computeRelativePath(File file, File root) {
+  public static String computeRelativePath(File file, File root) throws IllegalArgumentException {
     String fpath;
     try {
       fpath = file.getCanonicalPath();
@@ -43,6 +45,13 @@ public final class Files {
     if (fpath.equals(rpath)) return "";
     if (fpath.startsWith(rpath+File.separator))
       return fpath.substring(rpath.length()+1).replace(File.separatorChar, '/');
-    return null;
+    // sanitise paths
+    int i = 0;
+    while (i < rpath.length() && i < fpath.length()) {
+      if (rpath.charAt(i) != fpath.charAt(i)) break;
+      i++;
+    }
+    throw new IllegalArgumentException("The path " + File.separatorChar + fpath.substring(i) +
+            " is outside the src path " + File.separatorChar + rpath.substring(i));
   }
 }

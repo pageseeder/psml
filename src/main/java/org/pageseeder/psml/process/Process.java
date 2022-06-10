@@ -564,7 +564,7 @@ public final class Process {
         if (this.failOnError) throw e;
         else this.logger.error(e.getMessage());
       } catch (Throwable e) {
-        throw new ProcessException("Failed to process " + relPath + ": " + e.getMessage());
+        throw new ProcessException("Failed to process " + relPath + ": " + e.getMessage(), e);
       } finally {
         try {
           fos.close();
