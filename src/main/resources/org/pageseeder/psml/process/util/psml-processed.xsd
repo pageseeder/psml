@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?stylesheet format="schema" xsl-rootelement="root"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="1.3">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" version="1.4">
 
   <xs:annotation>
     <xs:documentation>This is the XML schema for PSML document processed content.</xs:documentation>
@@ -860,6 +860,11 @@
           <xs:documentation>The fragment of the source - 'default' if no specific fragment</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="config" type="xref-config">
+        <xs:annotation>
+          <xs:documentation>The name of an XRef configuration used when creating/editing this XRef.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="href" type="xs:string">
         <xs:annotation>
           <xs:documentation>The path of the source document</xs:documentation>
@@ -976,6 +981,11 @@
       <xs:attribute name="urltype" type="xs:string">
         <xs:annotation>
           <xs:documentation>The source URL type.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="external" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>If 'true' the source is a URL (external URI).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
