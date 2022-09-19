@@ -1214,6 +1214,11 @@
         <xs:element ref="content" />
         <xs:element ref="diff" minOccurs="0" />
       </xs:sequence>
+      <xs:attribute name="editid" type="xs:long">
+        <xs:annotation>
+          <xs:documentation>The XLink ID for the compare edit.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
