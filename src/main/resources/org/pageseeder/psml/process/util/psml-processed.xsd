@@ -405,7 +405,7 @@
       </xs:attribute>
       <xs:attribute name="count" default="1">
         <xs:annotation>
-          <xs:documentation>The property's value count or 'n' for unbounded (deprecated).</xs:documentation>
+          <xs:documentation>The property's value count or 'n' for unbounded. DEPRECATED - use @multiple.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -1214,6 +1214,11 @@
         <xs:element ref="content" />
         <xs:element ref="diff" minOccurs="0" />
       </xs:sequence>
+      <xs:attribute name="editid" type="xs:long">
+        <xs:annotation>
+          <xs:documentation>The XLink ID for the compare edit.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
@@ -1544,7 +1549,7 @@
       </xs:attribute>
        <xs:attribute name="span" type="xs:positiveInteger">
         <xs:annotation>
-          <xs:documentation>Number of columns this applies to.</xs:documentation>
+          <xs:documentation>Number of columns this applies to. DEPRECATED</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="width">
@@ -1918,7 +1923,7 @@
       </xs:attribute>
       <xs:attribute name="role" type="role">
         <xs:annotation>
-          <xs:documentation>Custom value that can be used for formatting (deprecated, use @labels instead).</xs:documentation>
+          <xs:documentation>Custom value that can be used for formatting. DEPRECATED - use @labels.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="uriid" type="xs:long">
