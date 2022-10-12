@@ -297,15 +297,16 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * Check if this tree contains a heading or embed reference.
+   * Check if this tree contains a heading, embed reference or visible paras.
    *
+   * @param config    The publication config for checking para visibility (optional)
    * @param fragment  The fragment for the heading or reference (optional)
    *
    * @return <code>true</code> if heading or reference found.
    */
-  public boolean hasHeadingOrReferences(@Nullable String fragment) {
+  public boolean hasVisibleItems(@Nullable PublicationConfig config, @Nullable String fragment) {
     for (Part<?> c : this._parts) {
-      if (hasHeadingOrReferences(c, fragment)) return true;
+      if (hasVisibleItems(c, config, fragment)) return true;
     }
     return false;
   }
@@ -348,22 +349,24 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
-   * Check if this part or it's children has a heading or embed reference.
+   * Check if this part or it's children has a heading, embed reference or visible para.
    *
    * @param part      The part to check.
+   * @param config    The publication config for checking para visibility (optional)
    * @param fragment  The fragment for the heading or reference (optional)
    *
    * @return <code>true</code> if heading or reference found.
    */
-  private static boolean hasHeadingOrReferences(Part<?> part, @Nullable String fragment) {
+  private static boolean hasVisibleItems(Part<?> part, @Nullable PublicationConfig config, @Nullable String fragment) {
     Element element = part.element();
     if (((element instanceof Reference && Reference.Type.EMBED.equals(((Reference)element).type())) ||
-          element instanceof Heading) &&
+          element instanceof Heading ||
+         (element instanceof Paragraph && ((Paragraph)element).isVisible(config))) &&
         (fragment == null || fragment.equals(element.fragment()))) {
       return true;
     }
     for (Part<?> c : part.parts()) {
-      if (hasHeadingOrReferences(c, fragment)) return true;
+      if (hasVisibleItems(c, config, fragment)) return true;
     }
     return false;
   }

@@ -726,11 +726,17 @@
   <xs:element name="section-ref">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="title"              minOccurs="0" type="xs:string" />
         <xs:element ref="fragment-ref"        minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
       <xs:attribute name="id" type="section-id" use="required">
         <xs:annotation>
           <xs:documentation>The Section ID.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="title" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The title for the section.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>

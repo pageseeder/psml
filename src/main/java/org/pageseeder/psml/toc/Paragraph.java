@@ -76,6 +76,18 @@ public final class Paragraph extends Element implements Serializable {
   }
 
   /**
+   * Whether this para is visible in a TOC with the specified config.
+   *
+   * @param config the publication config
+   *
+   * @return <code>true</code> if visible
+   */
+  public boolean isVisible(PublicationConfig config) {
+    return config != null && (config.getTocParaIndents().indexOf(this.level() + ",") != -1 ||
+        (!"".equals(this.blocklabel()) && config.getTocBlockLabels().indexOf(this.blocklabel() + ",") != -1));
+  }
+
+  /**
    * @return The full title of this paragraph including the prefix
    */
   public String getPrefixedTitle() {
