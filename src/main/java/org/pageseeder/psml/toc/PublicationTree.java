@@ -548,8 +548,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (output && !Reference.Type.TRANSCLUDE.equals(refType)) {
       if (element instanceof Paragraph) {
         Paragraph para = (Paragraph) element;
-        if (state.config != null && (state.config.getTocParaIndents().indexOf(para.level() + ",") != -1 ||
-            (!"".equals(para.blocklabel()) && state.config.getTocBlockLabels().indexOf(para.blocklabel() + ",") != -1))) {
+        if (para.isVisible(state.config)) {
           element.toXML(xml, level, state.number, id, count);
           return;
         } else {
@@ -577,12 +576,12 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
       if (Reference.Type.EMBED.equals(refType)) {
         if (Reference.DEFAULT_FRAGMENT.equals(targetFragment)) {
           if (output) ref.toXML(xml, level, state.number, next, nextcount, nextTree.title(),
-              nextTree.numbered(), nextTree.prefix(), nextTree.hasHeadingOrReferences(null),
+              nextTree.numbered(), nextTree.prefix(), nextTree.hasVisibleItems(state.config, null),
               nextTree.labels(), nextTree.lastedited(), nextTree.path());
         } else {
           // single embedded fragments can't be numbered
           if (output) ref.toXML(xml, level, state.number, next, nextcount, ref.title(),
-              false, DocumentTree.NO_PREFIX, nextTree.hasHeadingOrReferences(targetFragment),
+              false, DocumentTree.NO_PREFIX, nextTree.hasVisibleItems(state.config, targetFragment),
                   nextTree.labels(), nextTree.lastedited(), nextTree.path());
         }
       } else if (output) {
