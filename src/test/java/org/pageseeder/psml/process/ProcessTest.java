@@ -550,6 +550,35 @@ public class ProcessTest {
   }
 
   @Test
+  public void testKatexConvert() throws IOException, ProcessException {
+    String filename = "katex_conversion.psml";
+    String filename_expected = "katex_conversion_result.psml";
+    Process p = new Process();
+    p.setConvertTex(true);
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER, "math"));
+    File dest = new File(MATH_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
+    p.setPublicationConfig(config, filename, true);
+    p.process();
+
+    // check result
+    File expected = new File(SOURCE_FOLDER + "/" + filename_expected);
+    String xml_expected = new String (Files.readAllBytes(expected.toPath()), StandardCharsets.UTF_8);
+    File result = new File(MATH_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+//    System.out.println(xml);
+    // validate
+    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    Assert.assertThat(xml, hasXPath("count(inline[@label = 'tex'])", equalTo("0")));
+    Assert.assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace());
+  }
+
+  @Test
   public void testAsciiMathConvert() throws IOException, ProcessException {
     String filename = "asciimath_conversion.psml";
     String filename_expected = "asciimath_conversion_result.psml";
@@ -826,7 +855,7 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//diff//xref)[7]", equalTo("3.4. Heading B")));
     Assert.assertThat(xml, hasXPath("(//diff//xref)[8]", equalTo("3.2. Compare 2content.")));
     Assert.assertThat(xml, hasXPath("(//diff//xref)[9]", equalTo("3.2. Compare 2content.")));
-   }
+  }
 
   @Test
   public void testProcessImagesFilename() throws IOException, ProcessException {
@@ -1085,7 +1114,7 @@ public class ProcessTest {
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     Assert.assertThat(xml, hasXPath("//image/@src", equalTo("../images/diagram1.jpg")));
     Assert.assertThat(xml, hasXPath("//image//property[@name='hi-res']/xref/@href",
-            equalTo("../images/diagram space.jpg")));
+        equalTo("../images/diagram space.jpg")));
   }
 
   @Test

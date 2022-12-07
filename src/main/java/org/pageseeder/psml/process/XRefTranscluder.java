@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
+import org.pageseeder.psml.process.math.KatexConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
@@ -167,12 +168,14 @@ public final class XRefTranscluder {
    * @param image            If this is an image
    * @param link             If this is a link
    * @param inEmbedHierarchy If hierarchy has all embed XRefs
+   * @param convertTex       If xrefs to .tex should be converted
    *
    * @return <code>true</code> if the XRef is transcluded, false otherwise
    *
    * @throws ProcessException if the target is invalid or could not be read
    */
-  public boolean transcludeXRef(Attributes atts, boolean inXrefFragment, boolean image, boolean link, boolean inEmbedHierarchy) throws ProcessException {
+  public boolean transcludeXRef(Attributes atts, boolean inXrefFragment, boolean image,
+                                boolean link, boolean inEmbedHierarchy, boolean convertTex) throws ProcessException {
     // should transclude?
     if (!image && !link &&
        ((inXrefFragment && this.excludeXRefFragment) ||
@@ -189,7 +192,7 @@ public final class XRefTranscluder {
       boolean mathTarget = "math".equalsIgnoreCase(type) && "default".equals(atts.getValue("frag"));
       // ensure PSML or mathml for math xrefs
       if ((!mathTarget && !target.getName().endsWith(".psml")) ||
-          (mathTarget  && !target.getName().endsWith(".mml") && !target.getName().endsWith(".mathml")))
+          (mathTarget  && !target.getName().endsWith(".mml") && !target.getName().endsWith(".mathml") && !(convertTex && target.getName().endsWith(".tex"))))
         return false;
       // check for depth
       if (this.parentFiles.size() > MAX_DEPTH)
@@ -210,7 +213,15 @@ public final class XRefTranscluder {
         try {
           // read mathml target file and wrap it in media-fragment element
           this.parentHandler.write("<media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
-          this.parentHandler.writeFileContents(target);
+          if (convertTex && target.getName().endsWith(".tex")) {
+            try {
+              this.parentHandler.write(KatexConverter.convert(String.join("", java.nio.file.Files.readAllLines(target.toPath()))));
+            } catch (IOException ex) {
+              throw new ProcessException("Failed to read contents of file "+target.getName()+": "+ex.getMessage(), ex);
+            }
+          } else {
+            this.parentHandler.writeFileContents(target);
+          }
           this.parentHandler.write("</media-fragment>");
         } catch (SAXException ex) {
           throw new ProcessException("Failed to write contents of file "+target.getName()+": "+ex.getMessage(), ex);
@@ -289,7 +300,7 @@ public final class XRefTranscluder {
     } else {
       if (path.endsWith(".psml")) {
         target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
-      } else if (path.endsWith(".mml") || path.endsWith(".mathml")) {
+      } else if (path.endsWith(".mml") || path.endsWith(".mathml") || path.endsWith(".tex")) {
         target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
       } else {
         target = new File(this.parentHandler.getBinaryRepository(), "META-INF/" + dadPath + '/' + path + ".psml");

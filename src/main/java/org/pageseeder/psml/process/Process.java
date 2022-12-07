@@ -89,6 +89,11 @@ public final class Process {
   private boolean convertAsciiMath = false;
 
   /**
+   * If katex is converted to mathjax
+   */
+  private boolean convertTex = false;
+
+  /**
    * If placeholder elements are resolved
    */
   private boolean placeholders = false;
@@ -191,6 +196,14 @@ public final class Process {
    */
   public void setConvertAsciiMath(boolean convert) {
     this.convertAsciiMath = convert;
+    this.processXML = true;
+  }
+
+  /**
+   * @param convert If ascii math content is converted to Mathjax
+   */
+  public void setConvertTex(boolean convert) {
+    this.convertTex = convert;
     this.processXML = true;
   }
 
@@ -487,7 +500,7 @@ public final class Process {
    * @throws ProcessException if anything goes wrong
    */
   public void process(Map<String, File> psmlFiles, File source, File destination, File binaries,
-      ImageCache cache) throws ProcessException {
+                      ImageCache cache) throws ProcessException {
     // make sure we've got something to do
     if (!this.processXML) return;
     AsciiMathConverter.reset();
@@ -514,6 +527,7 @@ public final class Process {
       handler1.setProcessed(this.processed);
       handler1.setConvertMarkdown(this.convertMarkdown);
       handler1.setConvertAsciiMath(this.convertAsciiMath);
+      handler1.setConvertTex(this.convertTex);
       handler1.setPlaceholders(this.placeholders);
       // add xrefs handling details
       List<String> xrefsTypes = null;
@@ -522,8 +536,8 @@ public final class Process {
 
       // make sure the path matches
       if (this.xrefs != null && this.xrefs.getTypes() != null && (xrefsMatcher == null ||
-                                                                 !xrefsMatcher.hasPatterns() ||
-                                                                  xrefsMatcher.matches(relPath))) {
+          !xrefsMatcher.hasPatterns() ||
+          xrefsMatcher.matches(relPath))) {
         xrefsTypes = Arrays.asList(this.xrefs.getTypes().toLowerCase().split(","));
         excludeXRefFrag = this.xrefs.excludeXRefsInXRefFragment();
         onlyXRefFrag = this.xrefs.onlyXRefsInXRefFragment();
@@ -541,8 +555,8 @@ public final class Process {
       ImageSrc imageSrc = ImageSrc.LOCATION;
       String siteprefix = null;
       if (this.imageHandling != null && (this.imageMatcher == null ||
-                                           !this.imageMatcher.hasPatterns() ||
-                                            this.imageMatcher.matches(relPath))) {
+          !this.imageMatcher.hasPatterns() ||
+          this.imageMatcher.matches(relPath))) {
         // set proper values
         thecache          = cache;
         imageSrc          = this.imageHandling.getSrc();
@@ -554,7 +568,7 @@ public final class Process {
       // add publication config
       try {
         if (this.publicationConfig != null && this.publicationRoot.equals(relPath)) {
-            handler1.setPublicationConfig(this.publicationConfig, psml, this.generatetoc);
+          handler1.setPublicationConfig(this.publicationConfig, psml, this.generatetoc);
         }
         // add elements stripping details
         handler1.setStrip(this.strip);
@@ -624,7 +638,7 @@ public final class Process {
           //System.out.println(result);
         }
         // parse XML input
-          XMLUtils.parse(tempOutput, handler2);
+        XMLUtils.parse(tempOutput, handler2);
       } catch (XRefLoopException e) {
         throw new ProcessException(e.getMessage(), e);
       } catch (ProcessException e) {
@@ -716,7 +730,7 @@ public final class Process {
    * @param isRoot      if the current file is the root folder
    */
   private void collectFiles(File file, File root, Map<String, File> psml,
-      Map<String, File> metadata, Map<String, File> others, boolean isRoot) {
+                            Map<String, File> metadata, Map<String, File> others, boolean isRoot) {
     if (file.isDirectory()) {
       File[] all = file.listFiles();
       if (all != null) for (File f : all) {
