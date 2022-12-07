@@ -792,7 +792,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       write(" id=\"" + XMLUtils.escapeForAttribute(this.uriID) + '"');
     }
     // add a full href path for xrefs, it will be stripped on second pass
-    if (isXRef || isReverseXRef) {
+    if ((isXRef || isReverseXRef) && !"true".equals(atts.getValue("external"))) {
       String relpath = this.transcluder.findXRefRelativePath(atts.getValue("href"));
       if (relpath != null)
         write(" relpath=\"" + XMLUtils.escapeForAttribute(relpath) + "\"");

@@ -1143,6 +1143,12 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
     Assert.assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
     Assert.assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
+    Assert.assertThat(xml, hasXPath("(//xref)[1]/@href", equalTo("#21934-1")));
+    Assert.assertThat(xml, hasXPath("(//xref)[2]/@href", equalTo("#21931")));
+    Assert.assertThat(xml, hasXPath("(//xref)[3]/@href", equalTo("content/content_5.psml")));
+    Assert.assertThat(xml, hasXPath("(//xref)[4]/@href", equalTo("#2_21934-1")));
+    Assert.assertThat(xml, hasXPath("(//xref)[5]/@href", equalTo("#2_21931")));
+    Assert.assertThat(xml, hasXPath("(//xref)[6]/@href", equalTo("content/content_5.psml")));
   }
 
   @Test

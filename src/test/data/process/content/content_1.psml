@@ -55,6 +55,10 @@
           reversetitle="" reverselink="true" reversetype="none" display="document"
           type="none" uriid="21931" href="content_2.psml" urititle="Content 2"
           mediatype="application/vnd.pageseeder.psml+xml">Content 2</xref>
+        <xref id="394431" frag="default" reversefrag="2"
+              reversetitle="" reverselink="true" reversetype="none" display="document"
+              type="none" uriid="219311" href="content_5.psml" urititle="Content 5"
+              mediatype="application/vnd.pageseeder.psml+xml">Content 5</xref>
       </para>
       <blockxref id="39448" frag="default" reversefrag="2"
         reversetitle="Content 2" reverselink="true" reversetype="none"

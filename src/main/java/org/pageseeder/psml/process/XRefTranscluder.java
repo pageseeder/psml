@@ -319,16 +319,13 @@ public final class XRefTranscluder {
     }
     String dadPath = this.parentHandler.getParentFolderRelativePath();
     // find target file
-    if (path.endsWith(".xml") || path.endsWith(".psml")) {
+    if (path.endsWith(".psml")) {
       // try psml
-      File target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path.replaceFirst("\\.xml$", ".psml"));
-      if (target.exists()) return Files.computeRelativePath(target, this.parentHandler.getPSMLRoot());
-      // try binary xml?
-      target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
-      if (target.exists()) return Files.computeRelativePath(target, this.parentHandler.getBinaryRepository());
+      File target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
+      if (!path.startsWith("/")) return Files.computeRelativePath(target, this.parentHandler.getPSMLRoot());
     } else {
       File target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
-      if (target.exists()) return Files.computeRelativePath(target, this.parentHandler.getBinaryRepository());
+      if (!path.startsWith("/")) return Files.computeRelativePath(target, this.parentHandler.getBinaryRepository());
     }
     return null;
   }
