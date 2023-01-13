@@ -11,6 +11,7 @@ import org.pageseeder.psml.process.XRefTranscluder.XRefNotFoundException;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
+import org.pageseeder.psml.process.math.KatexConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
@@ -85,6 +86,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * If ascii content is converted to MathJax
    */
   private boolean convertAsciiMath = false;
+
+  /**
+   * If katex content is converted to MathJax
+   */
+  private boolean convertTex = false;
 
   /**
    * If an error should be logged when an image was not found.
@@ -177,6 +183,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * The markdown or ascii content to convert.
    */
   private StringBuilder convertContent = null;
+
+  /**
+   * The convert flag.
+   */
+  private boolean convertingAsciimath = false;
 
   /**
    * Number of times this URI has appeared.
@@ -406,6 +417,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
+   * @param convert if katex content converted to MathJax
+   */
+  public void setConvertTex(boolean convert) {
+    this.convertTex = convert;
+  }
+
+  /**
    * @param include whether or not to output the XML declaration
    */
   public void setIncludeXMLDeclaration(boolean include) {
@@ -599,7 +617,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     return this.inAlternateXRef;
   }
 
-/**
+  /**
    * @return the parentFolderRelativePath
    */
   public String getParentFolderRelativePath() {
@@ -680,14 +698,18 @@ public final class PSMLProcessHandler extends DefaultHandler {
       }
     }
     // convert ascii math inline labels
-    if (this.convertAsciiMath && noNamespace && "inline".equals(qName) && "asciimath".equals(atts.getValue("label"))) {
+    if ((this.convertAsciiMath && noNamespace && "inline".equals(qName) && "asciimath".equals(atts.getValue("label"))) ||
+        this.convertTex && noNamespace && "inline".equals(qName) && "tex".equals(atts.getValue("label"))) {
       this.convertContent = new StringBuilder();
+      this.convertingAsciimath = "asciimath".equals(atts.getValue("label"));
       return;
-    } else if (this.convertAsciiMath && noNamespace && "media-fragment".equals(qName) && "text/asciimath".equals(atts.getValue("mediatype"))) {
+    } else if ((this.convertAsciiMath && noNamespace && "media-fragment".equals(qName) && "text/asciimath".equals(atts.getValue("mediatype"))) ||
+        this.convertTex && noNamespace && "media-fragment".equals(qName) && "application/x-tex".equals(atts.getValue("mediatype"))) {
       String id = (this.uriID == null || !this.transcluder.isTranscluding()) ?
           atts.getValue("id") : (this.uriID + "-" + atts.getValue("id"));
       write("<media-fragment id=\""+XMLUtils.escapeForAttribute(id)+"\" mediatype=\"application/mathml+xml\">");
       this.convertContent = new StringBuilder();
+      this.convertingAsciimath = "text/asciimath".equals(atts.getValue("mediatype"));
       return;
     }
 
@@ -699,18 +721,18 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if ("publication".equals(qName) && this.parent == null) {
         this.publicationMetadata = new HashMap<>();
         this.documentMetadata = null;
-      // if metadata property, collect metadata
+        // if metadata property, collect metadata
       } else if (isMetadataProperty && !this.inTranscludedContent && atts.getValue("name") != null &&
           !"xref".equals(atts.getValue("datatype")) && !"markdown".equals(atts.getValue("datatype")) &&
           (atts.getValue("count") == null || "1".equals(atts.getValue("count"))) &&
-           atts.getValue("multiple") == null) {
+          atts.getValue("multiple") == null) {
         String value = atts.getValue("value") == null ? "" : atts.getValue("value");
         if (this.documentMetadata == null) {
           this.publicationMetadata.put(atts.getValue("name"), value);
         } else {
           this.documentMetadata.put(atts.getValue("name"), value);
         }
-      // if place holder, try to resolve
+        // if placeholder, try to resolve
       } else if ("placeholder".equals(qName) && atts.getValue("name") != null) {
         String name = atts.getValue("name");
         if (this.publicationMetadata != null) {
@@ -792,7 +814,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       write(" id=\"" + XMLUtils.escapeForAttribute(this.uriID) + '"');
     }
     // add a full href path for xrefs, it will be stripped on second pass
-    if (isXRef || isReverseXRef) {
+    if ((isXRef || isReverseXRef) && !"true".equals(atts.getValue("external"))) {
       String relpath = this.transcluder.findXRefRelativePath(atts.getValue("href"));
       if (relpath != null)
         write(" relpath=\"" + XMLUtils.escapeForAttribute(relpath) + "\"");
@@ -853,14 +875,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
       return;
     }
     // convert ascii?
-    if (this.convertAsciiMath && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
+    if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
       write("<xref frag=\"media\" type=\"math\" config=\"mathml\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
-      write(AsciiMathConverter.convert(this.convertContent.toString()));
+      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : KatexConverter.convert(this.convertContent.toString()));
       write("</media-fragment></xref>");
       this.convertContent = null;
       return;
-    } else if (this.convertAsciiMath && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
-      write(AsciiMathConverter.convert(this.convertContent.toString()));
+    } else if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
+      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : KatexConverter.convert(this.convertContent.toString()));
       write("</media-fragment>");
       this.convertContent = null;
       if (this.fragmentToLoad != null) {
@@ -898,7 +920,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       return;
     }
     // markdown
-    if ((this.convertAsciiMath || this.convertMarkdown) && this.convertContent != null)
+    if ((this.convertAsciiMath || this.convertMarkdown || this.convertTex) && this.convertContent != null)
       this.convertContent.append(ch, start, length);
     else
       write(XMLUtils.escape(new String(ch, start, length)));
@@ -935,7 +957,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @return the handler
    */
   protected PSMLProcessHandler cloneForTransclusion(File toParse, String uriid, String fragment,
-                                  int lvl, boolean fromImage, boolean embed, boolean transclude, boolean alternate) {
+                                                    int lvl, boolean fromImage, boolean embed, boolean transclude, boolean alternate) {
     // update uri count
     Integer count = this.allUriIDs.get(uriid);
     if (count == null) count = 0;
@@ -974,6 +996,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.publicationConfig = this.publicationConfig;
     handler.setConvertMarkdown(this.convertMarkdown);
     handler.setConvertAsciiMath(this.convertAsciiMath);
+    handler.setConvertTex(this.convertTex);
     handler.setPlaceholders(this.placeholders);
     handler.setPublicationMetadata(this.publicationMetadata);
     if (transclude) {
@@ -1085,7 +1108,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         }
       }
       // retrieve target document
-      if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, link, this.inEmbedHierarchy)) {
+      if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, link, this.inEmbedHierarchy, this.convertTex)) {
         // then ignore content of XRef
         this.inTranscludedXRef = !link;
       }
@@ -1112,9 +1135,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
         tgt = href;
       }
       String error = "Reference loop detected when resolving xref" +
-              (atts.getValue("urititle") == null ? "" : (" " + atts.getValue("urititle"))) +
-              " from " + src + " (URIID " + this.uriID + ") to " + tgt +
-              (atts.getValue("uriid") == null ? "" : (" (URIID " + atts.getValue("uriid")) + ").");
+          (atts.getValue("urititle") == null ? "" : (" " + atts.getValue("urititle"))) +
+          " from " + src + " (URIID " + this.uriID + ") to " + tgt +
+          (atts.getValue("uriid") == null ? "" : (" (URIID " + atts.getValue("uriid")) + ").");
       if (this.failOnError) {
         throw new SAXException(error);
       } else {
@@ -1198,8 +1221,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if (this.strip.stripDocumentInfoPublication() && "publication".equals(elemName))
         return true;
     } else if ("locator".equals(dad)) {
-        if (this.strip.stripFragmentInfoLabels() && "labels".equals(elemName))
-          return true;
+      if (this.strip.stripFragmentInfoLabels() && "labels".equals(elemName))
+        return true;
     }
     return false;
   }
@@ -1215,12 +1238,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
       return false;
     // strip docid or uriid in xrefs
     if (((this.strip.stripXRefsDocID() && "docid".equals(attName))
-            || (this.strip.stripXRefsURIID() && "uriid".equals(attName)))
-            && ("xref".equals(elemName) || "blockxref".equals(elemName)))
+        || (this.strip.stripXRefsURIID() && "uriid".equals(attName)))
+        && ("xref".equals(elemName) || "blockxref".equals(elemName)))
       return true;
     // strip uriid in images
     if (this.strip.stripImagesURIID() && "uriid".equals(attName)
-            && "image".equals(elemName))
+        && "image".equals(elemName))
       return true;
     // strip docid or title in uri in docinfo
     String dad = this.elements.isEmpty() ? null : this.elements.peek();
