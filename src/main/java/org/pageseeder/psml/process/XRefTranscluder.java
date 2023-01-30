@@ -3,7 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
-import org.pageseeder.psml.process.math.KatexConverter;
+import org.pageseeder.psml.process.math.TexConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
@@ -215,7 +215,7 @@ public final class XRefTranscluder {
           this.parentHandler.write("<media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
           if (convertTex && target.getName().endsWith(".tex")) {
             try {
-              this.parentHandler.write(KatexConverter.convert(String.join("", java.nio.file.Files.readAllLines(target.toPath()))));
+              this.parentHandler.write(TexConverter.convert(String.join("", java.nio.file.Files.readAllLines(target.toPath()))));
             } catch (IOException ex) {
               throw new ProcessException("Failed to read contents of file "+target.getName()+": "+ex.getMessage(), ex);
             }

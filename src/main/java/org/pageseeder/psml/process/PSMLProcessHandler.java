@@ -11,7 +11,7 @@ import org.pageseeder.psml.process.XRefTranscluder.XRefNotFoundException;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
-import org.pageseeder.psml.process.math.KatexConverter;
+import org.pageseeder.psml.process.math.TexConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
@@ -877,12 +877,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
     // convert ascii?
     if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
       write("<xref frag=\"media\" type=\"math\" config=\"mathml\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
-      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : KatexConverter.convert(this.convertContent.toString()));
+      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
       write("</media-fragment></xref>");
       this.convertContent = null;
       return;
     } else if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
-      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : KatexConverter.convert(this.convertContent.toString()));
+      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
       write("</media-fragment>");
       this.convertContent = null;
       if (this.fragmentToLoad != null) {
