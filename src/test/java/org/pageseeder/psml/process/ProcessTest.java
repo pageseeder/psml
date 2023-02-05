@@ -22,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
+import org.pageseeder.psml.process.math.TexConverter;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.psml.toc.Tests.Validates;
@@ -550,7 +551,20 @@ public class ProcessTest {
   }
 
   @Test
-  public void testKatexConvert() throws IOException, ProcessException {
+  public void testTexConverter() throws IOException, ProcessException {
+    //String tex = "y = x ^ 2";
+    //String tex = "\\frac{2}{3}";
+    //String tex = "\\begin{aligned}a&=b+c\\\\a-c&=b\\end{aligned}";
+    //String tex = "\\begin{eqnarray*}\n" +
+    //    "a   &=& b+c\\\\\n" +
+    //    "a-c &=& b\n" +
+    //   "\\end{eqnarray*}";
+    String tex = "\\begin{aligned}a&=b+c\u00A0\\\\a-c&=b\\end{aligned}";
+    System.out.println(TexConverter.convert(tex));
+  }
+
+  @Test
+  public void testTexConvert() throws IOException, ProcessException {
     String filename = "katex_conversion.psml";
     String filename_expected = "katex_conversion_result.psml";
     Process p = new Process();
