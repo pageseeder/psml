@@ -15,7 +15,8 @@ public class TexConverter {
     // stop at first error
     session.getConfiguration().setFailingFast(true);
 
-    String newInput = input;
+    // trim leading/trailing space
+    String newInput = input.trim();
     // replace all non-breaking space (caused an error in snuggle tex 1.2.2)
     //newInput = newInput.replaceAll("[\\u00A0]", " ");
     // aligned is not supported but eqnarray is
