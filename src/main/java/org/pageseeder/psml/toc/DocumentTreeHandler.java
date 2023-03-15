@@ -203,6 +203,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       }
     } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
+    } else if ((isElement("xref") || isElement("link")) && isParent("property")) {
+      newBuffer();
     } else if (isElement("property")) {
       startProperty(attributes);
     } else if (isElement("para")) {
@@ -387,7 +389,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
    */
   private void startProperty(Attributes attributes) {
     String value = attributes.getValue("value");
-    if (value != null) {
+    if (value != null && !value.isEmpty()) {
       if (this.firstHeading) {
         // set first property value as heading
         this._tree.putFragmentHeading(this.fragment, value);
@@ -422,7 +424,14 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
         }
         this._expander.add(heading);
       }
-
+    } else if ((isElement("xref") || isElement("link")) && isParent("property")) {
+      String title = buffer(true);
+      if (title != null) {
+        if (this.firstHeading) {
+          this._tree.putFragmentHeading(this.fragment, title);
+          this.firstHeading = false;
+        }
+      }
     } else if ("para".equals(element) && this.currentParagraph != null) {
       String title = buffer(true);
       Paragraph para = this.currentParagraph;

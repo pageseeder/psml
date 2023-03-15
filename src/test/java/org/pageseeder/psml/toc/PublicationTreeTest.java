@@ -1119,8 +1119,10 @@ public final class PublicationTreeTest {
     System.out.println("HEADINGS\n" + headings);
     Assert.assertEquals("Test doc 1", fheadings.get("1"));
     Assert.assertEquals("My link", fheadings.get("3"));
+    Assert.assertEquals("Default d5", fheadings.get("6"));
+    Assert.assertEquals("https://pageseeder.org/", fheadings.get("7"));
     Assert.assertEquals("Related", fheadings.get("content"));
-    Assert.assertEquals(3, fheadings.size());
+    Assert.assertEquals(5, fheadings.size());
     Map<String, Integer> flevels = tree.fragmentlevels();
     String levels = flevels.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
@@ -1130,7 +1132,11 @@ public final class PublicationTreeTest {
     Assert.assertEquals(Integer.valueOf(0), flevels.get("1"));
     Assert.assertEquals(Integer.valueOf(2), flevels.get("2"));
     Assert.assertEquals(Integer.valueOf(2), flevels.get("3"));
-    Assert.assertEquals(3, fheadings.size());
+    Assert.assertEquals(Integer.valueOf(2), flevels.get("4"));
+    Assert.assertEquals(Integer.valueOf(2), flevels.get("6"));
+    Assert.assertEquals(Integer.valueOf(2), flevels.get("7"));
+    Assert.assertEquals(Integer.valueOf(1), flevels.get("content"));
+    Assert.assertEquals(7, flevels.size());
     PublicationTree publication = new PublicationTree(tree);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering

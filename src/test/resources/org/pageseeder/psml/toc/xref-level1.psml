@@ -104,5 +104,28 @@
         </documentinfo>
       </document>
     </media-fragment>
+    <properties-fragment id="6">
+      <property name="description" title="Description" value="" />
+      <property name="xrefs" title="XRefs" datatype="xref" multiple="true">
+        <xref id="4743658"
+              frag="default"
+              reversefrag="3"
+              reversetitle=""
+              reverselink="true"
+              reversetype="none"
+              display="document"
+              type="none"
+              uriid="778972"
+              href="/ps/test/local1/documents/native2/default_d5.psml"
+              docid="def-778972"
+              urititle="Default d5"
+              mediatype="application/vnd.pageseeder.psml+xml">Default d5</xref>
+      </property>
+    </properties-fragment>
+    <properties-fragment id="7">
+      <property name="links" title="Links" datatype="link">
+        <link href="https://pageseeder.org/" uriid="776806">https://pageseeder.org/</link>
+      </property>
+    </properties-fragment>
   </section>
 </document>
