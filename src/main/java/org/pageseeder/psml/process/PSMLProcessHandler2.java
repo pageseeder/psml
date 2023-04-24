@@ -543,8 +543,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         // get xref's traget details
         String targetfrag = atts.getValue("frag") != null ? atts.getValue("frag") : atts.getValue("del:frag");
         String targeturi = atts.getValue("uriid") != null ? atts.getValue("uriid") : atts.getValue("del:uriid");
-        if (targeturi != null) {
-          long targeturiid = Long.parseLong(targeturi);
+        Long targeturiid = targeturi != null ? Long.parseLong(targeturi) : null;
+        // if not an interpublication xref
+        if (targeturiid != null && this.numberingAndTOC.publicationTree().containsTree(targeturiid)) {
 
           // compute adjusted values
           FragmentNumbering.Prefix prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
