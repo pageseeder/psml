@@ -770,6 +770,11 @@
       <xs:sequence>
         <xs:element ref="version" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
+      <xs:attribute name="limitreached" type="xs:boolean" default="false">
+        <xs:annotation>
+          <xs:documentation>Whether the maximum number of versions returned has been reached.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 
