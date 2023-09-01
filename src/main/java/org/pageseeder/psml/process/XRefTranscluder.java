@@ -183,7 +183,7 @@ public final class XRefTranscluder {
     String href = atts.getValue(image ? "src" : "href");
     String type = image ? "image" : link ? "link" : atts.getValue("type");
     boolean transclude = image ? this.transcludeImages : link ? this.transcludeLinks : this.xrefsTranscludeTypes.contains(type);
-    if (transclude && !"true".equals(atts.getValue("external"))) {
+    if (transclude && !"true".equals(atts.getValue("external")) && !"true".equals(atts.getValue("unresolved"))) {
       File target = findXRefTarget(href, atts.getValue("uriid"), link);
       // make sure it's valid
       if (target == null || !target.exists() ||!target.isFile()) {

@@ -814,7 +814,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       write(" id=\"" + XMLUtils.escapeForAttribute(this.uriID) + '"');
     }
     // add a full href path for xrefs, it will be stripped on second pass
-    if ((isXRef || isReverseXRef) && !"true".equals(atts.getValue("external"))) {
+    if ((isXRef || isReverseXRef) && !"true".equals(atts.getValue("external")) && !"true".equals(atts.getValue("unresolved"))) {
       String relpath = this.transcluder.findXRefRelativePath(atts.getValue("href"));
       if (relpath != null)
         write(" relpath=\"" + XMLUtils.escapeForAttribute(relpath) + "\"");
@@ -1071,7 +1071,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.stripCurrentXRefElement = true;
       return true;
     }
-    if (this.strip.stripNotFoundXRefs() && !"true".equals(atts.getValue("external")) &&
+    if (this.strip.stripNotFoundXRefs() && !"true".equals(atts.getValue("external")) && !"true".equals(atts.getValue("unresolved")) &&
         this.transcluder.isNotFoundXRef(atts.getValue("href"))) {
       // log it?
       if (this.logXRefNotFound) {

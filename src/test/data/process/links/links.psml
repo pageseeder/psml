@@ -36,6 +36,18 @@
       <para>
         <link href="https://localhost/ps/ui/g/jb-group1/d/475611.html" uriid="475616">a local url</link>
       </para>
+      <para>
+        <link href="https://www.youtube123.com/watch?v=0rmiEOVbPS4" unresolved="true">Unresolved youtube link</link>
+      </para>
+      <para>
+        <xref href="https://www.youtube.com/watch?v=0rmiEOVbPS4" frag="default" external="true" uriid="475600">Resolved youtube xref</xref>
+      </para>
+      <para>
+        <xref href="default123.psml" frag="default" unresolved="true">Unresolved PSML xref</xref>
+      </para>
+      <para>
+        <xref href="https://www.youtube123.com/watch?v=0rmiEOVbPS4" frag="default" unresolved="true">Unresolved youtube xref</xref>
+      </para>
     </fragment>
   </section>
 </document>
