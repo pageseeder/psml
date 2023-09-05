@@ -182,9 +182,11 @@ public final class XRefTranscluder {
        (!inXrefFragment && this.onlyXRefFrament))) return false;
     String href = atts.getValue(image ? "src" : "href");
     String type = image ? "image" : link ? "link" : atts.getValue("type");
+    String uriid = atts.getValue("uriid");
     boolean transclude = image ? this.transcludeImages : link ? this.transcludeLinks : this.xrefsTranscludeTypes.contains(type);
-    if (transclude && !"true".equals(atts.getValue("external"))) {
-      File target = findXRefTarget(href, atts.getValue("uriid"), link);
+    if (transclude && !"true".equals(atts.getValue("external")) &&
+        !"true".equals(atts.getValue("unresolved")) && uriid != null) {
+      File target = findXRefTarget(href, uriid, link);
       // make sure it's valid
       if (target == null || !target.exists() ||!target.isFile()) {
         throw new XRefNotFoundException();
@@ -243,7 +245,7 @@ public final class XRefTranscluder {
           ("transclude".equals(type) || numberingAndTOC == null) ?
           Integer.parseInt(levelAtt) : 0;
       PSMLProcessHandler handler = this.parentHandler.cloneForTransclusion(
-          target, atts.getValue("uriid"), fragment, level, image,
+          target, uriid, fragment, level, image,
           inEmbedHierarchy && "embed".equals(type), "transclude".equals(type),
           "alternate".equals(type) || this.parentHandler.inAlternateXRef());
       handler.getTranscluder().parentFiles.putAll(this.parentFiles);
