@@ -701,27 +701,33 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       for (int i = ancestors.size() - 1; i >= 0; i--) {
         String id = ancestors.get(i);
         Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs.get(id);
-        uri_counts = sub_hierarchy.get(uriid);
-        if (uri_counts != null) {
-          global_count = uri_counts[0];
-          local_count = uri_counts[1];
-          embed_count = uri_counts[2];
-          this.logger.debug("Hierarchy {} found ID {} globally {}, locally {} and embedded {} times",
-              id, uriid, uri_counts[0], uri_counts[1], uri_counts[2]);
-        }
-        // if link to fragment check transcluded fragments
-        if (!"default".equals(frag)) {
-          Integer[] frag_counts = sub_hierarchy.get(uriid + "-" + frag);
-          if (frag_counts != null) {
-            global_count = frag_counts[0];
-            local_count = local_count + frag_counts[1];
-            embed_count = embed_count + frag_counts[2];
-            this.logger.debug("Hierarchy {} found ID {}-{} globally {} times, locally {} and embedded {} times",
-                id, uriid, frag, frag_counts[0], frag_counts[1], frag_counts[2]);
+        if (sub_hierarchy == null) {
+          String message = "Unable to find subhierachy for URI ID " + id;
+          if (this.failOnError) throw new ProcessException(message);
+          else this.logger.error(message);
+        } else {
+          uri_counts = sub_hierarchy.get(uriid);
+          if (uri_counts != null) {
+            global_count = uri_counts[0];
+            local_count = uri_counts[1];
+            embed_count = uri_counts[2];
+            this.logger.debug("Hierarchy {} found ID {} globally {}, locally {} and embedded {} times",
+                id, uriid, uri_counts[0], uri_counts[1], uri_counts[2]);
           }
+          // if link to fragment check transcluded fragments
+          if (!"default".equals(frag)) {
+            Integer[] frag_counts = sub_hierarchy.get(uriid + "-" + frag);
+            if (frag_counts != null) {
+              global_count = frag_counts[0];
+              local_count = local_count + frag_counts[1];
+              embed_count = embed_count + frag_counts[2];
+              this.logger.debug("Hierarchy {} found ID {}-{} globally {} times, locally {} and embedded {} times",
+                  id, uriid, frag, frag_counts[0], frag_counts[1], frag_counts[2]);
+            }
+          }
+          // if embedded target or single transcluded target found then finished
+          if (embed_count > 0 || local_count == 1) break;
         }
-        // if embedded target or single transcluded target found then finished
-        if (embed_count > 0 || local_count == 1) break;
       }
     }
 
