@@ -6,9 +6,7 @@ package org.pageseeder.psml.toc;
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -172,6 +170,10 @@ public final class PublicationNumbering {
    */
   private final Map<String, ElementName> elements = new HashMap<>();
 
+  /**
+   * List of resets in format [level]-[blocklabel]
+   */
+  private final List<String> resets = new ArrayList<>();
 
   /**
    * @param label the document label to set
@@ -239,6 +241,17 @@ public final class PublicationNumbering {
   }
 
   /**
+   * Add a new reset.
+   *
+   * @param level      the level of the scheme
+   * @param blocklabel the block label (optional)
+   */
+  public void addReset(int level, @Nullable String blocklabel) {
+    if (blocklabel == null) blocklabel = "";
+    this.resets.add(level + "-" + blocklabel);
+  }
+
+  /**
    * Get a numbering format.
    *
    * @param level      the level of the scheme
@@ -258,6 +271,28 @@ public final class PublicationNumbering {
     NumberType type = this.types.get(level + "-" + blocklabel);
     if (type == null) type = this.types.get(level + "-");
     return type;
+  }
+
+  /**
+   * Checks if a numbering reset has been defined for these parameters
+   *
+   * @param level      the level
+   * @param blocklabel the block label name
+   *
+   * @return <code>true</code> if there is a matching reset
+   */
+  public boolean hasReset(int level, String blocklabel) {
+    String key = level + "-" + blocklabel;
+    return this.resets.contains(key);
+  }
+
+  /**
+   * Checks if any numbering resets are configured
+   *
+   * @return <code>true</code> if there is at least one
+   */
+  public boolean hasResets() {
+    return !this.resets.isEmpty();
   }
 
   /**

@@ -67,6 +67,26 @@ public final class NumberingGenerator {
   }
 
   /**
+   * Reset numbering levels below this level based on configured resets
+   *
+   * @param level         the level to reset from
+   */
+  public void resetNumbering(int level) {
+    if (!this.numberConfig.hasResets()) return;
+    Set<String> labels = this.numberingLevels.keySet();
+    // for each stack of levels
+    for (String label : labels) {
+      // if default reset or reset for this label defined
+      if (this.numberConfig.hasReset(level, "") ||
+          (!"".equals(label) && this.numberConfig.hasReset(level, label))) {
+        Deque<Integer> levels = this.numberingLevels.get(label);
+        while (levels.size() > level) {
+          levels.pop();
+        }
+      }
+    }
+  }
+  /**
    * Increment current numbering levels.
    *
    * @param level         the level to add to the list
