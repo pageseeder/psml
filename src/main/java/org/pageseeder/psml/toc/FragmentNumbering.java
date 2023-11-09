@@ -350,7 +350,7 @@ public final class FragmentNumbering implements Serializable {
       if (target.numbered()) {
         pref = number.generateNumbering(level, "heading", target.blocklabel());
       }
-      number.resetNumbering(level);
+      number.restartNumbering(level);
     }
     if (pref == null) {
       pref = new Prefix(p, null, level, null);
@@ -383,7 +383,7 @@ public final class FragmentNumbering implements Serializable {
       pref = new Prefix(p, null, level, null);
     }
     if (number != null) {
-      number.resetNumbering(level);
+      number.restartNumbering(level);
     }
     updateLocation(h, location);
     if (pref == null) return;

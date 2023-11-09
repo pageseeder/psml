@@ -25,9 +25,9 @@
       <scheme level="9" type="upperroman" format="[(9)]" element="para" />
       <scheme level="10" type="upperalpha" format="[(10)]" element="para" />
     </schemes>
-    <resets>
-      <reset level="2" />
-      <reset level="4" block-label="table-caption" />
-    </resets>
+    <restarts>
+      <restart level="2" />
+      <restart level="4" block-label="table-caption" />
+    </restarts>
   </numbering>
 </publication-config>

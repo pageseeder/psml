@@ -476,7 +476,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumberingResets() throws SAXException, IOException, XRefLoopException {
+  public void testAutoNumberingRestarts() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             ref(0, "X", 1000L,
@@ -523,7 +523,7 @@ public final class PublicationTreeTest {
     Assert.assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-    PublicationConfig config = Tests.parseConfig("publication-config-resets.xml");
+    PublicationConfig config = Tests.parseConfig("publication-config-restarts.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     Tests.print(publication, -1, -1, numbering, config, false);

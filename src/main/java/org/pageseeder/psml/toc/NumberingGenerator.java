@@ -67,18 +67,18 @@ public final class NumberingGenerator {
   }
 
   /**
-   * Reset numbering levels below this level based on configured resets
+   * Restart numbering levels below this level based on configured restarts
    *
-   * @param level         the level to reset from
+   * @param level         the level to restart from
    */
-  public void resetNumbering(int level) {
-    if (!this.numberConfig.hasResets()) return;
+  public void restartNumbering(int level) {
+    if (!this.numberConfig.hasRestarts()) return;
     Set<String> labels = this.numberingLevels.keySet();
     // for each stack of levels
     for (String label : labels) {
-      // if default reset or reset for this label defined
-      if (this.numberConfig.hasReset(level, "") ||
-          (!"".equals(label) && this.numberConfig.hasReset(level, label))) {
+      // if default restart or restart for this label defined
+      if (this.numberConfig.hasRestart(level, "") ||
+          (!"".equals(label) && this.numberConfig.hasRestart(level, label))) {
         Deque<Integer> levels = this.numberingLevels.get(label);
         while (levels.size() > level) {
           levels.pop();
@@ -86,6 +86,7 @@ public final class NumberingGenerator {
       }
     }
   }
+
   /**
    * Increment current numbering levels.
    *
@@ -113,10 +114,10 @@ public final class NumberingGenerator {
           levels.push(1);
         } else {
           while (levels.size() > level) {
-            // reset numbering if default block
+            // restart numbering if default block
             if ("".equals(label)) {
               levels.pop();
-            // reset numbering if block format contains this level
+            // restart numbering if block format contains this level
             } else {
               String format = this.numberConfig.getNumberFormat(levels.size(), label);
               if (format == null || format.matches("\\[(.*?)" + level + "(.*?)\\]")) {

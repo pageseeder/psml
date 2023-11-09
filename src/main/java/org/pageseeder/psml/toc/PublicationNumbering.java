@@ -171,9 +171,9 @@ public final class PublicationNumbering {
   private final Map<String, ElementName> elements = new HashMap<>();
 
   /**
-   * List of resets in format [level]-[blocklabel]
+   * List of restarts in format [level]-[blocklabel]
    */
-  private final List<String> resets = new ArrayList<>();
+  private final List<String> restarts = new ArrayList<>();
 
   /**
    * @param label the document label to set
@@ -241,14 +241,14 @@ public final class PublicationNumbering {
   }
 
   /**
-   * Add a new reset.
+   * Add a new restart.
    *
    * @param level      the level of the scheme
    * @param blocklabel the block label (optional)
    */
-  public void addReset(int level, @Nullable String blocklabel) {
+  public void addRestart(int level, @Nullable String blocklabel) {
     if (blocklabel == null) blocklabel = "";
-    this.resets.add(level + "-" + blocklabel);
+    this.restarts.add(level + "-" + blocklabel);
   }
 
   /**
@@ -274,25 +274,25 @@ public final class PublicationNumbering {
   }
 
   /**
-   * Checks if a numbering reset has been defined for these parameters
+   * Checks if a numbering restart has been defined for these parameters
    *
    * @param level      the level
    * @param blocklabel the block label name
    *
-   * @return <code>true</code> if there is a matching reset
+   * @return <code>true</code> if there is a matching restart
    */
-  public boolean hasReset(int level, String blocklabel) {
+  public boolean hasRestart(int level, String blocklabel) {
     String key = level + "-" + blocklabel;
-    return this.resets.contains(key);
+    return this.restarts.contains(key);
   }
 
   /**
-   * Checks if any numbering resets are configured
+   * Checks if any numbering restarts are configured
    *
    * @return <code>true</code> if there is at least one
    */
-  public boolean hasResets() {
-    return !this.resets.isEmpty();
+  public boolean hasRestarts() {
+    return !this.restarts.isEmpty();
   }
 
   /**

@@ -404,11 +404,11 @@ public final class PublicationConfig implements Cloneable {
         } catch (NumberFormatException ex) {
           throw new SAXException("Invalid level: " + attributes.getValue("level"));
         }
-      } else if ("reset".equals(qName) && this.numbering != null) {
+      } else if ("restart".equals(qName) && this.numbering != null) {
         try {
           int level = Integer.parseInt(attributes.getValue("level"));
           if (level < 1 || level > 9) new SAXException("Invalid level: " + level);
-          this.numbering.addReset(level, attributes.getValue("block-label"));
+          this.numbering.addRestart(level, attributes.getValue("block-label"));
         } catch (NumberFormatException ex) {
           throw new SAXException("Invalid level: " + attributes.getValue("level"));
         }
