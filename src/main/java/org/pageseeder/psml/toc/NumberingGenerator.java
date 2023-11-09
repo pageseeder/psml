@@ -67,6 +67,27 @@ public final class NumberingGenerator {
   }
 
   /**
+   * Restart numbering levels below this level based on configured restarts
+   *
+   * @param level         the level to restart from
+   */
+  public void restartNumbering(int level) {
+    if (!this.numberConfig.hasRestarts()) return;
+    Set<String> labels = this.numberingLevels.keySet();
+    // for each stack of levels
+    for (String label : labels) {
+      // if default restart or restart for this label defined
+      if (this.numberConfig.hasRestart(level, "") ||
+          (!"".equals(label) && this.numberConfig.hasRestart(level, label))) {
+        Deque<Integer> levels = this.numberingLevels.get(label);
+        while (levels.size() > level) {
+          levels.pop();
+        }
+      }
+    }
+  }
+
+  /**
    * Increment current numbering levels.
    *
    * @param level         the level to add to the list
@@ -93,10 +114,10 @@ public final class NumberingGenerator {
           levels.push(1);
         } else {
           while (levels.size() > level) {
-            // reset numbering if default block
+            // restart numbering if default block
             if ("".equals(label)) {
               levels.pop();
-            // reset numbering if block format contains this level
+            // restart numbering if block format contains this level
             } else {
               String format = this.numberConfig.getNumberFormat(levels.size(), label);
               if (format == null || format.matches("\\[(.*?)" + level + "(.*?)\\]")) {

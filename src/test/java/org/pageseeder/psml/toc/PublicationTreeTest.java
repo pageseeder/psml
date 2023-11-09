@@ -476,6 +476,95 @@ public final class PublicationTreeTest {
   }
 
   @Test
+  public void testAutoNumberingRestarts() throws SAXException, IOException, XRefLoopException {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+            ref(0, "X", 1000L,
+                ref(1, "A", 1001L)),
+            ref(0, "Y", 1002L))).build().normalize(TitleCollapse.auto);
+    DocumentTree tree1 = new DocumentTree.Builder(1000).title("X")
+        .part(h1("X", "1", 1, true, "",
+            p(2, "1a", 1, true, ""),
+            p(2, "1b", 1, true, "", "table-caption"),
+            p(2, "1c", 1, true, ""),
+            p(2, "1d", 1, true, "", "table-caption"),
+            p(2, "1e", 1, true, "", "figure-caption"),
+            p(2, "1f", 1, true, "", "table-caption"),
+            p(2, "1g", 1, true, "", "table-caption"),
+            p(3, "1h", 1, true, "", "table-caption")))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree2 = new DocumentTree.Builder(1001).title("A")
+        .part(h1("A", "1", "1", 1, false, "", "issue",
+            h2("d", "4",  "4", 2, false, "", "issue",
+                p(2, "1b", 1, true, "", "table-caption"),
+                p(2, "1c", 1, true, ""),
+                p(2, "1e", 1, true, "", "figure-caption"),
+                h3("y", "5", 1, false, "",
+                    p(2, "2b", 1, true, "", "table-caption"),
+                    p(2, "2c", 1, true, ""),
+                    p(2, "2e", 1, true, "", "figure-caption")))))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree tree3 = new DocumentTree.Builder(1002).title("Y")
+        .part(h1("Y", "1", 1, true, "",
+            h2("Y2", "2", 1, true, "",
+                h3("Y3", "3", 1, true, "",
+                    p(2, "1a", 1, true, ""),
+                    p(2, "1b", 1, true, "", "table-caption"),
+                    p(2, "1c", 1, true, ""),
+                    p(2, "1d", 1, true, "", "table-caption"),
+                    p(2, "1e", 1, true, "", "figure-caption"),
+                    p(2, "1f", 1, true, "", "table-caption")))))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    PublicationTree publication = new PublicationTree(root);
+    publication = publication.add(tree1);
+    publication = publication.add(tree2);
+    publication = publication.add(tree3);
+    Assert.assertEquals(root.id(), publication.id());
+    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    Tests.assertDocumentTreeEquals(root, publication.root());
+    assertValidPublication(publication);
+    PublicationConfig config = Tests.parseConfig("publication-config-restarts.xml");
+    // Generate fragment numbering
+    FragmentNumbering numbering = new FragmentNumbering(publication, config);
+    Tests.print(publication, -1, -1, numbering, config, false);
+    Map<String,Prefix> prefixes = numbering.getAllPrefixes();
+    String result = prefixes.entrySet()
+        .stream().sorted(Map.Entry.comparingByKey())
+        .map(entry -> entry.getKey() + " - " + entry.getValue())
+        .collect(Collectors.joining("\n"));
+    System.out.println(result);
+    assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
+    assertHasPrefix(prefixes,"1000-1-1-1",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"1000-1-1a-1","1.","(i)",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-1-1b-1",null,"Table 1-1",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-1-1c-1","1.","(ii)",8,"1.0.0.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1000-1-1d-1",null,"Table 1-2",8,"1.0.0.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1000-1-1e-1",null,"Fig 1-A",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1000-1-1f-1",null,"Table 1-3",8,"1.0.0.0.0.0.0.3.");
+    assertHasPrefix(prefixes,"1000-1-1g-1",null,"Table 1-4",8,"1.0.0.0.0.0.0.4.");
+    assertHasPrefix(prefixes,"1000-1-1h-1","1.(ii)","(I)",9,"1.0.0.0.0.0.0.2.1.");
+    assertHasPrefix(prefixes,"1000-1-default",null,"1.",1,"1.");
+    assertHasPrefix(prefixes,"1001-1-1b-1",null,"Table 1-1",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1001-1-1c-1","1.","(i)",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1001-1-1e-1",null,"Fig 1-A",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1001-1-2b-1",null,"Table 1-1",8,"1.0.0.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1001-1-2c-1","1.","(ii)",8,"1.0.0.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1001-1-2e-1",null,"Fig 1-B",8,"1.0.0.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1001-1-default",null,"",2,null);
+    assertHasPrefix(prefixes,"1002-1-1-1",null,"2.",1,"2.");
+    assertHasPrefix(prefixes,"1002-1-1a-1","2.1.1.","(i)",8,"2.1.1.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1002-1-1b-1",null,"Table 2-1",8,"2.1.1.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1002-1-1c-1","2.1.1.","(ii)",8,"2.1.1.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1002-1-1d-1",null,"Table 2-2",8,"2.1.1.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1002-1-1e-1",null,"Fig 2-A",8,"2.1.1.0.0.0.0.1.");
+    assertHasPrefix(prefixes,"1002-1-1f-1",null,"Table 2-3",8,"2.1.1.0.0.0.0.3.");
+    assertHasPrefix(prefixes,"1002-1-default",null,"2.",1,"2.");
+    assertHasPrefix(prefixes,"1002-1-2-1",null,"2.1.",2,"2.1.");
+    assertHasPrefix(prefixes,"1002-1-3-1",null,"2.1.1.",3,"2.1.1.");
+    Assert.assertEquals(28, prefixes.size());
+  }
+
+  @Test
   public void testAutoNumberingBlankFormat() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,

@@ -346,8 +346,11 @@ public final class FragmentNumbering implements Serializable {
   public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, int count) {
     String p = target.prefix();
     Prefix pref = null;
-    if (target.numbered() && number != null && Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
-      pref = number.generateNumbering(level, "heading", target.blocklabel());
+    if (number != null && Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
+      if (target.numbered()) {
+        pref = number.generateNumbering(level, "heading", target.blocklabel());
+      }
+      number.restartNumbering(level);
     }
     if (pref == null) {
       pref = new Prefix(p, null, level, null);
@@ -378,6 +381,9 @@ public final class FragmentNumbering implements Serializable {
       pref = number.generateNumbering(level, "heading", h.blocklabel());
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, level, null);
+    }
+    if (number != null) {
+      number.restartNumbering(level);
     }
     updateLocation(h, location);
     if (pref == null) return;
