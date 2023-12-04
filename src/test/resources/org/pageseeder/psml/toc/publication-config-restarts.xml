@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <publication-config>
   <toc block-labels="table-caption,figure-caption"
-       para-indents="1,2"/>
+       para-indents="1,2,3"/>
 
   <levels para-relative-to="6" />
 
@@ -28,6 +28,7 @@
     <restarts>
       <restart level="2" />
       <restart level="4" block-label="table-caption" />
+      <restart level="8" />
     </restarts>
   </numbering>
 </publication-config>

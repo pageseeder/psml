@@ -511,6 +511,9 @@ public final class PublicationTreeTest {
                     p(2, "1a", 1, true, ""),
                     p(2, "1b", 1, true, "", "table-caption"),
                     p(2, "1c", 1, true, ""),
+                    p(3, "1c", 2, true, ""),
+                    p(2, "1c", 3, false, "(x)"),
+                    p(3, "1c", 4, true, ""),
                     p(2, "1d", 1, true, "", "table-caption"),
                     p(2, "1e", 1, true, "", "figure-caption"),
                     p(2, "1f", 1, true, "", "table-caption")))))
@@ -555,13 +558,16 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1002-1-1a-1","2.1.1.","(i)",8,"2.1.1.0.0.0.0.1.");
     assertHasPrefix(prefixes,"1002-1-1b-1",null,"Table 2-1",8,"2.1.1.0.0.0.0.1.");
     assertHasPrefix(prefixes,"1002-1-1c-1","2.1.1.","(ii)",8,"2.1.1.0.0.0.0.2.");
+    assertHasPrefix(prefixes,"1002-1-1c-2","2.1.1.(ii)","(I)",9,"2.1.1.0.0.0.0.2.1.");
+    assertHasPrefix(prefixes,"1002-1-1c-3",null,"(x)",8,null);
+    assertHasPrefix(prefixes,"1002-1-1c-4","2.1.1.(ii)","(I)",9,"2.1.1.0.0.0.0.2.1.");
     assertHasPrefix(prefixes,"1002-1-1d-1",null,"Table 2-2",8,"2.1.1.0.0.0.0.2.");
     assertHasPrefix(prefixes,"1002-1-1e-1",null,"Fig 2-A",8,"2.1.1.0.0.0.0.1.");
     assertHasPrefix(prefixes,"1002-1-1f-1",null,"Table 2-3",8,"2.1.1.0.0.0.0.3.");
     assertHasPrefix(prefixes,"1002-1-default",null,"2.",1,"2.");
     assertHasPrefix(prefixes,"1002-1-2-1",null,"2.1.",2,"2.1.");
     assertHasPrefix(prefixes,"1002-1-3-1",null,"2.1.1.",3,"2.1.1.");
-    Assert.assertEquals(28, prefixes.size());
+    Assert.assertEquals(31, prefixes.size());
   }
 
   @Test

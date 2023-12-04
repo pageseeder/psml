@@ -439,6 +439,9 @@ public final class FragmentNumbering implements Serializable {
     } else if (p != null && !NO_PREFIX.equals(p)) {
       pref = new Prefix(p, null, adjusted_level, null);
     }
+    if (number != null) {
+      number.restartNumbering(adjusted_level);
+    }
     updateLocation(para, location);
     if (pref == null) return;
     // store prefix on fragment
