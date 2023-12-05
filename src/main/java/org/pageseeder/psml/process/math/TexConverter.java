@@ -115,7 +115,7 @@ public class TexConverter {
       if (in != null) {
         // add the Array.fill() method as it seems to be missing
         String scriptPrefix = "Array.prototype.fill = function(arg) { for (var i = 0; i < this.length; i++) { this[i] = arg; } };";
-        String scriptSuffix = "var parse = function(str) { return katex.renderToString(str); };";
+        String scriptSuffix = "var parse = function(str) { return katex.renderToString(str, { output: 'mathml' }); };";
         CompiledScript cscript = cengine.compile(new WrappingReader(new InputStreamReader(in), scriptPrefix, scriptSuffix));
         cscript.eval();
         // create an Invocable object by casting the script engine object
