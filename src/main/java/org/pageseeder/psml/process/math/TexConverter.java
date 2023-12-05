@@ -1,64 +1,133 @@
 package org.pageseeder.psml.process.math;
 
-import uk.ac.ed.ph.snuggletex.*;
-import uk.ac.ed.ph.snuggletex.utilities.MessageFormatter;
+import org.pageseeder.psml.process.util.WrappingReader;
+import org.pageseeder.psml.util.PSCache;
 
+import javax.script.*;
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.Map;
 
 public class TexConverter {
 
+  /**
+   * No constructor
+   */
+  private TexConverter() {}
+  private static final String JS_SCRIPT = "/org/pageseeder/psml/process/math/katex.0.16.9.min.js";
+
+  private static Invocable script = null;
+
+  private static final Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
+
+  /**
+   * Convert the provided TeX string to mathml content
+   *
+   * @param input the input
+   *
+   * @return the mathml content
+   */
   public static String convert(String input) {
-    /* Create vanilla SnuggleEngine and new SnuggleSession */
-    SnuggleEngine engine = new SnuggleEngine();
-    SnuggleSession session = engine.createSession();
-    // stop at first error
-    session.getConfiguration().setFailingFast(true);
+    // sanity check
+    if (input == null || input.isEmpty()) return "";
 
-    // trim leading/trailing space
-    String newInput = input.trim();
-    // replace all non-breaking space (caused an error in snuggle tex 1.2.2)
-    //newInput = newInput.replaceAll("[\\u00A0]", " ");
-    // aligned is not supported but eqnarray is
-    if (newInput.startsWith("\\begin{aligned}")) {
-      newInput = newInput.replaceAll("\\{aligned}", "{eqnarray*}");
-      newInput = newInput.replaceAll("&=", "&=&");
-    }
-    // eqnarray can't be used in math mode
-    if (!newInput.startsWith("\\begin{eqnarray*}"))
-      newInput = "$$ "+newInput+" $$";
+    // check cache
+    String result = cache.get(input);
+    if (result == null) {
 
-    /* Parse some LaTeX input */
-    SnuggleInput snuggleInput = new SnuggleInput(newInput);
-    try {
-      session.parseInput(snuggleInput);
-    } catch (IOException ex) {
-      ex.printStackTrace();
-      throw new IllegalArgumentException("The Tex \""+input+"\" could not be converted to MathML because: " + ex.getMessage());
+      // invoke the function named "parse" with the TeX math as the argument
+      try {
+        synchronized (TexConverter.class) {
+          result = script().invokeFunction("parse", input).toString();
+        }
+        // extract mathml from HTML result
+        result = extractMathML(result);
+        cache.put(input, result);
+      } catch (ScriptException | NoSuchMethodException | IOException ex) {
+        ex.printStackTrace();
+        throw new IllegalArgumentException("Failed to run KaTex to MathML JS script: " + ex.getMessage());
+      }
     }
-
-    /* Specify how we want the resulting XML */
-    XMLStringOutputOptions options = new XMLStringOutputOptions();
-    options.setSerializationMethod(SerializationMethod.XML);
-    options.setEncoding("UTF-8");
-    options.setIncludingXMLDeclaration(false);
-    //options.setIndenting(true);
-    //options.setAddingMathSourceAnnotations(true);
-    //options.setUsingNamedEntities(true); /* (Only used if caller has an XSLT 2.0 processor) */
-
-    /* Convert the results to an XML String, which in this case will
-     * be a single MathML <math>...</math> element. */
-    String mathml = session.buildXMLString(options);
-    List<InputError> errors = session.getErrors();
-    if (!errors.isEmpty()) {
-      String message2 = MessageFormatter.formatErrorAsString(errors.get(0));
-      // add input for non-ascii character error
-      String message1 = message2.contains("TTEG02") ? "\"" + input + "\" " : "";
-      throw new IllegalArgumentException("The Tex " + message1 + "could not be converted to MathML because: " + message2);
-    }
-    if (mathml.startsWith("<math ") && mathml.endsWith("</math>")) {
-      mathml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">" + mathml.substring(mathml.indexOf('>')+1);
-    }
-    return mathml;
+    return result;
   }
+
+  /**
+   * Look for mathml content in the string provided
+   *
+   * @param result the string from the JS script
+   *
+   * @return the mathml extracted
+   */
+  private static String extractMathML(String result) {
+    int start = result.indexOf("<math");
+    if (start > 0) {
+      int semantics = result.indexOf("<semantics>", start);
+      if (semantics > 0) {
+        start = semantics + 11;
+        int annotation = result.indexOf("<annotation encoding=\"application/x-tex\">");
+        if (annotation > 0) {
+          result = result.substring(start, annotation);
+        } else {
+          result = result.substring(start, result.indexOf("</semantics>", start + 1));
+        }
+        return "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">"+result+"</math>";
+      } else {
+        return result.substring(start, result.indexOf("</math>", start + 1) + 7);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Clears the script engine.
+   * This should be done before each process,
+   * otherwise the conversion will get slower over time.
+   */
+  public static void reset() {
+    synchronized (AsciiMathConverter.class) {
+      script = null;
+    }
+  }
+
+  /**
+   * Load the script from the internal resource
+   *
+   * @return the script ready to be invoked
+   *
+   * @throws ScriptException If loading the script failed
+   * @throws IOException If loading the script failed
+   */
+  private static Invocable script() throws ScriptException, IOException {
+    synchronized (TexConverter.class) {
+      if (script != null) return script;
+    }
+
+    // load script
+    ScriptEngineManager manager = new ScriptEngineManager();
+    ScriptEngine engine = manager.getEngineByName("javascript");
+    Compilable cengine = (Compilable) engine;
+
+    // evaluate JavaScript code
+    try {
+      InputStream in = TexConverter.class.getResourceAsStream(JS_SCRIPT);
+      if (in != null) {
+        // add the Array.fill() method as it seems to be missing
+        String scriptPrefix = "Array.prototype.fill = function(arg) { for (var i = 0; i < this.length; i++) { this[i] = arg; } };";
+        String scriptSuffix = "var parse = function(str) { return katex.renderToString(str); };";
+        CompiledScript cscript = cengine.compile(new WrappingReader(new InputStreamReader(in), scriptPrefix, scriptSuffix));
+        cscript.eval();
+        // create an Invocable object by casting the script engine object
+        script = (Invocable) cscript.getEngine();
+        return (Invocable) cscript.getEngine(); // don't return SCRIPT as it may have been reset by another thread
+      } else {
+        throw new IllegalArgumentException("Failed to load KaTex to MathML JS script");
+      }
+    } catch (ScriptException | IOException ex) {
+      System.err.println("Failed to load KaTex to MathML JS script: "+ex.getMessage());
+      throw ex;
+    }
+  }
+
 }

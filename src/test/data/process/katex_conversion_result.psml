@@ -9,33 +9,35 @@
         <xref frag="media" type="math" config="mathml">
           <media-fragment id="media" mediatype="application/mathml+xml">
             <math xmlns="http://www.w3.org/1998/Math/MathML">
-              <mi>E</mi>
-              <mo>=</mo>
-              <mfrac>
-                <mrow>
-                  <mi>m</mi>
-                  <msup>
-                    <mi>c</mi>
-                    <mn>2</mn>
-                  </msup>
-                </mrow>
-                <msqrt>
+              <mrow>
+                <mi>E</mi>
+                <mo>=</mo>
+                <mfrac>
                   <mrow>
-                    <mn>1</mn>
-                    <mo>-</mo>
-                    <mfrac>
-                      <msup>
-                        <mi>v</mi>
-                        <mn>2</mn>
-                      </msup>
-                      <msup>
-                        <mi>c</mi>
-                        <mn>2</mn>
-                      </msup>
-                    </mfrac>
+                    <mi>m</mi>
+                    <msup>
+                      <mi>c</mi>
+                      <mn>2</mn>
+                    </msup>
                   </mrow>
-                </msqrt>
-              </mfrac>
+                  <msqrt>
+                    <mrow>
+                      <mn>1</mn>
+                      <mo>−</mo>
+                      <mfrac>
+                        <msup>
+                          <mi>v</mi>
+                          <mn>2</mn>
+                        </msup>
+                        <msup>
+                          <mi>c</mi>
+                          <mn>2</mn>
+                        </msup>
+                      </mfrac>
+                    </mrow>
+                  </msqrt>
+                </mfrac>
+              </mrow>
             </math>
           </media-fragment>
         </xref>
@@ -45,24 +47,26 @@
         <xref frag="media" type="math" config="mathml">
           <media-fragment id="media" mediatype="application/mathml+xml">
             <math xmlns="http://www.w3.org/1998/Math/MathML">
-              <mfrac>
-                <mn>2</mn>
-                <mrow>
-                  <mn>1</mn>
-                  <mo>+</mo>
-                  <mfrac>
-                    <mn>2</mn>
-                    <mrow>
-                      <mn>1</mn>
-                      <mo>+</mo>
-                      <mfrac>
-                        <mn>2</mn>
+              <mrow>
+                <mfrac>
+                  <mn>2</mn>
+                  <mrow>
+                    <mn>1</mn>
+                    <mo>+</mo>
+                    <mfrac>
+                      <mn>2</mn>
+                      <mrow>
                         <mn>1</mn>
-                      </mfrac>
-                    </mrow>
-                  </mfrac>
-                </mrow>
-              </mfrac>
+                        <mo>+</mo>
+                        <mfrac>
+                          <mn>2</mn>
+                          <mn>1</mn>
+                        </mfrac>
+                      </mrow>
+                    </mfrac>
+                  </mrow>
+                </mfrac>
+              </mrow>
             </math>
           </media-fragment>
         </xref>
@@ -71,140 +75,160 @@
     </fragment>
     <media-fragment id="3" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mi>c</mi>
-        <mo>=</mo>
-        <mo>±</mo>
-        <msqrt>
-          <mrow>
-            <msup>
-              <mi>a</mi>
-              <mn>2</mn>
-            </msup>
-            <mo>+</mo>
-            <msup>
-              <mi>b</mi>
-              <mn>2</mn>
-            </msup>
-          </mrow>
-        </msqrt>
+        <mrow>
+          <mi>c</mi>
+          <mo>=</mo>
+          <mo>±</mo>
+          <msqrt>
+            <mrow>
+              <msup>
+                <mi>a</mi>
+                <mn>2</mn>
+              </msup>
+              <mo>+</mo>
+              <msup>
+                <mi>b</mi>
+                <mn>2</mn>
+              </msup>
+            </mrow>
+          </msqrt>
+        </mrow>
       </math>
     </media-fragment>
     <media-fragment id="5" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mfrac>
-          <mn>1</mn>
-          <mrow>
-            <mfenced close=")" open="(">
-              <mrow>
-                <msqrt>
-                  <mrow>
-                    <mi>φ</mi>
-                    <msqrt>
-                      <mn>5</mn>
-                    </msqrt>
-                  </mrow>
-                </msqrt>
-                <mo>-</mo>
-                <mi>φ</mi>
-              </mrow>
-            </mfenced>
-            <msup>
-              <mi>e</mi>
-              <mrow>
-                <mfrac>
-                  <mn>2</mn>
-                  <mn>5</mn>
-                </mfrac>
-                <mi>π</mi>
-              </mrow>
-            </msup>
-          </mrow>
-        </mfrac>
-        <mo>=</mo>
-        <mn>1</mn>
-        <mo>+</mo>
-        <mfrac>
-          <msup>
-            <mi>e</mi>
-            <mrow>
-              <mn>-2</mn>
-              <mi>π</mi>
-            </mrow>
-          </msup>
-          <mrow>
+        <mrow>
+          <mfrac>
             <mn>1</mn>
-            <mo>+</mo>
-            <mfrac>
+            <mrow>
+              <mo stretchy="false">(</mo>
+              <msqrt>
+                <mrow>
+                  <mi>ϕ</mi>
+                  <msqrt>
+                    <mn>5</mn>
+                  </msqrt>
+                </mrow>
+              </msqrt>
+              <mo>−</mo>
+              <mi>ϕ</mi>
+              <mo stretchy="false">)</mo>
               <msup>
                 <mi>e</mi>
                 <mrow>
-                  <mn>-4</mn>
+                  <mfrac>
+                    <mn>2</mn>
+                    <mn>5</mn>
+                  </mfrac>
                   <mi>π</mi>
                 </mrow>
               </msup>
+            </mrow>
+          </mfrac>
+          <mo>=</mo>
+          <mn>1</mn>
+          <mo>+</mo>
+          <mfrac>
+            <msup>
+              <mi>e</mi>
               <mrow>
-                <mn>1</mn>
-                <mo>+</mo>
-                <mfrac>
-                  <msup>
-                    <mi>e</mi>
-                    <mrow>
-                      <mn>-6</mn>
-                      <mi>π</mi>
-                    </mrow>
-                  </msup>
-                  <mrow>
-                    <mn>1</mn>
-                    <mo>+</mo>
-                    <mfrac>
-                      <msup>
-                        <mi>e</mi>
-                        <mrow>
-                          <mn>-8</mn>
-                          <mi>π</mi>
-                        </mrow>
-                      </msup>
-                      <mrow>
-                        <mn>1</mn>
-                        <mo>+</mo>
-                        <mi>⋯</mi>
-                      </mrow>
-                    </mfrac>
-                  </mrow>
-                </mfrac>
+                <mo>−</mo>
+                <mn>2</mn>
+                <mi>π</mi>
               </mrow>
-            </mfrac>
-          </mrow>
-        </mfrac>
+            </msup>
+            <mrow>
+              <mn>1</mn>
+              <mo>+</mo>
+              <mfrac>
+                <msup>
+                  <mi>e</mi>
+                  <mrow>
+                    <mo>−</mo>
+                    <mn>4</mn>
+                    <mi>π</mi>
+                  </mrow>
+                </msup>
+                <mrow>
+                  <mn>1</mn>
+                  <mo>+</mo>
+                  <mfrac>
+                    <msup>
+                      <mi>e</mi>
+                      <mrow>
+                        <mo>−</mo>
+                        <mn>6</mn>
+                        <mi>π</mi>
+                      </mrow>
+                    </msup>
+                    <mrow>
+                      <mn>1</mn>
+                      <mo>+</mo>
+                      <mfrac>
+                        <msup>
+                          <mi>e</mi>
+                          <mrow>
+                            <mo>−</mo>
+                            <mn>8</mn>
+                            <mi>π</mi>
+                          </mrow>
+                        </msup>
+                        <mrow>
+                          <mn>1</mn>
+                          <mo>+</mo>
+                          <mo>⋯</mo>
+                        </mrow>
+                      </mfrac>
+                    </mrow>
+                  </mfrac>
+                </mrow>
+              </mfrac>
+            </mrow>
+          </mfrac>
+        </mrow>
       </math>
     </media-fragment>
     <media-fragment id="6" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mtable>
+        <mtable columnalign="right left"
+                columnspacing="0em"
+                rowspacing="0.25em">
           <mtr>
-            <mtd columnalign="right">
-              <mi>a</mi>
+            <mtd>
+              <mstyle displaystyle="true" scriptlevel="0">
+                <mi>a</mi>
+              </mstyle>
             </mtd>
-            <mtd columnalign="center">
-              <mo>=</mo>
-            </mtd>
-            <mtd columnalign="left">
-              <mi>b</mi>
-              <mo>+</mo>
-              <mi>c</mi>
+            <mtd>
+              <mstyle displaystyle="true" scriptlevel="0">
+                <mrow>
+                  <mrow/>
+                  <mo>=</mo>
+                  <mi>b</mi>
+                  <mo>+</mo>
+                  <mi>c</mi>
+                </mrow>
+              </mstyle>
             </mtd>
           </mtr>
           <mtr>
-            <mtd columnalign="right">
-              <mi>d</mi>
-              <mo>+</mo>
-              <mi>e</mi>
+            <mtd>
+              <mstyle displaystyle="true" scriptlevel="0">
+                <mrow>
+                  <mi>d</mi>
+                  <mo>+</mo>
+                  <mi>e</mi>
+                </mrow>
+              </mstyle>
             </mtd>
-            <mtd columnalign="center">
-              <mo>=</mo>
-            </mtd>
-            <mtd columnalign="left">
-              <mi>f</mi>
+            <mtd>
+              <mstyle displaystyle="true" scriptlevel="0">
+                <mrow>
+                  <mrow/>
+                  <mo>=</mo>
+                  <mi>f</mi>
+                </mrow>
+              </mstyle>
             </mtd>
           </mtr>
         </mtable>
@@ -212,27 +236,37 @@
     </media-fragment>
     <media-fragment id="7" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mtable>
+        <mtable columnalign="right"
+                columnspacing=""
+                rowspacing="0.25em">
           <mtr>
-            <mtd columnalign="right">
-              <mn>10</mn>
-              <mi>x</mi>
-              <mo>+</mo>
-              <mn>3</mn>
-              <mi>y</mi>
-              <mo>=</mo>
-              <mn>2</mn>
+            <mtd>
+              <mstyle displaystyle="true" scriptlevel="0">
+                <mrow>
+                  <mn>10</mn>
+                  <mi>x</mi>
+                  <mo>+</mo>
+                  <mn>3</mn>
+                  <mi>y</mi>
+                  <mo>=</mo>
+                  <mn>2</mn>
+                </mrow>
+              </mstyle>
             </mtd>
           </mtr>
           <mtr>
-            <mtd columnalign="right">
-              <mn>3</mn>
-              <mi>x</mi>
-              <mo>+</mo>
-              <mn>13</mn>
-              <mi>y</mi>
-              <mo>=</mo>
-              <mn>4</mn>
+            <mtd>
+              <mstyle displaystyle="true" scriptlevel="0">
+                <mrow>
+                  <mn>3</mn>
+                  <mi>x</mi>
+                  <mo>+</mo>
+                  <mn>13</mn>
+                  <mi>y</mi>
+                  <mo>=</mo>
+                  <mn>4</mn>
+                </mrow>
+              </mstyle>
             </mtd>
           </mtr>
         </mtable>
@@ -240,45 +274,63 @@
     </media-fragment>
     <media-fragment id="8" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mfenced close="}" open="{">
-          <mtable>
+        <mrow>
+          <mo fence="true">{</mo>
+          <mtable columnspacing="1em" rowspacing="0.16em">
             <mtr>
               <mtd>
-                <mi>a</mi>
+                <mstyle displaystyle="false" scriptlevel="0">
+                  <mi>a</mi>
+                </mstyle>
               </mtd>
               <mtd>
-                <mi>b</mi>
+                <mstyle displaystyle="false" scriptlevel="0">
+                  <mi>b</mi>
+                </mstyle>
               </mtd>
             </mtr>
             <mtr>
               <mtd>
-                <mi>c</mi>
+                <mstyle displaystyle="false" scriptlevel="0">
+                  <mi>c</mi>
+                </mstyle>
               </mtd>
               <mtd>
-                <mi>d</mi>
+                <mstyle displaystyle="false" scriptlevel="0">
+                  <mi>d</mi>
+                </mstyle>
               </mtd>
             </mtr>
           </mtable>
-        </mfenced>
+          <mo fence="true">}</mo>
+        </mrow>
       </math>
     </media-fragment>
     <media-fragment id="11" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mtable>
+        <mtable columnspacing="1em" rowspacing="0.16em">
           <mtr>
             <mtd>
-              <mi>a</mi>
+              <mstyle displaystyle="false" scriptlevel="0">
+                <mi>a</mi>
+              </mstyle>
             </mtd>
             <mtd>
-              <mi>b</mi>
+              <mstyle displaystyle="false" scriptlevel="0">
+                <mi>b</mi>
+              </mstyle>
             </mtd>
           </mtr>
           <mtr>
             <mtd>
-              <mi>c</mi>
+              <mstyle displaystyle="false" scriptlevel="0">
+                <mi>c</mi>
+              </mstyle>
             </mtd>
             <mtd>
-              <mi>d</mi>
+              <mstyle displaystyle="false" scriptlevel="0">
+                <mi>d</mi>
+              </mstyle>
             </mtd>
           </mtr>
         </mtable>
@@ -286,35 +338,43 @@
     </media-fragment>
     <media-fragment id="12" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <munder>
-          <mo>∑</mo>
-          <mrow>
-            <mn>1</mn>
-            <mo>≤</mo>
+        <mrow>
+          <msub>
+            <mo>∑</mo>
+            <mrow>
+              <mn>1</mn>
+              <mo>≤</mo>
+              <mi>i</mi>
+              <mo>≤</mo>
+              <mi>n</mi>
+            </mrow>
+          </msub>
+          <msub>
+            <mi>x</mi>
             <mi>i</mi>
-            <mo>≤</mo>
-            <mi>n</mi>
-          </mrow>
-        </munder>
-        <msub>
-          <mi>x</mi>
-          <mi>i</mi>
-        </msub>
+          </msub>
+        </mrow>
       </math>
     </media-fragment>
     <media-fragment id="13" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mtable xmlns="http://www.w3.org/1998/Math/MathML">
+        <mtable columnspacing="1em" rowspacing="0.16em">
           <mtr>
             <mtd>
-              <mi>a</mi>
-              <mi>b</mi>
-              <mi>c</mi>
+              <mstyle displaystyle="false" scriptlevel="0">
+                <mrow>
+                  <mi>a</mi>
+                  <mi>b</mi>
+                  <mi>c</mi>
+                </mrow>
+              </mstyle>
             </mtd>
           </mtr>
           <mtr>
             <mtd>
-              <mo>⇌</mo>
+              <mstyle displaystyle="false" scriptlevel="0">
+                <mo lspace="0em" rspace="0em">⇌</mo>
+              </mstyle>
             </mtd>
           </mtr>
         </mtable>
@@ -322,10 +382,11 @@
     </media-fragment>
     <media-fragment id="14" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <msup>
-          <mfenced close=")" open="(">
+        <mrow>
+          <msup>
             <mrow>
-              <munderover>
+              <mo fence="true">(</mo>
+              <msubsup>
                 <mo>∑</mo>
                 <mrow>
                   <mi>k</mi>
@@ -333,7 +394,7 @@
                   <mn>1</mn>
                 </mrow>
                 <mi>n</mi>
-              </munderover>
+              </msubsup>
               <msub>
                 <mi>a</mi>
                 <mi>k</mi>
@@ -342,14 +403,14 @@
                 <mi>b</mi>
                 <mi>k</mi>
               </msub>
+              <mo fence="true">)</mo>
             </mrow>
-          </mfenced>
-          <mn>2</mn>
-        </msup>
-        <mo>≤</mo>
-        <mfenced close=")" open="(">
+            <mn>2</mn>
+          </msup>
+          <mo>≤</mo>
           <mrow>
-            <munderover>
+            <mo fence="true">(</mo>
+            <msubsup>
               <mo>∑</mo>
               <mrow>
                 <mi>k</mi>
@@ -357,17 +418,17 @@
                 <mn>1</mn>
               </mrow>
               <mi>n</mi>
-            </munderover>
+            </msubsup>
             <msubsup>
               <mi>a</mi>
               <mi>k</mi>
               <mn>2</mn>
             </msubsup>
+            <mo fence="true">)</mo>
           </mrow>
-        </mfenced>
-        <mfenced close=")" open="(">
           <mrow>
-            <munderover>
+            <mo fence="true">(</mo>
+            <msubsup>
               <mo>∑</mo>
               <mrow>
                 <mi>k</mi>
@@ -375,119 +436,114 @@
                 <mn>1</mn>
               </mrow>
               <mi>n</mi>
-            </munderover>
+            </msubsup>
             <msubsup>
               <mi>b</mi>
               <mi>k</mi>
               <mn>2</mn>
             </msubsup>
+            <mo fence="true">)</mo>
           </mrow>
-        </mfenced>
+        </mrow>
       </math>
     </media-fragment>
     <media-fragment id="15" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
         <mrow>
-          <mn>1</mn>
-          <mo>+</mo>
-          <mfrac>
-            <msup>
-              <mi>q</mi>
-              <mn>2</mn>
-            </msup>
-            <mfenced close=")" open="(">
-              <mrow>
-                <mn>1</mn>
-                <mo>-</mo>
+          <mrow>
+            <mn>1</mn>
+            <mo>+</mo>
+            <mfrac>
+              <msup>
                 <mi>q</mi>
+                <mn>2</mn>
+              </msup>
+              <mrow>
+                <mo stretchy="false">(</mo>
+                <mn>1</mn>
+                <mo>−</mo>
+                <mi>q</mi>
+                <mo stretchy="false">)</mo>
               </mrow>
-            </mfenced>
-          </mfrac>
-          <mo>+</mo>
-          <mfrac>
-            <msup>
-              <mi>q</mi>
-              <mn>6</mn>
-            </msup>
-            <mrow>
-              <mfenced close=")" open="(">
-                <mrow>
-                  <mn>1</mn>
-                  <mo>-</mo>
+            </mfrac>
+            <mo>+</mo>
+            <mfrac>
+              <msup>
+                <mi>q</mi>
+                <mn>6</mn>
+              </msup>
+              <mrow>
+                <mo stretchy="false">(</mo>
+                <mn>1</mn>
+                <mo>−</mo>
+                <mi>q</mi>
+                <mo stretchy="false">)</mo>
+                <mo stretchy="false">(</mo>
+                <mn>1</mn>
+                <mo>−</mo>
+                <msup>
                   <mi>q</mi>
-                </mrow>
-              </mfenced>
-              <mfenced close=")" open="(">
+                  <mn>2</mn>
+                </msup>
+                <mo stretchy="false">)</mo>
+              </mrow>
+            </mfrac>
+            <mo>+</mo>
+            <mo>⋯</mo>
+          </mrow>
+          <mo>=</mo>
+          <msubsup>
+            <mo>∏</mo>
+            <mrow>
+              <mi>j</mi>
+              <mo>=</mo>
+              <mn>0</mn>
+            </mrow>
+            <mi mathvariant="normal">∞</mi>
+          </msubsup>
+          <mfrac>
+            <mn>1</mn>
+            <mrow>
+              <mo stretchy="false">(</mo>
+              <mn>1</mn>
+              <mo>−</mo>
+              <msup>
+                <mi>q</mi>
                 <mrow>
-                  <mn>1</mn>
-                  <mo>-</mo>
-                  <msup>
-                    <mi>q</mi>
-                    <mn>2</mn>
-                  </msup>
+                  <mn>5</mn>
+                  <mi>j</mi>
+                  <mo>+</mo>
+                  <mn>2</mn>
                 </mrow>
-              </mfenced>
+              </msup>
+              <mo stretchy="false">)</mo>
+              <mo stretchy="false">(</mo>
+              <mn>1</mn>
+              <mo>−</mo>
+              <msup>
+                <mi>q</mi>
+                <mrow>
+                  <mn>5</mn>
+                  <mi>j</mi>
+                  <mo>+</mo>
+                  <mn>3</mn>
+                </mrow>
+              </msup>
+              <mo stretchy="false">)</mo>
             </mrow>
           </mfrac>
-          <mo>+</mo>
-          <mi>⋯</mi>
+          <mo separator="true">,</mo>
+          <mspace width="1em"/>
+          <mspace width="1em"/>
+          <mi>f</mi>
+          <mi>o</mi>
+          <mi>r</mi>
+          <mo>∣</mo>
+          <mi>q</mi>
+          <mo>∣</mo>
+          <mo>&lt;</mo>
+          <mn>1.</mn>
         </mrow>
-        <mo>=</mo>
-        <munderover>
-          <mo>∏</mo>
-          <mrow>
-            <mi>j</mi>
-            <mo>=</mo>
-            <mn>0</mn>
-          </mrow>
-          <mi>∞</mi>
-        </munderover>
-        <mfrac>
-          <mn>1</mn>
-          <mrow>
-            <mfenced close=")" open="(">
-              <mrow>
-                <mn>1</mn>
-                <mo>-</mo>
-                <msup>
-                  <mi>q</mi>
-                  <mrow>
-                    <mn>5</mn>
-                    <mi>j</mi>
-                    <mo>+</mo>
-                    <mn>2</mn>
-                  </mrow>
-                </msup>
-              </mrow>
-            </mfenced>
-            <mfenced close=")" open="(">
-              <mrow>
-                <mn>1</mn>
-                <mo>-</mo>
-                <msup>
-                  <mi>q</mi>
-                  <mrow>
-                    <mn>5</mn>
-                    <mi>j</mi>
-                    <mo>+</mo>
-                    <mn>3</mn>
-                  </mrow>
-                </msup>
-              </mrow>
-            </mfenced>
-          </mrow>
-        </mfrac>
-        <mo>,</mo>
-        <mspace width="1em"/>
-        <mspace width="1em"/>
-        <mi>f</mi>
-        <mi>o</mi>
-        <mi>r</mi>
-        <mo>∣</mo>
-        <mi>q</mi>
-        <mo>∣</mo>
-        <mo>&lt;</mo>
-        <mn>1.</mn>
       </math>
     </media-fragment>
   </section>
