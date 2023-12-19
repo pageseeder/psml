@@ -196,19 +196,23 @@ public final class Paragraph extends Element implements Serializable {
     if (!Paragraph.NO_BLOCK_LABEL.equals(this._blocklabel)) {
       xml.attribute("block-label", this._blocklabel);
     }
-    if (this._numbered && number != null) {
+    if (number != null) {
       Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index, true);
       if (pref != null) {
         xml.attribute("part-level", pref.level);
-        // don't output undefined prefixes
-        if (!"".equals(pref.value) || pref.canonical != null) {
-          xml.attribute("prefix", pref.value);
-          xml.attribute("canonical", pref.canonical);
-        }
       }
-    } else {
-      if (!NO_PREFIX.equals(this._prefix)) {
-        xml.attribute("prefix", this._prefix);
+      if (this._numbered) {
+        if (pref != null) {
+          // don't output undefined prefixes
+          if (!"".equals(pref.value) || pref.canonical != null) {
+            xml.attribute("prefix", pref.value);
+            xml.attribute("canonical", pref.canonical);
+          }
+        }
+      } else {
+        if (!NO_PREFIX.equals(this._prefix)) {
+          xml.attribute("prefix", this._prefix);
+        }
       }
     }
     xml.closeElement();

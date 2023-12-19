@@ -6,6 +6,7 @@ package org.pageseeder.psml.process;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
+import org.pageseeder.psml.process.math.TexConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -507,7 +508,7 @@ public final class Process {
     IncludesExcludesMatcher xrefsMatcher = this.xrefs == null ? null : this.xrefs.buildMatcher();
     for (String relPath : psmlFiles.keySet()) {
       // log
-      this.logger.debug("Processing file "+relPath);
+      this.logger.debug("Processing file {}",relPath);
       // create temp output file
       FileOutputStream fos;
       File tempOutput;
