@@ -22,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
+import org.pageseeder.psml.process.math.AsciiMathConverter;
 import org.pageseeder.psml.process.math.TexConverter;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.Tests;
@@ -551,6 +552,17 @@ public class ProcessTest {
   }
 
   @Test
+  public void testAsciiMathConverter() throws IOException, ProcessException {
+    //for (int i = 1; i < 1000; i++) {
+    //  String math = "10=-2x+" + (1000 - i);
+    //  if (i == 500) AsciiMathConverter.reset();
+    //  AsciiMathConverter.convert(math);
+    //}
+    String math = "10=-2 (x+6)";
+    System.out.println(AsciiMathConverter.convert(math));
+  }
+
+  @Test
   public void testTexConverter() throws IOException, ProcessException {
     //String tex = "y = x ^ 2";
     //String tex = "\\frac{2}{3}";
@@ -559,7 +571,17 @@ public class ProcessTest {
     //    "a   &=& b+c\\\\\n" +
     //    "a-c &=& b\n" +
     //   "\\end{eqnarray*}";
-    String tex = "\\begin{aligned}a&=b+c\u00A0\\\\a-c&=b\\end{aligned}";
+    //String tex = "\\begin{aligned}a&=b+c\u00A0\\\\a-c&=b\\end{aligned}";
+    //System.out.println(TexConverter.convert(tex));
+    //tex = "\\begin{aligned}&4x-2=3x+1\\quad (-3x)\\\\&x-2=1\\quad (+2)\\\\&x=3\\end{aligned}";
+    //System.out.println(TexConverter.convert(tex));
+    //tex = "3(2x+1)=-17-4x\\\\ 6x+3=-17-4x\\hspace{30pt}(\\color{Red}+4x\\color{Black})\\\\ 10x+3=-17\\hspace{30pt}(\\color{Red}-3\\color{Black})\\\\ 10x=-20\\hspace{30pt}(\\color{Red}\\div 10\\color{Black})\\\\ x=-2";
+    //System.out.println(TexConverter.convert(tex));
+    //for (int i = 1; i < 10000; i++) {
+    //  String tex = "10=-2x+" + (10000 - i);
+    //  TexConverter.convert(tex);
+    //}
+    String tex = "10=-2 (x+6)";
     System.out.println(TexConverter.convert(tex));
   }
 

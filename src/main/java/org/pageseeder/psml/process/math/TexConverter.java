@@ -80,16 +80,12 @@ public class TexConverter {
     return result;
   }
 
-  /**
-   * Clears the script engine.
-   * This should be done before each process,
-   * otherwise the conversion will get slower over time.
-   */
-  public static void reset() {
-    synchronized (AsciiMathConverter.class) {
-      script = null;
-    }
-  }
+  // Not required as the script doesn't seem to get slower over time
+  //public static void reset() {
+  //  synchronized (AsciiMathConverter.class) {
+  //    script = null;
+  //  }
+  //}
 
   /**
    * Load the script from the internal resource
@@ -120,7 +116,7 @@ public class TexConverter {
         cscript.eval();
         // create an Invocable object by casting the script engine object
         script = (Invocable) cscript.getEngine();
-        return (Invocable) cscript.getEngine(); // don't return SCRIPT as it may have been reset by another thread
+        return script;
       } else {
         throw new IllegalArgumentException("Failed to load KaTex to MathML JS script");
       }

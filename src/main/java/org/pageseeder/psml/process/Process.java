@@ -505,7 +505,6 @@ public final class Process {
     // make sure we've got something to do
     if (!this.processXML) return;
     AsciiMathConverter.reset();
-    TexConverter.reset();
     IncludesExcludesMatcher xrefsMatcher = this.xrefs == null ? null : this.xrefs.buildMatcher();
     for (String relPath : psmlFiles.keySet()) {
       // log
