@@ -31,7 +31,9 @@ public class TexConverter {
    */
   public static String convert(String input) {
     // sanity check
-    if (input == null || input.isEmpty()) return "";
+    if (input == null || input.trim().isEmpty()) return "";
+
+    input = input.trim();
 
     // check cache
     String result = cache.get(input);
