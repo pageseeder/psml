@@ -277,6 +277,17 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private String placeholderContent = null;
 
   /**
+   * Values for pre-transcluded content handling (exported using process-publication=true)
+   */
+  private int preXrefLevel = 0;
+  private String preFragment = null;
+  private boolean inPreTranscluded = false;
+  private String preUriID = null;
+  private Integer preUriCount = null;
+  private boolean preEmbedHierarchy = false;
+
+
+  /**
    * @param out            where the resulting XML should be written.
    * @param file           the source file.
    * @param root           the root folder of the PSML files (used to compute relative
@@ -472,18 +483,29 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param embed  whether hierarchy has all embed XRefs
    */
   public void addUriFragID(String uriid, String fragid, boolean embed) {
+    addKeyUriFragID(this.uriCount + "_" + this.uriID, uriid, fragid, embed);
+    // if not root add to parent
+    if (this.parent != null && !this.inAlternateXRef)
+      this.parent.addUriFragID(uriid, fragid, embed);
+  }
+
+  /**
+   * Add URI or frag ID to this uri and above in hierarchy
+   *
+   * @param key    [this.uriCount]_[this.uriID]
+   * @param uriid  the uri id
+   * @param fragid the fragment id (may be null)
+   * @param embed  whether hierarchy has all embed XRefs
+   */
+  public void addKeyUriFragID(String key, String uriid, String fragid, boolean embed) {
     // can't XRef to alternate content
     if (this.inAlternateXRef) return;
-    // if not root add to parent
-    if (this.parent != null)
-      this.parent.addUriFragID(uriid, fragid, embed);
-    Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs
-        .get(this.uriCount + "_" + this.uriID);
+    Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs.get(key);
     Integer global_count = this.allUriIDs.get(uriid);
     Integer[] counts = null;
     if (sub_hierarchy == null) {
       sub_hierarchy = new HashMap<>();
-      this.hierarchyUriFragIDs.put(this.uriCount + "_" + this.uriID, sub_hierarchy);
+      this.hierarchyUriFragIDs.put(key, sub_hierarchy);
     } else
       counts = sub_hierarchy.get(uriid + (fragid == null ? "" : ("-" + fragid)));
     if (counts == null) {
@@ -662,6 +684,28 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.allUriIDs.put(this.uriID, 1);
       addUriFragID(this.uriID, null, this.inEmbedHierarchy);
     }
+    // if pre-transcluded content update URI counts
+    if (this.preXrefLevel == 1 && !this.inPreTranscluded) {
+      this.inPreTranscluded = true;
+      // update uri count
+      Integer count = this.allUriIDs.get(this.uriID);
+      if (count == null) count = 0;
+      if (!this.inAlternateXRef) {
+        count++;
+        this.allUriIDs.put(this.uriID, count);
+      }
+      this.uriCount = count;
+
+      if (!"default".equals(this.preFragment)) {
+        addUriFragID(this.uriID, this.preFragment, false);
+        addKeyUriFragID(this.preUriCount + "_" + this.preUriID, this.uriID, this.preFragment, false);
+        write("<document-fragment uriid=\"" + XMLUtils.escapeForAttribute(this.uriID) + "\">");
+      } else {
+        addUriFragID(this.uriID, null, false);
+        addKeyUriFragID(this.preUriCount + "_" + this.preUriID, this.uriID, null, false);
+      }
+      System.out.println(" --" + this.uriCount);
+    }
     // if fragment loading add temporary document element (stripped out later)
     if (this.fragmentToLoad != null && "document".equals(qName)) {
       write("<document-fragment uriid=\"" + XMLUtils.escapeForAttribute(this.uriID) + "\">");
@@ -829,6 +873,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if (this.convertMarkdown && noNamespace && "markdown".equals(qName)) {
       this.convertContent = new StringBuilder();
     }
+    // update pre-transclude level
+    if (isXRef && this.preXrefLevel > 0) this.preXrefLevel++;
     // add transcluded content now
     if ((isXRef || isImage || isLink) && !this.elements.contains("compare")) {
       transcludeXRef(atts, isImage, isLink);
@@ -868,6 +914,19 @@ public final class PSMLProcessHandler extends DefaultHandler {
     this.inTranscludedXRef = false;
     // replace xref by its contents?
     boolean isXRef = (uri == null || uri.isEmpty()) && ("blockxref".equals(qName) || "xref".equals(qName));
+    // update pre-transclude values
+    if (isXRef) {
+      if (this.preXrefLevel == 1) {
+        if (this.inPreTranscluded && !"default".equals(this.preFragment)) write("</document-fragment>");
+        this.uriID = this.preUriID;
+        this.uriCount = this.preUriCount;
+        this.inEmbedHierarchy = this.preEmbedHierarchy;
+        this.inTranscludedContent = false;
+        this.preXrefLevel = 0;
+        this.inPreTranscluded = false;
+        System.out.println("<-" + this.uriID + "-" + this.uriCount);
+      } else if (this.preXrefLevel > 0) this.preXrefLevel--;
+    }
     if (isXRef && this.stripCurrentXRefElement) {
       if ("blockxref".equals(qName))
         write("</para>");
@@ -952,7 +1011,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param fromImage  whether transclusion is from an image
    * @param embed      whether hierarchy has all embed XRefs
    * @param transclude whether the XRef was a transclude
-   * @param transclude whether the XRef was an alternate
+   * @param alternate  whether the XRef was an alternate
    *
    * @return the handler
    */
@@ -1093,7 +1152,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
    */
   private void transcludeXRef(Attributes atts, boolean image, boolean link) throws SAXException {
     // ignore nested transclude
-    if ("transclude".equals(atts.getValue("type")) && this.inTranscludedContent) return;
+    String type = atts.getValue("type");
+    if ("transclude".equals(type) && this.inTranscludedContent) return;
     String href = atts.getValue(image ? "src" : "href");
     try {
       // find out if the fragment we're in is an xref-fragment
@@ -1108,9 +1168,23 @@ public final class PSMLProcessHandler extends DefaultHandler {
         }
       }
       // retrieve target document
+      String uriid = atts.getValue("uriid");
       if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, link, this.inEmbedHierarchy, this.convertTex)) {
         // then ignore content of XRef
         this.inTranscludedXRef = !link;
+      // else if pre-transcluded xref (ignoring generated media fragment without a uriid)
+      } else if (this.preXrefLevel == 0 && !image && !link && uriid != null &&
+          ("transclude".equals(type) || "math".equals(type))) {
+        // set pre-transclude values in case content exported with process-publication=true
+        this.preXrefLevel = 1;
+        this.preFragment = atts.getValue("frag");
+        this.preUriID = this.uriID;
+        this.preUriCount = this.uriCount;
+        this.preEmbedHierarchy = this.inEmbedHierarchy;
+        this.uriID = uriid;
+        this.inEmbedHierarchy = false;
+        this.inTranscludedContent = true;
+        System.out.println("->" + this.uriID + "-" + this.uriCount);
       }
     } catch (InfiniteLoopException ex) {
       File root_src = this.sourceFile;
@@ -1119,10 +1193,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
         root_src = parent.sourceFile;
         parent = parent.parent;
       }
-      String root, src, tgt;
+      String src, tgt;
       try {
-        root = root_src.getCanonicalPath().substring(this.psmlRoot.getCanonicalPath().length() + 1)
-            .replace(File.separatorChar, '/');
         src = this.sourceFile.getCanonicalPath()
             .substring(this.psmlRoot.getCanonicalPath().length() + 1)
             .replace(File.separatorChar, '/');
@@ -1130,7 +1202,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
             .substring(this.psmlRoot.getCanonicalPath().length() + 1)
             .replace(File.separatorChar, '/');
       } catch (IOException e) {
-        root = root_src.getName();
         src = this.sourceFile.getName();
         tgt = href;
       }

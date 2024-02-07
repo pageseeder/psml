@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="988297" schemaversion="1.4" date="2024-02-06T12:06:15+11:00" version="current" level="portable">
+  <documentinfo>
+    <uri id="988297" external="false" mediatype="application/vnd.pageseeder.psml+xml"
+         created="2024-02-06T12:05:37+11:00" modified="2024-02-06T12:06:15+11:00" scheme="http" host="localhost"
+         port="80" path="/ps/report2/local1/documents/component/embeded_1.psml"
+         decodedpath="/ps/report2/local1/documents/component/embeded_1.psml" title="Embeded 1">
+      <displaytitle>Embeded 1</displaytitle>
+    </uri>
+    <reversexrefs>
+      <reversexref uriid="921771" href="/ps/report2/local1/documents/component/transcluded_1.psml" frag="3"
+                   urititle="Transcluded 1" mediatype="application/vnd.pageseeder.psml+xml" id="5346716"
+                   title="Trans heading" type="none" forwardtype="none" forwarddisplay="document"
+                   forwardfrag="default"/>
+    </reversexrefs>
+  </documentinfo>
+  <fragmentinfo/>
+  <metadata/>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Embeded 1</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para/>
+    </fragment>
+  </section>
+</document>

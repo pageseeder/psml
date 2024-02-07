@@ -1350,6 +1350,50 @@ public class ProcessTest {
     p.process();
   }
 
+  /**
+   * Test processing PSML with pre-transcluded content from process-publication=true export.
+   */
+  @Test
+  public void testProcessXRefsPretranscluded() throws IOException, ProcessException {
+    String filename = "transclude.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed");
+    p.setXrefs(xrefs);
+    p.setConvertAsciiMath(true);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    System.out.println(xml);
+    Assert.assertThat(xml, hasXPath("(//fragment)[1]/@id", equalTo("988295-1")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[2]/@id", equalTo("988295-3")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[3]/@id", equalTo("921771-3")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[4]/@id", equalTo("988297-1")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[5]/@id", equalTo("988297-2")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[6]/@id", equalTo("988295-4")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[7]/@id", equalTo("988295-5")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[8]/@id", equalTo("988295-2")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[9]/@id", equalTo("2_921771-3")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[10]/@id", equalTo("2_988297-1")));
+    Assert.assertThat(xml, hasXPath("(//fragment)[11]/@id", equalTo("2_988297-2")));
+    Assert.assertThat(xml, hasXPath("(//media-fragment)[1]/@id", equalTo("media")));
+    Assert.assertThat(xml, hasXPath("(//media-fragment)[2]/@id", equalTo("227-1")));
+    Assert.assertThat(xml, hasXPath("(//media-fragment)[3]/@id", equalTo("208-1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[2]/@level", equalTo("2")));
+    Assert.assertThat(xml, hasXPath("(//heading)[3]/@level", equalTo("1")));
+    Assert.assertThat(xml, hasXPath("(//heading)[4]/@level", equalTo("3")));
+    Assert.assertThat(xml, hasXPath("(//heading)[5]/@level", equalTo("1")));
+  }
+
   @Test
   public void testProcessXRefsMathml() throws IOException, ProcessException {
     String filename = "ref_3.psml";

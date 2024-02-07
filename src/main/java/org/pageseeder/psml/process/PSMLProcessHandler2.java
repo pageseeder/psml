@@ -442,7 +442,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
 //            value = atts.getValue(i);
 //          }
       } else if (!this.elements.contains("compare")) {
-        if (isFrag && "id".equals(name) && this.alternateXRefs == 0) {
+        // update fragment id but ignore generated media fragments
+        if (isFrag && "id".equals(name) && this.alternateXRefs == 0 &&
+            (!"media-fragment".equals(qName) || !"media".equals(atts.getValue("id")))) {
           String id = atts.getValue(i);
           // get uriid and make id unique
           int j = id.indexOf('-');
@@ -702,11 +704,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         String id = ancestors.get(i);
         Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs.get(id);
         if (sub_hierarchy == null) {
-          String message = "Unable to find subhierachy for URI ID " + id;
+          String message = "Unable to find subhierarchy for URI ID " + id;
           if (this.failOnError) throw new ProcessException(message);
           else this.logger.error(message);
         } else {
           uri_counts = sub_hierarchy.get(uriid);
+          System.out.println("id:" + id +" uriid:" + uriid + " uri_counts:" + uri_counts);
           if (uri_counts != null) {
             global_count = uri_counts[0];
             local_count = uri_counts[1];
@@ -717,11 +720,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           // if link to fragment check transcluded fragments
           if (!"default".equals(frag)) {
             Integer[] frag_counts = sub_hierarchy.get(uriid + "-" + frag);
+            System.out.println("frag:" + frag + " frag_counts:" + frag_counts);
             if (frag_counts != null) {
               global_count = frag_counts[0];
               local_count = local_count + frag_counts[1];
               embed_count = embed_count + frag_counts[2];
-              this.logger.debug("Hierarchy {} found ID {}-{} globally {} times, locally {} and embedded {} times",
+              this.logger.debug("Hierarchy {} found fragment ID {}-{} globally {} times, locally {} and embedded {} times",
                   id, uriid, frag, frag_counts[0], frag_counts[1], frag_counts[2]);
             }
           }
