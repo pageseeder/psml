@@ -1,0 +1,78 @@
+<document id="988295" schemaversion="1.4" date="2024-02-07T12:02:02+11:00" version="current" level="processed" position="1" publicationid="report2-transclude">
+  <documentinfo>
+    <uri id="988295" external="false" mediatype="application/vnd.pageseeder.psml+xml" created="2024-02-05T16:34:54+11:00" modified="2024-02-07T12:02:02+11:00" scheme="http" host="localhost" port="80" path="/ps/report2/local1/documents/transclude.psml" decodedpath="/ps/report2/local1/documents/transclude.psml" title="Transclude">
+      <displaytitle>Transclude</displaytitle>
+    </uri>
+    <publication id="report2-transclude" hostid="1" rooturiid="988295" title="Transclude" defaultgroupid="18" type="default"/>
+  </documentinfo>
+  <fragmentinfo structure-modified="2024-02-06T11:53:06+11:00">
+    <locator id="2457607" fragment="2" editid="5346738" modified="2024-02-07T10:27:35+11:00"/>
+    <locator id="2457615" fragment="1" editid="5346740" modified="2024-02-07T10:27:36+11:00"/>
+    <locator id="2457610" fragment="4" editid="5346710" modified="2024-02-06T11:53:29+11:00"/>
+    <locator id="2457609" fragment="3" editid="5346761" modified="2024-02-07T12:02:02+11:00"/>
+    <locator id="2457611" fragment="5" editid="5346707" modified="2024-02-06T11:53:27+11:00"/>
+  </fragmentinfo>
+  <metadata/>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Transclude</heading>
+      <para>
+        <xref id="5346739" frag="3" reversefrag="1" reversetitle="Equations using inline labels should be …" reverselink="true" reversetype="none" display="document" type="none" uriid="921771" href="component/transcluded_1.psml" urititle="Transcluded 1" mediatype="application/vnd.pageseeder.psml+xml">Transcluded 1</xref>
+      </para>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="3">
+      <para>Equations using inline labels should be supported, for example <inline label="asciimath">a = b^2 + c</inline>.</para>
+      <blockxref id="5346741" frag="3" reversefrag="3" reversetitle="Equations using inline labels should be …" reverselink="true" reversetype="none" display="document" type="transclude" uriid="921771" href="component/transcluded_1.psml" urititle="Transcluded 1" mediatype="application/vnd.pageseeder.psml+xml">
+        <locator id="2301857" fragment="3" editid="5346764" modified="2024-02-09T10:58:54+11:00"/>
+        <fragment id="3">
+          <heading level="2" numbered="true" prefix="1">Trans heading</heading>
+          <para>
+            <xref id="5346763" frag="1" reversefrag="3" reversetitle="Trans heading" reverselink="true" reversetype="none" display="document" type="none" uriid="988297" href="component/embeded_1.psml" urititle="Embeded 1" mediatype="application/vnd.pageseeder.psml+xml">Embeded 1</xref>
+          </para>
+          <para>Trans content</para>
+          <blockxref id="5346725" frag="default" reversefrag="3" reversetitle="Trans heading" reverselink="true" reversetype="none" display="document" type="embed" uriid="988297" href="component/embeded_1.psml" urititle="Embeded 1" mediatype="application/vnd.pageseeder.psml+xml">Embeded 1</blockxref>
+          <para/>
+        </fragment>
+      </blockxref>
+    </fragment>
+    <fragment id="4">
+      <para>Equations from an AsciiMath library, for example <xref id="5346709" frag="1" reversefrag="4" reversetitle="" reverselink="true" reversetype="none" display="document" config="asciimath" type="math" uriid="227" href="asciimath/asciimath-001.psml" urititle="Exponential 1" urilabels="simple,exponential" mediatype="application/vnd.pageseeder.psml+xml" documenttype="asciimath">
+        <locator id="263" fragment="1" modified="2019-09-10T12:18:08+10:00"/>
+        <media-fragment id="1" mediatype="text/asciimath">y=x^2</media-fragment>
+      </xref>.</para>
+    </fragment>
+    <fragment id="5">
+      <para>Equations from a MathML library, for example <xref id="5346706" frag="1" reversefrag="5" reversetitle="" reverselink="true" reversetype="none" display="document" config="mathml" type="math" uriid="208" href="mathml/mathml-002.psml" urititle="Exponential 2" mediatype="application/vnd.pageseeder.psml+xml" documenttype="mathml">
+        <locator id="269" fragment="1" modified="2018-09-07T11:37:15+10:00"/>
+        <media-fragment id="1" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mi>y</mi>
+            <mo>=</mo>
+            <msup>
+              <mi>x</mi>
+              <mn>2</mn>
+            </msup>
+            <mo>+</mo>
+            <mn>1</mn>
+          </math>
+        </media-fragment>
+      </xref>.</para>
+    </fragment>
+    <fragment id="2">
+      <blockxref id="5346737" frag="3" reversefrag="2" reversetitle="Transcluded 1 (fragment 3)" reverselink="true" reversetype="none" display="document" level="1" type="transclude" uriid="921771" href="component/transcluded_1.psml" urititle="Transcluded 1" mediatype="application/vnd.pageseeder.psml+xml">
+        <locator id="2301857" fragment="3" editid="5346764" modified="2024-02-09T10:58:54+11:00"/>
+        <fragment id="3">
+          <heading level="3" numbered="true" prefix="1.1">Trans heading</heading>
+          <para>
+            <xref id="5346763" frag="1" reversefrag="3" reversetitle="Trans heading" reverselink="true" reversetype="none" display="document" type="none" uriid="988297" href="component/embeded_1.psml" urititle="Embeded 1" mediatype="application/vnd.pageseeder.psml+xml">Embeded 1</xref>
+          </para>
+          <para>Trans content</para>
+          <blockxref id="5346725" frag="default" reversefrag="3" reversetitle="Trans heading" reverselink="true" reversetype="none" display="document" type="embed" uriid="988297" href="component/embeded_1.psml" urititle="Embeded 1" mediatype="application/vnd.pageseeder.psml+xml">Embeded 1</blockxref>
+          <para/>
+        </fragment>
+      </blockxref>
+    </fragment>
+  </section>
+</document>

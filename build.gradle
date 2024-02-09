@@ -25,7 +25,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
 
-  compile (
+  api (
     'org.slf4j:slf4j-api:1.7.21',
     'org.pageseeder.xmlwriter:pso-xmlwriter:1.0.4',
     'org.pageseeder.diffx:pso-diffx:1.1.1'
@@ -33,7 +33,7 @@ dependencies {
 
   compileOnly 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
 
-  testCompile (
+  testImplementation (
     'junit:junit:4.13.1',
     'org.slf4j:slf4j-simple:1.7.21',
     'org.hamcrest:java-hamcrest:2.0.0.0',
@@ -44,8 +44,12 @@ dependencies {
     'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
   )
 
-  testRuntime (
+  testRuntimeOnly (
     'net.sf.saxon:Saxon-HE:9.9.1-5',
   )
+
+  testRuntimeOnly("org.mozilla:rhino-engine:1.7.14") {
+    because("Required by TeX/AsciiMath conversion in Java 15+")
+  }
 
 }
