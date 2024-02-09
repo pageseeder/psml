@@ -709,7 +709,6 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           else this.logger.error(message);
         } else {
           uri_counts = sub_hierarchy.get(uriid);
-          System.out.println("id:" + id +" uriid:" + uriid + " uri_counts:" + uri_counts);
           if (uri_counts != null) {
             global_count = uri_counts[0];
             local_count = uri_counts[1];
@@ -720,7 +719,6 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           // if link to fragment check transcluded fragments
           if (!"default".equals(frag)) {
             Integer[] frag_counts = sub_hierarchy.get(uriid + "-" + frag);
-            System.out.println("frag:" + frag + " frag_counts:" + frag_counts);
             if (frag_counts != null) {
               global_count = frag_counts[0];
               local_count = local_count + frag_counts[1];

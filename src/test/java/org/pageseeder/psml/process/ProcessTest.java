@@ -1373,7 +1373,6 @@ public class ProcessTest {
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    System.out.println(xml);
     Assert.assertThat(xml, hasXPath("(//fragment)[1]/@id", equalTo("988295-1")));
     Assert.assertThat(xml, hasXPath("(//fragment)[2]/@id", equalTo("988295-3")));
     Assert.assertThat(xml, hasXPath("(//fragment)[3]/@id", equalTo("921771-3")));
@@ -1392,6 +1391,9 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//heading)[3]/@level", equalTo("1")));
     Assert.assertThat(xml, hasXPath("(//heading)[4]/@level", equalTo("3")));
     Assert.assertThat(xml, hasXPath("(//heading)[5]/@level", equalTo("1")));
+    Assert.assertThat(xml, hasXPath("(//xref[@type='none'])[1]/@href", equalTo("#921771-3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@type='none'])[2]/@href", equalTo("#988297-1")));
+    Assert.assertThat(xml, hasXPath("(//xref[@type='none'])[3]/@href", equalTo("#2_988297-1")));
   }
 
   @Test

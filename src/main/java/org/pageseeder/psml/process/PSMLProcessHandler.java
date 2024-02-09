@@ -704,7 +704,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
         addUriFragID(this.uriID, null, false);
         addKeyUriFragID(this.preUriCount + "_" + this.preUriID, this.uriID, null, false);
       }
-      System.out.println(" --" + this.uriCount);
     }
     // if fragment loading add temporary document element (stripped out later)
     if (this.fragmentToLoad != null && "document".equals(qName)) {
@@ -924,7 +923,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.inTranscludedContent = false;
         this.preXrefLevel = 0;
         this.inPreTranscluded = false;
-        System.out.println("<-" + this.uriID + "-" + this.uriCount);
       } else if (this.preXrefLevel > 0) this.preXrefLevel--;
     }
     if (isXRef && this.stripCurrentXRefElement) {
@@ -1184,7 +1182,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.uriID = uriid;
         this.inEmbedHierarchy = false;
         this.inTranscludedContent = true;
-        System.out.println("->" + this.uriID + "-" + this.uriCount);
       }
     } catch (InfiniteLoopException ex) {
       File root_src = this.sourceFile;
