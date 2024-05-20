@@ -201,6 +201,7 @@ public final class XMLUtils {
       try {
         // run transform
         Source source = new SAXSource(XMLReaderFactory.createXMLReader(), new InputSource(fis));
+        source.setSystemId(in.toURI().toString());
         t.transform(source,  new StreamResult(fos));
       } finally {
         fis.close();

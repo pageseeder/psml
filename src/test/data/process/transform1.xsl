@@ -10,6 +10,7 @@
 
 <!-- change all displaytitle to x -->
 <xsl:template match="displaytitle">
+    <xsl:message>Base URI:<xsl:value-of select="base-uri()" /></xsl:message>
     <displaytitle>x</displaytitle>
 </xsl:template>
 
