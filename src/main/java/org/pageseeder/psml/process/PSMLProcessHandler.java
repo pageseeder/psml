@@ -1288,6 +1288,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
     } else if ("documentinfo".equals(dad)) {
       if (this.strip.stripDocumentInfoPublication() && "publication".equals(elemName))
         return true;
+      if (this.strip.stripDocumentInfoVersions() && "versions".equals(elemName))
+        return true;
     } else if ("locator".equals(dad)) {
       if (this.strip.stripFragmentInfoLabels() && "labels".equals(elemName))
         return true;

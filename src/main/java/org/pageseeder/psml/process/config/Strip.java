@@ -11,13 +11,14 @@ package org.pageseeder.psml.process.config;
  * <p>Used to represent the inner ANT element:<p>
  * <pre>{@code<strip
  *             manifest="[true|false]"
- *             documentinfo="[all,docid,title,description,labels]"
+ *             documentinfo="[all,docid,title,description,labels,publication,versions]"
  *             fragmentinfo="[all,labels]"
  *             xrefs="[all,docid,uriid,notfound,unresolved]" />}</pre>
  *
  * <p>Details are:</p>
  * <ul>
- *   <li>documentinfo: Comma separated list of items to strip (i.e. all, docid, title, description, labels)
+ *   <li>documentinfo: Comma separated list of items to strip (i.e. all, docid, title,
+ *                     description, labels, publication, versions)
  *                     all strips {@code<documentinfo>} elements - default none.</li>
  *   <li>fragmentinfo: Comma separated list of items to strip (i.e. all, labels)
  *                     all strips {@code<fragmentinfo>} elements - default none. </li>
@@ -61,6 +62,11 @@ public class Strip {
    * Strip the documentinfo/publication element
    */
   private boolean stripDocumentInfoPublication = false;
+
+  /**
+   * Strip the documentinfo/versions element
+   */
+  private boolean stripDocumentInfoVersions = false;
 
   /**
    * Strip the documentinfo element
@@ -152,6 +158,13 @@ public class Strip {
    */
   public void setStripDocumentInfoPublication(boolean stripDocumentInfoPublication) {
     this.stripDocumentInfoPublication = stripDocumentInfoPublication;
+  }
+
+  /**
+   * @param stripDocumentInfoVersions the stripDocumentInfoVersions to set
+   */
+  public void setStripDocumentInfoVersions(boolean stripDocumentInfoVersions) {
+    this.stripDocumentInfoVersions = stripDocumentInfoVersions;
   }
 
   /**
@@ -271,6 +284,13 @@ public class Strip {
    */
   public boolean stripDocumentInfoPublication() {
     return this.stripDocumentInfoPublication;
+  }
+
+  /**
+   * @return the stripDocumentInfoVersions
+   */
+  public boolean stripDocumentInfoVersions() {
+    return this.stripDocumentInfoVersions;
   }
 
   /**
