@@ -10,6 +10,18 @@
       <displaytitle>Placeholders</displaytitle>
     </uri>
     <publication id="placeholders" hostid="1" rooturiid="21927" title="Placeholders" defaultgroupid="6849" type="default"/>
+    <versions>
+      <version id="5366695" name="2.0" created="2024-03-05T15:21:36+11:00">
+        <author id="123" firstname="John" surname="Smith">
+          <fullname>John Smith</fullname>
+        </author>
+      </version>
+      <version id="5366648" name="1.0" created="2024-03-05T15:21:19+11:00">
+        <author id="456" firstname="Jane" surname="Brown">
+          <fullname>Jane Brown</fullname>
+        </author>
+      </version>
+    </versions>
   </documentinfo>
   <metadata>
     <properties>

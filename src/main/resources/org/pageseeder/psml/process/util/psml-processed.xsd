@@ -1185,7 +1185,7 @@
             <xs:documentation>The author of the notes (optional for backward compatibility)</xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element name="content" maxOccurs="unbounded" type="xs:string">
+        <xs:element name="content" type="xs:string">
           <xs:annotation>
             <xs:documentation>The content of the notes</xs:documentation>
           </xs:annotation>

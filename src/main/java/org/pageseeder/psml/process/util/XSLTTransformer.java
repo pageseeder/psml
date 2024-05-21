@@ -116,7 +116,7 @@ public final class XSLTTransformer {
   /**
    * Perform the XSLT transformation.
    *
-   * @param psmlFiles the list of files to transform
+   * @param psmlFiles the map of destination relative path to files to transform
    * @param destinationFolder the destination folder, where the output will be saved
    *
    * @throws ProcessException if anything goes wrong
