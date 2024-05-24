@@ -766,7 +766,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.documentMetadata = null;
         // if metadata property, collect metadata
       } else if (isMetadataProperty && !this.inTranscludedContent && atts.getValue("name") != null &&
-          !"xref".equals(atts.getValue("datatype")) && !"markdown".equals(atts.getValue("datatype")) &&
+          (atts.getValue("datatype") == null || "text".equals(atts.getValue("datatype")) ||
+          "date".equals(atts.getValue("datatype")) || "datetime".equals(atts.getValue("datatype"))) &&
           (atts.getValue("count") == null || "1".equals(atts.getValue("count"))) &&
           atts.getValue("multiple") == null) {
         String value = atts.getValue("value") == null ? "" : atts.getValue("value");
