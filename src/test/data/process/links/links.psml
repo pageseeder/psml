@@ -2,7 +2,7 @@
 <document id="21940" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
   version="current" level="portable">
   <documentinfo>
-    <uri scheme="http" host="localhost" port="80"
+    <uri id="21940" scheme="http" host="localhost" port="80"
       path="/ps/test/local1/documents/process/content/links.psml"
       decodedpath="/ps/test/local1/documents/process/content/links.psml"
       external="false" mediatype="application/vnd.pageseeder.psml+xml"

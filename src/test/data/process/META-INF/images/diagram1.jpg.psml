@@ -16,5 +16,11 @@
     </reversexrefs>
   </documentinfo>
   <fragmentinfo />
-  <metadata />
+  <metadata>
+    <properties>
+      <property name="related" title="Related" datatype="xref">
+        <xref href="diagram%20space.jpg" uriid="219290" frag="default" type="alternate">diagram space.jpg</xref>
+      </property>
+    </properties>
+  </metadata>
 </document>

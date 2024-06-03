@@ -146,7 +146,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * The relative path of the parent folder (used to compute relative paths).
    */
-  private final String parentFolderRelativePath;
+  private String parentFolderRelativePath;
 
   /**
    * The source PSML file.
@@ -683,6 +683,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.uriCount = 1;
       this.allUriIDs.put(this.uriID, 1);
       addUriFragID(this.uriID, null, this.inEmbedHierarchy);
+    }
+    // if URL metadata document, set parent to root
+    String dad = this.elements.isEmpty() ? null : this.elements.peek();
+    if ("documentinfo".equals(dad) && "uri".equals(qName) &&
+            "true".equals(atts.getValue("external"))) {
+      this.parentFolderRelativePath = "";
     }
     // if pre-transcluded content update URI counts
     if (this.preXrefLevel == 1 && !this.inPreTranscluded) {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="219401" schemaversion="0.10" date="2017-06-23T16:41:37+10:00"
+  version="current" level="portable">
+  <documentinfo>
+    <uri id="219401" scheme="http" host="localhost" port="80"
+      path="/ps/test/local1/documents/process/content/link_related.psml"
+      decodedpath="/ps/test/local1/documents/process/content/link_related.psml"
+      external="false" mediatype="application/vnd.pageseeder.psml+xml"
+      title="Links">
+      <displaytitle>Link related</displaytitle>
+    </uri>
+  </documentinfo>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Link related</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <para>Related to links</para>
+    </fragment>
+  </section>
+</document>

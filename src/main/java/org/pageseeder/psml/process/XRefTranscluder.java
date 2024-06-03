@@ -293,7 +293,7 @@ public final class XRefTranscluder {
         String scheme = u.getProtocol();
         int port = u.getPort();
         if (port == -1) port = "https".equals(scheme) ? 443 : "http".equals(scheme) ? 80 : -1;
-        target = new File(this.parentHandler.getBinaryRepository(),
+        target = new File(this.parentHandler.getPSMLRoot(),
             "META-INF/_urls/" + scheme + '/' + u.getHost() + '/' + port + '/' + uriid + ".psml");
       } catch (MalformedURLException ex) {
         this.parentHandler.getLogger().error("Invalid link URL: " + ex.getMessage(), ex);
@@ -305,7 +305,7 @@ public final class XRefTranscluder {
       } else if (path.endsWith(".mml") || path.endsWith(".mathml") || path.endsWith(".tex")) {
         target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
       } else {
-        target = new File(this.parentHandler.getBinaryRepository(), "META-INF/" + dadPath + '/' + path + ".psml");
+        target = new File(this.parentHandler.getPSMLRoot(), "META-INF/" + dadPath + '/' + path + ".psml");
       }
       try {
         // must use canonical file as some parent folders may not exist under META-INF causing ".." to not resolve on Linux
