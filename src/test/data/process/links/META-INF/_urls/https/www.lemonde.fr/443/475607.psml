@@ -3,4 +3,7 @@
       <property name="author" title="Author" value="Emmanuel Rivière"/>
       <property name="published" title="Published time" value="2020-11-10T14:30:36+00:00"/>
       <property name="image" title="Image" value="https://img.lemde.fr/2020/11/10/460/0/5977/2981/1440/720/60/0/91498c0_619000410-gtred-2.jpg"/>
+      <property name="related" title="Related" datatype="xref">
+        <xref href="link_related.psml" uriid="219401" frag="default" type="alternate">Link related</xref>
+      </property>
     </properties></metadata></document>

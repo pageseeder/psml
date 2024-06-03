@@ -146,7 +146,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * The relative path of the parent folder (used to compute relative paths).
    */
-  private final String parentFolderRelativePath;
+  private String parentFolderRelativePath;
 
   /**
    * The source PSML file.
@@ -684,6 +684,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
       this.allUriIDs.put(this.uriID, 1);
       addUriFragID(this.uriID, null, this.inEmbedHierarchy);
     }
+    // if URL metadata document, set parent to root
+    String dad = this.elements.isEmpty() ? null : this.elements.peek();
+    if ("documentinfo".equals(dad) && "uri".equals(qName) &&
+            "true".equals(atts.getValue("external"))) {
+      this.parentFolderRelativePath = "";
+    }
     // if pre-transcluded content update URI counts
     if (this.preXrefLevel == 1 && !this.inPreTranscluded) {
       this.inPreTranscluded = true;
@@ -766,7 +772,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.documentMetadata = null;
         // if metadata property, collect metadata
       } else if (isMetadataProperty && !this.inTranscludedContent && atts.getValue("name") != null &&
-          !"xref".equals(atts.getValue("datatype")) && !"markdown".equals(atts.getValue("datatype")) &&
+          (atts.getValue("datatype") == null || "text".equals(atts.getValue("datatype")) ||
+          "date".equals(atts.getValue("datatype")) || "datetime".equals(atts.getValue("datatype"))) &&
           (atts.getValue("count") == null || "1".equals(atts.getValue("count"))) &&
           atts.getValue("multiple") == null) {
         String value = atts.getValue("value") == null ? "" : atts.getValue("value");

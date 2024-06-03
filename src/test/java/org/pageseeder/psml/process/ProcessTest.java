@@ -1141,6 +1141,7 @@ public class ProcessTest {
 
   @Test
   public void testProcessEmbedLinkMetadata() throws IOException, ProcessException {
+    String filename = "links.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
     p.setSrc(new File(SOURCE_FOLDER + "/links"));
@@ -1150,15 +1151,54 @@ public class ProcessTest {
     dest.mkdirs();
     p.setDest(dest);
     p.setEmbedLinkMetadata(true);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("alternate");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
     p.process();
 
     // check result
-    File result = new File(DEST_FOLDER + "/links.psml");
+    File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     Assert.assertThat(xml, hasXPath("(//link)[1]/document/documentinfo/uri/@id", equalTo("475607")));
     Assert.assertThat(xml, hasXPath("(//link)[2]/document/documentinfo/uri/@id", equalTo("475600")));
     Assert.assertThat(xml, hasXPath("(//link)[3]/document/documentinfo/uri/@id", equalTo("475609")));
     Assert.assertThat(xml, hasXPath("(//link)[4]/document/documentinfo/uri/@id", equalTo("475616")));
+    Assert.assertThat(xml, hasXPath("(//xref)[1]/document/documentinfo/uri/@id", equalTo("219401")));
+  }
+
+  @Test
+  public void testProcessEmbedLinkMetadataPre() throws IOException, ProcessException {
+    String filename = "links.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER + "/links"));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    p.setEmbedLinkMetadata(true);
+    XSLTTransformation xslt = new XSLTTransformation();
+    xslt.setXSLT(SOURCE_FOLDER + "/transform1.xsl");
+    p.setPreTransform(xslt);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("alternate");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//link)[1]/document/documentinfo/uri/@id", equalTo("475607")));
+    Assert.assertThat(xml, hasXPath("(//link)[2]/document/documentinfo/uri/@id", equalTo("475600")));
+    Assert.assertThat(xml, hasXPath("(//link)[3]/document/documentinfo/uri/@id", equalTo("475609")));
+    Assert.assertThat(xml, hasXPath("(//link)[4]/document/documentinfo/uri/@id", equalTo("475616")));
+    Assert.assertThat(xml, hasXPath("(//xref)[1]/document/documentinfo/uri/@id", equalTo("219401")));
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[2]", equalTo("x")));
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[3]", equalTo("x")));
   }
 
   @Test
@@ -1657,6 +1697,45 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//placeholder)[33]", equalTo("my prop3")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[34]", equalTo("my prop4")));
     Assert.assertThat(xml, hasXPath("(//placeholder)[35]", equalTo("my prop5")));
+  }
+
+  @Test
+  public void testPreTransform() throws IOException, ProcessException {
+    String path1 = "content/content_2.psml";
+    String path2 = "META-INF/images/diagram1.jpg.psml";
+    String path3 = "images.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XSLTTransformation xslt = new XSLTTransformation();
+    xslt.setXSLT(SOURCE_FOLDER + "/transform1.xsl");
+    p.setPreTransform(xslt);
+    Images img = new Images();
+    img.setEmbedMetadata(true);
+    p.setImages(img);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("alternate");
+    xrefs.setIncludes(path3);
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + path1);
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//heading)[1]/@level", equalTo("3")));
+    result = new File(DEST_FOLDER + "/" + path2);
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
+    result = new File(DEST_FOLDER + "/" + path3);
+    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[2]", equalTo("x")));
+    Assert.assertThat(xml, hasXPath("(//displaytitle)[3]", equalTo("x")));
   }
 
   @Test
