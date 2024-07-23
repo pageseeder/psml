@@ -104,7 +104,7 @@ public class TexConverter {
 
     // load script
     ScriptEngineManager manager = new ScriptEngineManager();
-    ScriptEngine engine = manager.getEngineByName("javascript");
+    ScriptEngine engine = manager.getEngineByName("rhino");
     Compilable cengine = (Compilable) engine;
 
     // evaluate JavaScript code
