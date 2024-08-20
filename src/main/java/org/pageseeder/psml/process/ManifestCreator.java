@@ -3,15 +3,17 @@
  */
 package org.pageseeder.psml.process;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.pageseeder.psml.process.config.ManifestDocument;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
@@ -29,7 +31,12 @@ public final class ManifestCreator {
   /**
    * The UTF-8 charset
    */
-  private static final Charset UTF8 = Charset.forName("UTF-8");
+  private static final Charset UTF8 = StandardCharsets.UTF_8;
+
+  /**
+   * For finding URI ID in a PSML document
+   */
+  private static final Pattern PSML_URIID = Pattern.compile("<document[^>]+id=\"(\\d+)\"");
 
   /**
    * How the xrefs are processed
@@ -121,12 +128,30 @@ public final class ManifestCreator {
         manifestStream.write("    <xref-fragment id=\"xrefs\">\n".getBytes(UTF8));
         // add all xrefs
         for (String path : toInclude) {
-          String name = psmlFiles.get(path).getName();
+          File file = psmlFiles.get(path);
+          String uriid = null;
+          // get URI ID
+          try (BufferedReader in = Files.newBufferedReader(file.toPath(), UTF8)) {
+            char[] buffer = new char[200];
+            int charsRead = in.read(buffer);
+            if (charsRead != -1) {
+              String content = new String(buffer, 0, charsRead);
+              Matcher m = PSML_URIID.matcher(content);
+              if (m.find()) {
+                uriid = m.group(1);
+              }
+            }
+          } catch (IOException ex) {
+            this.logger.error("Failed to read PSML file " + path, ex);
+          }
           manifestStream.write(("      <blockxref type=\"embed\"").getBytes(UTF8));
           manifestStream.write((" href=\""+path+"\"").getBytes(UTF8));
           manifestStream.write((" frag=\"default\"").getBytes(UTF8));
-          manifestStream.write((" reverselink=\"false\" ").getBytes(UTF8));
-          manifestStream.write((">"+name+"</blockxref>\n").getBytes(UTF8));
+          manifestStream.write((" reverselink=\"false\"").getBytes(UTF8));
+          if (uriid != null) {
+            manifestStream.write((" uriid=\""+uriid+"\"").getBytes(UTF8));
+          }
+          manifestStream.write((">"+file.getName()+"</blockxref>\n").getBytes(UTF8));
         }
         manifestStream.write("    </xref-fragment>\n".getBytes(UTF8));
         manifestStream.write("  </section>\n".getBytes(UTF8));

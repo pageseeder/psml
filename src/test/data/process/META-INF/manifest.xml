@@ -1,1 +1,41 @@
-<uris><uri id="21927" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/ref_1.psml" decodedpath="/ps/test/local1/documents/process/ref_1.psml" external="false" mediatype="application/vnd.pageseeder.psml+xml" documenttype="references" created="2017-06-23T16:30:12+10:00" modified="2017-06-23T16:39:57+10:00" title="Ref 1"><displaytitle>Ref 1</displaytitle></uri><uri id="21930" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/content/content_1.psml" decodedpath="/ps/test/local1/documents/process/content/content_1.psml" external="false" mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:31:36+10:00" modified="2017-06-23T16:41:37+10:00" title="Content 1"><displaytitle>Content 1</displaytitle></uri><uri id="21931" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/content/content_2.psml" decodedpath="/ps/test/local1/documents/process/content/content_2.psml" external="false" mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:31:56+10:00" modified="2017-06-23T16:35:34+10:00" title="Content 2"><displaytitle>Content 2</displaytitle></uri><uri id="21934" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/content/content_3.psml" decodedpath="/ps/test/local1/documents/process/content/content_3.psml" external="false" mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:38:25+10:00" modified="2017-06-23T16:41:37+10:00" title="Content 3"><displaytitle>Content 3</displaytitle></uri><uri id="21926" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/ref_0.psml" decodedpath="/ps/test/local1/documents/process/ref_0.psml" external="false" mediatype="application/vnd.pageseeder.psml+xml" documenttype="references" created="2017-06-23T16:29:51+10:00" modified="2017-06-23T16:41:37+10:00" title="Ref 0"><displaytitle>Ref 0</displaytitle></uri><uri id="21928" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/ref_2.psml" decodedpath="/ps/test/local1/documents/process/ref_2.psml" external="false" mediatype="application/vnd.pageseeder.psml+xml" documenttype="references" created="2017-06-23T16:30:37+10:00" modified="2017-06-23T16:33:52+10:00" title="Ref 2"><displaytitle>Ref 2</displaytitle></uri></uris>
+<uris>
+    <uri id="21927" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/ref_1.psml"
+         decodedpath="/ps/test/local1/documents/process/ref_1.psml" external="false"
+         mediatype="application/vnd.pageseeder.psml+xml" documenttype="references" created="2017-06-23T16:30:12+10:00"
+         modified="2017-06-23T16:39:57+10:00" title="Ref 1">
+        <displaytitle>Ref 1</displaytitle>
+    </uri>
+    <uri id="21930" scheme="http" host="localhost" port="80"
+         path="/ps/test/local1/documents/process/content/content_1.psml"
+         decodedpath="/ps/test/local1/documents/process/content/content_1.psml" external="false"
+         mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:31:36+10:00"
+         modified="2017-06-23T16:41:37+10:00" title="Content 1">
+        <displaytitle>Content 1</displaytitle>
+    </uri>
+    <uri id="21931" scheme="http" host="localhost" port="80"
+         path="/ps/test/local1/documents/process/content/content_2.psml"
+         decodedpath="/ps/test/local1/documents/process/content/content_2.psml" external="false"
+         mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:31:56+10:00"
+         modified="2017-06-23T16:35:34+10:00" title="Content 2">
+        <displaytitle>Content 2</displaytitle>
+    </uri>
+    <uri id="21934" scheme="http" host="localhost" port="80"
+         path="/ps/test/local1/documents/process/content/content_3.psml"
+         decodedpath="/ps/test/local1/documents/process/content/content_3.psml" external="false"
+         mediatype="application/vnd.pageseeder.psml+xml" created="2017-06-23T16:38:25+10:00"
+         modified="2017-06-23T16:41:37+10:00" title="Content 3">
+        <displaytitle>Content 3</displaytitle>
+    </uri>
+    <uri id="21926" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/ref_0.psml"
+         decodedpath="/ps/test/local1/documents/process/ref_0.psml" external="false"
+         mediatype="application/vnd.pageseeder.psml+xml" documenttype="references" created="2017-06-23T16:29:51+10:00"
+         modified="2017-06-23T16:41:37+10:00" title="Ref 0">
+        <displaytitle>Ref 0</displaytitle>
+    </uri>
+    <uri id="21928" scheme="http" host="localhost" port="80" path="/ps/test/local1/documents/process/ref_2.psml"
+         decodedpath="/ps/test/local1/documents/process/ref_2.psml" external="false"
+         mediatype="application/vnd.pageseeder.psml+xml" documenttype="references" created="2017-06-23T16:30:37+10:00"
+         modified="2017-06-23T16:33:52+10:00" title="Ref 2">
+        <displaytitle>Ref 2</displaytitle>
+    </uri>
+</uris>
