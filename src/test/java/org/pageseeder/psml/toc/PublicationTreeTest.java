@@ -939,7 +939,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-1-3-2",null,"1.2.",3,"0.1.2.");
     assertHasPrefix(prefixes,"1000-1-3a-1","1.2.","(a)",8,"0.1.2.0.0.0.0.1.");
     assertHasPrefix(prefixes,"1000-1-3b-1","1.2.(a)","(i)",9,"0.1.2.0.0.0.0.1.1.");
-    assertHasPrefix(prefixes,"1000-1-3c-1","1.2.(a)(i)","(A)",10,"0.1.2.0.0.0.0.1.1.1.");
+    assertHasPrefix(prefixes,"1000-1-3c-1","1.2.(a)(i)","[A]",10,"0.1.2.0.0.0.0.1.1.1.");
     assertHasPrefix(prefixes,"1000-1-3d-1","1.2.","(b)",8,"0.1.2.0.0.0.0.2.");
     assertHasPrefix(prefixes,"1000-1-4-2",null,"1.3.",3,"0.1.3.");
     assertHasPrefix(prefixes,"1000-1-5-1",null,"1.3.1.",4,"0.1.3.1.");
@@ -952,7 +952,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-2-3-2",null,"1.3.2.2.",5,"0.1.3.2.2.");
     assertHasPrefix(prefixes,"1000-2-3a-1","1.3.2.2.","(a)",8,"0.1.3.2.2.0.0.1.");
     assertHasPrefix(prefixes,"1000-2-3b-1","1.3.2.2.(a)","(i)",9,"0.1.3.2.2.0.0.1.1.");
-    assertHasPrefix(prefixes,"1000-2-3c-1","1.3.2.2.(a)(i)","(A)",10,"0.1.3.2.2.0.0.1.1.1.");
+    assertHasPrefix(prefixes,"1000-2-3c-1","1.3.2.2.(a)(i)","[A]",10,"0.1.3.2.2.0.0.1.1.1.");
     assertHasPrefix(prefixes,"1000-2-3d-1","1.3.2.2.","(b)",8,"0.1.3.2.2.0.0.2.");
     assertHasPrefix(prefixes,"1000-2-4-2",null,"1.3.2.3.",5,"0.1.3.2.3.");
     assertHasPrefix(prefixes,"1000-2-5-1",null,"1.3.2.3.1.",6,"0.1.3.2.3.1.");
