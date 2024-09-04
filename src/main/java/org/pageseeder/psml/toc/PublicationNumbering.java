@@ -127,7 +127,7 @@ public final class PublicationNumbering {
   }
 
   /** A pattern for all schemes */
-  private static final Pattern SCHEME_PATTERN = Pattern.compile("\\[(.*?)([0-9]+)(.*?)\\]");
+  private static final Pattern SCHEME_PATTERN = Pattern.compile("\\[(.*?)([0-9]+)(.*?)\\](?![\\]])");
   /** A pattern for canonical labels */
   private static final Pattern CANONICAL_PATTERN = Pattern.compile("(\\d+)\\.");
   /** The lowercase alphabet, for convenience */

@@ -16,7 +16,7 @@
       <scheme level="7" type="decimal" format=""                         element="any"/>
       <scheme level="8" type="loweralpha" format="[(8)]"                 element="para"/>
       <scheme level="9" type="lowerroman" format="[(9)]"                 element="para" />
-      <scheme level="10" type="upperalpha" format="[(10)]"               element="para" />
+      <scheme level="10" type="upperalpha" format="[[10]]"               element="para" />
       <scheme level="11" type="upperroman" format="[(11)]"               element="para"/>
       <scheme level="12" type="loweralpha" format="[12]"                 element="para"/>
     </schemes>

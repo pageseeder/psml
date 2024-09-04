@@ -144,6 +144,68 @@ public class ProcessTest {
   }
 
   @Test
+  public void testManifestDoc() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "mymanifest";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setSrc(copy);
+    p.setDest(dest);
+    ManifestDocument doc = new ManifestDocument();
+    doc.setFilename(filename);
+    doc.setExcludes("META-INF/**,*/META-INF/**");
+    p.setManifestDoc(doc);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename + ".psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref)", equalTo("27")));
+  }
+
+  @Test
+  public void testManifestDocXrefs() throws IOException, ProcessException {
+    // make a copy of source docs so they can be moved
+    File src = new File(SOURCE_FOLDER);
+    File copy = new File(COPY_FOLDER);
+    if (copy.exists())
+      FileUtils.deleteDirectory(copy);
+    FileUtils.copyDirectory(src, copy);
+    // process
+    String filename = "mymanifest";
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    Process p = new Process();
+    p.setSrc(copy);
+    p.setDest(dest);
+    ManifestDocument doc = new ManifestDocument();
+    doc.setFilename(filename);
+    doc.setIncludes("content/**");
+    p.setManifestDoc(doc);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed");
+    xrefs.setIncludes(filename +".psml");
+    p.setXrefs(xrefs);
+    p.process();
+
+    // check result
+    File result = new File(DEST_FOLDER + "/" + filename + ".psml");
+    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    Assert.assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref/document)", equalTo("6")));
+  }
+
+  @Test
   public void testStripDocumentInfo() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
