@@ -1212,8 +1212,8 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("HEADINGS\n" + headings);
-    Assert.assertEquals("Test doc 1", fheadings.get("1"));
-    Assert.assertEquals("My link", fheadings.get("3"));
+    Assert.assertEquals("Test <inline name=\"test\">doc <sup>1</sup></inline>", fheadings.get("1"));
+    Assert.assertEquals("My &lt; &amp; > link", fheadings.get("3"));
     Assert.assertEquals("Default d5", fheadings.get("6"));
     Assert.assertEquals("https://pageseeder.org/", fheadings.get("7"));
     Assert.assertEquals("Related", fheadings.get("content"));

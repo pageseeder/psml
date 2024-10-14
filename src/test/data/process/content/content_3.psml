@@ -34,7 +34,7 @@
   <metadata />
   <section id="title">
     <fragment id="1">
-      <heading level="1" numbered="true">Content 3</heading>
+      <heading level="1" numbered="true">Content <sup>3</sup></heading>
     </fragment>
   </section>
   <section id="content">

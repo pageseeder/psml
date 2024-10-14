@@ -24,7 +24,7 @@
   <metadata />
   <section id="title">
     <fragment id="1">
-      <heading level="1">Test doc 1</heading>
+      <heading level="1"><xref frag="1" uriid="123" href="123.psml">Test</xref> <image src="test.jpg"/><inline name="test">doc <sup>1</sup></inline></heading>
     </fragment>
   </section>
   <section id="content">
@@ -55,7 +55,7 @@
     <title>Related</title>
     <xref-fragment id="2"/>
     <properties-fragment id="3">
-      <property name="link-text" title="Link text" value="My link" />
+      <property name="link-text" title="Link text" value="My &lt; &amp; &gt; link" />
     </properties-fragment>
     <fragment id="4">
       <para indent="1">Ignore <xref id="1208156" frag="1" reversefrag="1-1" reversetitle="This section describes the functional re…" reverselink="true" reversetype="none" display="document" config="asciimath" type="math" uriid="348835" href="_local/documents/asciimath/asciimath-009.psml" urititle="Simple" mediatype="application/vnd.pageseeder.psml+xml" documenttype="asciimath">

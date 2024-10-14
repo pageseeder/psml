@@ -4,6 +4,9 @@
 package org.pageseeder.psml.toc;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.xmlwriter.XML;
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.slf4j.Logger;
@@ -267,12 +270,18 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param treeid    the URI ID for the document tree
    * @param fragment  the fragment ID.
    *
-   * @return the heading text or <code>null</code> if none found
+   * @return the heading text which could include markup or <code>null</code> if none found
    */
   public @Nullable String getFragmentHeading(long treeid, String fragment) {
     DocumentTree t = tree(treeid);
     if (t == null) return null;
-    return t.fragmentheadings().get(fragment);
+    String h = t.fragmentheadings().get(fragment);
+    if (h == null) return null;
+    if (t.xmlheadings()) {
+      return h;
+    } else {
+      return XMLUtils.escape(h);
+    }
   }
 
   /**

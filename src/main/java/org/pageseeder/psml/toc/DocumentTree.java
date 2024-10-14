@@ -124,6 +124,10 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    */
   private final Map<String,String> _fragmentheadings;
 
+  /**
+   * Whether the _fragmentheadings are unescaped XML (may be <code>null</code> for old cached trees)
+   */
+  private final Boolean _xmlheadings;
 
   /**
    * Map of fragment ID to the level of the fragment (level of closest preceding heading),
@@ -163,6 +167,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     this._lastedited = lastedited;
     this._path = path;
     this._fragmentheadings = Collections.unmodifiableMap(fragmentheadings);
+    this._xmlheadings = true;
     this._fragmentlevels = Collections.unmodifiableMap(fragmentlevels);
   }
 
@@ -257,6 +262,12 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     return Collections.unmodifiableMap(this._fragmentheadings);
   }
 
+  /**
+   * @return Whether the _fragmentheadings are unescaped XML
+   */
+  public boolean xmlheadings() {
+    return this._xmlheadings == null ? false : this._xmlheadings;
+  }
 
   /**
    * @return Map of fragment ID to the level of the fragment

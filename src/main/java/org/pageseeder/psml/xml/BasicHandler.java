@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.pageseeder.xmlwriter.XML;
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -65,6 +67,11 @@ public abstract class BasicHandler<T> extends Handler<T> {
   private @Nullable StringBuilder buffer = null;
 
   /**
+   * The buffer when capturing text and character markup (except <image> and <xref>).
+   */
+  private @Nullable XMLStringWriter xmlBuffer = null;
+
+  /**
    * The locator if supplied by the SAX implementation.
    */
   private @Nullable Locator locator = null;
@@ -82,8 +89,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
    * @param element The name of the element
    * @param atts The attributes attached to this element.
    */
-  public void startElement(String element, Attributes atts) {
-  }
+  public void startElement(String element, Attributes atts) {}
 
   /**
    * Method called after the SAX {@link #endElement(String, String, String)} is
@@ -98,8 +104,14 @@ public abstract class BasicHandler<T> extends Handler<T> {
 
   @Override
   public final void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-    String element = localName.length() == 0? qName : localName;
+    String element = localName.length() == 0 ? qName : localName;
     this.ancestorOrSelf.add(element);
+    if (this.xmlBuffer != null && !element.equals("xref") && !element.equals("image")) {
+      this.xmlBuffer.openElement(element);
+      for (int i = 0; i < attributes.getLength(); i++) {
+        this.xmlBuffer.attribute(attributes.getLocalName(i), attributes.getValue(i));
+      }
+    }
     try {
       startElement(element, attributes);
     } catch (AttributeException ex) {
@@ -110,10 +122,13 @@ public abstract class BasicHandler<T> extends Handler<T> {
 
   @Override
   public final void endElement(String uri, String localName, String qName) throws SAXException {
-    String element = localName.length() == 0? qName : localName;
+    String element = localName.length() == 0 ? qName : localName;
     endElement(element);
     if (!this.ancestorOrSelf.isEmpty()) {
       this.ancestorOrSelf.remove(this.ancestorOrSelf.size()-1);
+    }
+    if (this.xmlBuffer != null && !element.equals("xref") && !element.equals("image")) {
+      this.xmlBuffer.closeElement();
     }
   }
 
@@ -125,6 +140,10 @@ public abstract class BasicHandler<T> extends Handler<T> {
     StringBuilder b = this.buffer;
     if (b != null) {
       b.append(ch, start, length);
+    }
+    XMLStringWriter x = this.xmlBuffer;
+    if (x != null) {
+      x.writeText(ch, start, length);
     }
   }
 
@@ -176,6 +195,33 @@ public abstract class BasicHandler<T> extends Handler<T> {
     String text = buffer();
     if (clear) {
       this.buffer = null;
+    }
+    return text;
+  }
+
+  /**
+   * Initialises the heading buffer to capture text and character markup (except <image> and <xref>).
+   *
+   * Use this in the {@link #startElement(String, Attributes)} method when the element starts.
+   */
+  protected final void newXmlBuffer() {
+    this.xmlBuffer = new XMLStringWriter(XML.NamespaceAware.No);
+  }
+
+  /**
+   * Returns the content of the XML buffer as a string an optionally reset it.
+   *
+   * @param clear <code>true</code> to clear the content of the XML buffer as well.
+   *
+   * @return the content of the current buffer as an XML string.
+   */
+  @Nullable
+  protected final String xmlBuffer(boolean clear) {
+    if (this.xmlBuffer == null) return null;
+    this.xmlBuffer.flush();
+    String text = this.xmlBuffer.toString();
+    if (clear) {
+      this.xmlBuffer = null;
     }
     return text;
   }
