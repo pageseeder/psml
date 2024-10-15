@@ -67,7 +67,8 @@ public abstract class BasicHandler<T> extends Handler<T> {
   private @Nullable StringBuilder buffer = null;
 
   /**
-   * The buffer when capturing text and character markup (except <image> and <xref>).
+   * The buffer when capturing text and character markup
+   * (except elements image, xref and placeholder/@resolved).
    */
   private @Nullable XMLStringWriter xmlBuffer = null;
 
@@ -109,7 +110,9 @@ public abstract class BasicHandler<T> extends Handler<T> {
     if (this.xmlBuffer != null && !element.equals("xref") && !element.equals("image")) {
       this.xmlBuffer.openElement(element);
       for (int i = 0; i < attributes.getLength(); i++) {
-        this.xmlBuffer.attribute(attributes.getLocalName(i), attributes.getValue(i));
+        String name = attributes.getLocalName(i);
+        if ("placeholder".equals(element) && "resolved".equals(name)) continue;
+        this.xmlBuffer.attribute(name, attributes.getValue(i));
       }
     }
     try {
