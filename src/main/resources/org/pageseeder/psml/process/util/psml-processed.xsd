@@ -2033,6 +2033,7 @@
         The content is INFORMATIONAL - ignored by upload as the link display text is generated.</xs:documentation>
     </xs:annotation>
     <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:group ref="character-style-group" />
       <xs:element ref="document" />
       <xs:element ref="locator" />
       <xs:element ref="fragment" />

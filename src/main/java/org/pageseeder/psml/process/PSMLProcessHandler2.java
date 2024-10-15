@@ -8,6 +8,8 @@ import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.psml.toc.PublicationConfig;
+import org.pageseeder.xmlwriter.XML;
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.pageseeder.xmlwriter.XMLWriterImpl;
 import org.slf4j.Logger;
@@ -184,7 +186,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
   private int previousheadingLevel = 0;
 
   /**
-   * The resolved title when inside an <xref display="template" title="[{prefix}|{heading}|{parentnumber}]">,
+   * The resolved title as XML when inside an <xref display="template" title="[{prefix}|{heading}|{parentnumber}]">,
    * otherwise <code>null</code>.
    */
   private String resolvedXRefTemplate = null;
@@ -556,14 +558,13 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           if (prefix == null) prefix = this.numberingAndTOC.fragmentNumbering().getPrefix(
                   targeturiid, this.xrefTargetPosition, targetfrag, 2);
           String newPrefix       = prefix == null ? null : prefix.value;
-          DocumentTree tree      = this.numberingAndTOC.publicationTree().tree(targeturiid);
-          String newHeading      = tree == null ? null : tree.fragmentheadings().get(targetfrag);
+          String newHeading      = this.numberingAndTOC.publicationTree().getFragmentHeading(targeturiid, targetfrag);
           String newParentNumber = prefix == null ? null : prefix.parentNumber;
 
           // set content and title attribute
-          this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : newPrefix)
+          this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : XMLUtils.escape(newPrefix))
                                          .replaceAll("\\{heading}",      newHeading      == null ? "?" : newHeading)
-                                         .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : newParentNumber);
+                                         .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : XMLUtils.escape(newParentNumber));
         }
       }
     }
@@ -585,12 +586,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         // if xref has changed but no diffx elements then add some to flag the change
         if (this.xrefElementChange == DiffType.CHANGE && this.insideDiffElement == null) {
           this.xml.write("<dfx:ins>");
-          this.xml.write(XMLUtils.escape(this.resolvedXRefTemplate));
+          this.xml.write(this.resolvedXRefTemplate);
           this.xml.write("</dfx:ins>");
           // it's difficult to find the previous template value so just output x.
           this.xml.write("<dfx:del>x</dfx:del>");
         } else {
-          this.xml.write(XMLUtils.escape(this.resolvedXRefTemplate));
+          this.xml.write(this.resolvedXRefTemplate);
         }
       } catch (IOException ex) {
         throw new SAXException("Failed to write text", ex);

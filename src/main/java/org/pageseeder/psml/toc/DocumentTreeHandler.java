@@ -4,7 +4,10 @@
 package org.pageseeder.psml.toc;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.xml.BasicHandler;
+import org.pageseeder.xmlwriter.XML;
+import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.xml.sax.Attributes;
 
 import java.time.OffsetDateTime;
@@ -204,7 +207,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     } else if (isElement("heading") || (isElement("title") && isParent("section"))) {
       startHeading(attributes);
     } else if ((isElement("xref") || isElement("link")) && isParent("property")) {
-      newBuffer();
+      newXmlBuffer();
     } else if (isElement("property")) {
       startProperty(attributes);
     } else if (isElement("para")) {
@@ -259,6 +262,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     }
 
     newBuffer();
+    newXmlBuffer();
     this.currentHeading = heading;
   }
 
@@ -391,8 +395,8 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     String value = attributes.getValue("value");
     if (value != null && !value.isEmpty()) {
       if (this.firstHeading) {
-        // set first property value as heading
-        this._tree.putFragmentHeading(this.fragment, value);
+        // set first property value (escaped for XML) as heading
+        this._tree.putFragmentHeading(this.fragment, XMLUtils.escape(value));
         this.firstHeading = false;
       }
     }
@@ -414,21 +418,22 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       // Set the title of the current part (top of stack)
       Heading heading = this.currentHeading;
       if (heading != null) {
+        String xmltitle = xmlBuffer(true);
+        if (xmltitle != null && this.firstHeading) {
+          this._tree.putFragmentHeading(this.fragment, xmltitle);
+          this.firstHeading = false;
+        }
         String title = buffer(true);
         if (title != null) {
           heading = heading.title(title);
-          if (this.firstHeading) {
-            this._tree.putFragmentHeading(this.fragment, title);
-            this.firstHeading = false;
-          }
         }
         this._expander.add(heading);
       }
     } else if ((isElement("xref") || isElement("link")) && isParent("property")) {
-      String title = buffer(true);
-      if (title != null) {
+      String xmltitle = xmlBuffer(true);
+      if (xmltitle != null) {
         if (this.firstHeading) {
-          this._tree.putFragmentHeading(this.fragment, title);
+          this._tree.putFragmentHeading(this.fragment, xmltitle);
           this.firstHeading = false;
         }
       }

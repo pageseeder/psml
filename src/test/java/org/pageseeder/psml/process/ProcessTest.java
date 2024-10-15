@@ -790,6 +790,7 @@ public class ProcessTest {
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    //System.out.println(xml);
     // validate
     Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     // test xpaths
@@ -843,20 +844,23 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//heading)[22][@prefix='3.1.5.'][@level='3']/@id",   equalTo("219350-2-1-3")));
     Assert.assertThat(xml, hasXPath("(//heading)[23][@prefix='4.'][@level='1']/@id",       equalTo("21926-1-3-3")));
     Assert.assertThat(xml, hasXPath("count(//para[@numbered='true'])", equalTo("7")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[1][@indent=4]/@prefix",    equalTo("1.2.1.1.")));
+    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[1][@indent=4]/@prefix",    equalTo("1.2.1.1&")));
     Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[2][@indent=8]/@prefix",    equalTo("(I)")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[3][@indent=4]/@prefix",    equalTo("3.1.1.1.")));
+    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[3][@indent=4]/@prefix",    equalTo("3.1.1.1&")));
     Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[4][@indent=5]/@prefix",    equalTo("(a)")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[5][@indent=4]/@prefix",    equalTo("3.1.3.2.")));
+    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[5][@indent=4]/@prefix",    equalTo("3.1.3.2&")));
     Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[6][@indent=5]/@prefix",    equalTo("(a)")));
     Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[7]/@prefix",               equalTo("")));
     Assert.assertThat(xml, hasXPath("count(//xref[@display='template'])",     equalTo("7")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[1]",       equalTo("Parentnumber 2.1.1.1.(a) Prefix (i)")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[1]",       equalTo("Parentnumber 2.1.1.1&(a) Prefix (i)")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[2]/@type", equalTo("alternate")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]",       equalTo("1.2.1. Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]",       equalTo("2.1.1.1.(a)(i)(A) Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[5]",       equalTo("2.1.1.1.(a)(i)(A)(I)")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]",       equalTo("2.1.1.1.(a)(i)(A) Content 3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]/sup",   equalTo("3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]",       equalTo("2.1.1.1&(a)(i)(A) Content 3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]/sup",   equalTo("3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[5]",       equalTo("2.1.1.1&(a)(i)(A)(I)")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]",       equalTo("2.1.1.1&(a)(i)(A) Content 3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]/sup",   equalTo("3")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[7]",       equalTo("1.3.2 Accounts")));
   }
 
@@ -946,9 +950,12 @@ public class ProcessTest {
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[1]",       equalTo("Parentnumber  Prefix 5.1.2.")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[2]/@type", equalTo("alternate")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]",       equalTo("2. Content 3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]/sup",   equalTo("3")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]",       equalTo("5.1.3. Content 3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]/sup",   equalTo("3")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[5]",       equalTo("5.1.4.")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]",       equalTo("5.1.3. Content 3")));
+    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]/sup",   equalTo("3")));
     Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[7]",       equalTo("1.3.2 Accounts")));
   }
 
