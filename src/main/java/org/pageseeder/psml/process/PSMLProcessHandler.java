@@ -43,6 +43,10 @@ import java.util.*;
 public final class PSMLProcessHandler extends DefaultHandler {
 
   /**
+   * Check depth message
+   */
+  private static final String CHECK_DEPTH = " (check export depth): ";
+  /**
    * The logger object
    */
   private Logger logger = null;
@@ -1141,7 +1145,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if (this.logXRefNotFound) {
         String href = atts.getValue("href");
         this.logger.error(
-            "XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
       }
       if ("blockxref".equals(qName))
         write("<para>");
@@ -1236,13 +1240,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
     } catch (XRefNotFoundException ex) {
       if (this.logXRefNotFound && this.failOnError)
         throw new SAXException(
-            "XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
       else if (this.logXRefNotFound)
         this.logger.error(
-            "XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
       else
         this.logger
-            .warn("XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            .warn("XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
     } catch (ProcessException ex) {
       if (this.failOnError)
         throw new SAXException("Failed to resolve XRef reference " + href + ": " + ex.getMessage(),
