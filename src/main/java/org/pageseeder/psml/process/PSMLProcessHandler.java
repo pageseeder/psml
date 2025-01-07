@@ -943,20 +943,25 @@ public final class PSMLProcessHandler extends DefaultHandler {
       return;
     }
     // convert ascii?
-    if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
-      write("<xref frag=\"media\" type=\"math\" config=\"mathml\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
-      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
-      write("</media-fragment></xref>");
-      this.convertContent = null;
-      return;
-    } else if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
-      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
-      write("</media-fragment>");
-      this.convertContent = null;
-      if (this.fragmentToLoad != null) {
-        this.inRequiredFragment = false;
+    try {
+      if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
+        write("<xref frag=\"media\" type=\"math\" config=\"mathml\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
+        write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
+        write("</media-fragment></xref>");
+        this.convertContent = null;
+        return;
+      } else if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
+        write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
+        write("</media-fragment>");
+        this.convertContent = null;
+        if (this.fragmentToLoad != null) {
+          this.inRequiredFragment = false;
+        }
+        return;
       }
-      return;
+    } catch (IllegalArgumentException ex) {
+      // Add filename for math conversion debugging
+      throw new IllegalArgumentException("File " + this.sourceFile.getName() + ": " + ex.getMessage());
     }
     // handle markdown
     if (this.convertMarkdown && (uri == null || uri.isEmpty()) && "markdown".equals(qName) && this.convertContent != null) {

@@ -75,8 +75,7 @@ public final class Loader {
       SAXParser parser = this.factory.newSAXParser();
       parser.parse(source, handler);
     } catch (SAXException | ParserConfigurationException ex) {
-      // TODO Auto-generated catch block
-      ex.printStackTrace();
+      throw new IOException(ex);
     }
     PSMLElement element = handler.result;
     return element;
