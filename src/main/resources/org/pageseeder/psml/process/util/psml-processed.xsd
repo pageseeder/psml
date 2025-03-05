@@ -165,6 +165,11 @@
           <xs:documentation>Whether or not the section can be edited via the interface.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="deleted" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>If 'true' this section was deleted (used for combined diffx compare only).</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
 

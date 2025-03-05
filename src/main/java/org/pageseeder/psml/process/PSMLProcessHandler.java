@@ -43,6 +43,10 @@ import java.util.*;
 public final class PSMLProcessHandler extends DefaultHandler {
 
   /**
+   * Check depth message
+   */
+  private static final String CHECK_DEPTH = " (check export depth): ";
+  /**
    * The logger object
    */
   private Logger logger = null;
@@ -939,20 +943,25 @@ public final class PSMLProcessHandler extends DefaultHandler {
       return;
     }
     // convert ascii?
-    if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
-      write("<xref frag=\"media\" type=\"math\" config=\"mathml\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
-      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
-      write("</media-fragment></xref>");
-      this.convertContent = null;
-      return;
-    } else if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
-      write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
-      write("</media-fragment>");
-      this.convertContent = null;
-      if (this.fragmentToLoad != null) {
-        this.inRequiredFragment = false;
+    try {
+      if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "inline".equals(qName) && this.convertContent != null) {
+        write("<xref frag=\"media\" type=\"math\" config=\"mathml\"><media-fragment id=\"media\" mediatype=\"application/mathml+xml\">");
+        write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
+        write("</media-fragment></xref>");
+        this.convertContent = null;
+        return;
+      } else if ((this.convertAsciiMath || this.convertTex) && (uri == null || uri.isEmpty()) && "media-fragment".equals(qName) && this.convertContent != null) {
+        write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
+        write("</media-fragment>");
+        this.convertContent = null;
+        if (this.fragmentToLoad != null) {
+          this.inRequiredFragment = false;
+        }
+        return;
       }
-      return;
+    } catch (IllegalArgumentException ex) {
+      // Add filename for math conversion debugging
+      throw new IllegalArgumentException("File " + this.sourceFile.getName() + ": " + ex.getMessage());
     }
     // handle markdown
     if (this.convertMarkdown && (uri == null || uri.isEmpty()) && "markdown".equals(qName) && this.convertContent != null) {
@@ -1141,7 +1150,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if (this.logXRefNotFound) {
         String href = atts.getValue("href");
         this.logger.error(
-            "XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
       }
       if ("blockxref".equals(qName))
         write("<para>");
@@ -1236,13 +1245,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
     } catch (XRefNotFoundException ex) {
       if (this.logXRefNotFound && this.failOnError)
         throw new SAXException(
-            "XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
       else if (this.logXRefNotFound)
         this.logger.error(
-            "XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
       else
         this.logger
-            .warn("XRef target not found in URI " + this.uriID + (href != null ? ": " + href : ""));
+            .warn("XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
     } catch (ProcessException ex) {
       if (this.failOnError)
         throw new SAXException("Failed to resolve XRef reference " + href + ": " + ex.getMessage(),

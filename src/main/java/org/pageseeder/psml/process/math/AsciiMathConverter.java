@@ -45,7 +45,6 @@ public class AsciiMathConverter {
         }
         cache.put(am, result);
       } catch (ScriptException | NoSuchMethodException | IOException ex) {
-        ex.printStackTrace();
         throw new IllegalArgumentException(
                 "Failed to run ASCIIMath to MathML JS script: " + ex.getMessage());
       }

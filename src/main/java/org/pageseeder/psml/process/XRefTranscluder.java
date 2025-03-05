@@ -220,6 +220,9 @@ public final class XRefTranscluder {
               this.parentHandler.write(TexConverter.convert(String.join("", java.nio.file.Files.readAllLines(target.toPath()))));
             } catch (IOException ex) {
               throw new ProcessException("Failed to read contents of file "+target.getName()+": "+ex.getMessage(), ex);
+            } catch (IllegalArgumentException ex) {
+              // Add filename for math conversion debugging
+              throw new IllegalArgumentException("File " + target.getName() + ": " + ex.getMessage());
             }
           } else {
             this.parentHandler.writeFileContents(target);
