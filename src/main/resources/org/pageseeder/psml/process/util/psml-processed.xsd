@@ -167,7 +167,7 @@
       </xs:attribute>
       <xs:attribute name="deleted" type="xs:boolean">
         <xs:annotation>
-          <xs:documentation>If 'true' this section was deleted (used for combined compare only).</xs:documentation>
+          <xs:documentation>If 'true' this section was deleted (used for combined diffx compare only).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
