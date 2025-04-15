@@ -108,6 +108,10 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    */
   private boolean errorOnAmbiguous = false;
 
+  /**
+   *  Whether to raise a warn when an XRef target is ambiguous.
+   */
+  private boolean warnOnAmbiguous = true;
 
   /**
    * Whether to change attribute level to "processed" and URL decode @href and @src
@@ -239,6 +243,13 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    */
   public void setErrorOnAmbiguous(boolean error) {
     this.errorOnAmbiguous = error;
+  }
+
+  /**
+   * @param warn whether to raise an error when an XRef target is ambiguous.
+   */
+  public void setWarnOnAmbiguous(boolean warn) {
+    this.warnOnAmbiguous = warn;
   }
 
   /**
@@ -685,9 +696,10 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    *
    * @return the modified href
    *
-   * @throws ProcessException If it points to multiple locations in the current document
+   * @throws ProcessException If xref is invalid
+   * @throws SAXException     If it points to multiple locations in the current document
    */
-  private String handleXRef(Attributes atts) throws ProcessException {
+  private String handleXRef(Attributes atts) throws ProcessException, SAXException {
     String type = atts.getValue("type");
     String uriid = atts.getValue("uriid");
     String frag = atts.getValue("frag");
@@ -744,12 +756,8 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
             " in document " +  this.sourceRelativePath +
             (this.ancestorUriIDs.isEmpty() ? "" : (" (URIID " + this.ancestorUriIDs.peek() + ")")) +
             ". This can be fixed by having the content embedded in one location and transcluded in the others.";
-        if (this.errorOnAmbiguous) {
-          if (this.failOnError) throw new ProcessException(message);
-          else this.logger.error(message);
-        } else {
-          this.logger.warn(message);
-        }
+        PSMLProcessHandler.handleError(message, this.failOnError, this.logger,
+                this.errorOnAmbiguous, this.warnOnAmbiguous);
       }
       // if target document is embedded, use that instead of transcluded fragment
       if (uri_counts != null && uri_counts[2] > 0) {

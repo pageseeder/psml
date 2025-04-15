@@ -230,8 +230,10 @@ public class TransclusionHandler extends DefaultHandler {
    * @return whether content was transcluded
    *
    * @throws TransclusionException if the target is invalid or could not be read
+   * @throws SAXException          if the target is not found
    */
-  private boolean resolveTransclusion(String href, String fragment) throws TransclusionException {
+  private boolean resolveTransclusion(String href, String fragment)
+          throws TransclusionException, SAXException {
     if (href == null || !href.endsWith(".psml") || !this.transclude) return false;
     try {
       href = URLDecoder.decode(href, "utf-8");
@@ -242,8 +244,13 @@ public class TransclusionHandler extends DefaultHandler {
     // find target file
     File target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + href);
     // make sure it's valid
-    if (target == null || !target.exists() ||!target.isFile())
-      throw new TransclusionException("XRef target not found for path: " + dadPath + '/' + href);
+    if (target == null || !target.exists() || !target.isFile()) {
+      PSMLProcessHandler.handleError(
+              "XRef transclusion not found for path: " + dadPath + '/' + href,
+              this.parentHandler.getFailOnError(), this.parentHandler.getLogger(),
+              this.parentHandler.getErrorXRefNotFound(), this.parentHandler.getWarnXRefNotFound());
+      return false;
+    }
     // parse target
     TransclusionHandler handler = new TransclusionHandler(this.xml, fragment, false, this.parentHandler);
     handler.documentMetadata = this.documentMetadata;
