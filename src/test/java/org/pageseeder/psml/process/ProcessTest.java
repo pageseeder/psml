@@ -1496,7 +1496,7 @@ public class ProcessTest {
   }
 
   @Test
-  public void testProcessXRefsNotFound() throws IOException, ProcessException {
+  public void testXRefsImagesNotFound() throws IOException, ProcessException {
     String filename = "ref_6.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1510,14 +1510,6 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
-    Images images = new Images();
-    images.setImageSrc(ImageSrc.LOCATION);
-    File image = new File(IMAGE_FOLDER);
-    if (image.exists())
-      FileUtils.deleteDirectory(image);
-    images.setLocation(image.getAbsolutePath());
-    images.setIncludes(filename);
-    p.setImages(images);
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
     p.setPublicationConfig(config, filename, true);
     //ErrorHandling err = new ErrorHandling();
@@ -1525,8 +1517,9 @@ public class ProcessTest {
     //p.setError(err);
     WarningHandling warn = new WarningHandling();
     warn.setXrefNotFound(false);
+    warn.setImageNotFound(false);
     p.setWarning(warn);
-    p.setFailOnError(false);
+    //p.setFailOnError(false);
     p.process();
   }
 

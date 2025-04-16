@@ -104,7 +104,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * If a warning should be logged when an image was not found.
    */
-  private boolean warnImageNotFound = false;
+  private boolean warnImageNotFound = true;
 
   /**
    * If an error should be logged when an xref reference was not found.

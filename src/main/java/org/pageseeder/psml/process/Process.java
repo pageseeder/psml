@@ -564,8 +564,6 @@ public final class Process {
               this.warning == null || this.warning.getXrefNotFound());
       handler1.setEmbedLinkMetadata(this.embedLinkMetadata);
       // add images paths processing details
-      boolean errorImagesNotFound = false;
-      boolean warnImagesNotFound = false;
       boolean embedMetadata = false;
       ImageCache thecache = null;
       ImageSrc imageSrc = ImageSrc.LOCATION;
@@ -576,12 +574,12 @@ public final class Process {
         // set proper values
         thecache            = cache;
         imageSrc            = this.imageHandling.getSrc();
-        errorImagesNotFound = this.error != null && this.error.getImageNotFound();
-        warnImagesNotFound  = this.warning != null && this.warning.getImageNotFound();
         siteprefix          = this.imageHandling.getSitePrefix();
         embedMetadata       = this.imageHandling.isMetadataEmbedded();
       }
-      handler1.setImageHandling(thecache, imageSrc, errorImagesNotFound, warnImagesNotFound,
+      handler1.setImageHandling(thecache, imageSrc,
+              this.error != null && this.error.getImageNotFound(),
+              this.warning == null || this.warning.getImageNotFound(),
               siteprefix, embedMetadata);
       // add publication config
       try {

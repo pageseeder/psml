@@ -15,8 +15,8 @@ package org.pageseeder.psml.process.config;
  * <p>Details are:</p>
  * <ul>
  *   <li>xrefnotfound:  If 'true' log a warning if an xref target file is not in the export set - default true.</li>
- *   <li>xrefambiguous:  If 'true' log a warning if an xref target is ambiguous - default true.</li>
- *   <li>imagenotfound: If 'true' log a warning if a referenced image is not in the export set - default false.</li>
+ *   <li>xrefambiguous: If 'true' log a warning if an xref target is ambiguous - default true.</li>
+ *   <li>imagenotfound: If 'true' log a warning if a referenced image is not in the export set - default true.</li>
  * </ul>
  *
  * @author Philip Rutherford
@@ -37,7 +37,7 @@ public final class WarningHandling {
   /**
    * Whether or not to throw a warning for an image not found
    */
-  private boolean imagenotfound = false;
+  private boolean imagenotfound = true;
 
   /**
    * @param imagenf the imagenotfound to set
