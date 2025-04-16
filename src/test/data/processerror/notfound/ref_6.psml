@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="21954" schemaversion="0.12" version="current" level="portable">
+  <metadata/>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Ref 5</heading>
+    </fragment>
+  </section>
+  <toc/>
+  <section id="xrefs">
+    <fragment id="2">
+      <blockxref id="39215" frag="default" reversefrag="2" reversetitle="References" reverselink="true"
+              reversetype="embed" display="document" type="embed" uriid="21930" href="content_5.psml"
+              urititle="Content 5">Content 5</blockxref>
+    </fragment>
+    <fragment id="3">
+      <image uriid="22000" src="image1.jpg" />
+    </fragment>
+  </section>
+</document>

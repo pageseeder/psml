@@ -155,6 +155,11 @@ public final class Process {
   private ErrorHandling error = null;
 
   /**
+   * The warning handling details
+   */
+  private WarningHandling warning = null;
+
+  /**
    * @param fail the failOnError to set
    */
   public void setFailOnError(boolean fail) {
@@ -290,6 +295,14 @@ public final class Process {
     this.error = err;
     if (this.error.getImageNotFound() || this.error.getXrefNotFound() || this.error.getXrefAmbiguous())
       this.processXML = true;
+  }
+
+  /**
+   * @param warn defines the error handling.
+   */
+  public void setWarning(WarningHandling warn) {
+    if (warn == null) return;
+    this.warning = warn;
   }
 
   /**
@@ -547,10 +560,10 @@ public final class Process {
         }
       }
       handler1.setXRefsHandling(xrefsTypes, excludeXRefFrag, onlyXRefFrag,
-          this.error != null && this.error.getXrefNotFound());
+              this.error != null && this.error.getXrefNotFound(),
+              this.warning == null || this.warning.getXrefNotFound());
       handler1.setEmbedLinkMetadata(this.embedLinkMetadata);
       // add images paths processing details
-      boolean logImagesNotFound = false;
       boolean embedMetadata = false;
       ImageCache thecache = null;
       ImageSrc imageSrc = ImageSrc.LOCATION;
@@ -559,13 +572,15 @@ public final class Process {
           !this.imageMatcher.hasPatterns() ||
           this.imageMatcher.matches(relPath))) {
         // set proper values
-        thecache          = cache;
-        imageSrc          = this.imageHandling.getSrc();
-        logImagesNotFound = this.error != null && this.error.getImageNotFound();
-        siteprefix        = this.imageHandling.getSitePrefix();
-        embedMetadata     = this.imageHandling.isMetadataEmbedded();
+        thecache            = cache;
+        imageSrc            = this.imageHandling.getSrc();
+        siteprefix          = this.imageHandling.getSitePrefix();
+        embedMetadata       = this.imageHandling.isMetadataEmbedded();
       }
-      handler1.setImageHandling(thecache, imageSrc, logImagesNotFound, siteprefix, embedMetadata);
+      handler1.setImageHandling(thecache, imageSrc,
+              this.error != null && this.error.getImageNotFound(),
+              this.warning == null || this.warning.getImageNotFound(),
+              siteprefix, embedMetadata);
       // add publication config
       try {
         if (this.publicationConfig != null && this.publicationRoot.equals(relPath)) {
@@ -619,6 +634,7 @@ public final class Process {
       handler2.setLogger(this.logger);
       handler2.setFailOnError(this.failOnError);
       handler2.setErrorOnAmbiguous(this.error != null && this.error.getXrefAmbiguous());
+      handler2.setWarnOnAmbiguous(this.warning == null || this.warning.getXrefAmbiguous());
       handler2.setHierarchyUriFragIDs(handler1.getHierarchyUriFragIDs());
       handler2.setRelativiseImagePaths(imageSrc == ImageSrc.LOCATION);
       handler2.setProcessed(this.processed);

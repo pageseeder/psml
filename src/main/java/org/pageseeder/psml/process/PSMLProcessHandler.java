@@ -99,12 +99,22 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * If an error should be logged when an image was not found.
    */
-  private boolean logImageNotFound = false;
+  private boolean errorImageNotFound = false;
+
+  /**
+   * If a warning should be logged when an image was not found.
+   */
+  private boolean warnImageNotFound = true;
 
   /**
    * If an error should be logged when an xref reference was not found.
    */
-  private boolean logXRefNotFound = false;
+  private boolean errorXRefNotFound = false;
+
+  /**
+   * If a warning should be logged when an xref reference was not found.
+   */
+  private boolean warnXRefNotFound = true;
 
   /**
    * if alternate iamge xrefs are handled like images
@@ -470,13 +480,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param xrefTypes           List of XRefs types to transclude
    * @param excludeXRefFragment If the xrefs in an xref-fragment are ignored.
    * @param onlyXRefFrament     If only the xrefs in an xref-fragment are included.
-   * @param logxrefnotfound     If an error is logged when an XRef's target is not resolved
+   * @param errornotfound    If an error is logged when an XRef's target is not resolved
+   * @param warnnotfound     If a warn is logged when an XRef's target is not resolved
    */
   public void setXRefsHandling(List<String> xrefTypes, boolean excludeXRefFragment,
-                               boolean onlyXRefFrament, boolean logxrefnotfound) {
+                               boolean onlyXRefFrament, boolean errornotfound, boolean warnnotfound) {
     this.transcluder.addXRefsTypes(xrefTypes);
     this.transcluder.setXRefFragmentHandling(excludeXRefFragment, onlyXRefFrament);
-    this.logXRefNotFound = logxrefnotfound;
+    this.errorXRefNotFound = errornotfound;
+    this.warnXRefNotFound = warnnotfound;
   }
 
   /**
@@ -572,12 +584,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
    *
    * @param cache         where URI details for images are loaded from.
    * @param src           how image src should be rewritten
-   * @param logNotFound   if the image not found should be logged as an error
+   * @param errorNotFound if the image not found should be logged as an error
+   * @param warnNotFound  if the image not found should be logged as a warn
    * @param siteprefix    site prefix, used to rewrite images paths to permalink
    * @param embedMetadata if images are transcluded (metadata embedded)
    */
-  public void setImageHandling(ImageCache cache, ImageSrc src, boolean logNotFound,
-                               String siteprefix, boolean embedMetadata) {
+  public void setImageHandling(ImageCache cache, ImageSrc src, boolean errorNotFound,
+                               boolean warnNotFound, String siteprefix, boolean embedMetadata) {
     // make sure the required bits are there
     if (src != ImageSrc.LOCATION && cache == null)
       throw new IllegalArgumentException("Required images metadata cache is missing");
@@ -585,7 +598,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       throw new IllegalArgumentException("Site prefix missing");
     // set flags
     this.imageSrc = src;
-    this.logImageNotFound = logNotFound;
+    this.errorImageNotFound = errorNotFound;
+    this.warnImageNotFound = warnNotFound;
     this.imageCache = cache;
     this.sitePrefix = siteprefix;
     this.embedImageMetadata = embedMetadata;
@@ -656,6 +670,28 @@ public final class PSMLProcessHandler extends DefaultHandler {
   public Logger getLogger() {
     return this.logger;
   }
+
+  /**
+   * @return whether to fail On Error
+   */
+  public boolean getFailOnError() {
+    return this.failOnError;
+  }
+
+  /**
+   * @return whether to log XRef Not Found as error
+   */
+  public boolean getErrorXRefNotFound() {
+    return this.errorXRefNotFound;
+  }
+
+  /**
+   * @return whether to log XRef Not Found as warn
+   */
+  public boolean getWarnXRefNotFound() {
+    return this.warnXRefNotFound;
+  }
+
 
   // --------------------------------- Content Handler methods
   // --------------------------------------------
@@ -1047,15 +1083,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
     handler.transcluder.addParentFile(this.sourceFile, this.currentFragment);
     handler.transcluder.addParentFile(this.sourceFile, "default");
     handler.setIncludeXMLDeclaration(false);
-    handler.setImageHandling(this.imageCache, this.imageSrc, this.logImageNotFound, this.sitePrefix,
-        this.embedImageMetadata);
+    handler.setImageHandling(this.imageCache, this.imageSrc, this.errorImageNotFound,
+            this.warnImageNotFound, this.sitePrefix, this.embedImageMetadata);
     handler.setStrip(this.strip);
     handler.setLogger(this.logger);
     handler.setFailOnError(this.failOnError);
     handler.setProcessed(this.processed);
     handler.setXRefsHandling(this.transcluder.xrefsTranscludeTypes,
         this.transcluder.excludeXRefFragment, this.transcluder.onlyXRefFrament,
-        this.logXRefNotFound);
+        this.errorXRefNotFound, this.warnXRefNotFound);
     handler.alternateImageXRefs = fromImage;
     handler.inAlternateXRef = alternate;
     handler.setURIID(uriid);
@@ -1147,11 +1183,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if (this.strip.stripNotFoundXRefs() && !"true".equals(atts.getValue("external")) && !"true".equals(atts.getValue("unresolved")) &&
         this.transcluder.isNotFoundXRef(atts.getValue("href"))) {
       // log it?
-      if (this.logXRefNotFound) {
-        String href = atts.getValue("href");
-        this.logger.error(
-            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
-      }
+      String href = atts.getValue("href");
+      handleError("XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""),
+              this.failOnError, this.logger, this.errorXRefNotFound, this.warnXRefNotFound);
       if ("blockxref".equals(qName))
         write("<para>");
       this.stripCurrentXRefElement = true;
@@ -1243,21 +1277,40 @@ public final class PSMLProcessHandler extends DefaultHandler {
       throw new SAXException("Transclusion/embed depth is too big (max is "
           + XRefTranscluder.MAX_DEPTH + ") for XRef from " + src + " to " + tgt + ".");
     } catch (XRefNotFoundException ex) {
-      if (this.logXRefNotFound && this.failOnError)
-        throw new SAXException(
-            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
-      else if (this.logXRefNotFound)
-        this.logger.error(
-            "XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
-      else
-        this.logger
-            .warn("XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""));
+      handleError("XRef target not found in URI " + this.uriID + (href != null ? CHECK_DEPTH + href : ""),
+              this.failOnError, this.logger, this.errorXRefNotFound, this.warnXRefNotFound);
     } catch (ProcessException ex) {
       if (this.failOnError)
         throw new SAXException("Failed to resolve XRef reference " + href + ": " + ex.getMessage(),
             ex);
       else
         this.logger.warn("Failed to resolve XRef reference " + href + ": " + ex.getMessage());
+    }
+  }
+
+  /**
+   * Handle an error message as follows:
+   * - if an error and fail throw exception OR
+   * - if an error log as error
+   * - if a warn log as warning
+   * - otherwise ignore
+   *
+   * @param message the error message
+   * @param fail    whether to fail on error
+   * @param log     the logger
+   * @param error   whether to log as error
+   * @param warn    whether to log as warn
+   *
+   * @throws SAXException if error and fail on error
+   */
+  public static void handleError(String message, boolean fail,
+                                 Logger log, boolean error, boolean warn) throws SAXException {
+    if (error && fail) {
+      throw new SAXException(message);
+    } else if (error) {
+      log.error(message);
+    } else if (warn) {
+      log.warn(message);
     }
   }
 
@@ -1370,15 +1423,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
     //this.logger.debug("Image file is " + imageFile.getAbsolutePath());
     // log image not found
     if ((!imageFile.exists() || !imageFile.isFile())) {
-      if (this.logImageNotFound && this.failOnError)
-        throw new SAXException(
-            "Image not found in URI " + this.uriID + " with src " + src + " and URI ID " + uriid);
-      else if (this.logImageNotFound)
-        this.logger.error(
-            "Image not found in URI " + this.uriID + " with src " + src + " and URI ID " + uriid);
-      // don't warn as may be export with binarymetadataonly="true"
-      // else
-      // this.logger.warn("Image not found with src "+src+" and URI ID "+uriid);
+      handleError("Image not found in URI " + this.uriID + " with src " + src + " and URI ID " + uriid,
+              this.failOnError, this.logger, this.errorImageNotFound, this.warnImageNotFound);
     }
     if (uriid == null) {
       // unresolved image

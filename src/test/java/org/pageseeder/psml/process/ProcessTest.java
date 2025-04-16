@@ -1371,6 +1371,13 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
+    //ErrorHandling err = new ErrorHandling();
+    //err.setXrefAmbiguous(true);
+    //p.setError(err);
+    //WarningHandling warn = new WarningHandling();
+    //warn.setXrefAmbiguous(false);
+    //p.setWarning(warn);
+    p.setFailOnError(false);
     p.process();
 
     // check result
@@ -1485,6 +1492,34 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
+    p.process();
+  }
+
+  @Test
+  public void testXRefsImagesNotFound() throws IOException, ProcessException {
+    String filename = "ref_6.psml";
+    Process p = new Process();
+    p.setPreserveSrc(true);
+    p.setSrc(new File(SOURCE_FOLDER + "error/notfound"));
+    File dest = new File(DEST_FOLDER);
+    if (dest.exists())
+      FileUtils.deleteDirectory(dest);
+    dest.mkdirs();
+    p.setDest(dest);
+    XRefsTransclude xrefs = new XRefsTransclude();
+    xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes(filename);
+    p.setXrefs(xrefs);
+    PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
+    p.setPublicationConfig(config, filename, true);
+    //ErrorHandling err = new ErrorHandling();
+    //err.setImageNotFound(true);
+    //p.setError(err);
+    WarningHandling warn = new WarningHandling();
+    warn.setXrefNotFound(false);
+    warn.setImageNotFound(false);
+    p.setWarning(warn);
+    //p.setFailOnError(false);
     p.process();
   }
 
