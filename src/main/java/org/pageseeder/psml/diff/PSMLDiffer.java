@@ -171,7 +171,7 @@ public final class PSMLDiffer {
     OperationsBuffer<XMLToken> buffer = new OperationsBuffer<>();
     boolean successful = diffGasherbrum(from, to, buffer);
     if (!successful) {
-      LOGGER.debug("Gasherbrum diff failed! Falling back to matrix-based diff");
+      LOGGER.info("Gasherbrum diff failed! Falling back to matrix-based diff");
       buffer = new OperationsBuffer<>();
       diffMatrixXML(from, to, buffer, false);
     }
