@@ -6,15 +6,12 @@ package org.pageseeder.psml.diff;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 
 import org.pageseeder.diffx.DiffException;
-import org.pageseeder.diffx.action.Operation;
 import org.pageseeder.diffx.action.OperationsBuffer;
 import org.pageseeder.diffx.algorithm.*;
-import org.pageseeder.diffx.api.DiffAlgorithm;
 import org.pageseeder.diffx.api.DiffHandler;
 import org.pageseeder.diffx.config.DiffConfig;
 import org.pageseeder.diffx.config.TextGranularity;
@@ -22,7 +19,6 @@ import org.pageseeder.diffx.config.WhiteSpaceProcessing;
 import org.pageseeder.diffx.format.DefaultXMLDiffOutput;
 import org.pageseeder.diffx.format.XMLDiffOutput;
 import org.pageseeder.diffx.handler.CoalescingFilter;
-import org.pageseeder.diffx.handler.PostXMLFixer;
 import org.pageseeder.diffx.load.SAXLoader;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.xml.NamespaceSet;
@@ -108,8 +104,8 @@ public final class PSMLDiffer {
     if (LOGGER.isDebugEnabled()) {
       String source1 = toString(xml1);
       String source2 = toString(xml2);
-      LOGGER.debug("XML Source B:\n"+source1);
-      LOGGER.debug("XML Source A:\n"+source2);
+      LOGGER.debug("XML Source B:\n{}", source1);
+      LOGGER.debug("XML Source A:\n{}", source2);
       loadAndDiff(new StringReader(source2), new StringReader(source1), out);
     } else {
       loadAndDiff(xml2, xml1, out);
@@ -147,18 +143,7 @@ public final class PSMLDiffer {
     output.setWriteXMLDeclaration(false);
     NamespaceSet namespaces = NamespaceSet.merge(to.getNamespaces(), from.getNamespaces());
     output.setNamespaces(namespaces);
-
     diffWithFallback(from, to, output);
-  }
-
-  private static String toString(Reader input) throws IOException {
-    StringWriter out = new StringWriter();
-    char[] buffer = new char[1024];
-    int n;
-    while (-1 != (n = input.read(buffer))) {
-      out.write(buffer, 0, n);
-    }
-    return out.toString();
   }
 
   /**
@@ -214,6 +199,23 @@ public final class PSMLDiffer {
     } else {
       throw new DataLengthException(from.size() * to.size(), this.maxEvents);
     }
+  }
+
+  /**
+   * Converts the content of the given Reader into a String.
+   *
+   * @param input The Reader from which the content is to be read.
+   * @return A String containing the text read from the input Reader.
+   * @throws IOException If an I/O error occurs while reading from the Reader.
+   */
+  private static String toString(Reader input) throws IOException {
+    StringBuilder out = new StringBuilder();
+    char[] buffer = new char[1024];
+    int n;
+    while ((n = input.read(buffer)) != -1) {
+      out.append(buffer, 0, n);
+    }
+    return out.toString();
   }
 
 }
