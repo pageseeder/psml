@@ -37,6 +37,9 @@ import java.util.*;
  * thresholds and ensuring efficient handling of XML structures.
  *
  * @author Christophe Lauret
+ *
+ * @since 1.5.1
+ * @version 1.5.1
  */
 public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
 
@@ -64,7 +67,9 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    * threshold is treated as a match. This is primarily used in the equality
    * checks of {@code GToken} instances.
    */
-  private float similarityThreshold;
+  private final float similarityThreshold;
+
+  private boolean hasError = false;
 
   public GasherbrumIIIAlgorithm() {
     this.similarityThreshold = DEFAULT_SIMILARITY_THRESHOLD;
@@ -72,14 +77,6 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
 
   public GasherbrumIIIAlgorithm(float similarityThreshold) {
     this.similarityThreshold = similarityThreshold;
-  }
-
-  public void setSimilarityThreshold(float similarityThreshold) {
-    this.similarityThreshold = similarityThreshold;
-  }
-
-  public float getSimilarityThreshold() {
-    return this.similarityThreshold;
   }
 
   @Override
@@ -93,6 +90,16 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
     fixer.start();
     diffAndUnfold(gFrom, gTo, buffer, fixer);
     fixer.end();
+    hasError = fixer.hasError();
+  }
+
+  /**
+   * Indicates whether an error occurred during the operation or processing.
+   *
+   * @return true if an error has occurred; false otherwise.
+   */
+  boolean hasError() {
+    return hasError;
   }
 
   /**
