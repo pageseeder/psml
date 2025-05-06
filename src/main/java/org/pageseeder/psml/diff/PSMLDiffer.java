@@ -112,6 +112,17 @@ public final class PSMLDiffer {
     }
   }
 
+  /**
+   * Loads two XML sequences from the provided readers, computes the differences between them,
+   * and writes the output to the specified writer.
+   *
+   * @param from The reader for the original XML content.
+   * @param to   The reader for the modified XML content.
+   * @param out  The writer where the computed differences will be written.
+   * @throws DiffException If an error occurs during the diff,
+   *                       or if a data length or undeclared namespace issue arises.
+   * @throws IOException If an input/output error occurs while reading or writing.
+   */
   private void loadAndDiff(Reader from, Reader to, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
     // Load tokens from XML
     SAXLoader loader = new SAXLoader();
@@ -147,10 +158,16 @@ public final class PSMLDiffer {
   }
 
   /**
-   * Similar to optimistic diff from diffx
+   * Compares two XML sequences and outputs their differences using a fallback mechanism.
+   *
+   * <p>First attempts the Gasherbrum algorithm, and if it fails, falls back to
+   * a matrix-based diff algorithm. The results are applied to the provided output.
+   *
+   * @param from   The original XML sequence.
+   * @param to     The modified XML sequence.
+   * @param output The output where the computed differences will be written.
    */
   private void diffWithFallback(Sequence from, Sequence to, XMLDiffOutput output) {
-    // Try with Gasherbrum
     OperationsBuffer<XMLToken> buffer = new OperationsBuffer<>();
     boolean successful = diffGasherbrum(from, to, buffer);
     if (!successful) {
@@ -163,9 +180,14 @@ public final class PSMLDiffer {
   }
 
   /**
-   * Fast diff uses myers' greedy algorithm with a post-process XML correction filter.
+   * Computes the differences between two sequences of XML tokens using the Gasherbrum algorithm.
+   * Applies the result to the provided diff handler and evaluates if the process was successful.
    *
-   * @return true if successful; false otherwise.
+   * @param from    The original list of XML tokens to compare.
+   * @param to      The modified list of XML tokens to compare.
+   * @param handler The handler responsible for processing the diff output.
+   *
+   * @return {@code true} if the operation completed successfully, {@code false} if an error occurred.
    */
   private boolean diffGasherbrum(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
     GasherbrumIIIAlgorithm algorithm = new GasherbrumIIIAlgorithm(.5f);
