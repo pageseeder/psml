@@ -16,7 +16,6 @@ targetCompatibility = 1.8
 repositories {
   mavenCentral { url 'https://maven-central.storage.googleapis.com/maven2' }
   maven { url 'https://s01.oss.sonatype.org/content/groups/public/' }
-  jcenter()
 }
 
 tasks.withType(JavaCompile) {
