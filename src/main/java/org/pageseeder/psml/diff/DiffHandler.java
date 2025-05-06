@@ -115,6 +115,7 @@ public final class DiffHandler extends DefaultHandler {
     try {
       this.xml.write("</"+qName+">");
       if ("content".equals(qName) && this.fragmentId != null) {
+        assert this.fragmentContent != null; // Set at the same time as this.fragmentId
         String current = this.compareFragments.get(this.fragmentId);
         if (current != null) {
           try {

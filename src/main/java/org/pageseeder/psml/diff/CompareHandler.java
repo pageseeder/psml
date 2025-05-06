@@ -101,6 +101,7 @@ public final class CompareHandler extends DefaultHandler {
       throw new SAXException("Failed to close element "+qName, ex);
     }
     if (isFragment(qName) && !"content".equals(this.elements.peek()) && this.fragmentId != null) {
+      assert this.xml != null; // Set at the same time as this.fragmentId
       this.compareFragments.put(this.fragmentId, this.xml.toString());
       this.xml = null;
       this.fragmentId = null;
