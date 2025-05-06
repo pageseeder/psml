@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 
 /**
  * Collects compare fragments in portable PSML.
@@ -26,22 +26,22 @@ public final class CompareHandler extends DefaultHandler {
   /**
    * For writing XML
    */
-  private Writer xml = null;
+  private @Nullable Writer xml = null;
 
   /**
    * Current state.
    */
-  private Stack<String> elements = new Stack<>();
+  private final Stack<String> elements = new Stack<>();
 
   /**
    * Current fragment ID
    */
-  private String fragmentId = null;
+  private @Nullable String fragmentId = null;
 
   /**
    * Map of fragment ID to current fragment with a corresponding <compare> element.
    */
-  private Map<String, String> compareFragments = new HashMap<>();
+  private final Map<String, String> compareFragments = new HashMap<>();
 
   /**
    * @return map of fragment ID to current fragment with a corresponding <compare> element.
@@ -50,9 +50,6 @@ public final class CompareHandler extends DefaultHandler {
     return this.compareFragments;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 
@@ -69,7 +66,7 @@ public final class CompareHandler extends DefaultHandler {
       }
     }
 
-    // write start tag
+    // write the start tag
     if (this.xml != null) {
       try {
         this.xml.write('<'+qName);
@@ -95,9 +92,6 @@ public final class CompareHandler extends DefaultHandler {
     this.elements.push(qName);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void endElement(String uri, String localName, String qName) throws SAXException {
     this.elements.pop();
@@ -107,15 +101,13 @@ public final class CompareHandler extends DefaultHandler {
       throw new SAXException("Failed to close element "+qName, ex);
     }
     if (isFragment(qName) && !"content".equals(this.elements.peek()) && this.fragmentId != null) {
+      assert this.xml != null; // Set at the same time as this.fragmentId
       this.compareFragments.put(this.fragmentId, this.xml.toString());
       this.xml = null;
       this.fragmentId = null;
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void characters(char[] ch, int start, int length) throws SAXException {
     try {
@@ -130,7 +122,7 @@ public final class CompareHandler extends DefaultHandler {
    *
    * @param qName  the element name
    *
-   * @return <code>true</code> if element is a PSML fragment.
+   * @return <code>true</code> if the element is a PSML fragment.
    */
   private boolean isFragment(String qName) {
     return "fragment".equals(qName) ||

@@ -6,15 +6,12 @@ package org.pageseeder.psml.diff;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 
 import org.pageseeder.diffx.DiffException;
-import org.pageseeder.diffx.action.Operation;
 import org.pageseeder.diffx.action.OperationsBuffer;
 import org.pageseeder.diffx.algorithm.*;
-import org.pageseeder.diffx.api.DiffAlgorithm;
 import org.pageseeder.diffx.api.DiffHandler;
 import org.pageseeder.diffx.config.DiffConfig;
 import org.pageseeder.diffx.config.TextGranularity;
@@ -22,7 +19,6 @@ import org.pageseeder.diffx.config.WhiteSpaceProcessing;
 import org.pageseeder.diffx.format.DefaultXMLDiffOutput;
 import org.pageseeder.diffx.format.XMLDiffOutput;
 import org.pageseeder.diffx.handler.CoalescingFilter;
-import org.pageseeder.diffx.handler.PostXMLFixer;
 import org.pageseeder.diffx.load.SAXLoader;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.xml.NamespaceSet;
@@ -38,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Philip Rutherford
  *
  * @since 0.3.7
- * @version 0.7.0
+ * @version 1.5.1
  */
 public final class PSMLDiffer {
 
@@ -46,11 +42,6 @@ public final class PSMLDiffer {
    * Logger for PageSeeder Diffing.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(PSMLDiffer.class);
-
-  /**
-   * The default buffer size to use.
-   */
-  private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
   /**
    * The configuration used for Diff-X.
@@ -64,35 +55,35 @@ public final class PSMLDiffer {
 
   /**
    * Constructor.
-   * Diff events are the number of elements/attributes/text in each fragment multiplied by each other.
-   * When maxevents is reached the diff will set the coarsest granularity (TEXT) and try again.
-   * If events is still larger than maxevents an exception is generated.
-   * For reasonable performance maximum 4,000,000 is recommended.
    *
-   * @param maxevents maximum allowed diff events
+   * <p>Diff events are the number of elements/attributes/text in each fragment multiplied by each other.
+   * When `maxEvents` is reached the diff will set the coarsest granularity (TEXT) and try again.
+   * If events is still larger than `maxEvents` an exception is generated.
+   *
+   * <p>For reasonable performance, a maximum of 4,000,000 is recommended.
+   *
+   * @param maxEvents maximum allowed diff events
    */
-  public PSMLDiffer(int maxevents) {
-    this.maxEvents = maxevents;
+  public PSMLDiffer(int maxEvents) {
+    this.maxEvents = maxEvents;
     this.config = DiffConfig.getDefault()
         .granularity(TextGranularity.SPACE_WORD)
         .whitespace(WhiteSpaceProcessing.PRESERVE);
   }
 
-// getters and setters -------------------------------------------------------------------------
-
   /**
-   * Defines how the white spaces should be processed by Diff-X (default is PRESERVE).
+   * Defines how Diff-X should process the white spaces (default is PRESERVE).
    *
-   * @param whitespace how the white spaces should be processed by Diff-X.
+   * @param whitespace how Diff-X should process the white spaces.
    */
   public void setWhiteSpaceProcessing(WhiteSpaceProcessing whitespace) {
     this.config = this.config.whitespace(whitespace);
   }
 
   /**
-   * Defines the granularity of the text compare used by Diff-X (default is WORD).
+   * Defines the granularity of the text compare used by Diff-X (default is SPACE_WORD).
    *
-   * @param granularity the granularity of the text compare used by Diff-X.
+   * @param granularity the granularity of the text compares used by Diff-X.
    */
   public void setGranularity(TextGranularity granularity) {
     this.config = this.config.granularity(granularity);
@@ -105,23 +96,34 @@ public final class PSMLDiffer {
    * @param xml2 The first XML reader to compare.
    * @param out  Where the output goes
    *
-   * @throws org.pageseeder.diffx.DiffException Should a Diff-X exception occur or if maxevents is reached.
-   * @throws IOException   Should an I/O exception occur.
+   * @throws org.pageseeder.diffx.DiffException If a Diff-X exception occurs or if maxEvents is reached.
+   * @throws IOException   If an I/O exception occurs.
    */
   public void diff(Reader xml1, Reader xml2, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
     LOGGER.debug("Diff-X config: {} {}", this.config.granularity(), this.config.whitespace());
     if (LOGGER.isDebugEnabled()) {
       String source1 = toString(xml1);
       String source2 = toString(xml2);
-      LOGGER.debug("XML Source B:\n"+source1);
-      LOGGER.debug("XML Source A:\n"+source2);
-      doDiff(new StringReader(source2), new StringReader(source1), out);
+      LOGGER.debug("XML Source B:\n{}", source1);
+      LOGGER.debug("XML Source A:\n{}", source2);
+      loadAndDiff(new StringReader(source2), new StringReader(source1), out);
     } else {
-      doDiff(xml2, xml1, out);
+      loadAndDiff(xml2, xml1, out);
     }
   }
 
-  private void doDiff(Reader from, Reader to, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
+  /**
+   * Loads two XML sequences from the provided readers, computes the differences between them,
+   * and writes the output to the specified writer.
+   *
+   * @param from The reader for the original XML content.
+   * @param to   The reader for the modified XML content.
+   * @param out  The writer where the computed differences will be written.
+   * @throws DiffException If an error occurs during the diff,
+   *                       or if a data length or undeclared namespace issue arises.
+   * @throws IOException If an input/output error occurs while reading or writing.
+   */
+  private void loadAndDiff(Reader from, Reader to, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
     // Load tokens from XML
     SAXLoader loader = new SAXLoader();
     loader.setConfig(this.config);
@@ -132,7 +134,6 @@ public final class PSMLDiffer {
 
     // Diff sequences
     try {
-      // Since diffx-beta-2 the order has changed to A (from) -> B (to)
       diff(seqA, seqB, out);
     } catch (DataLengthException ex) {
       throw new org.pageseeder.diffx.DiffException("There are over "+ex.getThreshold()+" points of comparison ("+ex.getSize()+") reducing the fragment size will allow the comparison to be calculated.");
@@ -153,84 +154,61 @@ public final class PSMLDiffer {
     output.setWriteXMLDeclaration(false);
     NamespaceSet namespaces = NamespaceSet.merge(to.getNamespaces(), from.getNamespaces());
     output.setNamespaces(namespaces);
-//    OptimisticXMLProcessor processor = new OptimisticXMLProcessor();
-//    processor.setCoalesce(true);
-//    processor.setFallbackThreshold(this.maxEvents);
-//    processor.setDownscaleAllowed(true);
-//    processor.diff(from.tokens(), to.tokens(), output);
-
-    diffOptimistic(from, to, output);
-  }
-
-  private static String toString(Reader input) throws IOException {
-    StringWriter out = new StringWriter();
-    char[] buffer = new char[1024];
-    int n;
-    while (-1 != (n = input.read(buffer))) {
-      out.write(buffer, 0, n);
-    }
-    return out.toString();
+    diffWithFallback(from, to, output);
   }
 
   /**
-   * Similar to optimistic diff from diffx
+   * Compares two XML sequences and outputs their differences using a fallback mechanism.
+   *
+   * <p>First attempts the Gasherbrum algorithm, and if it fails, falls back to
+   * a matrix-based diff algorithm. The results are applied to the provided output.
+   *
+   * @param from   The original XML sequence.
+   * @param to     The modified XML sequence.
+   * @param output The output where the computed differences will be written.
    */
-  private void diffOptimistic(Sequence from, Sequence to, XMLDiffOutput output) {
-    // Try with fast diff
+  private void diffWithFallback(Sequence from, Sequence to, XMLDiffOutput output) {
     OperationsBuffer<XMLToken> buffer = new OperationsBuffer<>();
-    boolean successful = diffMyersWithXMLFix(from, to, buffer);
+    boolean successful = diffGasherbrum(from, to, buffer);
     if (!successful) {
-      // Fallback on default diff
-      LOGGER.debug("Fast diff failed! Unable to fix XML");
-      long edits = countEdits(buffer);
+      LOGGER.info("Gasherbrum diff failed! Falling back to matrix-based diff");
       buffer = new OperationsBuffer<>();
-      if (edits * (from.size()+to.size()) < this.maxEvents) {
-        try {
-          LOGGER.debug("Trying with XML diff based on Myers");
-          diffMyersXML(from, to, buffer);
-        } catch (IllegalStateException ex) {
-          buffer = new OperationsBuffer<>();
-          // In some rare cases Myers XML fails, we fallback on the matrix
-          diffMatrixXML(from, to, buffer, false);
-        }
-      } else {
-        diffMatrixXML(from, to, buffer, false);
-      }
+      diffMatrixXML(from, to, buffer, false);
     }
-
     // Apply the results from to the buffer
     buffer.applyTo(new CoalescingFilter(output));
   }
 
   /**
-   * Fast diff uses myers' greedy algorithm with a post-process XML correction filter.
+   * Computes the differences between two sequences of XML tokens using the Gasherbrum algorithm.
+   * Applies the result to the provided diff handler and evaluates if the process was successful.
    *
-   * @return true if successful; false otherwise.
+   * @param from    The original list of XML tokens to compare.
+   * @param to      The modified list of XML tokens to compare.
+   * @param handler The handler responsible for processing the diff output.
+   *
+   * @return {@code true} if the operation completed successfully, {@code false} if an error occurred.
    */
-  private boolean diffMyersWithXMLFix(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
-    DiffAlgorithm<XMLToken> algorithm = new MyersGreedyAlgorithm<>();
-    PostXMLFixer fixer = new PostXMLFixer(handler);
-    fixer.start();
-    algorithm.diff(from, to, fixer);
-    fixer.end();
-    return !fixer.hasError();
-  }
-
-  /**
-   * Fall back on XML algorithm
-   */
-  private void diffMyersXML(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
-    MyersGreedyXMLAlgorithm algorithm = new MyersGreedyXMLAlgorithm();
-    handler.start();
+  private boolean diffGasherbrum(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
+    GasherbrumIIIAlgorithm algorithm = new GasherbrumIIIAlgorithm(.5f);
     algorithm.diff(from, to, handler);
-    handler.end();
+    return !algorithm.hasError();
   }
 
   /**
-   * Fall back on slower matrix-based algorithm.
+   * Computes the differences between two sequences of XML tokens using the matrix
+   * diff algorithm. Handles cases where the diff computation exceeds a defined threshold
+   * by coalescing the input sequences or throwing an exception if the threshold is still exceeded.
+   *
+   * @param from       The original list of XML tokens to compare.
+   * @param to         The modified list of XML tokens to compare.
+   * @param handler    The handler responsible for processing the diff output.
+   * @param coalesced  Indicates whether the input sequences have already been coalesced
+   *                   to a coarser granularity.
    */
   private void diffMatrixXML(List<? extends XMLToken> from, List<? extends XMLToken> to, DiffHandler<XMLToken> handler, boolean coalesced) {
     MatrixXMLAlgorithm algorithm = new MatrixXMLAlgorithm();
+    algorithm.setThreshold(this.maxEvents);
     if (algorithm.isDiffComputable(from, to)) {
       handler.start();
       algorithm.diff(from, to, handler);
@@ -245,10 +223,21 @@ public final class PSMLDiffer {
     }
   }
 
-  public long countEdits(OperationsBuffer<?> buffer) {
-    long edits = 0;
-    for (Operation<?> op : buffer.getOperations()) if (op.operator().isEdit()) edits++;
-    return edits;
+  /**
+   * Converts the content of the given Reader into a String.
+   *
+   * @param input The Reader from which the content is to be read.
+   * @return A String containing the text read from the input Reader.
+   * @throws IOException If an I/O error occurs while reading from the Reader.
+   */
+  private static String toString(Reader input) throws IOException {
+    StringBuilder out = new StringBuilder();
+    char[] buffer = new char[1024];
+    int n;
+    while ((n = input.read(buffer)) != -1) {
+      out.append(buffer, 0, n);
+    }
+    return out.toString();
   }
 
 }

@@ -16,7 +16,6 @@ targetCompatibility = 1.8
 repositories {
   mavenCentral { url 'https://maven-central.storage.googleapis.com/maven2' }
   maven { url 'https://s01.oss.sonatype.org/content/groups/public/' }
-  jcenter()
 }
 
 tasks.withType(JavaCompile) {
@@ -28,7 +27,7 @@ dependencies {
   api (
     'org.slf4j:slf4j-api:1.7.21',
     'org.pageseeder.xmlwriter:pso-xmlwriter:1.0.4',
-    'org.pageseeder.diffx:pso-diffx:1.1.1'
+    'org.pageseeder.diffx:pso-diffx:1.1.2'
   )
 
   compileOnly 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.0.0'
