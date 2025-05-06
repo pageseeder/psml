@@ -10,13 +10,13 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 
 /**
  * Adds <diff> elements to compare fragments in portable PSML.
@@ -33,32 +33,32 @@ public final class DiffHandler extends DefaultHandler {
   /**
    * For writing XML
    */
-  private Writer xml;
+  private final Writer xml;
 
   /**
    * Map of fragment ID to fragment inside <compare> element.
    */
-  private Map<String, String> compareFragments;
+  private final Map<String, String> compareFragments;
 
   /**
    * Differ to use for comparing fragments
    */
-  private PSMLDiffer differ;
+  private final PSMLDiffer differ;
 
   /**
    * Current state.
    */
-  private Stack<String> elements = new Stack<>();
+  private final Stack<String> elements = new Stack<>();
 
   /**
    * Current fragment ID
    */
-  private String fragmentId = null;
+  private @Nullable String fragmentId = null;
 
   /**
    * Current fragment ID
    */
-  private Writer fragmentContent = null;
+  private @Nullable Writer fragmentContent = null;
 
   /**
    * Constructor.
@@ -74,9 +74,6 @@ public final class DiffHandler extends DefaultHandler {
     this.differ = diff;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
 
@@ -85,14 +82,14 @@ public final class DiffHandler extends DefaultHandler {
         this.fragmentContent = new StringWriter();
     }
 
-    // write start tag
+    // Write the start tag
     try {
       this.xml.write('<'+qName);
       if (this.fragmentContent != null) this.fragmentContent.write('<'+qName);
     } catch (IOException ex) {
       throw new SAXException("Failed to open element "+qName, ex);
     }
-    // attributes
+    // Attributes
     for (int i = 0; i < atts.getLength(); i++) {
       String name = atts.getQName(i);
       String value = atts.getValue(i);
@@ -112,9 +109,6 @@ public final class DiffHandler extends DefaultHandler {
     this.elements.push(qName);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void endElement(String uri, String localName, String qName) throws SAXException {
     this.elements.pop();
@@ -135,7 +129,7 @@ public final class DiffHandler extends DefaultHandler {
             this.xml.write(diffx);
             this.xml.write("</diff>\n");
           } catch (org.pageseeder.diffx.DiffException ex) {
-            LOGGER.error("Failed to diff content: "+ex.getMessage());
+            LOGGER.error("Failed to diff content: {}", ex.getMessage());
           } catch (IOException ex) {
             throw new SAXException("Failed to write <diff> element: "+ex.getMessage(), ex);
           }
@@ -149,9 +143,6 @@ public final class DiffHandler extends DefaultHandler {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void characters(char[] ch, int start, int length) throws SAXException {
     try {
