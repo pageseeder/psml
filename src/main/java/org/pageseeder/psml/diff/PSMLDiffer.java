@@ -21,6 +21,7 @@ import org.pageseeder.diffx.format.XMLDiffOutput;
 import org.pageseeder.diffx.handler.CoalescingFilter;
 import org.pageseeder.diffx.load.SAXLoader;
 import org.pageseeder.diffx.token.XMLToken;
+import org.pageseeder.diffx.util.WhitespaceStripper;
 import org.pageseeder.diffx.xml.NamespaceSet;
 import org.pageseeder.diffx.xml.Sequence;
 import org.pageseeder.xmlwriter.UndeclaredNamespaceException;
@@ -127,8 +128,9 @@ public final class PSMLDiffer {
     // Load tokens from XML
     SAXLoader loader = new SAXLoader();
     loader.setConfig(this.config);
-    Sequence seqB = loader.load(to);
-    Sequence seqA = loader.load(from);
+    WhitespaceStripper stripper = new WhitespaceStripper("fragment", "table", "row", "list", "nlist");
+    Sequence seqB = stripper.strip(loader.load(to));
+    Sequence seqA = stripper.strip(loader.load(from));
     LOGGER.debug("Sequence A: {} (granularity={})", seqA.size(), this.config.granularity());
     LOGGER.debug("Sequence B: {} (granularity={})", seqB.size(), this.config.granularity());
 
