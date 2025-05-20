@@ -25,10 +25,10 @@
         <image uriid="21942" src="images/test/diagram1.jpg" />
       </para>
       <para>test/diagram2.jpg
-        <image uriid="21943" src="images/test/diagram2.jpg" />
+        <image uriid="21943" docid="image-d2" src="images/test/diagram2.jpg" />
       </para>
       <para>test2/diagram1.jpg
-        <image uriid="21944" src="images/test2/diagram1.jpg" />
+        <image uriid="21944" docid="image-d1" src="images/test2/diagram1.jpg" />
       </para>
     </fragment>
   </section>
