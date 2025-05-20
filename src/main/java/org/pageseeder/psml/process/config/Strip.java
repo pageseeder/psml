@@ -104,6 +104,11 @@ public class Strip {
   private boolean stripImagesURIID = false;
 
   /**
+   * Strip the docid attribute on image elements.
+   */
+  private boolean stripImagesDocID = false;
+
+  /**
    * Replace the unresolved xrefs elements with their content.
    */
   private boolean stripUnresolvedXRefs = false;
@@ -207,6 +212,13 @@ public class Strip {
    */
   public void setStripImagesURIID(boolean stripImagesURIID) {
     this.stripImagesURIID = stripImagesURIID;
+  }
+
+  /**
+   * @param stripImagesDocID the stripImagesURIID to set
+   */
+  public void setStripImagesDocID(boolean stripImagesDocID) {
+    this.stripImagesDocID = stripImagesDocID;
   }
 
   /**
@@ -356,6 +368,12 @@ public class Strip {
     return this.stripImagesURIID;
   }
 
+  /**
+   * @return the stripImagesDocID
+   */
+  public boolean stripImagesDocID() {
+    return this.stripImagesDocID;
+  }
 
   /**
    * @return this strip cloned
@@ -377,6 +395,7 @@ public class Strip {
     s.stripXRefsDocID = this.stripXRefsDocID;
     s.stripXRefsURIID = this.stripXRefsURIID;
     s.stripImagesURIID = this.stripImagesURIID;
+    s.stripImagesDocID = this.stripImagesDocID;
     return s;
   }
 }

@@ -1380,10 +1380,14 @@ public final class PSMLProcessHandler extends DefaultHandler {
         || (this.strip.stripXRefsURIID() && "uriid".equals(attName)))
         && ("xref".equals(elemName) || "blockxref".equals(elemName)))
       return true;
-    // strip uriid in images
-    if (this.strip.stripImagesURIID() && "uriid".equals(attName)
-        && "image".equals(elemName))
-      return true;
+    if ("image".equals(elemName)) {
+      // strip uriid in images
+      if (this.strip.stripImagesURIID() && "uriid".equals(attName))
+        return true;
+      // strip docid in images
+      if (this.strip.stripImagesDocID() && "docid".equals(attName))
+        return true;
+    }
     // strip docid or title in uri in docinfo
     String dad = this.elements.isEmpty() ? null : this.elements.peek();
     if ("documentinfo".equals(dad) && "uri".equals(elemName)) {
