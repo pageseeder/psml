@@ -16,6 +16,7 @@
 package org.pageseeder.psml.model;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.pageseeder.xmlwriter.XMLWriter;
 
@@ -26,6 +27,9 @@ import org.pageseeder.xmlwriter.XMLWriter;
  * be coalesced into a single node.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class PSMLText implements PSMLNode {
 
@@ -44,19 +48,19 @@ public class PSMLText implements PSMLNode {
   /**
    * Create a new text node with the specified text.
    *
-   * @param The text to initialise this text node with.
+   * @param text The text to initialise this text node with.
    */
   public PSMLText(String text) {
-    this.text = text;
+    this.text = Objects.requireNonNull(text);
   }
 
   /**
    * Sets the text for this text node.
    *
-   * @param The text to initialise this text node with.
+   * @param text The text to initialise this text node with.
    */
   public void setText(String text) {
-    this.text = text;
+    this.text = Objects.requireNonNull(text);
   }
 
   /**
@@ -71,7 +75,7 @@ public class PSMLText implements PSMLNode {
    */
   @Override
   public void toXML(XMLWriter xml) throws IOException {
-    if (this.text != null) {
+    if (!this.text.isEmpty()) {
       xml.writeText(this.text);
     }
   }
