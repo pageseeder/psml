@@ -177,57 +177,57 @@ public class BlockParserTest {
     state.commit();
     Assert.assertNull(state.current());
     // Empty fragment
-    state.push(Name.Fragment);
-    Assert.assertTrue(state.isElement(Name.Fragment));
+    state.push(Name.FRAGMENT);
+    Assert.assertTrue(state.isElement(Name.FRAGMENT));
     state.commit();
-    Assert.assertFalse(state.isElement(Name.Fragment));
+    Assert.assertFalse(state.isElement(Name.FRAGMENT));
     Assert.assertNull(state.current());
     // Empty fragment with paragraph
-    state.push(Name.Fragment);
-    state.push(Name.Para, "test");
-    Assert.assertTrue(state.isElement(Name.Para));
+    state.push(Name.FRAGMENT);
+    state.push(Name.PARA, "test");
+    Assert.assertTrue(state.isElement(Name.PARA));
     state.commit();
-    Assert.assertFalse(state.isElement(Name.Para));
-    Assert.assertTrue(state.isElement(Name.Fragment));
+    Assert.assertFalse(state.isElement(Name.PARA));
+    Assert.assertTrue(state.isElement(Name.FRAGMENT));
   }
 
   @Test
   public void testStateCurrent() {
     State state = new State();
     Assert.assertNull(state.current());
-    state.push(Name.Fragment);
-    Assert.assertEquals(Name.Fragment, state.current().getElement());
-    Assert.assertNotEquals(Name.Para, state.current().getElement());
-    state.push(Name.Para);
-    Assert.assertNotEquals(Name.Fragment, state.current().getElement());
-    Assert.assertEquals(Name.Para, state.current().getElement());
+    state.push(Name.FRAGMENT);
+    Assert.assertEquals(Name.FRAGMENT, state.current().getElement());
+    Assert.assertNotEquals(Name.PARA, state.current().getElement());
+    state.push(Name.PARA);
+    Assert.assertNotEquals(Name.FRAGMENT, state.current().getElement());
+    Assert.assertEquals(Name.PARA, state.current().getElement());
   }
 
   @Test
   public void testStateIsElement() {
     State state = new State();
     Assert.assertFalse(state.isElement(null));
-    Assert.assertFalse(state.isElement(Name.Fragment));
-    Assert.assertFalse(state.isElement(Name.Para));
-    state.push(Name.Fragment);
-    Assert.assertTrue(state.isElement(Name.Fragment));
-    Assert.assertFalse(state.isElement(Name.Para));
-    state.push(Name.Para);
-    Assert.assertFalse(state.isElement(Name.Fragment));
-    Assert.assertTrue(state.isElement(Name.Para));
+    Assert.assertFalse(state.isElement(Name.FRAGMENT));
+    Assert.assertFalse(state.isElement(Name.PARA));
+    state.push(Name.FRAGMENT);
+    Assert.assertTrue(state.isElement(Name.FRAGMENT));
+    Assert.assertFalse(state.isElement(Name.PARA));
+    state.push(Name.PARA);
+    Assert.assertFalse(state.isElement(Name.FRAGMENT));
+    Assert.assertTrue(state.isElement(Name.PARA));
   }
 
   @Test
   public void testStateIsDescendantOf() {
     State state = new State();
-    Assert.assertFalse(state.isDescendantOf(Name.Para));
-    state.push(Name.Fragment);
-    Assert.assertFalse(state.isDescendantOf(Name.Para));
-    state.push(Name.Para);
-    Assert.assertTrue(state.isDescendantOf(Name.Para));
-    state.push(Name.Bold);
-    Assert.assertTrue(state.isDescendantOf(Name.Para));
-    Assert.assertTrue(state.isDescendantOf(Name.Fragment));
+    Assert.assertFalse(state.isDescendantOf(Name.PARA));
+    state.push(Name.FRAGMENT);
+    Assert.assertFalse(state.isDescendantOf(Name.PARA));
+    state.push(Name.PARA);
+    Assert.assertTrue(state.isDescendantOf(Name.PARA));
+    state.push(Name.BOLD);
+    Assert.assertTrue(state.isDescendantOf(Name.PARA));
+    Assert.assertTrue(state.isDescendantOf(Name.FRAGMENT));
   }
 
   /**

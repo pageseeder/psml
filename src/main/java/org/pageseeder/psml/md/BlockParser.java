@@ -98,7 +98,7 @@ public class BlockParser {
 
     // Empty lines are used to separate the different kinds of blocks, except inside fenced (```) code
     else if (line.matches("\\s*") && !state.isFenced()) {
-      state.commitUpto(Name.Fragment);
+      state.commitUpto(Name.FRAGMENT);
     }
 
     // New list items starting with '+', '-', '*' or number followed by a '.'
@@ -117,22 +117,22 @@ public class BlockParser {
           state.commit();
         } else {
           // A new list! Clear the context...
-          state.commitUpto(Name.Fragment);
+          state.commitUpto(Name.FRAGMENT);
           // An create a new list
           PSMLElement list;
           if (no.matches("\\d+\\.")) {
-            list = new PSMLElement(Name.Nlist);
+            list = new PSMLElement(Name.NLIST);
             String initial = no.substring(0, no.length()-1);
             if (!"1".equals(initial)) {
               list.setAttribute("start", initial);
             }
           } else {
-            list = new PSMLElement(Name.List);
+            list = new PSMLElement(Name.LIST);
           }
           state.push(list);
         }
         // Create a new item
-        state.push(Name.Item, m.group(2).trim());
+        state.push(Name.ITEM, m.group(2).trim());
       }
     }
 
@@ -151,9 +151,9 @@ public class BlockParser {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (!state.isElement(Name.Preformat)) {
-        state.commitUpto(Name.Fragment);
-        state.push(Name.Preformat, line.substring(4));
+      if (!state.isElement(Name.PREFORMAT)) {
+        state.commitUpto(Name.FRAGMENT);
+        state.push(Name.PREFORMAT, line.substring(4));
       } else {
         state.append(line.substring(4));
       }
@@ -164,13 +164,13 @@ public class BlockParser {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (state.isElement(Name.Preformat)) {
+      if (state.isElement(Name.PREFORMAT)) {
         state.setFenced(false);
         state.append("");
-        state.commitUpto(Name.Fragment);
+        state.commitUpto(Name.FRAGMENT);
       } else {
-        state.commitUpto(Name.Fragment);
-        PSMLElement pre = new PSMLElement(Name.Preformat);
+        state.commitUpto(Name.FRAGMENT);
+        PSMLElement pre = new PSMLElement(Name.PREFORMAT);
         if (line.length() > 3) {
           String language = line.substring(3).trim();
           if (language.length() > 0) {
@@ -187,11 +187,11 @@ public class BlockParser {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (state.isElement(Name.Block)) {
-        state.commitUpto(Name.Fragment);
+      if (state.isElement(Name.BLOCK)) {
+        state.commitUpto(Name.FRAGMENT);
       } else {
-        state.commitUpto(Name.Fragment);
-        PSMLElement pre = new PSMLElement(Name.Block);
+        state.commitUpto(Name.FRAGMENT);
+        PSMLElement pre = new PSMLElement(Name.BLOCK);
         if (line.length() > 3) {
           String label = line.substring(3).trim();
           if (label.length() > 0) {
@@ -203,7 +203,7 @@ public class BlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.Preformat)) {
+    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.PREFORMAT)) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
@@ -211,25 +211,25 @@ public class BlockParser {
       String text = line.substring(line.indexOf('>') + 1).replaceFirst("^\\s+", "");
       // check if already in a blockquote
       PSMLElement current = state.current();
-      if (current != null && current.isElement(Name.Block)) {
+      if (current != null && current.isElement(Name.BLOCK)) {
         List<PSMLNode> children = current.getNodes();
         PSMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
         if (last instanceof PSMLElement) {
           PSMLElement lastElement = (PSMLElement) last;
-          if (lastElement.isElement(Name.Para)) {
+          if (lastElement.isElement(Name.PARA)) {
             if (text.matches("\\s*")) {
-              current.addNode(new PSMLElement(Name.Para));
+              current.addNode(new PSMLElement(Name.PARA));
             } else {
               lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
             }
           }
         }
       } else {
-        state.commitUpto(Name.Fragment);
+        state.commitUpto(Name.FRAGMENT);
         // create new blockquote
-        PSMLElement block = new PSMLElement(Name.Block);
+        PSMLElement block = new PSMLElement(Name.BLOCK);
         block.setAttribute("label", "quoted");
-        PSMLElement p = new PSMLElement(Name.Para);
+        PSMLElement p = new PSMLElement(Name.PARA);
         p.setText(text);
         block.addNode(p);
         state.push(block);
@@ -237,14 +237,14 @@ public class BlockParser {
     }
 
     // Metadata (document mode only)
-    else if (config.isDocumentMode() && !state.isDescendantOf(Name.Section) && line.matches("^\\w+\\:\\s.*")) {
+    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+\\:\\s.*")) {
       int colon = line.indexOf(':');
-      if (!state.isDescendantOf(Name.Metadata)) {
-        state.push(Name.Metadata);
-        state.push(Name.Properties);
+      if (!state.isDescendantOf(Name.METADATA)) {
+        state.push(Name.METADATA);
+        state.push(Name.PROPERTIES);
       }
       // Create and commit a property
-      PSMLElement property = new PSMLElement(Name.Property);
+      PSMLElement property = new PSMLElement(Name.PROPERTY);
       property.setAttribute("name", line.substring(0,colon));
       property.setAttribute("value", line.substring(colon+2).trim());
       state.push(property);
@@ -258,7 +258,7 @@ public class BlockParser {
       }
 
       // We're in a fenced code block
-      if (state.isElement(Name.Preformat)) {
+      if (state.isElement(Name.PREFORMAT)) {
 
         // Just add the line
         state.append(line);
@@ -269,10 +269,10 @@ public class BlockParser {
         Pattern headingPattern = Pattern.compile("^\\s*(#{1,6})\\s+(.*?)(#{1,6})?$");
         Matcher m = headingPattern.matcher(line);
         if (m.matches()) {
-          state.commitUpto(Name.Fragment);
+          state.commitUpto(Name.FRAGMENT);
           String level = Integer.toString(m.group(1).length());
           String text = m.group(2).trim();
-          PSMLElement heading = new PSMLElement(Name.Heading);
+          PSMLElement heading = new PSMLElement(Name.HEADING);
           heading.setAttribute("level", level);
           state.push(heading, text);
           state.commit();
@@ -282,19 +282,19 @@ public class BlockParser {
           boolean isTitle = false;
 
           // Let's check whether we have a heading using SetExt style
-          PSMLElement element = new PSMLElement(Name.Para);
+          PSMLElement element = new PSMLElement(Name.PARA);
           if (next != null) {
             if (next.matches("\\s*==+\\s*")) {
               // We use the '====' as a marker for a new section
               if (config.isDocumentMode() && !state.current().isEmpty()) {
                 state.newSection();
               }
-              element = new PSMLElement(Name.Heading);
+              element = new PSMLElement(Name.HEADING);
               element.setAttribute("level", "1");
 
               // Special case for title section
               if (config.isDocumentMode()) {
-                PSMLElement section = state.ancestor(Name.Section);
+                PSMLElement section = state.ancestor(Name.SECTION);
                 if ("title".equals(section.getAttribute("id"))) {
                   isTitle = true;
                 }
@@ -305,13 +305,13 @@ public class BlockParser {
               if (config.isDocumentMode() && !state.current().isEmpty()) {
                 state.newFragment();
               }
-              element = new PSMLElement(Name.Heading);
+              element = new PSMLElement(Name.HEADING);
               element.setAttribute("level", "2");
             }
           }
 
           if (!state.isElement(element.getElement())) {
-            state.commitUpto(Name.Fragment);
+            state.commitUpto(Name.FRAGMENT);
             state.push(element, line.trim());
           } else {
             if (state.lineBreak) {
@@ -325,7 +325,7 @@ public class BlockParser {
 
           // Special case: we terminate the section title
           if (isTitle) {
-            state.commitUpto(Name.Document);
+            state.commitUpto(Name.DOCUMENT);
           }
         }
       }
@@ -396,7 +396,7 @@ public class BlockParser {
     /**
      * Sets whether we are inside fenced (```) code.
      *
-     * @param whether inside fenced code.
+     * @param fence whether inside fenced code.
      */
     public void setFenced(boolean fence) {
       this.fenced = fence;
@@ -411,8 +411,8 @@ public class BlockParser {
       final int size = this.context.size();
       PSMLElement current = size > 0? this.context.get(size-1) : null;
       PSMLElement parent = size > 1? this.context.get(size-2) : null;
-      boolean isCurrentList = current != null && (current.isElement(Name.List) || current.isElement(Name.Nlist));
-      boolean isParentList = parent != null && (parent.isElement(Name.List) || parent.isElement(Name.Nlist));
+      boolean isCurrentList = current != null && (current.isElement(Name.LIST) || current.isElement(Name.NLIST));
+      boolean isParentList = parent != null && (parent.isElement(Name.LIST) || parent.isElement(Name.NLIST));
       return isCurrentList || isParentList;
     }
 
@@ -470,7 +470,7 @@ public class BlockParser {
     public void newSection() {
       if (this.sectionPosition < this.sectionIds.length) {
         commitAll();
-        PSMLElement section = new PSMLElement(Name.Section);
+        PSMLElement section = new PSMLElement(Name.SECTION);
         String sectionId = this.sectionIds[this.sectionPosition];
         section.setAttribute("id", sectionId);
         push(section);
@@ -482,8 +482,8 @@ public class BlockParser {
      * Set the state to a new fragment
      */
     public void newFragment() {
-      commitUpto(Name.Section);
-      PSMLElement fragment = new PSMLElement(Name.Fragment);
+      commitUpto(Name.SECTION);
+      PSMLElement fragment = new PSMLElement(Name.FRAGMENT);
       fragment.setAttribute("id", ++this.fragmentId);
       push(fragment);
     }
@@ -492,10 +492,10 @@ public class BlockParser {
      * Ensure that we are in a fragment
      */
     public void ensureFragment() {
-      if (!isDescendantOf(Name.Section)) {
+      if (!isDescendantOf(Name.SECTION)) {
         newSection();
       }
-      if (!isDescendantOf(Name.Fragment)) {
+      if (!isDescendantOf(Name.FRAGMENT)) {
         newFragment();
       }
     }
@@ -522,7 +522,7 @@ public class BlockParser {
     /**
      * Add a new element to the context and reset the text.
      *
-     * @param name Name of the element to push
+     * @param element The element to push
      */
     public void push(PSMLElement element) {
       this.context.add(element);
@@ -532,7 +532,7 @@ public class BlockParser {
     /**
      * Add a new element to the context and add some text.
      *
-     * @param name Name of the element to push
+     * @param element The element to push
      * @param text Text for the element (not committed)
      */
     public void push(PSMLElement element, String text) {
@@ -627,7 +627,7 @@ public class BlockParser {
      */
     public void lineBreak() {
       commitText();
-      current().addNode(new PSMLElement(Name.Br));
+      current().addNode(new PSMLElement(Name.BR));
       this.text = new StringBuilder();
     }
 

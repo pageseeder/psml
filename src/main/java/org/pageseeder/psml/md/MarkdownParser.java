@@ -61,9 +61,9 @@ public class MarkdownParser extends Parser {
     // Wrap the element based on the configuration
     PSMLElement wrapper = null;
     if (this.config.isFragment()) {
-      wrapper = new PSMLElement(Name.Fragment);
+      wrapper = new PSMLElement(Name.FRAGMENT);
     } else {
-      wrapper = new PSMLElement(Name.Document);
+      wrapper = new PSMLElement(Name.DOCUMENT);
       wrapper.setAttribute("level", "portable");
     }
     wrapper.addNodes(elements);

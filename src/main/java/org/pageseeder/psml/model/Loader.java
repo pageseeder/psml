@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -46,7 +47,7 @@ public final class Loader {
   /**
    * Lazily loaded SAX parser factory.
    */
-  private SAXParserFactory factory = null;
+  private @Nullable SAXParserFactory factory = null;
 
   /**
    * Indicates whether whitespace should be preserve even in contexts where
@@ -148,7 +149,7 @@ public final class Loader {
     /**
      * The current context, before it is committed
      */
-    private PSMLElement result = null;
+    private PSMLElement result = new PSMLElement(Name.UNKNOWN);
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -186,7 +187,7 @@ public final class Loader {
     /**
      * @return The current element in the stack.
      */
-    private PSMLElement current() {
+    private @Nullable PSMLElement current() {
       if (this.context.isEmpty()) return null;
       return this.context.get(this.context.size()-1);
     }
@@ -230,9 +231,9 @@ public final class Loader {
     private static boolean isIgnorableSpace(CharSequence text, PSMLElement element) {
       return isWhiteSpace(text) &&
           element.isAnyElement(
-              Name.Document, Name.Documentinfo, Name.Section,
-              Name.Fragment, Name.XrefFragment, Name.PropertiesFragment,
-              Name.Table, Name.Row, Name.List, Name.Nlist
+              Name.DOCUMENT, Name.DOCUMENTINFO, Name.SECTION,
+              Name.FRAGMENT, Name.XREF_FRAGMENT, Name.PROPERTIES_FRAGMENT,
+              Name.TABLE, Name.ROW, Name.LIST, Name.NLIST
           );
     }
 

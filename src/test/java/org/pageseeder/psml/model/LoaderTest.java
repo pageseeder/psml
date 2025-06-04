@@ -30,7 +30,7 @@ public class LoaderTest {
     String psml = "<document/>";
     PSMLElement element = loader.parse(new StringReader(psml));
     Assert.assertNotNull(element);
-    Assert.assertEquals(Name.Document, element.getElement());
+    Assert.assertEquals(Name.DOCUMENT, element.getElement());
     Assert.assertEquals(psml, element.toString());
   }
 
@@ -40,7 +40,7 @@ public class LoaderTest {
     String psml = "<document><metadata></metadata></document>";
     PSMLElement element = loader.parse(new StringReader(psml));
     Assert.assertNotNull(element);
-    Assert.assertEquals(Name.Document, element.getElement());
+    Assert.assertEquals(Name.DOCUMENT, element.getElement());
     System.out.println(element);
   }
 
@@ -50,7 +50,7 @@ public class LoaderTest {
     String psml = "<para>A <bold>test</bold>!</para>";
     PSMLElement element = loader.parse(new StringReader(psml));
     Assert.assertNotNull(element);
-    Assert.assertEquals(Name.Para, element.getElement());
+    Assert.assertEquals(Name.PARA, element.getElement());
     System.out.println(element);
   }
 
@@ -60,10 +60,10 @@ public class LoaderTest {
     String psml = "<list><item>A</item><item>B</item></list>";
     PSMLElement element = loader.parse(new StringReader(psml));
     Assert.assertNotNull(element);
-    Assert.assertEquals(Name.List, element.getElement());
+    Assert.assertEquals(Name.LIST, element.getElement());
     Assert.assertEquals(2, element.getNodes().size());
-    Assert.assertEquals(Name.Item, ((PSMLElement)element.getNodes().get(0)).getElement());
-    Assert.assertEquals(Name.Item, ((PSMLElement)element.getNodes().get(1)).getElement());
+    Assert.assertEquals(Name.ITEM, ((PSMLElement)element.getNodes().get(0)).getElement());
+    Assert.assertEquals(Name.ITEM, ((PSMLElement)element.getNodes().get(1)).getElement());
     System.out.println(element);
   }
 

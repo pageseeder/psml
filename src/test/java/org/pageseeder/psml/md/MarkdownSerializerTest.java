@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.PSML;
 import org.pageseeder.psml.model.PSMLElement;
+import org.pageseeder.psml.model.PSMLNode;
 
 public final class MarkdownSerializerTest {
 
@@ -85,14 +86,18 @@ public final class MarkdownSerializerTest {
     Assert.assertEquals("[test](http://example.net/)", toMarkdown("<link href=\"http://example.net/\">test</link>"));
   }
 
+  @Test
+  public void testList() {
+    String psml = "<list><item>Item 1</item><item>Item 2</item></list>";
+    Assert.assertEquals(" * Item 1\n * Item 2\n", toMarkdown(psml));
+  }
+
   /**
    * Returns the Markdown text as PSML using the inline parser.
    *
    * @param text The text to parse
    *
    * @return The corresponding PSML as a string.
-   *
-   * @throws IOException If thrown by
    */
   private static String toMarkdown(String text) {
     try {

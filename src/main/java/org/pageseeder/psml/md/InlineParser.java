@@ -15,7 +15,6 @@
  */
 package org.pageseeder.psml.md;
 
-import org.pageseeder.psml.html.HTMLText;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
@@ -142,32 +141,32 @@ public class InlineParser {
       previousEnd = m.end();
       // Strong emphases with '**' (appear in bold)
       if (m.group(1) != null) {
-        PSMLElement element = new PSMLElement(Name.Bold);
+        PSMLElement element = new PSMLElement(Name.BOLD);
         element.addNodes(parse(m.group(2)));
         nodes.add(element);
       }
       // Strong emphases with '__' (appear in bold)
       else if (m.group(3) != null) {
-        PSMLElement element = new PSMLElement(Name.Bold);
+        PSMLElement element = new PSMLElement(Name.BOLD);
         element.addNodes(parse(m.group(4)));
         nodes.add(element);
       }
       // Normal emphases with '*' (appear in italic)
       if (m.group(5) != null) {
-        PSMLElement element = new PSMLElement(Name.Italic);
+        PSMLElement element = new PSMLElement(Name.ITALIC);
         element.addNodes(parse(m.group(6)));
         nodes.add(element);
       }
       // Strong emphases with '_' (appear in bold)
       else if (m.group(7) != null) {
-        PSMLElement element = new PSMLElement(Name.Italic);
+        PSMLElement element = new PSMLElement(Name.ITALIC);
         element.addNodes(parse(m.group(8)));
         nodes.add(element);
       }
       // Code with '`'
       else if (m.group(9) != null) {
         String code = m.group(10);
-        PSMLElement monospace = new PSMLElement(Name.Monospace);
+        PSMLElement monospace = new PSMLElement(Name.MONOSPACE);
         if (code.length() > 0) {
           monospace.addNode(new PSMLText(code));
         }
@@ -176,7 +175,7 @@ public class InlineParser {
       // Code escape with '``'
       else if (m.group(11) != null) {
         String code = m.group(12);
-        PSMLElement monospace = new PSMLElement(Name.Monospace);
+        PSMLElement monospace = new PSMLElement(Name.MONOSPACE);
         if (code.length() > 0) {
           monospace.addNode(new PSMLText(code));
         }
@@ -188,12 +187,12 @@ public class InlineParser {
         String src = m.group(15);
         if (src.startsWith("http")) {
           // PageSeeder does not support external images
-          PSMLElement link = new PSMLElement(Name.Link);
+          PSMLElement link = new PSMLElement(Name.LINK);
           link.setAttribute("href", unescape(src));
           link.addNodes(parse(alt, true));
           nodes.add(link);
         } else {
-          PSMLElement image = new PSMLElement(Name.Image);
+          PSMLElement image = new PSMLElement(Name.IMAGE);
           image.setAttribute("alt", unescape(alt));
           image.setAttribute("src", unescape(src));
           nodes.add(image);
@@ -204,7 +203,7 @@ public class InlineParser {
         String ref = m.group(18);
         String text = m.group(17);
         if (ref.startsWith("http")) {
-          PSMLElement link = new PSMLElement(Name.Link);
+          PSMLElement link = new PSMLElement(Name.LINK);
           link.setAttribute("href", unescape(ref));
           link.addNodes(parse(text, true));
           nodes.add(link);
@@ -212,7 +211,7 @@ public class InlineParser {
           int hash = ref.indexOf('#');
           String url = hash < 0? ref : ref.substring(0, hash);
           String fragment = hash < 0? "default" : ref.substring(hash+1);
-          PSMLElement xref = new PSMLElement(Name.Xref);
+          PSMLElement xref = new PSMLElement(Name.XREF);
           // TODO Config
           xref.setAttribute("display", "manual");
           xref.setAttribute("reverselink", "true");
@@ -227,7 +226,7 @@ public class InlineParser {
       else if (m.group(19) != null && !inLink) {
         String url = m.group(20);
         String text = m.group(22);
-        PSMLElement link = new PSMLElement(Name.Link);
+        PSMLElement link = new PSMLElement(Name.LINK);
         link.setAttribute("href", unescape(url));
         link.addNode(new PSMLText(unescape(text)));
         nodes.add(link);
@@ -235,7 +234,7 @@ public class InlineParser {
       // Auto links
       else if (m.group(23) != null && !inLink) {
         String url = m.group(23);
-        PSMLElement link = new PSMLElement(Name.Link);
+        PSMLElement link = new PSMLElement(Name.LINK);
         link.setAttribute("href", unescape(url));
         link.addNode(new PSMLText(unescape(url)));
         nodes.add(link);

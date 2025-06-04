@@ -16,13 +16,11 @@
 package org.pageseeder.psml.model;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -35,6 +33,9 @@ import org.pageseeder.xmlwriter.XMLWriter;
  * @see <a href="https://dev.pageseeder.com/api/psml/element_reference.html">PSML element reference</a>
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class PSMLElement implements PSMLNode {
 
@@ -51,140 +52,140 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-anchor.html">anchor element</a>
      */
-    Anchor("anchor", true, "name"),
+    ANCHOR("anchor", true, "name"),
 
     /**
      * &lt;author&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-author.html">author element</a>
      */
-    Author("author", "firstname", "id", "surname"),
+    AUTHOR("author", "firstname", "id", "surname"),
 
     /**
      * &lt;block&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-block.html">block element</a>
      */
-    Block("block", "label"),
+    BLOCK("block", "label"),
 
     /**
      * &lt;blockxref&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-blockxref.html">blockxref element</a>
      */
-    Blockxref("blockxref", "display","docid","documenttype","external","frag","href","id","labels","level","mediatype","reverselink","reversetitle","reversetype","title","type","unresolved","uriid","urititle"),
+    BLOCKXREF("blockxref", "display","docid","documenttype","external","frag","href","id","labels","level","mediatype","reverselink","reversetitle","reversetype","title","type","unresolved","uriid","urititle"),
 
     /**
      * &lt;bold&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-bold.html">bold element</a>
      */
-    Bold("bold", true),
+    BOLD("bold", true),
 
     /**
      * &lt;br&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-br.html">br element</a>
      */
-    Br("br", true),
+    BR("br", true),
 
     /**
      * &lt;caption&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-caption.html">caption element</a>
      */
-    Caption("caption"),
+    CAPTION("caption"),
 
     /**
      * &lt;cell&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-cell.html">cell element</a>
      */
-    Cell("cell", "align", "colspan", "role", "rowspan", "valign", "width"),
+    CELL("cell", "align", "colspan", "role", "rowspan", "valign", "width"),
 
     /**
      * &lt;col&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-col.html">col element</a>
      */
-    Col("col", "align", "part", "role", "span", "width"),
+    COL("col", "align", "part", "role", "span", "width"),
 
     /**
      * &lt;compare&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-compare.html">compare element</a>
      */
-    Compare("compare"),
+    COMPARE("compare"),
 
     /**
      * &lt;compareto&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-compareto.html">compareto element</a>
      */
-    Compareto("compareto", "date", "version", "docid"),
+    COMPARETO("compareto", "date", "version", "docid"),
 
     /**
      * &lt;content&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-content.html">content element</a>
      */
-    Content("content"),
+    CONTENT("content"),
 
     /**
      * &lt;description&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-description.html">description element</a>
      */
-    Description("description"),
+    DESCRIPTION("description"),
 
     /**
      * &lt;diff&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-diff.html">diff element</a>
      */
-    Diff("diff"),
+    DIFF("diff"),
 
     /**
      * &lt;displaytitle&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-displaytitle.html">displaytitle element</a>
      */
-    Displaytitle("displaytitle"),
+    DISPLAYTITLE("displaytitle"),
 
     /**
      * &lt;document&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-document.html">document element</a>
      */
-    Document("document", "date", "edit", "id", "level", "lockstructure", "schemaversion", "status", "type", "version"),
+    DOCUMENT("document", "date", "edit", "id", "level", "lockstructure", "schemaversion", "status", "type", "version"),
 
     /**
      * &lt;documentinfo&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-documentinfo.html">documentinfo element</a>
      */
-    Documentinfo("documentinfo"),
+    DOCUMENTINFO("documentinfo"),
 
     /**
      * &lt;fragment&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fragment.html">fragment element</a>
      */
-    Fragment("fragment", "id", "type"),
+    FRAGMENT("fragment", "id", "type"),
 
     /**
      * &lt;fragmentinfo&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fragmentinfo.html">fragmentinfo element</a>
      */
-    Fragmentinfo("fragmentinfo"),
+    FRAGMENTINFO("fragmentinfo"),
 
     /**
      * &lt;fullname&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fullname.html">fullname element</a>
      */
-    Fullname("fullname"),
+    FULLNAME("fullname"),
 
     /**
      * &lt;hcell&lt; element
@@ -193,283 +194,283 @@ public class PSMLElement implements PSMLNode {
      *
      * @deprecated
      */
-    Hcell("hcell", "align", "alignment", "colspan", "role", "rowspan", "valign", "width"),
+    HCELL("hcell", "align", "alignment", "colspan", "role", "rowspan", "valign", "width"),
 
     /**
      * &lt;heading&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-heading.html">heading element</a>
      */
-    Heading("heading"),
+    HEADING("heading"),
 
     /**
      * &lt;image&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-image.html">image element</a>
      */
-    Image("image", true, "src", "docid", "uriid", "alt", "height", "unresolved", "width"),
+    IMAGE("image", true, "src", "docid", "uriid", "alt", "height", "unresolved", "width"),
 
     /**
      * &lt;inline&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-inline.html">inline element</a>
      */
-    Inline("inline", true, "label"),
+    INLINE("inline", true, "label"),
 
     /**
      * &lt;italic&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-italic.html">italic element</a>
      */
-    Italic("italic", true),
+    ITALIC("italic", true),
 
     /**
      * &lt;item&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-item.html">item element</a>
      */
-    Item("item"),
+    ITEM("item"),
 
     /**
      * &lt;item&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-item.html">item element</a>
      */
-    Labels("labels"),
+    LABELS("labels"),
 
     /**
      * &lt;link&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-link.html">link element</a>
      */
-    Link("link", true, "href", "role"),
+    LINK("link", true, "href", "role"),
 
     /**
      * &lt;list&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-list.html">list element</a>
      */
-    List("list", "type", "role"),
+    LIST("list", "type", "role"),
 
     /**
      * &lt;locator&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-locator.html">locator element</a>
      */
-    Locator("locator", "editid", "fragment", "id", "modified"),
+    LOCATOR("locator", "editid", "fragment", "id", "modified"),
 
     /**
      * &lt;markdown&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-markdown.html">markdown element</a>
      */
-    Markdown("markdown"),
+    MARKDOWN("markdown"),
 
     /**
      * &lt;media-fragment&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-media-fragment.html">media-fragment element</a>
      */
-    MediaFragment("media-fragment", "id", "mediatype", "type"),
+    MEDIA_FRAGMENT("media-fragment", "id", "mediatype", "type"),
 
     /**
      * &lt;metadata&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-metadata.html">metadata element</a>
      */
-    Metadata("metadata"),
+    METADATA("metadata"),
 
     /**
      * &lt;monospace&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-monospace.html">monospace element</a>
      */
-    Monospace("monospace", true),
+    MONOSPACE("monospace", true),
 
     /**
      * &lt;nlist&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-nlist.html">nlist element</a>
      */
-    Nlist("nlist", "start", "type", "role"),
+    NLIST("nlist", "start", "type", "role"),
 
     /**
      * &lt;note&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-note.html">note element</a>
      */
-    Note("note", "id", "modified", "title"),
+    NOTE("note", "id", "modified", "title"),
 
     /**
      * &lt;notes&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-notes.html">notes element</a>
      */
-    Notes("notes"),
+    NOTES("notes"),
 
     /**
      * &lt;para&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-para.html">para element</a>
      */
-    Para("para", "indent", "numbered", "prefix"),
+    PARA("para", "indent", "numbered", "prefix"),
 
     /**
      * &lt;preformat&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-preformat.html">preformat element</a>
      */
-    Preformat("preformat"),
+    PREFORMAT("preformat"),
 
     /**
      * &lt;properties&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-properties.html">properties element</a>
      */
-    Properties("properties"),
+    PROPERTIES("properties"),
 
     /**
      * &lt;properties-fragment&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-properties-fragment.html">properties-fragment element</a>
      */
-    PropertiesFragment("properties-fragment"),
+    PROPERTIES_FRAGMENT("properties-fragment"),
 
     /**
      * &lt;property&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-property.html">property element</a>
      */
-    Property("property", "count", "datatype", "name", "title", "value"),
+    PROPERTY("property", "count", "datatype", "name", "title", "value"),
 
     /**
      * &lt;reversexrefs&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-reversexrefs.html">reversexrefs element</a>
      */
-    Reversexref("reversexref", "docid","documenttype","forwardtitle","forwardtype","frag","href","id","labels","level","mediatype","title","type","uriid","urititle"),
+    REVERSEXREF("reversexref", "docid","documenttype","forwardtitle","forwardtype","frag","href","id","labels","level","mediatype","title","type","uriid","urititle"),
 
     /**
      * &lt;reversexrefs&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-reversexrefs.html">reversexrefs element</a>
      */
-    Reversexrefs("reversexrefs", "limitreached"),
+    REVERSEXREFS("reversexrefs", "limitreached"),
 
     /**
      * &lt;row&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-row.html">row element</a>
      */
-    Row("row", "align", "part", "role"),
+    ROW("row", "align", "part", "role"),
 
     /**
      * &lt;section&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-section.html">section element</a>
      */
-    Section("section", "edit", "fragmenttype", "id", "lockstructure", "overwrite", "title"),
+    SECTION("section", "edit", "fragmenttype", "id", "lockstructure", "overwrite", "title"),
 
     /**
      * &lt;sub&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-sub.html">sub element</a>
      */
-    Sub("sub", true),
+    SUB("sub", true),
 
     /**
      * &lt;sup&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-sup.html">sup element</a>
      */
-    Sup("sup", true),
+    SUP("sup", true),
 
     /**
      * &lt;table&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-table.html">table element</a>
      */
-    Table("table", "height", "role", "summary", "width"),
+    TABLE("table", "height", "role", "summary", "width"),
 
     /**
      * &lt;title&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-title.html">title element</a>
      */
-    Title("title"),
+    TITLE("title"),
 
     /**
      * &lt;toc&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-toc.html">toc element</a>
      */
-    Toc("toc"),
+    TOC("toc"),
 
     /**
      * &lt;tocref&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-tocref.html">tocref element</a>
      */
-    Tocref("tocref", "level", "idref", "canonical", "prefix"),
+    TOCREF("tocref", "level", "idref", "canonical", "prefix"),
 
     /**
      * &lt;underline&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-underline.html">underline element</a>
      */
-    Underline("underline", true),
+    UNDERLINE("underline", true),
 
     /**
      * &lt;uri&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-uri.html">uri element</a>
      */
-    Uri("uri", "created", "decodedpath", "docid", "documenttype", "external", "folder", "host", "id", "mediatype", "modified", "path", "port", "scheme", "title"),
+    URI("uri", "created", "decodedpath", "docid", "documenttype", "external", "folder", "host", "id", "mediatype", "modified", "path", "port", "scheme", "title"),
 
     /**
      * &lt;value&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-value.html">value element</a>
      */
-    Value("value"),
+    VALUE("value"),
 
     /**
      * &lt;version&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-version.html">version element</a>
      */
-    Version("version", "created", "id", "name"),
+    VERSION("version", "created", "id", "name"),
 
     /**
      * &lt;versions&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-versions.html">versions element</a>
      */
-    Versions("versions"),
+    VERSIONS("versions"),
 
     /**
      * &lt;xref&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-xref.html">xref element</a>
      */
-    Xref("xref", true, "display","docid","documenttype","external","frag","href","id","labels","level","mediatype","reverselink","reversetitle","reversetype","title","type","unresolved","uriid","urititle"),
+    XREF("xref", true, "display","docid","documenttype","external","frag","href","id","labels","level","mediatype","reverselink","reversetitle","reversetype","title","type","unresolved","uriid","urititle"),
 
     /**
      * &lt;xref-fragment&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-xref-fragment.html">xref-fragment element</a>
      */
-    XrefFragment("xref-fragment", "id", "type"),
+    XREF_FRAGMENT("xref-fragment", "id", "type"),
 
     /**
      * This element is used for any unrecognized PSML element.
      */
-    Unknown("unknown");
+    UNKNOWN("unknown");
 
     /**
      * The actual element name.
      */
-    private final String _element;
+    private final String element;
 
     /**
      * Indicates that this element is an inline element.
@@ -477,12 +478,12 @@ public class PSMLElement implements PSMLNode {
      * <p>It is defined as an inline element if it can have sibling text nodes
      * that are significant (i.e other than white spaces)
      */
-    private final boolean _inline;
+    private final boolean inline;
 
     /**
      * The possible attributes on this element.
      */
-    private final List<String> _attributes;
+    private final List<String> attributes;
 
     /**
      * Creates a new PSML name for the
@@ -491,10 +492,10 @@ public class PSMLElement implements PSMLNode {
      * @param inline     whether it is an inline element
      * @param attributes an array of possible attribute names
      */
-    private Name(String name, boolean inline, String... attributes) {
-      this._element = name;
-      this._inline = inline;
-      this._attributes = Arrays.asList(attributes);
+    Name(String name, boolean inline, String... attributes) {
+      this.element = name;
+      this.inline = inline;
+      this.attributes = Arrays.asList(attributes);
     }
 
     /**
@@ -503,7 +504,7 @@ public class PSMLElement implements PSMLNode {
      * @param name       the name of the element
      * @param attributes an array of possible attribute names
      */
-    private Name(String name, String... attributes) {
+    Name(String name, String... attributes) {
       this(name, false, attributes);
     }
 
@@ -511,43 +512,72 @@ public class PSMLElement implements PSMLNode {
      * @return The element name.
      */
     public String element() {
-      return this._element;
+      return this.element;
     }
 
     /**
      * @return <code>true</code> if considered an inline element.
      */
     public boolean isInline() {
-      return this._inline;
+      return this.inline;
     }
 
     /**
      * @return The list of possible attribute names for this element.
      */
     public List<String> attributes() {
-      return this._attributes;
+      return this.attributes;
     }
 
     public static Name forElement(String name) {
       for (Name element : values()) {
-        if (element._element.equals(name)) return element;
+        if (element.element.equals(name)) return element;
       }
-      return Name.Unknown;
+      return Name.UNKNOWN;
     }
 
   }
 
   /**
+   * Represents the name of the PSML element.
    *
+   * <p>The name serves as an identifier for the element, allowing interactions
+   * such as retrieval, comparison, or updates. By default, this field is
+   * initialized to {@code Name.Unknown}.
    */
-  private Name name = Name.Unknown;
+  private Name name = Name.UNKNOWN;
 
-  private Map<String, String> attributes;
+  /**
+   * A map of attributes associated with this element. Keys represent attribute
+   * names and values represent their corresponding string values.
+   *
+   * <p>This map may be null if no attributes have been defined for the element.
+   * It is typically initialized lazily when an attribute is added to the element.
+   */
+  private @Nullable Map<String, String> attributes;
 
-  public List<PSMLNode> nodes;
+  /**
+   * The list of child nodes associated with this element.
+   *
+   * <p>Each child node implements the {@link PSMLNode} interface. The list can contain
+   * various types of nodes, including element nodes and text nodes.
+   *
+   * <p>This field supports lazy initialization and may be {@code null} if no nodes
+   * have been added to this element. Use methods like {@code addNode}, {@code addNodes},
+   * or {@code setText} in the containing class to populate it.
+   *
+   * <p>Modifying this field directly outside provided methods is discouraged
+   * to prevent inconsistent states.
+   */
+  public @Nullable List<PSMLNode> nodes;
 
+  /**
+   * Constructs a new PSMLElement with the specified name.
+   *
+   * @param name The name of this element. Must not be null.
+   */
   public PSMLElement(Name name) {
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
   }
 
   /**
@@ -557,8 +587,6 @@ public class PSMLElement implements PSMLNode {
     return this.name;
   }
 
-
-
   /**
    * Changes the name of this element.
    *
@@ -567,7 +595,7 @@ public class PSMLElement implements PSMLNode {
    * @return this element
    */
   public PSMLElement setName(Name name) {
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
     return this;
   }
 
@@ -588,15 +616,38 @@ public class PSMLElement implements PSMLNode {
   }
 
   /**
+   * Indicates whether the name of this element matches the specified name.
+   */
+  public boolean isAnyElement(Name... names) {
+    for (Name element : names) {
+      if (this.name == element) return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the attribute value for the specified attribute.
    *
    * @param name The name of the attribute.
    *
    * @return The corresponding value or <code>null</code>.
    */
-  public String getAttribute(String name) {
+  public @Nullable String getAttribute(String name) {
     if (this.attributes == null) return null;
     else return this.attributes.get(name);
+  }
+
+  /**
+   * Returns the attribute value for the specified attribute.
+   *
+   * @param name The name of the attribute.
+   *
+   * @return The corresponding value or <code>null</code>.
+   */
+  public String getAttributeOrElse(String name, String defaultValue) {
+    if (this.attributes == null) return defaultValue;
+    String value = this.attributes.get(name);
+    return value == null ? defaultValue : value;
   }
 
   /**
@@ -659,9 +710,9 @@ public class PSMLElement implements PSMLNode {
    * <p>Implementation note: this method will initialize the node list if
    * necessary.
    *
-   * @param name The name of the attribute.
+   * @param node The name of the attribute.
    *
-   * @return this element
+   * @return this element for easy chaining.
    */
   public PSMLElement addNode(PSMLNode node) {
     if (this.nodes == null) {
@@ -680,9 +731,9 @@ public class PSMLElement implements PSMLNode {
    * <p>Implementation note: this method will initialize the node list if
    * necessary.
    *
-   * @param name The name of the attribute.
+   * @param nodes The list of nodes to add
    *
-   * @return this element
+   * @return this element for easy chaining.
    */
   public PSMLElement addNodes(List<? extends PSMLNode> nodes) {
     if (this.nodes == null) {
@@ -701,17 +752,15 @@ public class PSMLElement implements PSMLNode {
    * <p>Implementation note: this method will initialize the node list if
    * necessary.
    *
-   * @param name The name of the attribute.
+   * @param nodes The array of nodes to add
    *
-   * @return this element
+   * @return this element for easy chaining.
    */
   public PSMLElement addNodes(PSMLNode... nodes) {
     if (this.nodes == null) {
       this.nodes = new ArrayList<>();
     }
-    for (PSMLNode node : nodes ){
-      this.nodes.add(node);
-    }
+    this.nodes.addAll(Arrays.asList(nodes));
     return this;
   }
 
@@ -726,7 +775,7 @@ public class PSMLElement implements PSMLNode {
    *
    * @param text The text to set.
    *
-   * @return this element
+   * @return this element for easy chaining.
    */
   public PSMLElement setText(String text) {
     if (this.nodes == null) {
@@ -747,9 +796,9 @@ public class PSMLElement implements PSMLNode {
    * <p>Implementation note: this method will initialize the node list if
    * necessary.
    *
-   * @param name The text to add to this element.
+   * @param text The text to add to this element.
    *
-   * @return this element
+   * @return this element for easy chaining.
    */
   public PSMLElement addText(String text) {
     if (this.nodes == null) {
@@ -775,12 +824,93 @@ public class PSMLElement implements PSMLNode {
   }
 
   /**
+   * Retrieves all child elements of this PSMLElement instance that are instances of PSMLElement.
+   *
+   * <p>The method filters the list of nodes associated with the element, extracting only those
+   * that are of type PSMLElement.
+   *
+   * @return A list of child elements that are of type PSMLElement. If there are no such elements
+   *         or the node list is uninitialized, an empty list is returned.
+   */
+  public List<PSMLElement> getChildElements() {
+    if (this.nodes == null) return List.of();
+    return this.nodes.stream()
+        .filter(PSMLElement.class::isInstance)
+        .map(PSMLElement.class::cast)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Retrieves all child elements of this PSMLElement instance that match the specified name.
+   *
+   * <p>This method filters the list of nodes associated with the element, extracting only those
+   * that are of type {@code PSMLElement} and whose name matches the specified {@code Name}.
+   *
+   * @param name The name to filter the child elements by. Must not be {@code null}.
+   *
+   * @return A list of child elements of type {@code PSMLElement} whose name matches the specified
+   *         {@code Name}. If there are no matching elements or the node list is uninitialized,
+   *         an empty list is returned.
+   */
+  public List<PSMLElement> getChildElements(Name name) {
+    if (this.nodes == null) return List.of();
+    return this.nodes.stream()
+        .filter(PSMLElement.class::isInstance)
+        .map(PSMLElement.class::cast)
+        .filter(e -> e.isElement(name))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Retrieves all child elements of this PSMLElement instance that match the specified names.
+   *
+   * This method filters the list of nodes associated with the element, extracting only those
+   * that are of type {@code PSMLElement} and whose name matches any of the specified {@code Name}.
+   *
+   * @param names The array of names to filter the child elements by. Must not be {@code null}.
+   * @return A list of child elements of type {@code PSMLElement} whose name matches any of the specified
+   *         {@code Name}. If there are no matching elements or the node list is uninitialized,
+   *         an empty list is returned.
+   */
+  public List<PSMLElement> getChildElements(Name... names) {
+    if (this.nodes == null) return List.of();
+    return this.nodes.stream()
+        .filter(PSMLElement.class::isInstance)
+        .map(PSMLElement.class::cast)
+        .filter(e -> e.isAnyElement(names))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Retrieves all child elements of this PSMLElement instance that match the specified name.
+   *
+   * <p>This method filters the list of nodes associated with the element, extracting only those
+   * that are of type {@code PSMLElement} and whose name matches the specified {@code Name}.
+   *
+   * @param name The name to filter the child elements by. Must not be {@code null}.
+   *
+   * @return A list of child elements of type {@code PSMLElement} whose name matches the specified
+   *         {@code Name}. If there are no matching elements or the node list is uninitialized,
+   *         an empty list is returned.
+   */
+  public @Nullable PSMLElement getFirstChildElement(Name name) {
+    if (this.nodes == null) return null;
+    for (PSMLNode node : this.nodes) {
+      if (node instanceof PSMLElement && ((PSMLElement)node).isElement(name)) {
+        return (PSMLElement)node;
+      }
+    }
+    return null;
+  }
+
+
+  /**
    * Indicates whether the element has nay child node (attribute nodes are ignored)
    *
    * @return <code>true</code> is the node list is uninitialized or empty.
    */
   public boolean isEmpty() {
-    return this.nodes == null || this.nodes.size() == 0;
+    return this.nodes == null || this.nodes.isEmpty();
   }
 
   @Override
@@ -812,6 +942,12 @@ public class PSMLElement implements PSMLNode {
     xml.closeElement();
   }
 
+  /**
+   * Converts this PSMLElement object to its string representation in XML format.
+   * The output is generated using an instance of XMLStringWriter.
+   *
+   * @return A string representation of this element in XML format.
+   */
   @Override
   public String toString() {
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
