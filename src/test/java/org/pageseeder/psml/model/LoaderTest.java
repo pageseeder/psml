@@ -24,21 +24,18 @@ import org.pageseeder.psml.model.PSMLElement.Name;
 
 public class LoaderTest {
 
-  public LoaderTest() {
-  }
-
   @Test
-  public void testParse() throws IOException {
+  public void testParse_Document() throws IOException {
     Loader loader = new Loader();
     String psml = "<document/>";
     PSMLElement element = loader.parse(new StringReader(psml));
     Assert.assertNotNull(element);
     Assert.assertEquals(Name.Document, element.getElement());
-    System.out.println(element);
+    Assert.assertEquals(psml, element.toString());
   }
 
   @Test
-  public void testParse2() throws IOException {
+  public void testParse_Metadata() throws IOException {
     Loader loader = new Loader();
     String psml = "<document><metadata></metadata></document>";
     PSMLElement element = loader.parse(new StringReader(psml));
@@ -48,7 +45,7 @@ public class LoaderTest {
   }
 
   @Test
-  public void testParse3() throws IOException {
+  public void testParse_ParaMixedContent() throws IOException {
     Loader loader = new Loader();
     String psml = "<para>A <bold>test</bold>!</para>";
     PSMLElement element = loader.parse(new StringReader(psml));
@@ -57,6 +54,17 @@ public class LoaderTest {
     System.out.println(element);
   }
 
-
+  @Test
+  public void testParse_List() throws IOException {
+    Loader loader = new Loader();
+    String psml = "<list><item>A</item><item>B</item></list>";
+    PSMLElement element = loader.parse(new StringReader(psml));
+    Assert.assertNotNull(element);
+    Assert.assertEquals(Name.List, element.getElement());
+    Assert.assertEquals(2, element.getNodes().size());
+    Assert.assertEquals(Name.Item, ((PSMLElement)element.getNodes().get(0)).getElement());
+    Assert.assertEquals(Name.Item, ((PSMLElement)element.getNodes().get(1)).getElement());
+    System.out.println(element);
+  }
 
 }
