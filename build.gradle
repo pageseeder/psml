@@ -10,15 +10,18 @@ description = "$title"
 
 apply from: 'gradle/publish-mavencentral.gradle'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 repositories {
   mavenCentral { url 'https://maven-central.storage.googleapis.com/maven2' }
   maven { url 'https://s01.oss.sonatype.org/content/groups/public/' }
 }
 
-tasks.withType(JavaCompile) {
+// Use Java toolchain to ensure the correct JVM is used by Gradle
+java.toolchain {
+  languageVersion.set(JavaLanguageVersion.of(11))
+}
+
+tasks.withType(JavaCompile).configureEach {
+  options.release = 11 // Target Java 11 compatibility
   options.encoding = 'UTF-8'
 }
 
