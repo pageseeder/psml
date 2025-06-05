@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Christophe Lauret
  *
- * @version 1.2.0
+ * @version 1.6.0
  * @since 1.0
  */
 public final class Constants {

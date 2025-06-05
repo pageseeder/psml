@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
  * Processes a new document template to generate new document instances.
  *
  * <p>A new instance can be created as:
- * <pre>
+ * <pre>{@code
  * Processor p = new Processor();
  * File template = new File([path to template]);
  * File psml = new File([path to document to create]);
@@ -40,16 +40,19 @@ import org.xml.sax.SAXException;
  * values.put([name], [value]);
  *  ...
  * p.process(template, psml, values);
- * </pre>
+ * }</pre>
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class Processor {
 
   /**
    * The handler for the specified encoding (lazily loaded).
    */
-  private Charset charset;
+  private final Charset charset;
 
   /**
    * The fragment to process if any, otherwise document.
@@ -98,10 +101,10 @@ public final class Processor {
    *
    * @param template The PSML template to process.
    * @param psml     The PSML document to generate.
-   * @param values   The values to fill out the place holders
+   * @param values   The values to fill out the placeholders
    *
    * @throws IOException Should an I/O error occur while reading the XML.
-   * @throws SAXException Should an error occur while parsing the XML.
+   * @throws TemplateException Should an error occur while parsing the XML.
    */
   public void process(Reader template, Writer psml, Map<String, String> values) throws IOException, TemplateException {
     InputSource source = new InputSource(template);
@@ -122,7 +125,7 @@ public final class Processor {
    */
   public void process(File template, File psml, Map<String, String> values) throws IOException, TemplateException {
     InputSource source = new InputSource(template.toURI().toASCIIString());
-    PrintWriter out = new PrintWriter(psml, this.charset.name());
+    PrintWriter out = new PrintWriter(psml, this.charset);
     process(source, out, values);
   }
 
@@ -139,7 +142,7 @@ public final class Processor {
    */
   public void process(Reader template, File psml, Map<String, String> values) throws IOException, TemplateException {
     InputSource source = new InputSource(template);
-    PrintWriter out = new PrintWriter(psml, this.charset.name());
+    PrintWriter out = new PrintWriter(psml, this.charset);
     process(source, out, values);
   }
 

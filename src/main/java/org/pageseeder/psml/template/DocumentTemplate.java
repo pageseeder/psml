@@ -15,6 +15,8 @@
  */
 package org.pageseeder.psml.template;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -27,23 +29,26 @@ import java.util.Map;
  * A PSML template.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class DocumentTemplate implements Template {
 
   /**
    * The charset used for this template.
    */
-  private final Charset _charset;
+  private final Charset charset;
 
   /**
    * The list of tokens this template is made of.
    */
-  private final List<Token> _tokens;
+  private final List<Token> tokens;
 
   /**
    * The list of fragments this template is made of.
    */
-  private final Map<String, TFragment> _fragments;
+  private final Map<String, TFragment> fragments;
 
   /**
    * Create a new template.
@@ -53,9 +58,9 @@ public final class DocumentTemplate implements Template {
    * @param charset   the charset
    */
   private DocumentTemplate(List<Token> tokens, Map<String, TFragment> fragments, Charset charset) {
-    this._tokens = new ArrayList<Token>(tokens);
-    this._fragments = new HashMap<String, TFragment>(fragments);
-    this._charset = charset;
+    this.tokens = new ArrayList<>(tokens);
+    this.fragments = new HashMap<>(fragments);
+    this.charset = charset;
   }
 
   /**
@@ -65,7 +70,7 @@ public final class DocumentTemplate implements Template {
    */
   @Override
   public Charset charset() {
-    return this._charset;
+    return this.charset;
   }
 
   /**
@@ -76,8 +81,8 @@ public final class DocumentTemplate implements Template {
    */
   @Override
   public void process(PrintWriter psml, Map<String, String> values) {
-    for (Token token : this._tokens) {
-      token.print(psml, values, this._charset);
+    for (Token token : this.tokens) {
+      token.print(psml, values, this.charset);
     }
     psml.flush();
   }
@@ -92,7 +97,7 @@ public final class DocumentTemplate implements Template {
   public void process(PrintWriter psml, Map<String, String> values, boolean failOnError) throws TemplateException {
     // If fail on error scan for any error reported during parsing
     if (failOnError) {
-      for (Token token : this._tokens) {
+      for (Token token : this.tokens) {
         if (token instanceof TError) throw new TemplateException(((TError)token).message());
       }
     }
@@ -103,7 +108,7 @@ public final class DocumentTemplate implements Template {
    * @return the fragment types from the template
    */
   public Collection<String> getFragments() {
-    return new ArrayList<String>(this._fragments.keySet());
+    return new ArrayList<>(this.fragments.keySet());
   }
 
   /**
@@ -113,10 +118,10 @@ public final class DocumentTemplate implements Template {
    * 
    * @return the fragment template
    */
-  public FragmentTemplate getFragmentTemplate(String type) {
-    TFragment frag = this._fragments.get(type);
+  public @Nullable FragmentTemplate getFragmentTemplate(String type) {
+    TFragment frag = this.fragments.get(type);
     if (frag == null) return null;
-    FragmentTemplate.Builder builder = new FragmentTemplate.Builder(this._charset, frag.type());
+    FragmentTemplate.Builder builder = new FragmentTemplate.Builder(this.charset, frag.type());
     builder.setFragment(frag);
     return builder.build();
   }
@@ -129,41 +134,40 @@ public final class DocumentTemplate implements Template {
     /**
      * The charset used by the builder.
      */
-    private final Charset _charset;
+    private final Charset charset;
 
     /**
      * The types for each parameter.
      */
-    private final Map<String, ParameterType> _types = new HashMap<String, ParameterType>();
+    private final Map<String, ParameterType> types = new HashMap<>();
 
     /**
      * The types for each parameter.
      */
-    private final Map<String, TFragment> _fragments = new HashMap<String, TFragment>();
+    private final Map<String, TFragment> fragments = new HashMap<>();
 
     /**
      * The default values.
      */
-    private final Map<String, String> _defaults = new HashMap<String, String>();
+    private final Map<String, String> defaults = new HashMap<>();
 
     /**
      * The list of tokens this template is made of.
      */
-    private final List<Token> tokens = new ArrayList<Token>();
+    private final List<Token> tokens = new ArrayList<>();
 
     public Builder(Charset charset) {
-      this._charset = charset;
+      this.charset = charset;
     }
 
     /**
      * Adds a declared parameter
      *
-     * @param name     The name of the parameter
      * @param fragment The default value for the parameter
      */
     @Override
     public void addFragment(TFragment fragment) {
-      this._fragments.put(fragment.type(), fragment);
+      this.fragments.put(fragment.type(), fragment);
     }
 
     /**
@@ -174,10 +178,10 @@ public final class DocumentTemplate implements Template {
      * @param type     The type of parameter.
      */
     @Override
-    public void addParameter(String name, String fallback, ParameterType type) {
-      this._types.put(name, type);
+    public void addParameter(String name, @Nullable String fallback, ParameterType type) {
+      this.types.put(name, type);
       if (fallback != null) {
-        this._defaults.put(name, fallback);
+        this.defaults.put(name, fallback);
       }
     }
 
@@ -188,11 +192,11 @@ public final class DocumentTemplate implements Template {
      */
     @Override
     public void pushValue(String name, boolean attribute) {
-      ParameterType type = this._types.get(name);
+      ParameterType type = this.types.get(name);
       if (type == null) {
         type = ParameterType.TEXT;
       }
-      String fallback = this._defaults.get(name);
+      String fallback = this.defaults.get(name);
       if (fallback == null) {
         fallback = "";
       }
@@ -201,8 +205,6 @@ public final class DocumentTemplate implements Template {
 
     /**
      * A error reported by the parser
-     *
-     * @param name The name of the parameter to use.
      */
     @Override
     public void pushError(String error) {
@@ -216,11 +218,11 @@ public final class DocumentTemplate implements Template {
      * @param type type of the fragment
      */
     @Override
-    public void pushFragmentRef(String id, String type) {
+    public void pushFragmentRef(@Nullable String id, @Nullable String type) {
       if (id == null || type == null) {
         this.tokens.add(new TError("Fragment reference must specify both id and type"));
       } else {
-        TFragment fragment = this._fragments.get(type);
+        TFragment fragment = this.fragments.get(type);
         if (fragment != null) {
           this.tokens.add(new TFragmentRef(id, fragment));
         } else {
@@ -246,7 +248,7 @@ public final class DocumentTemplate implements Template {
      */
     @Override
     public DocumentTemplate build() {
-      return new DocumentTemplate(this.tokens, this._fragments, this._charset);
+      return new DocumentTemplate(this.tokens, this.fragments, this.charset);
     }
   }
 }

@@ -19,9 +19,15 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * An error to print as a comment in the output.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 final class TError implements Token {
 
@@ -39,7 +45,7 @@ final class TError implements Token {
    * @param message message to be copied.
    */
   public TError(String message) {
-    this.message = message;
+    this.message = Objects.requireNonNull(message);
     this.hasNonASCIIChar = XML.hasNonASCIIChar(message);
   }
 

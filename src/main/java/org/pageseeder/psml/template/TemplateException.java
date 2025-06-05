@@ -16,7 +16,18 @@
 package org.pageseeder.psml.template;
 
 /**
+ * Represents an exception specific to template-related operations.
+ *
+ * <p>This exception is primarily used to indicate errors that occur when working with
+ * templates in the application.
+ *
+ * <p>It provides constructors to create an exception instance with a message, a cause,
+ * or a combination of both.
+ *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class TemplateException extends Exception {
 

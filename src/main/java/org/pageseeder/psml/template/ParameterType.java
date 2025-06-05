@@ -19,6 +19,9 @@ package org.pageseeder.psml.template;
  * The possible types of parameters that can be used to generate a template.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public enum ParameterType {
 

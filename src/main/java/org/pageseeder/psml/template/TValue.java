@@ -21,28 +21,33 @@ import java.util.Map;
 
 /**
  * A variable in the template to be replaced by the correct value.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 class TValue implements Token {
 
   /**
    * The name of the variable.
    */
-  private final String _name;
+  private final String name;
 
   /**
    * The type of variable.
    */
-  private final ParameterType _type;
+  private final ParameterType type;
 
   /**
    * The fallback value
    */
-  private final String _fallback;
+  private final String fallback;
 
   /**
    * <code>true</code> for an attribute value; <code>false</code> for regular text.
    */
-  private final boolean _attribute;
+  private final boolean attribute;
 
   /**
    * Creates a new value.
@@ -53,30 +58,30 @@ class TValue implements Token {
    * @param attribute <code>true</code> for an attribute value; <code>false</code> for text.
    */
   public TValue(String name, String fallback, ParameterType type, boolean attribute) {
-    this._name = name;
-    this._fallback = fallback;
-    this._type = type;
-    this._attribute = attribute;
+    this.name = name;
+    this.fallback = fallback;
+    this.type = type;
+    this.attribute = attribute;
   }
 
   @Override
   public void print(PrintWriter psml, Map<String, String> values, Charset charset) {
-    String value = values.get(this._name);
+    String value = values.get(this.name);
     if (value != null) {
-      if (!this._type.matches(value)) {
-        value = this._fallback;
+      if (!this.type.matches(value)) {
+        value = this.fallback;
       }
     } else {
-      value = this._fallback;
+      value = this.fallback;
     }
 
     // Prints the value out
-    if (this._type == ParameterType.XML) {
+    if (this.type == ParameterType.XML) {
       psml.print(value);
     } else {
       XML.Encoder encoder = XML.getEncoder(charset);
       StringBuilder xml = new StringBuilder();
-      if (this._attribute) {
+      if (this.attribute) {
         encoder.attribute(value, xml);
       } else {
         encoder.text(value.toCharArray(), 0, value.length(), xml);

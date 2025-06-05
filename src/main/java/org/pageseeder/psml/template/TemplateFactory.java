@@ -29,22 +29,26 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * A simple factory for templates
+ * A factory for templates
  *
  * <p>A new instance can be created as:
- * <pre>
+ * <pre>{@code
  * TemplateFactory factory = new TemplateFactory();
  * File file = new File([path to template]);
  * Template template = factory.parse(file);
- * </pre>
+ * }</pre>
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class TemplateFactory {
 
@@ -64,19 +68,19 @@ public final class TemplateFactory {
   };
 
   /**
-   * The parser to use (lazily loaded).
+   * The character set used to encode the template's content and output.
    */
-  private SAXParser parser;
+  private final Charset charset;
 
   /**
-   * The handler for the specified encoding (lazily loaded).
+   * The parser to use (lazily loaded).
    */
-  private Charset charset;
+  private @Nullable SAXParser parser;
 
   /**
    * <code>null</code> for a document otherwise it is the type of fragment.
    */
-  private String fragment;
+  private @Nullable String fragment;
 
   /**
    * Creates a new processor.
@@ -101,15 +105,13 @@ public final class TemplateFactory {
   }
 
   /**
-   * Processes the template and write out the corresponding PSML.
+   * Parses the given template file and returns a processed {@link Template} instance.
    *
-   * <p>Note this method will automatically select the correct encoding for the file output.
+   * @param template the file representing the template to be parsed.
+   * @return the parsed {@link Template} object.
    *
-   * @param in  The XML to transcode
-   * @param out The file output.
-   *
-   * @throws IOException Should an I/O error occur while reading the XML.
-   * @throws SAXException Should an error occur while parsing the XML.
+   * @throws IOException if an IO error occurs while reading the template file.
+   * @throws TemplateException if an error occurs while processing the template.
    */
   public Template parse(File template) throws IOException, TemplateException {
     InputSource source = new InputSource(template.toURI().toASCIIString());
@@ -117,15 +119,13 @@ public final class TemplateFactory {
   }
 
   /**
-   * Transcodes the specified XML and saves into a file.
+   * Parses the given template reader and returns a processed {@link Template} instance.
    *
-   * <p>Note this method will automatically select the correct encoding for the file output.
+   * @param template the reader representing the template to be parsed.
+   * @return the parsed {@link Template} object.
    *
-   * @param in  The XML to transcode
-   * @param out The file output.
-   *
-   * @throws IOException Should an I/O error occur while reading the XML.
-   * @throws SAXException Should an error occur while parsing the XML.
+   * @throws IOException if an IO error occurs while reading the template.
+   * @throws TemplateException if an error occurs while processing the template.
    */
   public Template parse(Reader template) throws IOException, TemplateException {
     InputSource source = new InputSource(template);
@@ -133,13 +133,13 @@ public final class TemplateFactory {
   }
 
   /**
-   * Transcodes the specified XML.
+   * Parses the given template input source and returns a processed {@link Template} instance.
    *
-   * @param in  The XML to transcode
-   * @param out The print writer.
+   * @param template the input source representing the template to be parsed.
+   * @return the parsed {@link Template} object.
    *
-   * @throws IOException Should an I/O error occur while reading the XML.
-   * @throws SAXException Should an error occur while parsing the XML.
+   * @throws IOException if an IO error occurs while reading the template.
+   * @throws TemplateException if an error occurs while processing the template.
    */
   public Template parse(InputSource template) throws IOException, TemplateException {
     Handler handler = new Handler(this.charset, this.fragment);
@@ -249,7 +249,7 @@ public final class TemplateFactory {
     /**
      * The stack of parent elements.
      */
-    private Deque<NSElement> parents = new ArrayDeque<NSElement>();
+    private Deque<NSElement> parents = new ArrayDeque<>();
 
     /**
      * We use this to determine whether to output white spaces.
@@ -265,7 +265,7 @@ public final class TemplateFactory {
      * @param charset  The charset for the XML output
      * @param fragment The fragment type
      */
-    public Handler(Charset charset, String fragment) {
+    public Handler(@Nullable Charset charset, @Nullable String fragment) {
       if (charset == null) {
         charset = StandardCharsets.UTF_8;
       }
