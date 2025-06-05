@@ -11,8 +11,8 @@ description = "$title"
 apply from: 'gradle/publish-mavencentral.gradle'
 
 repositories {
-  mavenCentral { url 'https://maven-central.storage.googleapis.com/maven2' }
-  maven { url 'https://s01.oss.sonatype.org/content/groups/public/' }
+  mavenCentral { url = 'https://maven-central.storage.googleapis.com/maven2' }
+  maven { url = 'https://s01.oss.sonatype.org/content/groups/public/' }
 }
 
 // Use Java toolchain to ensure the correct JVM is used by Gradle
