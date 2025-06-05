@@ -139,32 +139,32 @@ public class HTMLInlineParser {
       previousEnd = m.end();
       // Strong emphases with '**' (appear in bold)
       if (m.group(1) != null) {
-        HTMLElement element = new HTMLElement(Name.strong);
+        HTMLElement element = new HTMLElement(Name.STRONG);
         element.addNodes(parse(m.group(2)));
         nodes.add(element);
       }
       // Strong emphases with '__' (appear in bold)
       else if (m.group(3) != null) {
-        HTMLElement element = new HTMLElement(Name.strong);
+        HTMLElement element = new HTMLElement(Name.STRONG);
         element.addNodes(parse(m.group(4)));
         nodes.add(element);
       }
       // Normal emphases with '*' (appear in italic)
       if (m.group(5) != null) {
-        HTMLElement element = new HTMLElement(Name.em);
+        HTMLElement element = new HTMLElement(Name.EM);
         element.addNodes(parse(m.group(6)));
         nodes.add(element);
       }
       // Strong emphases with '_' (appear in italic)
       else if (m.group(7) != null) {
-        HTMLElement element = new HTMLElement(Name.em);
+        HTMLElement element = new HTMLElement(Name.EM);
         element.addNodes(parse(m.group(8)));
         nodes.add(element);
       }
       // Code with '`'
       else if (m.group(9) != null) {
         String code = m.group(10);
-        HTMLElement monospace = new HTMLElement(Name.code);
+        HTMLElement monospace = new HTMLElement(Name.CODE);
         if (code.length() > 0) {
           monospace.addNode(new HTMLText(code));
         }
@@ -173,7 +173,7 @@ public class HTMLInlineParser {
       // Code escape with '``'
       else if (m.group(11) != null) {
         String code = m.group(12);
-        HTMLElement monospace = new HTMLElement(Name.code);
+        HTMLElement monospace = new HTMLElement(Name.CODE);
         if (code.length() > 0) {
           monospace.addNode(new HTMLText(code));
         }
@@ -185,12 +185,12 @@ public class HTMLInlineParser {
         String src = m.group(15);
         if (src.startsWith("http")) {
           // PageSeeder does not support external images
-          HTMLElement link = new HTMLElement(Name.a);
+          HTMLElement link = new HTMLElement(Name.A);
           link.setAttribute("href", InlineParser.unescape(src));
           link.addNodes(parse(alt, true));
           nodes.add(link);
         } else {
-          HTMLElement image = new HTMLElement(Name.img);
+          HTMLElement image = new HTMLElement(Name.IMG);
           image.setAttribute("alt", InlineParser.unescape(alt));
           image.setAttribute("src", InlineParser.unescape(src));
           nodes.add(image);
@@ -200,7 +200,7 @@ public class HTMLInlineParser {
       else if (m.group(16) != null && !inLink) {
         String ref = m.group(18);
         String text = m.group(17);
-        HTMLElement link = new HTMLElement(Name.a);
+        HTMLElement link = new HTMLElement(Name.A);
         link.setAttribute("href", InlineParser.unescape(ref));
         link.addNodes(parse(text, true));
         nodes.add(link);
@@ -209,7 +209,7 @@ public class HTMLInlineParser {
       else if (m.group(19) != null && !inLink) {
         String url = m.group(20);
         String text = m.group(22);
-        HTMLElement link = new HTMLElement(Name.a);
+        HTMLElement link = new HTMLElement(Name.A);
         link.setAttribute("href", InlineParser.unescape(url));
         link.addNode(new HTMLText(InlineParser.unescape(text)));
         nodes.add(link);
@@ -217,7 +217,7 @@ public class HTMLInlineParser {
       //  Auto links
       else if (m.group(23) != null && !inLink) {
         String url = m.group(23);
-        HTMLElement link = new HTMLElement(Name.a);
+        HTMLElement link = new HTMLElement(Name.A);
         link.setAttribute("href", InlineParser.unescape(url));
         link.addNode(new HTMLText(InlineParser.unescape(url)));
         nodes.add(link);

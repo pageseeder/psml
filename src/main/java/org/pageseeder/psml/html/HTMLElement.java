@@ -595,7 +595,7 @@ public class HTMLElement implements HTMLNode {
      * @return The element name.
      */
     public String element() {
-      return name();
+      return name().toLowerCase();
     }
 
     /**
