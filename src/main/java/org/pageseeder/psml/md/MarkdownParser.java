@@ -119,9 +119,9 @@ public class MarkdownParser extends Parser {
     // Wrap the element based on the configuration
     HTMLElement wrapper = null;
     if (this.config.isFragment()) {
-      wrapper = new HTMLElement(HTMLElement.Name.section);
+      wrapper = new HTMLElement(HTMLElement.Name.SECTION);
     } else {
-      wrapper = new HTMLElement(HTMLElement.Name.article);
+      wrapper = new HTMLElement(HTMLElement.Name.SECTION);
     }
     wrapper.addNodes(elements);
 

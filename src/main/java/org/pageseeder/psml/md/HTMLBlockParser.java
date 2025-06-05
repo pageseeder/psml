@@ -30,6 +30,9 @@ import org.pageseeder.psml.html.HTMLNode;
  * delegating inline elements to the HTML inline parser.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class HTMLBlockParser {
 
@@ -96,7 +99,7 @@ public class HTMLBlockParser {
 
     // Empty lines are used to separate the different kinds of blocks, except inside fenced (```) code
     else if (line.matches("\\s*") && !state.isFenced()) {
-      state.commitUpto(Name.section);
+      state.commitUpto(Name.SECTION);
     }
 
     // New list items starting with '+', '-', '*' or number followed by a '.'
@@ -115,22 +118,22 @@ public class HTMLBlockParser {
           state.commit();
         } else {
           // A new list! Clear the context...
-          state.commitUpto(Name.section);
+          state.commitUpto(Name.SECTION);
           // An create a new list
           HTMLElement list;
           if (no.matches("\\d+\\.")) {
-            list = new HTMLElement(Name.ol);
+            list = new HTMLElement(Name.OL);
             String initial = no.substring(0, no.length()-1);
             if (!"1".equals(initial)) {
               list.setAttribute("start", initial);
             }
           } else {
-            list = new HTMLElement(Name.ul);
+            list = new HTMLElement(Name.UL);
           }
           state.push(list);
         }
         // Create a new item
-        state.push(Name.li, m.group(2).trim());
+        state.push(Name.LI, m.group(2).trim());
       }
     }
 
@@ -149,9 +152,9 @@ public class HTMLBlockParser {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (!state.isElement(Name.pre)) {
-        state.commitUpto(Name.section);
-        state.push(Name.pre, line.substring(4));
+      if (!state.isElement(Name.PRE)) {
+        state.commitUpto(Name.SECTION);
+        state.push(Name.PRE, line.substring(4));
       } else {
         state.append(line.substring(4));
       }
@@ -162,19 +165,19 @@ public class HTMLBlockParser {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (state.isElement(Name.pre) || (state.isElement(Name.code) && state.isDescendantOf(Name.pre))) {
+      if (state.isElement(Name.PRE) || (state.isElement(Name.CODE) && state.isDescendantOf(Name.PRE))) {
         state.setFenced(false);
         state.append("");
-        state.commitUpto(Name.section);
+        state.commitUpto(Name.SECTION);
       } else {
-        state.commitUpto(Name.section);
-        HTMLElement pre = new HTMLElement(Name.pre);
+        state.commitUpto(Name.SECTION);
+        HTMLElement pre = new HTMLElement(Name.PRE);
         state.push(pre, "");
         state.setFenced(true);
         if (line.length() > 3) {
-          HTMLElement code = new HTMLElement(Name.code);
+          HTMLElement code = new HTMLElement(Name.CODE);
           String language = line.substring(3).trim();
-          if (language.length() > 0) {
+          if (!language.isEmpty()) {
             code.setAttribute("class", language);
           }
           state.push(code, "");
@@ -187,14 +190,14 @@ public class HTMLBlockParser {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
-      if (state.isElement(Name.div)) {
-        state.commitUpto(Name.section);
+      if (state.isElement(Name.DIV)) {
+        state.commitUpto(Name.SECTION);
       } else {
-        state.commitUpto(Name.section);
-        HTMLElement pre = new HTMLElement(Name.div);
+        state.commitUpto(Name.SECTION);
+        HTMLElement pre = new HTMLElement(Name.DIV);
         if (line.length() > 3) {
           String label = line.substring(3).trim();
-          if (label.length() > 0) {
+          if (!label.isEmpty()) {
             pre.setAttribute("label", label);
             pre.setAttribute("class", "label-"+label);
           }
@@ -204,31 +207,31 @@ public class HTMLBlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.pre)) {
+    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.PRE)) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
       }
       String text = line.substring(line.indexOf('>') + 1).replaceFirst("^\\s+", "");
       // check if already in a blockquote
       HTMLElement current = state.current();
-      if (current != null && current.isElement(Name.blockquote)) {
+      if (current != null && current.isElement(Name.BLOCKQUOTE)) {
         List<HTMLNode> children = current.getNodes();
         HTMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
         if (last instanceof HTMLElement) {
           HTMLElement lastElement = (HTMLElement) last;
-          if (lastElement.isElement(Name.p)) {
+          if (lastElement.isElement(Name.P)) {
             if (text.matches("\\s*")) {
-              current.addNode(new HTMLElement(Name.p));
+              current.addNode(new HTMLElement(Name.P));
             } else {
               lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
             }
           }
         }
       } else {
-        state.commitUpto(Name.section);
+        state.commitUpto(Name.SECTION);
         // create new blockquote
-        HTMLElement block = new HTMLElement(Name.blockquote);
-        HTMLElement p = new HTMLElement(Name.p);
+        HTMLElement block = new HTMLElement(Name.BLOCKQUOTE);
+        HTMLElement p = new HTMLElement(Name.P);
         p.setText(text);
         block.addNode(p);
         state.push(block);
@@ -236,14 +239,14 @@ public class HTMLBlockParser {
     }
 
     // Metadata (document mode only)
-    else if (config.isDocumentMode() && !state.isDescendantOf(Name.section) && line.matches("^\\w+\\:\\s.*")) {
+    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+\\:\\s.*")) {
       int colon = line.indexOf(':');
-      if (!state.isDescendantOf(Name.dl)) {
-        state.push(Name.dl);
+      if (!state.isDescendantOf(Name.DL)) {
+        state.push(Name.DL);
       }
       // Create and commit a definition list
-      state.push(Name.dt, line.substring(0,colon));
-      state.push(Name.dd, line.substring(colon+2).trim());
+      state.push(Name.DT, line.substring(0,colon));
+      state.push(Name.DD, line.substring(colon+2).trim());
       state.commit();
     }
 
@@ -254,7 +257,7 @@ public class HTMLBlockParser {
       }
 
       // We're in a fenced code block
-      if (state.isElement(Name.pre) || (state.isElement(Name.code) && state.isDescendantOf(Name.pre))) {
+      if (state.isElement(Name.PRE) || (state.isElement(Name.CODE) && state.isDescendantOf(Name.PRE))) {
 
         // Just add the line
         state.append(line);
@@ -265,7 +268,7 @@ public class HTMLBlockParser {
         Pattern headingPattern = Pattern.compile("^\\s*(#{1,6})\\s+(.*?)(#{1,6})?$");
         Matcher m = headingPattern.matcher(line);
         if (m.matches()) {
-          state.commitUpto(Name.section);
+          state.commitUpto(Name.SECTION);
           int level = m.group(1).length();
           String text = m.group(2).trim();
           HTMLElement heading = newHeadingElement(level);
@@ -277,7 +280,7 @@ public class HTMLBlockParser {
           boolean isTitle = false;
 
           // Assume paragraph, but check whether we have a heading using SetExt style
-          HTMLElement element = new HTMLElement(Name.p);
+          HTMLElement element = new HTMLElement(Name.P);
           if (next != null) {
             if (next.matches("\\s*==+\\s*")) {
               // We use the '====' as a marker for a new section
@@ -288,7 +291,7 @@ public class HTMLBlockParser {
 
               // Special case for title section
               if (config.isDocumentMode()) {
-                HTMLElement section = state.ancestor(Name.section);
+                HTMLElement section = state.ancestor(Name.SECTION);
                 if ("title".equals(section.getAttribute("id"))) {
                   isTitle = true;
                 }
@@ -305,7 +308,7 @@ public class HTMLBlockParser {
 
           // Check whether the current element matches what we found (h1, h2 or p)
           if (!state.isElement(element.getElement())) {
-            state.commitUpto(Name.section);
+            state.commitUpto(Name.SECTION);
             state.push(element, line.trim());
           } else {
             if (state.lineBreak) {
@@ -319,7 +322,7 @@ public class HTMLBlockParser {
 
           // Special case: we terminate the section title
           if (isTitle) {
-            state.commitUpto(Name.article);
+            state.commitUpto(Name.ARTICLE);
           }
         }
       }
@@ -334,13 +337,13 @@ public class HTMLBlockParser {
    */
   public static HTMLElement newHeadingElement(final int level) {
     switch (level) {
-      case 1: return new HTMLElement(Name.h1);
-      case 2: return new HTMLElement(Name.h2);
-      case 3: return new HTMLElement(Name.h3);
-      case 4: return new HTMLElement(Name.h4);
-      case 5: return new HTMLElement(Name.h5);
-      case 6: return new HTMLElement(Name.h6);
-      default: return new HTMLElement(Name.p);
+      case 1: return new HTMLElement(Name.H1);
+      case 2: return new HTMLElement(Name.H2);
+      case 3: return new HTMLElement(Name.H3);
+      case 4: return new HTMLElement(Name.H4);
+      case 5: return new HTMLElement(Name.H5);
+      case 6: return new HTMLElement(Name.H6);
+      default: return new HTMLElement(Name.P);
     }
   }
 
@@ -422,8 +425,8 @@ public class HTMLBlockParser {
       final int size = this.context.size();
       HTMLElement current = size > 0? this.context.get(size-1) : null;
       HTMLElement parent = size > 1? this.context.get(size-2) : null;
-      boolean isCurrentList = current != null && (current.isElement(Name.ul) || current.isElement(Name.ol));
-      boolean isParentList = parent != null && (parent.isElement(Name.ul) || parent.isElement(Name.ol));
+      boolean isCurrentList = current != null && (current.isElement(Name.UL) || current.isElement(Name.OL));
+      boolean isParentList = parent != null && (parent.isElement(Name.UL) || parent.isElement(Name.OL));
       return isCurrentList || isParentList;
     }
 
@@ -481,7 +484,7 @@ public class HTMLBlockParser {
     public void newSection() {
       if (this.sectionPosition < this.sectionIds.length) {
         commitAll();
-        HTMLElement section = new HTMLElement(Name.section);
+        HTMLElement section = new HTMLElement(Name.SECTION);
         String sectionId = this.sectionIds[this.sectionPosition];
         section.setAttribute("id", sectionId);
         push(section);
@@ -493,8 +496,8 @@ public class HTMLBlockParser {
      * Set the state to a new fragment
      */
     public void newFragment() {
-      commitUpto(Name.section);
-      HTMLElement fragment = new HTMLElement(Name.section);
+      commitUpto(Name.SECTION);
+      HTMLElement fragment = new HTMLElement(Name.SECTION);
       fragment.setAttribute("id", ++this.fragmentId);
       push(fragment);
     }
@@ -503,10 +506,10 @@ public class HTMLBlockParser {
      * Ensure that we are in a fragment
      */
     public void ensureFragment() {
-      if (!isDescendantOf(Name.article)) {
+      if (!isDescendantOf(Name.ARTICLE)) {
         newSection();
       }
-      if (!isDescendantOf(Name.section)) {
+      if (!isDescendantOf(Name.SECTION)) {
         newFragment();
       }
     }
@@ -606,7 +609,7 @@ public class HTMLBlockParser {
      */
     public void lineBreak() {
       commitText();
-      current().addNode(new HTMLElement(Name.br));
+      current().addNode(new HTMLElement(Name.BR));
       this.text = new StringBuilder();
     }
 

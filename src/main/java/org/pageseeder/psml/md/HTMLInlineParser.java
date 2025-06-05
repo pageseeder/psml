@@ -36,6 +36,9 @@ import java.util.regex.Pattern;
  * eventually, these should be merged.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class HTMLInlineParser {
 
