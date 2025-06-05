@@ -7,7 +7,7 @@ package org.pageseeder.psml.process.config;
  * Defines how to traverse XRefs, including the XRefs types and some patterns to include/exclude.
  *
  * <p>Used to represent the inner ANT element:<p>
- * <pre>{@code<xrefs
+ * <pre>{@code <xrefs
  *       types="[xref types]"
  *       levels="[true|false]"
  *       xrefragment="[include,exclude,only]"
@@ -42,7 +42,7 @@ package org.pageseeder.psml.process.config;
  */
 public final class XRefsTransclude extends IncludeExcludeConfig {
 
-  public static enum XREF_IN_XREF_FRAGMENT {
+  public enum XREF_IN_XREF_FRAGMENT {
     
     /** Process xrefs inside <xref-fragment> */
     INCLUDE,
@@ -91,7 +91,7 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
   }
 
   /**
-   * @param s the xRefFragment to set
+   * @param xf the xRefFragment to set
    */
   public void setXRefsInXRefFragment(XREF_IN_XREF_FRAGMENT xf) {
     this.xRefFragment = xf;

@@ -10,7 +10,7 @@ import java.util.Map;
  * Provides a mechanism to process PSML files with XSLT.
  *
  * <p>Used to represent the inner ANT element:<p>
- * <pre>{@code<pretransform
+ * <pre>{@code <pretransform
  *             xslt="[pre XSLT path]"
  *             includes="[patterns]"
  *             excludes="[patterns]">
@@ -50,7 +50,7 @@ public final class XSLTTransformation extends IncludeExcludeConfig {
   /**
    * List of facets to filter the documents
    */
-  private Map<String, String> params = new HashMap<>();
+  private final Map<String, String> params = new HashMap<>();
 
   /**
    * @param x the path to XSLT script

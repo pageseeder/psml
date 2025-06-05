@@ -16,4 +16,7 @@
 /**
  * Package providing classes to process PSML templates.
  */
+@NonNullByDefault
 package org.pageseeder.psml.template;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
