@@ -99,7 +99,7 @@ public final class FragmentNumbering implements Serializable {
    * @throws XRefLoopException if an XRef loop is detected
    */
   public FragmentNumbering(PublicationTree pub, PublicationConfig config) throws XRefLoopException {
-    this(pub, config, new ArrayList<Long>(), new HashMap<Long,List<Long>>());
+    this(pub, config, new ArrayList<>(), new HashMap<>());
   }
 
   /**
@@ -151,7 +151,7 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the map of generators
    */
-  private Map<String, NumberingGenerator> getNumberingGenerators(PublicationConfig config) {
+  private Map<String, NumberingGenerator> getNumberingGenerators(@Nullable PublicationConfig config) {
     Map<String, NumberingGenerator> numbers = new HashMap<>();
     if (config != null) {
       for (PublicationNumbering numbering : config.getNumberingConfigs()) {
@@ -167,10 +167,8 @@ public final class FragmentNumbering implements Serializable {
    * @param config   the publication config
    * @param numbers  the numbering generators
    * @param tree     the document tree
-   *
-   * @return
    */
-  private NumberingGenerator getNumberingGenerator(PublicationConfig config,
+  private @Nullable NumberingGenerator getNumberingGenerator(@Nullable PublicationConfig config,
       Map<String, NumberingGenerator> numbers, DocumentTree tree) {
     // Use config to get the first numbering that matches in config order
     PublicationNumbering numbering = config == null ? null : config.getPublicationNumbering(tree.labels());

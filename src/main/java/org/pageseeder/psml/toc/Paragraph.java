@@ -22,16 +22,16 @@ public final class Paragraph extends Element implements Serializable {
   public static final String NO_BLOCK_LABEL = "";
 
   /** The location of this part in the content */
-  private final int _index;
+  private final int index;
 
   /** Whether the title is numbered */
-  private final boolean _numbered;
+  private final boolean numbered;
 
   /** Prefix of title if any */
-  private final String _prefix;
+  private final String prefix;
 
   /** Parent block label if any */
-  private final String _blocklabel;
+  private final String blocklabel;
 
   /**
    * Full constructor for a paragraph.
@@ -48,10 +48,10 @@ public final class Paragraph extends Element implements Serializable {
   private Paragraph(int level, String title, String fragment, String originalfrag,
       int index, boolean numbered, String prefix, String blocklabel) {
     super(level, title, fragment, originalfrag);
-    this._index = index;
-    this._numbered = numbered;
-    this._prefix = prefix;
-    this._blocklabel = blocklabel;
+    this.index = index;
+    this.numbered = numbered;
+    this.prefix = prefix;
+    this.blocklabel = blocklabel;
   }
 
   /**
@@ -72,7 +72,7 @@ public final class Paragraph extends Element implements Serializable {
    * @return The index of the paragraph in the document.
    */
   public int index() {
-    return this._index;
+    return this.index;
   }
 
   /**
@@ -91,28 +91,28 @@ public final class Paragraph extends Element implements Serializable {
    * @return The full title of this paragraph including the prefix
    */
   public String getPrefixedTitle() {
-    return !NO_PREFIX.equals(this._prefix)? this._prefix+" "+title() : title();
+    return !NO_PREFIX.equals(this.prefix)? this.prefix +" "+title() : title();
   }
 
   /**
    * @return The prefix given to this paragraph or empty if none.
    */
   public String prefix() {
-    return this._prefix;
+    return this.prefix;
   }
 
   /**
    * @return The blocklabel parent of this paragraph or empty if none.
    */
   public String blocklabel() {
-    return this._blocklabel;
+    return this.blocklabel;
   }
 
   /**
    * @return Whether the paragraph is automatically numbered
    */
   public boolean numbered() {
-    return this._numbered;
+    return this.numbered;
   }
 
   /**
@@ -124,7 +124,7 @@ public final class Paragraph extends Element implements Serializable {
    */
   public Paragraph title(String title) {
     if (title.equals(title())) return this;
-    return new Paragraph(level(), title, fragment(), originalFragment(), this._index, this._numbered, this._prefix, this._blocklabel);
+    return new Paragraph(level(), title, fragment(), originalFragment(), this.index, this.numbered, this.prefix, this.blocklabel);
   }
 
   /**
@@ -135,7 +135,7 @@ public final class Paragraph extends Element implements Serializable {
    * @return A new paragraph instance.
    */
   public Paragraph prefix(String prefix) {
-    return new Paragraph(level(), title(), fragment(), originalFragment(), this._index, this._numbered, prefix, this._blocklabel);
+    return new Paragraph(level(), title(), fragment(), originalFragment(), this.index, this.numbered, prefix, this.blocklabel);
   }
 
   /**
@@ -146,7 +146,7 @@ public final class Paragraph extends Element implements Serializable {
    * @return A new paragraph instance.
    */
   public Paragraph blocklabel(String blocklabel) {
-    return new Paragraph(level(), title(), fragment(), originalFragment(), this._index, this._numbered, this._prefix, blocklabel);
+    return new Paragraph(level(), title(), fragment(), originalFragment(), this.index, this.numbered, this.prefix, blocklabel);
   }
 
   /**
@@ -157,8 +157,8 @@ public final class Paragraph extends Element implements Serializable {
    * @return A new paragraph instance unless the numbered flag is equal to the numbered flag of current paragraph.
    */
   public Paragraph numbered(boolean numbered) {
-    if (this._numbered == numbered) return this;
-    return new Paragraph(level(), title(), fragment(), originalFragment(), this._index, numbered, this._prefix, this._blocklabel);
+    if (this.numbered == numbered) return this;
+    return new Paragraph(level(), title(), fragment(), originalFragment(), this.index, numbered, this.prefix, this.blocklabel);
   }
 
   @Override
@@ -172,7 +172,7 @@ public final class Paragraph extends Element implements Serializable {
         out.append(prefix()).append(' ');
       }
       out.append("para");
-      out.append(" [").append(Integer.toString(this._index)).append(']');
+      out.append(" [").append(Integer.toString(this.index)).append(']');
       out.append(" @").append(fragment());
     } catch (IOException ex) {
       // Ignore
@@ -182,26 +182,26 @@ public final class Paragraph extends Element implements Serializable {
   @Override
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
     // don't output if not numbered and no prefix
-    if (!this._numbered && (NO_PREFIX.equals(this._prefix) || this._prefix == null)) return;
+    if (!this.numbered && (NO_PREFIX.equals(this.prefix) || this.prefix == null)) return;
     xml.openElement("para-ref", false);
     xml.attribute("level", this.level());
     if (!Element.NO_TITLE.equals(title())) {
       xml.attribute("title", title());
     }
     xml.attribute("fragment", fragment());
-    xml.attribute("index", this._index);
-    if (this._numbered) {
+    xml.attribute("index", this.index);
+    if (this.numbered) {
       xml.attribute("numbered", "true");
     }
-    if (!Paragraph.NO_BLOCK_LABEL.equals(this._blocklabel)) {
-      xml.attribute("block-label", this._blocklabel);
+    if (!Paragraph.NO_BLOCK_LABEL.equals(this.blocklabel)) {
+      xml.attribute("block-label", this.blocklabel);
     }
     if (number != null) {
-      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index, true);
+      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this.index, true);
       if (pref != null) {
         xml.attribute("part-level", pref.level);
       }
-      if (this._numbered) {
+      if (this.numbered) {
         if (pref != null) {
           // don't output undefined prefixes
           if (!"".equals(pref.value) || pref.canonical != null) {
@@ -210,8 +210,8 @@ public final class Paragraph extends Element implements Serializable {
           }
         }
       } else {
-        if (!NO_PREFIX.equals(this._prefix)) {
-          xml.attribute("prefix", this._prefix);
+        if (!NO_PREFIX.equals(this.prefix)) {
+          xml.attribute("prefix", this.prefix);
         }
       }
     }

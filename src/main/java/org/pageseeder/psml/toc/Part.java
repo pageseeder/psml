@@ -34,12 +34,12 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   /**
    * Element defining this part.
    */
-  private final T _element;
+  private final T element;
 
   /**
    * List of sub-parts in this part
    */
-  private final List<Part<?>> _parts;
+  private final List<Part<?>> parts;
 
   /**
    * Create an empty part starting with the specified element.
@@ -57,8 +57,8 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @param parts   The sub-parts
    */
   public Part(T element, @NonNull Part<?>... parts) {
-    this._element = element;
-    this._parts = Arrays.asList(parts);
+    this.element = element;
+    this.parts = Arrays.asList(parts);
   }
 
   /**
@@ -68,8 +68,8 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @param parts   The sub-parts
    */
   public Part(T element, List<Part<?>> parts) {
-    this._element = element;
-    this._parts = parts;
+    this.element = element;
+    this.parts = parts;
   }
 
   /**
@@ -80,28 +80,28 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @return A new part instance
    */
   public Part<T> element(Element element) {
-    return new Part<>((T)element, this._parts);
+    return new Part<>((T)element, this.parts);
   }
 
   /**
    * @return The element at the origin of this part.
    */
-  public final @NonNull T element() {
-    return this._element;
+  public @NonNull T element() {
+    return this.element;
   }
 
   /**
    * @return The level of the structure
    */
-  public final int level() {
-    return this._element.level();
+  public int level() {
+    return this.element.level();
   }
 
   /**
    * @return The title of the part
    */
-  public final String title() {
-    return this._element.title();
+  public String title() {
+    return this.element.title();
   }
 
   /**
@@ -110,15 +110,15 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @return <code>true</code> if the part's defining element has a title;
    *         <code>false</code> otherwise.
    */
-  public final boolean hasTitle() {
-    return this._element.hasTitle();
+  public boolean hasTitle() {
+    return this.element.hasTitle();
   }
 
   /**
    * @return The number of sub-parts.
    */
-  public final int size() {
-    return this._parts.size();
+  public int size() {
+    return this.parts.size();
   }
 
   /**
@@ -126,8 +126,8 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    *
    * @return the list of sub-parts in the part.
    */
-  public final List<Part<?>> parts() {
-    return this._parts;
+  public List<Part<?>> parts() {
+    return this.parts;
   }
 
   /**
@@ -137,8 +137,8 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @return <code>true</code> if the levels are consistent;
    *         <code>false</code> otherwise.
    */
-  public final boolean isLevelConsistent() {
-    return isLevelConsistent(this._element.level());
+  public boolean isLevelConsistent() {
+    return isLevelConsistent(this.element.level());
   }
 
   /**
@@ -151,8 +151,8 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    *         <code>false</code> otherwise.
    */
   protected final boolean isLevelConsistent(int level) {
-    if (this._element.level() != level) return false;
-    for (Part<?> p: this._parts) {
+    if (this.element.level() != level) return false;
+    for (Part<?> p: this.parts) {
       if (!p.isLevelConsistent(level+1)) return false;
     }
     return true;
@@ -181,8 +181,6 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * Print a text representation of the structural element.
    *
    * @param out Where to print the structure
-   *
-   * @throws IOException If thrown by the appendable
    */
   public void print(Appendable out) {
     try {
@@ -202,7 +200,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   }
 
   public void toXML(XMLWriter xml, int level, @Nullable FragmentNumbering number, long treeid, int count) throws IOException {
-    xml.openElement("part", parts().size() > 0);
+    xml.openElement("part", !parts().isEmpty());
     xml.attribute("level", level);
     element().toXML(xml, level, number, treeid, count);
     for (Part<?> p : parts()) {

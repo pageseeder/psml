@@ -257,7 +257,7 @@ public final class PublicationNumbering {
    * @param level      the level of the scheme
    * @param blocklabel the parent block label name
    */
-  public String getNumberFormat(int level, String blocklabel) {
+  public @Nullable String getNumberFormat(int level, String blocklabel) {
     return this.formats.get(level + "-" + blocklabel);
   }
 

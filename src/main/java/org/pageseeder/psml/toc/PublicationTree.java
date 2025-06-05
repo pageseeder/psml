@@ -41,7 +41,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * Stores the state of the TOC as it is being serialized.
    *
    */
-  private final class TOCState {
+  private static final class TOCState {
 
     /**
      * The ID of the content tree (leaf).

@@ -17,12 +17,12 @@ import java.util.*;
  * Represents the internal hierarchy of a document independently of its
  * context.
  *
- * The internal hierarchy is constructed from the headings in the document.
+ * <p>The internal hierarchy is constructed from the headings in the document.
  *
- * This class effectively converts the linear structure of the document into a
+ * <p>This class effectively converts the linear structure of the document into a
  * tree structure based on heading levels
  *
- * <pre>
+ * <pre>{@code
  *
  * Title                    Title                            Title
  *                          +-------------------------+       |
@@ -40,9 +40,15 @@ import java.util.*;
  *                          +-------------------------+       |
  * 2. Part2                 | Part 2               L1 |       +--- Part 2
  * ...
- * </pre>
+ * }</pre>
  *
- * Maintains a list of references for the specified document.
+ * <p>Maintains a list of references for the specified document.
+ *
+ * @author Christophe Lauret
+ * @author Philip Rutherford
+ *
+ * @version 1.0
+ * @since 1.0
  */
 public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
@@ -573,7 +579,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    *
    * @return the modified parts or <code>null</code> if fragment not found
    */
-  public static List<Part<?>> removeOtherFragments(List<Part<?>> parts, String fragment, boolean found) {
+  public static @Nullable List<Part<?>> removeOtherFragments(List<Part<?>> parts, String fragment, boolean found) {
     List<Part<?>> modified = new ArrayList<>();
     if (!parts.isEmpty()) {
       for (Part<?> part : parts) {
@@ -602,37 +608,37 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   public static class Builder {
 
     /** URI ID */
-    private long _id = -1;
+    private long id = -1;
 
     /** Title of the document. */
-    private String _title = "[untitled]";
+    private String title = "[untitled]";
 
     /** Document labels (comma separated). */
-    private String _labels = "";
+    private String labels = "";
 
     /** Document last edited date (including transclusions). */
-    private OffsetDateTime _lastedited = null;
+    private @Nullable OffsetDateTime lastedited = null;
 
     /** Document URI path. */
-    private String _path = "";
+    private String path = "";
 
     /** List of parts in this tree. */
-    private final List<Part<?>> _parts = new ArrayList<>();
+    private final List<Part<?>> parts = new ArrayList<>();
 
     /** List of URI ID of reverse cross-references. */
-    private final List<Long> _reverse = new ArrayList<>();
+    private final List<Long> reverse = new ArrayList<>();
 
     /**
      * Map of fragment ID to the first heading in the fragment,
      * otherwise the first preceding heading or section title (within the current section).
      */
-    private final Map<String,String> _fragmentheadings = new HashMap<>();
+    private final Map<String,String> fragmentheadings = new HashMap<>();
 
     /**
      * Map of fragment ID to the level of the fragment (level of closest preceding heading),
      * used for adjusting para indents.
      */
-    private final Map<String,Integer> _fragmentlevels = new HashMap<>();;
+    private final Map<String,Integer> fragmentlevels = new HashMap<>();
 
     /**
      * Creates a new builder for this content tree (id must be set before calling build).
@@ -647,7 +653,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
      */
     public Builder(long id) {
       if (id < 0) throw new IllegalArgumentException("URI ID must be positive");
-      this._id = id;
+      this.id = id;
     }
 
     /**
@@ -661,78 +667,78 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     }
 
     public long id() {
-      return this._id;
+      return this.id;
     }
 
     public Builder id(long id) {
       if (id < 0) throw new IllegalArgumentException("URI ID must be positive");
-      this._id = id;
+      this.id = id;
       return this;
     }
 
     public Builder title(String title) {
-      this._title = title;
+      this.title = title;
       return this;
     }
 
     public Builder labels(String labels) {
-      this._labels = labels;
+      this.labels = labels;
       return this;
     }
 
     public Builder lastedited(OffsetDateTime lastedited) {
-      this._lastedited = lastedited;
+      this.lastedited = lastedited;
       return this;
     }
 
     public Builder path(String path) {
-      this._path = path;
+      this.path = path;
       return this;
     }
 
     public Builder parts(List<Part<?>> parts) {
       // XXX Should only be Level 1
-      this._parts.addAll(parts);
+      this.parts.addAll(parts);
       return this;
     }
 
     public Builder part(Part<?> part) {
       // XXX Should only be Level 1
-      this._parts.add(part);
+      this.parts.add(part);
       return this;
     }
 
     public Builder addReverseReference(Long ref) {
-      this._reverse.add(ref);
+      this.reverse.add(ref);
       return this;
     }
 
     public Builder addReverseReferenceIfNew(Long ref) {
-      if (!this._reverse.contains(ref)) {
-        this._reverse.add(ref);
+      if (!this.reverse.contains(ref)) {
+        this.reverse.add(ref);
       }
       return this;
     }
 
     public Builder putFragmentHeading(String fragment, String heading) {
-      this._fragmentheadings.put(fragment, heading);
+      this.fragmentheadings.put(fragment, heading);
       return this;
     }
 
     public Builder putFragmentLevel(String fragment, int level) {
-      this._fragmentlevels.put(fragment, level);
+      this.fragmentlevels.put(fragment, level);
       return this;
     }
 
     public DocumentTree build() {
-      if (this._id < 0) throw new IllegalStateException("URI ID must be set");
+      if (this.id < 0) throw new IllegalStateException("URI ID must be set");
       // New lists to ensure the builder no longer affects built tree
-      List<Part<?>> parts = new ArrayList<>(this._parts);
-      List<Long> reverse = new ArrayList<>(this._reverse);
-      Map<String,String> fragmentheadings = new HashMap<>(this._fragmentheadings);
-      Map<String,Integer> fragmentlevels = new HashMap<>(this._fragmentlevels);
-      return new DocumentTree(this._id, this._title, this._labels, this._lastedited,
-              this._path, reverse, parts, fragmentheadings, fragmentlevels);
+      List<Part<?>> parts = new ArrayList<>(this.parts);
+      List<Long> reverse = new ArrayList<>(this.reverse);
+      Map<String,String> fragmentheadings = new HashMap<>(this.fragmentheadings);
+      Map<String,Integer> fragmentlevels = new HashMap<>(this.fragmentlevels);
+      return new DocumentTree(this.id, this.title, this.labels, this.lastedited,
+              this.path, reverse, parts, fragmentheadings, fragmentlevels);
     }
 
   }
