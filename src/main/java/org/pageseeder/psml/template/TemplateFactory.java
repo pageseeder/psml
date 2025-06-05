@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.regex.Matcher;
@@ -55,9 +56,12 @@ public final class TemplateFactory {
   /**
    * The charset below are supported target charset.
    *
-   * Note every Java platform must support the charset below.
+   * <p>Note every Java platform must support the charset below.
    */
-  private static final Charset[] SUPPORTED = new Charset[]{Constants.ASCII, Constants.UTF8};
+  private static final Charset[] SUPPORTED = new Charset[]{
+      StandardCharsets.US_ASCII,
+      StandardCharsets.UTF_8
+  };
 
   /**
    * The parser to use (lazily loaded).
@@ -78,7 +82,7 @@ public final class TemplateFactory {
    * Creates a new processor.
    */
   public TemplateFactory() {
-    this.charset = Constants.UTF8;
+    this.charset = StandardCharsets.UTF_8;
   }
 
   /**
@@ -263,7 +267,7 @@ public final class TemplateFactory {
      */
     public Handler(Charset charset, String fragment) {
       if (charset == null) {
-        charset = Constants.UTF8;
+        charset = StandardCharsets.UTF_8;
       }
       if (!isSupported(charset)) throw new IllegalArgumentException("Only supports ASCII and UTF-8");
       this._charset = charset;

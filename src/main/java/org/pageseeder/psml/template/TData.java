@@ -17,6 +17,7 @@ package org.pageseeder.psml.template;
 
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -44,7 +45,7 @@ final class TData implements Token {
 
   @Override
   public void print(PrintWriter psml, Map<String, String> values, Charset charset) {
-    if (this._hasNonASCIIChar && charset.equals(Constants.ASCII)) {
+    if (this._hasNonASCIIChar && charset.equals(StandardCharsets.US_ASCII)) {
       XML.toASCII(this._data, psml);
     } else {
       psml.print(this._data);

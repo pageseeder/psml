@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public final class Processor {
    * Creates a new processor.
    */
   public Processor() {
-    this.charset = Constants.ASCII;
+    this.charset = StandardCharsets.US_ASCII;
   }
 
   /**
@@ -170,13 +171,13 @@ public final class Processor {
       File f = new File(args[0]);
       InputSource source = new InputSource(f.toURI().toASCIIString());
       PrintWriter psml = new PrintWriter(System.out);
-      Processor p = new Processor(Constants.ASCII);
+      Processor p = new Processor(StandardCharsets.US_ASCII);
 
       // Generate parameter map
       Map<String, String> parameters = null;
       for (String a : args) {
         if (parameters == null) {
-          parameters = new HashMap<String, String>();
+          parameters = new HashMap<>();
         } else {
           int equal = a.indexOf('=');
           if (a.equals("-failonerror")) {

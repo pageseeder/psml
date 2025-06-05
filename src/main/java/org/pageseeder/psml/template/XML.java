@@ -17,6 +17,7 @@ package org.pageseeder.psml.template;
 
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A collection of utility classes for XML.
@@ -35,8 +36,8 @@ public final class XML {
    * @return The corresponding XML encoder or <code>null</code> is none exists.
    */
   public static Encoder getEncoder(Charset cs) {
-    if (cs.equals(Constants.ASCII)) return ASCII_ENCODER;
-    if (cs.equals(Constants.UTF8)) return UNICODE_ENCODER;
+    if (cs.equals(StandardCharsets.US_ASCII)) return ASCII_ENCODER;
+    if (cs.equals(StandardCharsets.UTF_8)) return UNICODE_ENCODER;
     return null;
   }
 

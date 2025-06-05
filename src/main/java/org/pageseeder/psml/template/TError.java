@@ -17,6 +17,7 @@ package org.pageseeder.psml.template;
 
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -51,7 +52,7 @@ final class TError implements Token {
 
   @Override
   public void print(PrintWriter psml, Map<String, String> values, Charset charset) {
-    if (this.hasNonASCIIChar && charset.equals(Constants.ASCII)) {
+    if (this.hasNonASCIIChar && charset.equals(StandardCharsets.US_ASCII)) {
       XML.toASCII("<!-- Template error: "+this.message+" -->", psml);
     } else {
       psml.print("<!-- Template error: "+this.message+" -->");
