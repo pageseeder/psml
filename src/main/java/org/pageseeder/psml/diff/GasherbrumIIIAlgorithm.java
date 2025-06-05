@@ -9,7 +9,7 @@ import org.pageseeder.diffx.api.DiffAlgorithm;
 import org.pageseeder.diffx.api.DiffHandler;
 import org.pageseeder.diffx.api.Operator;
 import org.pageseeder.diffx.handler.PostXMLFixer;
-import org.pageseeder.diffx.similarity.SimilarityFunction;
+import org.pageseeder.diffx.similarity.Similarity;
 import org.pageseeder.diffx.similarity.SimilarityWagnerFischerAlgorithm;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.XMLTokenType;
@@ -175,7 +175,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
     boolean recurse = childHasBlock(from, to);
     if (recurse) {
       handler.handle(operator, from.getStart());
-      diff(from.getChildren(), to.getChildren(), handler);
+      diff(from.getContent(), to.getContent(), handler);
       handler.handle(operator, from.getEnd());
     } else {
       MatrixXMLAlgorithm matrix = new MatrixXMLAlgorithm();
@@ -236,7 +236,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    *         more than two child elements, {@code false} otherwise.
    */
   private static boolean childHasBlock(XMLElement from, XMLElement to) {
-    if (from.getChildren().size() > 2 && to.getChildren().size() > 2) {
+    if (from.getContent().size() > 2 && to.getContent().size() > 2) {
       return childHasBlock(from) || childHasBlock(to);
     }
     return false;
@@ -250,7 +250,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    * @return {@code true} if a matching child block is found, {@code false} otherwise.
    */
   private static boolean childHasBlock(XMLElement element) {
-    for (XMLToken t : element.getChildren()) {
+    for (XMLToken t : element.getContent()) {
       if (t.getType() == XMLTokenType.START_ELEMENT && BLOCKS.contains(t.getName())) {
         return true;
       }
@@ -267,7 +267,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    * of {@link XMLToken} objects, where similarity between individual tokens influences
    * the resulting edit operations.
    */
-  private static class XMLTokenSimilarityFunction implements SimilarityFunction<XMLToken> {
+  private static class XMLTokenSimilarityFunction implements Similarity<XMLToken> {
 
     @Override
     public float score(XMLToken a, XMLToken b) {
@@ -283,13 +283,13 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
       if (!sameElementName) return 0;
 
       // Empty it's a match
-      if (a.getChildren().isEmpty() && b.getChildren().isEmpty())
+      if (a.getContent().isEmpty() && b.getContent().isEmpty())
         return 1;
 
       // Multiple tokens
       MyersGreedyAlgorithm<XMLToken> alg = new MyersGreedyAlgorithm<>();
       EditCounter counter = new EditCounter();
-      alg.diff(a.getChildren(), b.getChildren(), counter);
+      alg.diff(a.getContent(), b.getContent(), counter);
       return counter.score();
     }
   }
