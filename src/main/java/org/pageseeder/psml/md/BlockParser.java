@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
@@ -29,13 +30,13 @@ import org.pageseeder.psml.model.PSMLNode;
  * delegating inline elements to the inline parser.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class BlockParser {
 
   private Configuration configuration;
-
-  public BlockParser() {
-  }
 
   public void setConfiguration(Configuration configuration) {
     this.configuration = configuration;
@@ -81,10 +82,10 @@ public class BlockParser {
    * @param next  The next line
    * @param state The state of the parser
    */
-  public void processLine(String line, String next, State state, Configuration config) {
+  public void processLine(String line, @Nullable String next, State state, Configuration config) {
 
     // Lines made entirely of '=' or '-' are used for heading 1 and 2
-    if (line.matches("\\s?(==+|\\-\\-+)\\s*")) {
+    if (line.matches("\\s?(==+|--+)\\s*")) {
       // DO nothing, we've already handled it
     }
 
@@ -111,7 +112,7 @@ public class BlockParser {
       Pattern x  = Pattern.compile("^\\s*(-|\\+|\\*|\\d+\\.)\\s+(.+)$");
       Matcher m = x.matcher(line);
       if (m.matches()) {
-        String no = m.group(1); // TODO
+        String no = m.group(1);
         if (state.isInList()) {
           // Already in a list, let's commit the previous item
           state.commit();
@@ -173,7 +174,7 @@ public class BlockParser {
         PSMLElement pre = new PSMLElement(Name.PREFORMAT);
         if (line.length() > 3) {
           String language = line.substring(3).trim();
-          if (language.length() > 0) {
+          if (!language.isEmpty()) {
             pre.setAttribute("role", language);
           }
         }
@@ -194,7 +195,7 @@ public class BlockParser {
         PSMLElement pre = new PSMLElement(Name.BLOCK);
         if (line.length() > 3) {
           String label = line.substring(3).trim();
-          if (label.length() > 0) {
+          if (!label.isEmpty()) {
             pre.setAttribute("label", label);
           }
         }
@@ -237,7 +238,7 @@ public class BlockParser {
     }
 
     // Metadata (document mode only)
-    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+\\:\\s.*")) {
+    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+:\\s.*")) {
       int colon = line.indexOf(':');
       if (!state.isDescendantOf(Name.METADATA)) {
         state.push(Name.METADATA);
@@ -295,7 +296,7 @@ public class BlockParser {
               // Special case for title section
               if (config.isDocumentMode()) {
                 PSMLElement section = state.ancestor(Name.SECTION);
-                if ("title".equals(section.getAttribute("id"))) {
+                if (section != null && "title".equals(section.getAttribute("id"))) {
                   isTitle = true;
                 }
               }
@@ -342,22 +343,22 @@ public class BlockParser {
     /**
      * List of element that have been committed.
      */
-    private List<PSMLElement> elements = new ArrayList<>();
+    private final List<PSMLElement> elements = new ArrayList<>();
 
     /**
      * The inline parser to use.
      */
-    private InlineParser inline = new InlineParser();
+    private final InlineParser inline = new InlineParser();
 
     /**
      * The current context, before it is committed
      */
-    private List<PSMLElement> context = new ArrayList<>(4);
+    private final List<PSMLElement> context = new ArrayList<>(4);
 
     /**
      * The section identifiers.
      */
-    private String[] sectionIds = new String[]{"title", "content"};
+    private final String[] sectionIds = new String[]{"title", "content"};
 
     /**
      * Position of the section
@@ -372,7 +373,7 @@ public class BlockParser {
     /**
      * String of text for the current element
      */
-    private StringBuilder text = null;
+    private @Nullable StringBuilder text = null;
 
     /**
      * Boolean flag to possibly include a line break.
@@ -419,7 +420,7 @@ public class BlockParser {
     /**
      * @return the current element.
      */
-    public PSMLElement current() {
+    public @Nullable PSMLElement current() {
       if (this.context.isEmpty()) return null;
       return this.context.get(this.context.size()-1);
     }
@@ -431,7 +432,7 @@ public class BlockParser {
      * @return <code>true</code> if the current element matches the specified name;
      *         <code>false</code> otherwise.
      */
-    public PSMLElement ancestor(Name name) {
+    public @Nullable PSMLElement ancestor(Name name) {
       final int size = this.context.size();
       if (size == 0) return null;
       for (int i = size-1; i >= 0; i--) {

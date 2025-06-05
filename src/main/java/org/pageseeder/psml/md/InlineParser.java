@@ -26,13 +26,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This simple parser can produce a list of PSML nodes from textual content
- * using the markdown format.
+ * This parser can produce a list of PSML nodes from textual content
+ * using the Markdown format.
  *
  * <p>This parser only matches inline PSML elements from a text inside a
  * block level element.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class InlineParser {
 
@@ -99,15 +102,12 @@ public class InlineParser {
    */
   private static final Pattern ESCAPED = Pattern.compile("\\\\(-|`|\\*|_|\\[|\\]|\\\\|!|<|>|\\.)");
 
-  public InlineParser() {
-  }
-
   /**
    * Parses the text content and returns the corresponding list of nodes.
    *
    * @param content The text content to parse.
    *
-   * @return
+   * @return the list of nodes as a results of parsing
    */
   public List<PSMLNode> parse(String content) {
     return parse(content, false);
@@ -119,7 +119,7 @@ public class InlineParser {
    * @param content The text content to parse.
    * @param inLink  Whether parsing text inside a link
    *
-   * @return
+   * @return the list of nodes as a results of parsing
    */
   private List<PSMLNode> parse(String content, boolean inLink) {
     List<PSMLNode> nodes = new ArrayList<>();
@@ -167,7 +167,7 @@ public class InlineParser {
       else if (m.group(9) != null) {
         String code = m.group(10);
         PSMLElement monospace = new PSMLElement(Name.MONOSPACE);
-        if (code.length() > 0) {
+        if (!code.isEmpty()) {
           monospace.addNode(new PSMLText(code));
         }
         nodes.add(monospace);
@@ -176,7 +176,7 @@ public class InlineParser {
       else if (m.group(11) != null) {
         String code = m.group(12);
         PSMLElement monospace = new PSMLElement(Name.MONOSPACE);
-        if (code.length() > 0) {
+        if (!code.isEmpty()) {
           monospace.addNode(new PSMLText(code));
         }
         nodes.add(monospace);
@@ -263,12 +263,12 @@ public class InlineParser {
   public static String unescape(String text) {
     if (text.indexOf('\\') == -1) return text;
     Matcher m = ESCAPED.matcher(text);
-    StringBuffer sb = new StringBuffer();
+    StringBuilder out = new StringBuilder();
     while (m.find()) {
-        m.appendReplacement(sb, "$1");
+      m.appendReplacement(out, "$1");
     }
-    m.appendTail(sb);
-    return sb.toString();
+    m.appendTail(out);
+    return out.toString();
   }
 
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.html.HTMLElement.Name;
 import org.pageseeder.psml.html.HTMLNode;
@@ -33,9 +34,6 @@ import org.pageseeder.psml.html.HTMLNode;
 public class HTMLBlockParser {
 
   private Configuration configuration;
-
-  public HTMLBlockParser() {
-  }
 
   public void setConfiguration(Configuration configuration) {
     this.configuration = configuration;
@@ -81,10 +79,10 @@ public class HTMLBlockParser {
    * @param next  The next line
    * @param state The state of the parser
    */
-  public void processLine(String line, String next, State state, Configuration config) {
+  public void processLine(String line, @Nullable String next, State state, Configuration config) {
 
     // Lines made entirely of '=' or '-' are used for heading 1 and 2
-    if (line.matches("\\s?(==+|\\-\\-+)\\s*")) {
+    if (line.matches("\\s?(==+|--+)\\s*")) {
       // DO nothing, we've already handled it
     }
 
@@ -111,7 +109,7 @@ public class HTMLBlockParser {
       Pattern x  = Pattern.compile("^\\s*(-|\\+|\\*|\\d+\\.)\\s+(.+)$");
       Matcher m = x.matcher(line);
       if (m.matches()) {
-        String no = m.group(1); // TODO
+        String no = m.group(1);
         if (state.isInList()) {
           // Already in a list, let's commit the previous item
           state.commit();
@@ -355,22 +353,22 @@ public class HTMLBlockParser {
     /**
      * List of element that have been committed.
      */
-    private List<HTMLElement> elements = new ArrayList<>();
+    private final List<HTMLElement> elements = new ArrayList<>();
 
     /**
      * The inline parser to use.
      */
-    private HTMLInlineParser inline = new HTMLInlineParser();
+    private final HTMLInlineParser inline = new HTMLInlineParser();
 
     /**
      * The current context, before it is committed
      */
-    private List<HTMLElement> context = new ArrayList<>(4);
+    private final List<HTMLElement> context = new ArrayList<>(4);
 
     /**
      * The section identifiers.
      */
-    private String[] sectionIds = new String[]{"title", "content"};
+    private final String[] sectionIds = new String[]{"title", "content"};
 
     /**
      * Position of the section
@@ -385,7 +383,7 @@ public class HTMLBlockParser {
     /**
      * String of text for the current element
      */
-    private StringBuilder text = null;
+    private @Nullable StringBuilder text = null;
 
     /**
      * Boolean flag to possibly include a line break.
@@ -409,7 +407,7 @@ public class HTMLBlockParser {
     /**
      * Sets whether we are inside fenced (```) code.
      *
-     * @param whether inside fenced code.
+     * @param fence whether inside fenced code.
      */
     public void setFenced(boolean fence) {
       this.fenced = fence;
@@ -432,7 +430,7 @@ public class HTMLBlockParser {
     /**
      * @return the current element.
      */
-    public HTMLElement current() {
+    public @Nullable HTMLElement current() {
       if (this.context.isEmpty()) return null;
       return this.context.get(this.context.size()-1);
     }
@@ -444,7 +442,7 @@ public class HTMLBlockParser {
      * @return <code>true</code> if the current element matches the specified name;
      *         <code>false</code> otherwise.
      */
-    public HTMLElement ancestor(Name name) {
+    public @Nullable HTMLElement ancestor(Name name) {
       final int size = this.context.size();
       if (size == 0) return null;
       for (int i = size-1; i >= 0; i--) {
@@ -535,7 +533,7 @@ public class HTMLBlockParser {
     /**
      * Add a new element to the context and reset the text.
      *
-     * @param name Name of the element to push
+     * @param element The element to push
      */
     public void push(HTMLElement element) {
       this.context.add(element);
@@ -545,7 +543,7 @@ public class HTMLBlockParser {
     /**
      * Add a new element to the context and add some text.
      *
-     * @param name Name of the element to push
+     * @param element The element to push
      * @param text Text for the element (not committed)
      */
     public void push(HTMLElement element, String text) {

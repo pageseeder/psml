@@ -19,7 +19,6 @@ public class Configuration {
 
   private int lineBreakThreshold = 66;
 
-
   /**
    * Indicates whether the parser should generate a document or a fragment.
    */

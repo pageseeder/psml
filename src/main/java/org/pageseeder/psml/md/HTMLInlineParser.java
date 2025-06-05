@@ -27,10 +27,10 @@ import java.util.regex.Pattern;
 
 /**
  * This simple parser can produce a list of HTML nodes from textual content
- * using the markdown format.
+ * using the Markdown format.
  *
  * <p>This parser only matches inline HTML elements from a text inside a
- * block level element.
+ * block-level element.
  *
  * <p>Implementation note: this algorithm is identical to the PSML namesake,
  * eventually, these should be merged.
@@ -97,15 +97,12 @@ public class HTMLInlineParser {
    */
   private static final Pattern TOKENS = Pattern.compile(DOUBLE_EMPHASIS+"|"+DOUBLE_UNDERSCORE+"|"+EMPHASIS+"|"+UNDERSCORE+"|"+CODE_ESCAPE+"|"+CODE+"|"+IMAGE+"|"+REF+"|"+LINK+"|"+LINK_AUTO);
 
-  public HTMLInlineParser() {
-  }
-
   /**
    * Parses the text content and returns the corresponding list of nodes.
    *
    * @param content The text content to parse.
    *
-   * @return
+   * @return The list of HTML nodes as a result of parsing
    */
   public List<HTMLNode> parse(String content) {
     return parse(content, false);
@@ -117,7 +114,7 @@ public class HTMLInlineParser {
    * @param content The text content to parse.
    * @param inLink  Whether parsing text inside a link
    *
-   * @return
+   * @return The list of HTML nodes as a result of parsing
    */
   private List<HTMLNode> parse(String content, boolean inLink) {
     List<HTMLNode> nodes = new ArrayList<>();

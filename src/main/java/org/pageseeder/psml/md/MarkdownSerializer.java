@@ -24,6 +24,12 @@ import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
 import org.pageseeder.psml.model.PSMLText;
 
+/**
+ * This class is responsible for serializing PSML content into Markdown format.
+ *
+ * @version 1.6.0
+ * @since 1.0
+ */
 public class MarkdownSerializer {
 
   public MarkdownSerializer() {
