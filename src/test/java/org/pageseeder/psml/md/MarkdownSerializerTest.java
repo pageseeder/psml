@@ -15,15 +15,13 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.pageseeder.psml.PSML;
 import org.pageseeder.psml.model.PSMLElement;
-import org.pageseeder.psml.model.PSMLNode;
+import org.pageseeder.psml.toc.Tests;
 
 public final class MarkdownSerializerTest {
 
@@ -92,6 +90,24 @@ public final class MarkdownSerializerTest {
     Assert.assertEquals(" * Item 1\n * Item 2\n", toMarkdown(psml));
   }
 
+  @Test
+  public void testKitchenSink() throws IOException {
+    PSMLElement psml = getTestFile("kitchen_sink.psml");
+    MarkdownSerializer serializer = new MarkdownSerializer();
+    StringWriter out = new StringWriter();
+    serializer.serialize(psml, out);
+    System.out.println(out.toString());
+  }
+
+  @Test
+  public void testProperties() throws IOException {
+    PSMLElement psml = getTestFile("8.17_clock_synchronisation.psml");
+    MarkdownSerializer serializer = new MarkdownSerializer();
+    StringWriter out = new StringWriter();
+    serializer.serialize(psml, out);
+    System.out.println(out.toString());
+  }
+
   /**
    * Returns the Markdown text as PSML using the inline parser.
    *
@@ -111,5 +127,14 @@ public final class MarkdownSerializerTest {
       throw new RuntimeException(ex);
     }
   }
+
+  public static PSMLElement getTestFile(String filename) {
+    try (Reader r = new InputStreamReader(Tests.class.getResourceAsStream("/org/pageseeder/psml/md/"+filename))) {
+      return PSML.load(r);
+    } catch (IOException ex) {
+      throw new UncheckedIOException("Unable to load test file '"+filename+"'", ex);
+    }
+  }
+
 
 }
