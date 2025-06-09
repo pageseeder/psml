@@ -651,6 +651,24 @@ public class PSMLElement implements PSMLNode {
   }
 
   /**
+   * Returns the attribute value for the specified attribute.
+   *
+   * @param name The name of the attribute.
+   *
+   * @return The corresponding value or <code>null</code>.
+   */
+  public int getAttributeOrElse(String name, int defaultValue) {
+    if (this.attributes == null) return defaultValue;
+    String value = this.attributes.get(name);
+    if (value == null) return defaultValue;
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException ex) {
+      return defaultValue;
+    }
+  }
+
+  /**
    * Sets the attribute value of the specified attribute.
    *
    * <p>Implementation note: this method will initialize the attribute map
@@ -902,7 +920,6 @@ public class PSMLElement implements PSMLNode {
     }
     return null;
   }
-
 
   /**
    * Indicates whether the element has nay child node (attribute nodes are ignored)
