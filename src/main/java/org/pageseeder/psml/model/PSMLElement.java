@@ -192,8 +192,9 @@ public class PSMLElement implements PSMLNode {
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-hcell.html">hcell element</a>
      *
-     * @deprecated
+     * @deprecated Use cell instead
      */
+    @Deprecated
     HCELL("hcell", "align", "alignment", "colspan", "role", "rowspan", "valign", "width"),
 
     /**
