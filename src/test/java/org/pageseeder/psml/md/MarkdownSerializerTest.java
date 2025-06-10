@@ -96,16 +96,16 @@ public final class MarkdownSerializerTest {
     MarkdownSerializer serializer = new MarkdownSerializer();
     StringWriter out = new StringWriter();
     serializer.serialize(psml, out);
-    System.out.println(out.toString());
+    System.out.println(out);
   }
 
   @Test
   public void testProperties() throws IOException {
-    PSMLElement psml = getTestFile("8.17_clock_synchronisation.psml");
+    PSMLElement psml = getTestFile("clock_synchronisation.psml");
     MarkdownSerializer serializer = new MarkdownSerializer();
     StringWriter out = new StringWriter();
     serializer.serialize(psml, out);
-    System.out.println(out.toString());
+    System.out.println(out);
   }
 
   /**
@@ -135,6 +135,5 @@ public final class MarkdownSerializerTest {
       throw new UncheckedIOException("Unable to load test file '"+filename+"'", ex);
     }
   }
-
 
 }
