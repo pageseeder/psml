@@ -6,7 +6,6 @@ package org.pageseeder.psml.process;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
-import org.pageseeder.psml.process.math.TexConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -19,21 +18,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
  * Perform the process task.
- * For more info, see {@link https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_process.html}
+ *
+ * @see <a href="https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_process.html">Task process</a>
  *
  * @author Jean-Baptiste Reure
- *
  */
 public final class Process {
 
   /**
    * UTF-8 charset.
    */
-  private static final Charset UTF8 = Charset.forName("UTF-8");
+  private static final Charset UTF8 = StandardCharsets.UTF_8;
+
   /**
    * The size of the byte buffer used to copy files.
    */
@@ -332,9 +333,25 @@ public final class Process {
     this.processXML = true;
   }
 
+
   /**
-   * {@inheritDoc}
-   * @throws ProcessException
+   * Processes the source files from the specified source directory and performs the following steps:
+   * - Validates input parameters including source and destination directories.
+   * - Collects PSML and other files from the source directory for processing.
+   * - Optionally creates a manifest document if a manifest creator is specified.
+   * - Executes a pre-transform operation if configured.
+   * - Processes PSML files, handling their content such as cross-references, images, metadata stripping, and numbering.
+   * - Executes a post-transform operation if configured.
+   * - Moves processed PSML files and other non-PSML files to the destination directory.
+   * - Handles specialized image-handling logic if configured.
+   * - Deletes temporary files and folders used during processing.
+   * - Optionally removes source files after processing is complete.
+   * - Cleans up any changes made in case of a processing exception.
+   *
+   * <p>This method also uses an image cache to optimize image lookup and processing.
+   *
+   * @throws ProcessException if any errors occur during processing, particularly if input validation fails,
+   *                          temporary folders cannot be removed, or source files cannot be deleted.
    */
   public void process() throws ProcessException {
 
@@ -354,7 +371,7 @@ public final class Process {
     if (this.logger == null) this.logger = LoggerFactory.getLogger(Process.class);
 
     // collect files
-    this.logger.debug("Collecting PSML files from "+this.src.getAbsolutePath());
+    this.logger.debug("Collecting PSML files from {}", this.src.getAbsolutePath());
     Map<String, File> psml = new HashMap<>();
     Map<String, File> rest = new HashMap<>();
     collectAll(this.src, psml, null, rest);

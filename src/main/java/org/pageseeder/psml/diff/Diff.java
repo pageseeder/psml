@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
 /**
  * Adds <diff> elements to portable PSML files.
  *
- * For more info, see {@link https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_diff.html}
+ * @see <a href="https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_diff.html">Task Diff</a>
  *
  * @author Philip Rutherford
  * @author Christophe Lauret

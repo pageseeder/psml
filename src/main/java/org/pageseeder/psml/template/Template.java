@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Represents a template that can generate PSML documents with specified placeholder values.
  *
- * <p>>This interface defines operations for obtaining the charset used by the template
+ * <p>This interface defines operations for getting the charset used by the template
  * and processing PSML templates to populate placeholders with specified values.
  *
  * @author Christophe Lauret

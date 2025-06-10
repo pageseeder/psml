@@ -205,7 +205,7 @@ public final class PublicationConfig implements Cloneable {
   }
 
   /**
-   * @param tocParaLevels comma separated list of numbered paragraph indents to include in the toc
+   * @param tocParaIndents comma separated list of numbered paragraph indents to include in the toc
    */
   public void setTocParaIndents(String tocParaIndents) {
     this.tocParaIndents = (tocParaIndents == null ? ""  : tocParaIndents) + ",";

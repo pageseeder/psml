@@ -22,7 +22,7 @@ package org.pageseeder.psml.process.config;
  *   <li>types:        Comma separated list of xref types to process in included files
  *                     (i.e. transclude, embed ) - default none. </li>
  *   <li>levels:       Whether to modify heading levels based on XRef level attribute - default true. </li>
- *   <li>xreffragment: Defines how to handle XRefs in an <xref-fragment> element.
+ *   <li>xreffragment: Defines how to handle XRefs in an {@code <xref-fragment>} element.
  *                     Possible values are "include" (process XRefs in an xref-fragment),
  *                     "exclude" (don't process XRefs in an xref-fragment) and
  *                     "only" (process only XRefs in an xref-fragment). Default is "include". </li>
@@ -44,13 +44,13 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
 
   public enum XREF_IN_XREF_FRAGMENT {
     
-    /** Process xrefs inside <xref-fragment> */
+    /** Process xrefs inside {@code <xref-fragment>} */
     INCLUDE,
     
-    /** Don't process xrefs inside <xref-fragment> */
+    /** Don't process xrefs inside {@code <xref-fragment>} */
     EXCLUDE,
     
-    /** Process only xrefs inside <xref-fragment> */
+    /** Process only xrefs inside {@code <xref-fragment>} */
     ONLY;
     
     /**

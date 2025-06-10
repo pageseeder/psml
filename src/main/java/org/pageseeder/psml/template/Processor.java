@@ -117,9 +117,6 @@ public final class Processor {
    *
    * <p>Note this method will automatically select the correct encoding for the file output.
    *
-   * @param in  The XML to transcode
-   * @param out The file output.
-   *
    * @throws IOException Should an I/O error occur while reading the XML.
    * @throws SAXException Should an error occur while parsing the XML.
    */
@@ -134,9 +131,6 @@ public final class Processor {
    *
    * <p>Note this method will automatically select the correct encoding for the file output.
    *
-   * @param in  The XML to transcode
-   * @param out The file output.
-   *
    * @throws IOException Should an I/O error occur while reading the XML.
    * @throws SAXException Should an error occur while parsing the XML.
    */
@@ -148,9 +142,6 @@ public final class Processor {
 
   /**
    * Process the template and generate the PSML using the specified values.
-   *
-   * @param in  The XML to transcode
-   * @param out The print writer.
    *
    * @throws IOException Should an I/O error occur while reading the XML.
    * @throws SAXException Should an error occur while parsing the XML.

@@ -69,8 +69,8 @@ public final class FragmentNumbering implements Serializable {
 
   /**
    * Map of [uriid]-[position]-[fragment][-index]], [prefix]
-   * where position is the number of times the document has been used (>=1)
-   * and index is the index of the heading/para in the fragment (>=1).
+   * where position is the number of times the document has been used (1 or greater)
+   * and index is the index of the heading/para in the fragment (1 or greater).
    */
   private final Map<String,Prefix> numbering = new HashMap<>();
 
@@ -79,8 +79,8 @@ public final class FragmentNumbering implements Serializable {
    * Numbering for transcluded content in context of parent fragment.
    *
    * Map of [uriid]-[position]-[fragment][-index]], [prefix]
-   * where position is the number of times the document has been used (>=1)
-   * and index is the index of the heading/para in the fragment (>=1).
+   * where position is the number of times the document has been used (1 or greater)
+   * and index is the index of the heading/para in the fragment (1 or greater).
    */
   private final Map<String,Prefix> transcludedNumbering = new HashMap<>();
 

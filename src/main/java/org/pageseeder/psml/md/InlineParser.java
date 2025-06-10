@@ -254,7 +254,18 @@ public class InlineParser {
   }
 
   /**
-   * Removes the first '\' from '\-', '\`', '\*', '\_', '\[', '\]', '\\', '\!', '\<', '\>', '\.'.
+   * Removes the first {@code '\'} from
+   * {@code '\-'},
+   * {@code '\`'},
+   * {@code '\*'},
+   * {@code '\_'},
+   * {@code '\['},
+   * {@code '\]'},
+   * {@code '\\'},
+   * {@code '\!'},
+   * {@code '\<'},
+   * {@code '\>'},
+   * {@code '\.'}.
    *
    * @param text  the original text
    *

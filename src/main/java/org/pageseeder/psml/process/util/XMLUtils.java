@@ -47,8 +47,8 @@ public final class XMLUtils {
    *
    * <p>these characters are:</p>
    * <ul>
-   *  <li>'&amp' by the ampersand entity "&amp;amp"</li>
-   *  <li>'&lt;' by the entity "&amp;lt;"</li>
+   *  <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
+   *  <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
    * </ul>
    *
    * <p>Empty strings or <code>null</code> return respectively "" and <code>null</code>.
@@ -92,10 +92,10 @@ public final class XMLUtils {
    *
    * <p>these characters are:</p>
    * <ul>
-   *  <li>'&amp' by the ampersand entity "&amp;amp"</li>
-   *  <li>'&lt;' by the entity "&amp;lt;"</li>
-   *  <li>'"' by the entity "&amp;quot;"</li>
-   *  <li>''' by the entity "&amp;apos;"</li>
+   *  <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
+   *  <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
+   *  <li>{@code '"'} by the entity {@code "&amp;quot;"}</li>
+   *  <li>{@code '''} by the entity {@code "&amp;apos;"}</li>
    * </ul>
    *
    * <p>Empty strings or <code>null</code> return respectively
@@ -103,7 +103,7 @@ public final class XMLUtils {
    *
    * <p>Note: this function assumes that there are no entities in
    * the given String. If there are existing entities, then the
-   * ampersand character will be escaped by the ampersand entity.
+   * ampersand entity will replace the ampersand character.
    *
    * @param  s The String to be parsed
    *
