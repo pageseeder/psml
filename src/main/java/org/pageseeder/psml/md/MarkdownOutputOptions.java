@@ -1,6 +1,17 @@
 package org.pageseeder.psml.md;
 
-public class MarkdownOutputOptions {
+/**
+ * Configuration options for customizing the output of Markdown content.
+ *
+ * <p>This class provides various toggles for including or excluding specific elements
+ * in the Markdown output, such as metadata, image URLs, and cross-reference URLs.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
+ */
+public final class MarkdownOutputOptions {
 
   private boolean includeMetadata = true;
 
@@ -8,10 +19,20 @@ public class MarkdownOutputOptions {
 
   private boolean includeXrefUrl = false;
 
+  /**
+   * Determines whether metadata should be included in the Markdown output.
+   *
+   * @return true if metadata is included in the output, false otherwise.
+   */
   public boolean includeMetadata() {
     return includeMetadata;
   }
 
+  /**
+   * Sets whether metadata should be included in the Markdown output.
+   *
+   * @param includeMetadata true to include metadata in the output, false to exclude it.
+   */
   public void setIncludeMetadata(boolean includeMetadata) {
     this.includeMetadata = includeMetadata;
   }
