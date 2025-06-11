@@ -87,6 +87,11 @@ public class BlockParser {
     // Lines made entirely of '=' or '-' are used for heading 1 and 2
     if (line.matches("\\s?(==+|--+)\\s*")) {
       // DO nothing, we've already handled it
+
+      // Ensure that metadata is committed before we start with content
+      if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION)) {
+        state.commitAll();
+      }
     }
 
     // Separators
@@ -238,18 +243,60 @@ public class BlockParser {
     }
 
     // Metadata (document mode only)
-    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+:\\s.*")) {
+    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^[^:]+:\\s.*")) {
       int colon = line.indexOf(':');
-      if (!state.isDescendantOf(Name.METADATA)) {
-        state.push(Name.METADATA);
-        state.push(Name.PROPERTIES);
+      String title = line.substring(0, colon).trim();
+      String name = title.toLowerCase().replaceAll("[^a-z0-9_-]", "_");
+      String value = line.substring(colon+2).trim();
+
+      // URI metadata
+      if (!state.isDescendantOf(Name.METADATA) && name.toLowerCase().matches("^(type|title|description|docid)$")) {
+        if (!state.isDescendantOf(Name.DOCUMENTINFO)) {
+          state.push(Name.DOCUMENTINFO);
+          state.push(Name.URI);
+        }
+        PSMLElement uri = state.current();
+        if (uri != null && uri.isElement(Name.URI)) {
+          if ("type".equals(name)) {
+            uri.setAttribute("documenttype", value.replaceAll("[^A-Za-z0-9_]", "_"));
+          } else if ("docid".equals(name)) {
+            uri.setAttribute(name, value.replaceAll("[^A-Za-z0-9_-]", "_"));
+          } else if ("title".equals(name)) {
+            PSMLElement displayTitle = new PSMLElement(Name.DISPLAYTITLE);
+            displayTitle.setText(value);
+            uri.addNode(displayTitle);
+          } else if ("description".equals(name)) {
+            PSMLElement description = new PSMLElement(Name.DESCRIPTION);
+            description.setText(value);
+            uri.addNode(description);
+          }
+        }
       }
-      // Create and commit a property
-      PSMLElement property = new PSMLElement(Name.PROPERTY);
-      property.setAttribute("name", line.substring(0,colon));
-      property.setAttribute("value", line.substring(colon+2).trim());
-      state.push(property);
-      state.commit();
+
+      // Metadata properties
+      else {
+        if (!state.isDescendantOf(Name.METADATA)) {
+          state.commitAll();
+          state.push(Name.METADATA);
+          state.push(Name.PROPERTIES);
+        }
+        // Create and commit a property
+        PSMLElement property = new PSMLElement(Name.PROPERTY);
+        property.setAttribute("title", title);
+        property.setAttribute("name", name);
+        if (value.startsWith("[") && value.endsWith("]")) {
+          property.setAttribute("multiple", "true");
+          String[] values = value.substring(1, value.length()-1).split("\\s*,\\s*");
+          for (String v : values) {
+            property.addNode(new PSMLElement(Name.VALUE).setText(v.trim()));
+          }
+        } else {
+          property.setAttribute("value", value);
+        }
+        state.push(property);
+        state.commit();
+      }
+
     }
 
     // Probably a paragraph or heading
@@ -341,7 +388,7 @@ public class BlockParser {
   public static final class State {
 
     /**
-     * List of element that have been committed.
+     * List of elements that have been committed.
      */
     private final List<PSMLElement> elements = new ArrayList<>();
 

@@ -93,12 +93,12 @@ public class InlineParser {
   private static final String LINK_AUTO = "(https?://\\S+[\\w/+=@\\-])";
 
   /**
-   * Define the general pattern to use to match markdown.
+   * Define the general pattern to use to match Markdown.
    */
   private static final Pattern TOKENS = Pattern.compile(DOUBLE_EMPHASIS+"|"+DOUBLE_UNDERSCORE+"|"+EMPHASIS+"|"+UNDERSCORE+"|"+CODE_ESCAPE+"|"+CODE+"|"+IMAGE+"|"+REF+"|"+LINK+"|"+LINK_AUTO);
 
   /**
-   * Define the pattern to match escaped characters in markdown.
+   * Define the pattern to match escaped characters in Markdown.
    */
   private static final Pattern ESCAPED = Pattern.compile("\\\\(-|`|\\*|_|\\[|\\]|\\\\|!|<|>|\\.)");
 
@@ -107,7 +107,7 @@ public class InlineParser {
    *
    * @param content The text content to parse.
    *
-   * @return the list of nodes as a results of parsing
+   * @return the list of nodes as a result of parsing
    */
   public List<PSMLNode> parse(String content) {
     return parse(content, false);
@@ -119,7 +119,7 @@ public class InlineParser {
    * @param content The text content to parse.
    * @param inLink  Whether parsing text inside a link
    *
-   * @return the list of nodes as a results of parsing
+   * @return the list of nodes as a result of parsing
    */
   private List<PSMLNode> parse(String content, boolean inLink) {
     List<PSMLNode> nodes = new ArrayList<>();

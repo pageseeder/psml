@@ -60,6 +60,10 @@ public final class MarkdownOutputOptions {
   // - embed as base64 (max size threshold)
   // - include url to PageSeeder?
 
+  // Block labels:
+  // - As quoted supported embedded
+  // - as fenced block (no embedding)
+
   // Xrefs:
   // - as plain text
   // - as links to PageSeeder
