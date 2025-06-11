@@ -165,7 +165,7 @@ public class BlockParser {
       }
     }
 
-    // Beginning/end of fenced code block
+    // Beginning/end of a fenced code block
     else if (line.startsWith("```")) {
       if (config.isDocumentMode()) {
         state.ensureFragment();
@@ -239,6 +239,54 @@ public class BlockParser {
         p.setText(text);
         block.addNode(p);
         state.push(block);
+      }
+    }
+
+    // Tables
+    else if (line.startsWith("|") && !state.isElement(Name.PREFORMAT)) {
+      String[] columns = line.substring(1).split("\\|");
+      boolean inTable = state.isDescendantOf(Name.TABLE);
+      boolean isHeaderRow = false;
+      if (!inTable && next != null && next.startsWith("|") && next.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
+        PSMLElement table = new PSMLElement(Name.TABLE);
+        String[] cols = next.substring(1).split("\\|");
+        for (String col : cols) {
+          String text = col.trim();
+          boolean startWithColon = text.startsWith(":");
+          boolean endsWithColon = text.endsWith(":");
+          if (startWithColon && endsWithColon) {
+            table.addNode(new PSMLElement(Name.COL).setAttribute("align", "center"));
+          } else if (startWithColon) {
+            table.addNode(new PSMLElement(Name.COL).setAttribute("align", "left"));
+          } else if (endsWithColon) {
+            table.addNode(new PSMLElement(Name.COL).setAttribute("align", "right"));
+          } else {
+            table.addNode(new PSMLElement(Name.COL));
+          }
+        }
+        state.push(table);
+        inTable = true;
+        isHeaderRow = true;
+      }
+
+      if (inTable) {
+        if (!line.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
+          PSMLElement row = new PSMLElement(Name.ROW);
+          if (isHeaderRow) row.setAttribute("part", "header");
+          for (String col : columns) {
+            String text = col.trim();
+            // TODO Support inline style and replace <br>
+            if (isHeaderRow && text.matches("^\\*\\*(.*)\\*\\*$")) {
+              text = text.substring(2, text.length() - 2);
+            }
+            PSMLElement cell = new PSMLElement(Name.CELL).setText(text);
+            row.addNode(cell);
+          }
+          state.push(row);
+          state.commit();
+        }
+      } else {
+        // TODO when it's not a table
       }
     }
 
@@ -349,7 +397,7 @@ public class BlockParser {
               }
 
             } else if (next.matches("\\s*--+\\s*")) {
-              // We use the '----' as a marker for a new fragment
+              // We use the '---' as a marker for a new fragment
               if (config.isDocumentMode() && !state.current().isEmpty()) {
                 state.newFragment();
               }
@@ -368,7 +416,7 @@ public class BlockParser {
             state.append(line.trim());
           }
 
-          // If the line breaks occurs before 66 characters, we assume it is intentional and insert a break
+          // If the line break occurs before 66 characters, we assume it is intentional and insert a break
           state.lineBreak = line.length() < config.getLineBreakThreshold();
 
           // Special case: we terminate the section title
