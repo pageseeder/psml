@@ -174,6 +174,20 @@ public class PSMLElement implements PSMLNode {
     FRAGMENT("fragment", "id", "type"),
 
     /**
+     * &lt;fragment-ref&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fragment-ref.html">fragment-ref element</a>
+     */
+    FRAGMENT_REF("fragment-ref", "id"),
+
+    /**
+     * &lt;fragments&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fragments.html">fragments element</a>
+     */
+    FRAGMENTS("overwrite"),
+
+    /**
      * &lt;fragmentinfo&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-fragmentinfo.html">fragmentinfo element</a>
@@ -319,9 +333,9 @@ public class PSMLElement implements PSMLNode {
     /**
      * &lt;placeholder&lt; element
      *
-     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-placeholder.html">para element</a>
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-placeholder.html">placeholder element</a>
      */
-    PLACEHOLDER("name", "unresolved"),
+    PLACEHOLDER("name", true, "unresolved"),
 
     /**
      * &lt;preformat&lt; element
@@ -352,6 +366,13 @@ public class PSMLElement implements PSMLNode {
     PROPERTY("property", "count", "datatype", "name", "title", "value"),
 
     /**
+     * &lt;publication&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-publication.html">publication element</a>
+     */
+    PUBLICATION("publication", "defaultgroupid", "hostid", "id", "rooturiid", "title", "type"),
+
+    /**
      * &lt;reversexrefs&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-reversexrefs.html">reversexrefs element</a>
@@ -378,6 +399,20 @@ public class PSMLElement implements PSMLNode {
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-section.html">section element</a>
      */
     SECTION("section", "edit", "fragmenttype", "id", "lockstructure", "overwrite", "title"),
+
+    /**
+     * &lt;section-ref&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-section-ref.html">section-ref element</a>
+     */
+    SECTION_REF("section-ref", "id", "title"),
+
+    /**
+     * &lt;structure&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-structure.html">structure element</a>
+     */
+    STRUCTURE("structure"),
 
     /**
      * &lt;sub&lt; element
@@ -417,9 +452,31 @@ public class PSMLElement implements PSMLNode {
     /**
      * &lt;tocref&lt; element
      *
-     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-tocref.html">tocref element</a>
+     * @deprecated Replaced by {@link #TOC_PART}
      */
+    @Deprecated
     TOCREF("tocref", "level", "idref", "canonical", "prefix"),
+
+    /**
+     * &lt;toc-part&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-toc-part.html">toc-part element</a>
+     */
+    TOC_PART("toc-part", "level", "idref", "canonical", "prefix", "title"),
+
+    /**
+     * &lt;toc-ref&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-toc-ref.html">toc-ref element</a>
+     */
+    TOC_REF("toc-ref"),
+
+    /**
+     * &lt;toc-tree&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-toc-tree.html">toc-tree element</a>
+     */
+    TOC_TREE("toc-tree", "title"),
 
     /**
      * &lt;underline&lt; element
