@@ -317,6 +317,13 @@ public class PSMLElement implements PSMLNode {
     PARA("para", "indent", "numbered", "prefix"),
 
     /**
+     * &lt;placeholder&lt; element
+     *
+     * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-placeholder.html">para element</a>
+     */
+    PLACEHOLDER("name", "unresolved"),
+
+    /**
      * &lt;preformat&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-preformat.html">preformat element</a>
