@@ -20,6 +20,8 @@ import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
 import org.pageseeder.psml.model.PSMLText;
+import org.pageseeder.psml.util.DiagnosticCollector;
+import org.pageseeder.psml.util.NilDiagnosticCollector;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -44,12 +46,28 @@ public class MarkdownSerializer {
     NONE, BOLD, ITALIC
   }
 
-  MarkdownOutputOptions options = new MarkdownOutputOptions();
+  /**
+   * The default configuration for generating Markdown content.
+   */
+  MarkdownOutputOptions options = MarkdownOutputOptions.defaultOptions();
 
+  /**
+   * Sets the configuration options for customizing the Markdown output.
+   *
+   * @param options the {@code MarkdownOutputOptions} instance containing settings
+   *                for customizing the Markdown output, such as metadata inclusion
+   *                or handling of image URLs and cross-references.
+   */
   public void setOptions(MarkdownOutputOptions options) {
     this.options = options;
   }
 
+  /**
+   * Retrieves the current configuration options used for customizing the Markdown output.
+   *
+   * @return the {@code MarkdownOutputOptions} instance that contains the settings
+   *         for generating the Markdown output.
+   */
   public MarkdownOutputOptions getOptions() {
     return options;
   }
@@ -76,8 +94,6 @@ public class MarkdownSerializer {
     private final int[] headingPrefix = new int[]{0, 0, 0, 0, 0, 0};
 
     private final int[] paraPrefix = new int[]{0, 0, 0, 0, 0};
-
-    private final List<String> warnings = new ArrayList<>();
 
     public void push(Name name) {
       this.context.push(name);
@@ -146,10 +162,6 @@ public class MarkdownSerializer {
       return false;
     }
 
-    void addWarning(String warning) {
-      this.warnings.add(warning);
-    }
-
   }
 
   private static class Instance {
@@ -158,8 +170,11 @@ public class MarkdownSerializer {
 
     private final State state = new State();
 
+    private final DiagnosticCollector collector;
+
     Instance(MarkdownOutputOptions options) {
       this.options = options;
+      this.collector = new NilDiagnosticCollector();
     }
 
     void serialize(PSMLElement element, Appendable out) throws IOException {
@@ -304,6 +319,20 @@ public class MarkdownSerializer {
     }
 
     private void serializeBlock(PSMLElement block, Appendable out) throws IOException {
+      switch (options.blockFormat()) {
+        case QUOTED:
+          serializeBlock_Quoted(block, out);
+          break;
+        case FENCED:
+          serializeBlock_Fenced(block, out);
+          break;
+        default:
+          serializeBlock_LabelText(block, out);
+          break;
+      }
+    }
+
+    private void serializeBlock_Quoted(PSMLElement block, Appendable out) throws IOException {
       String label = block.getAttribute("label");
       out.append("> ");
       if (label != null) {
@@ -312,16 +341,30 @@ public class MarkdownSerializer {
       StringBuilder buffer = new StringBuilder();
       processChildren(block, buffer);
       String text = String.join("\n> ", buffer.toString().split("\n"));
-      out.append(text).append("\n");
+      out.append(text).append('\n');
     }
 
-    private void serializeBlockXref(PSMLElement link, Appendable out) throws IOException {
-      String text = normalizeText(link.getText());
-      if (options.includeXrefUrl()) {
-        String url = link.getAttribute("href");
-        out.append("[").append(text).append("](").append(url).append(")");
+    private void serializeBlock_Fenced(PSMLElement block, Appendable out) throws IOException {
+      String label = block.getAttributeOrElse("label", "");
+      out.append("~~~").append(label);
+      processChildren(block, out);
+      out.append("~~~\n");
+    }
+
+    private void serializeBlock_LabelText(PSMLElement block, Appendable out) throws IOException {
+      String label = block.getAttribute("label");
+      if (label != null) {
+        out.append("**").append(block.getAttribute("label")).append("**: ");
+      }
+      processChildren(block, out);
+      out.append('\n');
+    }
+
+    private void serializeBlockXref(PSMLElement blockXref, Appendable out) throws IOException {
+      if (!blockXref.getChildElements().isEmpty()) {
+        // TODO handle transclusions
       } else {
-        out.append("**").append(text).append("**");
+        serializeXref(blockXref, out);
       }
     }
 
@@ -418,18 +461,45 @@ public class MarkdownSerializer {
     }
 
     private void serializeImage(PSMLElement image, Appendable out) throws IOException {
-      String alt = image.getAttribute("alt");
       String src = image.getAttribute("src");
+      String alt = image.getAttribute("alt");
       out.append("**").append(state.nextImage()).append("**");
       if (alt != null) {
-        // TODO See if other attribute could be used
         out.append(": ").append(alt);
+      } else {
+        alt = src != null ? src.substring(src.lastIndexOf('/') + 1) : "";
       }
       out.append("\n");
-      if (options.includeImageUrl()) {
-        if (src != null && alt != null && !src.isEmpty() && !alt.isEmpty()) {
-          out.append("![").append(alt).append("](").append(src).append(")");
-        }
+      switch (options.imageFormat()) {
+        case LOCAL:
+          if (src != null && !src.isEmpty()) {
+            out.append("![").append(alt).append("](").append(src).append(")");
+          }
+          break;
+        case EXTERNAL:
+          // TODO requires base URI
+          if (src != null && !src.isEmpty()) {
+            out.append("![").append(alt).append("](").append(src).append(")");
+          }
+          break;
+        case DATA_URI:
+          // TODO Not supported
+          break;
+        case IMG_TAG:
+          String width = image.getAttribute("width");
+          String height = image.getAttribute("height");
+          out.append("<img src=\"").append(src).append('"');
+          if (alt != null && !alt.isEmpty()) {
+            out.append(" alt=\"").append(alt).append('"');
+          }
+          if (width != null && !width.isEmpty()) {
+            out.append(" width=\"").append(width).append('"');
+          }
+          if (height != null && !height.isEmpty()) {
+            out.append(" height=\"").append(height).append('"');
+          }
+          out.append(" />");
+          break;
       }
     }
 
@@ -575,12 +645,12 @@ public class MarkdownSerializer {
     }
 
     private void serializeSup(PSMLElement element, Appendable out) throws IOException {
-      state.addWarning("Superscripts are not supported in Markdown");
+      collector.warn("Superscripts are not supported in Markdown");
       processChildren(element, out);
     }
 
     private void serializeSub(PSMLElement element, Appendable out) throws IOException {
-      state.addWarning("Subscripts are not supported in Markdown");
+      collector.warn("Subscripts are not supported in Markdown");
       processChildren(element, out);
     }
 
@@ -654,18 +724,27 @@ public class MarkdownSerializer {
     }
 
     private void serializeUnderline(PSMLElement element, Appendable out) throws IOException {
-      state.addWarning("Underlines are not supported in Markdown");
+      collector.warn("Underlines are not supported in Markdown");
       processChildren(element, out);
     }
 
-
     private void serializeXref(PSMLElement link, Appendable out) throws IOException {
       String text = normalizeText(link.getText());
-      if (options.includeXrefUrl()) {
-        String url = link.getAttribute("href");
-        out.append("[").append(text).append("](").append(url).append(")");
-      } else {
-        out.append("**").append(text).append("**");
+      String url = link.getAttribute("href");
+      switch (options.xrefFormat()) {
+        case EXTERNAL_LINK:
+          // TODO Base URL
+          out.append("[").append(text).append("](").append(url).append(")");
+          break;
+        case LOCAL_LINK:
+          out.append("[").append(text).append("](").append(url).append(")");
+          break;
+        case BOLD_TEXT:
+          out.append("**").append(text).append("**");
+          break;
+        default:
+          out.append(text);
+          break;
       }
     }
 
