@@ -25,6 +25,7 @@ import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.spi.Parser;
+import org.pageseeder.psml.util.DiagnosticCollector;
 
 /**
  * A parser for Markdown
@@ -99,6 +100,26 @@ public class MarkdownParser extends Parser {
 
     return wrapper;
   }
+
+  public PSMLElement parse(Reader reader, DiagnosticCollector collector) throws IOException {
+    List<String> lines = toLines(reader);
+    BlockParser parser = new BlockParser(config.toMarkdownInputOptions());
+    List<PSMLElement> elements = parser.parse(lines, collector);
+
+    // Wrap the element based on the configuration
+    PSMLElement wrapper;
+    if (this.config.isFragment()) {
+      wrapper = new PSMLElement(Name.FRAGMENT);
+    } else {
+      wrapper = new PSMLElement(Name.DOCUMENT);
+      wrapper.setAttribute("level", "portable");
+    }
+    wrapper.addNodes(elements);
+
+    return wrapper;
+  }
+
+
 
   /**
    * Parses the contents provided by a reader into an HTML representation.

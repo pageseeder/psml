@@ -103,7 +103,6 @@ public class BlockParserTest {
     Assert.assertEquals("<para>This line is longer than sixty-six characters and should continue without\na line break</para>", toPSML(p7));
   }
 
-
   @Test
   public void testUnorderedList() {
     List<String> list1 = List.of(" * Red", " * Green", " * Blue");
@@ -124,6 +123,19 @@ public class BlockParserTest {
     Assert.assertEquals("<nlist><item>Bird</item><item>McHale</item><item>Parish</item></nlist>", toPSML(list2));
     Assert.assertEquals("<nlist start=\"7\"><item>Bird</item><item>McHale</item><item>Parish</item></nlist>", toPSML(list3));
     Assert.assertEquals("<nlist start=\"3\"><item>Bird</item><item>McHale</item><item>Parish</item></nlist>", toPSML(list4));
+  }
+
+  // Not supported yet
+  public void tesNestedLists() {
+    List<String> nested = List.of(
+        "- Fruits:",
+        "    - Apple",
+        "    - Banana",
+        "",
+        "- Vegetables:",
+        "    - Carrot"
+    );
+    Assert.assertEquals("", toPSML(nested));
   }
 
   @Test
@@ -149,7 +161,7 @@ public class BlockParserTest {
     List<String> fencedCode5 = List.of("```", "function() {","","return 'Hello!';}", "```");
     List<String> fencedCode6 = List.of("```", "<report>","  <errors>","    <error>", "```");
     Assert.assertEquals("<preformat>\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode1));
-    Assert.assertEquals("<preformat role=\"javascript\">\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode2));
+    Assert.assertEquals("<preformat role=\"lang-javascript\">\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode2));
     Assert.assertEquals("<preformat>\nfunction() {\n  return 'Hello!';\n}\n</preformat>", toPSML(fencedCode3));
     Assert.assertEquals("<preformat>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</preformat>", toPSML(fencedCode4));
     Assert.assertEquals("<preformat>\nfunction() {\n\nreturn 'Hello!';}\n</preformat>", toPSML(fencedCode5));
@@ -157,12 +169,26 @@ public class BlockParserTest {
   }
 
   @Test
+  public void testFencedBlock() {
+    List<String> fencedBlock1 = List.of("~~~warning", "A warning!", "~~~");
+    List<String> fencedBlock2 = List.of("~~~", "Anonymous block", "~~~");
+    List<String> fencedBlock3 = List.of("~~~empty",  "~~~");
+    List<String> fencedBlock4 = List.of("~~~warning", "A double", "", "warning", "~~~");
+    List<String> fencedBlock5 = List.of("~~~note", " - apple", " - pear", "", "~~~");
+    List<String> fencedBlock6 = List.of("~~~wrap", "~~~warning", "The warning", "~~~", "~~~");
+    Assert.assertEquals("<block label=\"warning\"><para>A warning!</para></block>", toPSML(fencedBlock1));
+    Assert.assertEquals("<block><para>Anonymous block</para></block>", toPSML(fencedBlock2));
+    Assert.assertEquals("<block label=\"empty\"/>", toPSML(fencedBlock3));
+    Assert.assertEquals("<block label=\"warning\"><para>A double</para><para>warning</para></block>", toPSML(fencedBlock4));
+    Assert.assertEquals("<block label=\"note\"><list><item>apple</item><item>pear</item></list></block>", toPSML(fencedBlock5));
+    Assert.assertEquals("<block label=\"wrap\"><block label=\"warning\"><para>The warning</para></block></block>", toPSML(fencedBlock6));
+  }
+
+  @Test
   public void testUC1() {
     List<String> mixed = List.of("`coconut`");
     Assert.assertEquals("<para><monospace>coconut</monospace></para>", toPSML(mixed));
   }
-
-
 
   // Testing the parser state
   // --------------------------------------------------------------------------------------------
@@ -234,8 +260,19 @@ public class BlockParserTest {
    * @return The corresponding PSML as a string.
    */
   private static String toPSML(List<String> lines) {
+    return toPSML(lines, MarkdownInputOptions.defaultFragmentOptions());
+  }
+
+  /**
+   * Returns the Markdown text as PSML using the block parser.
+   *
+   * @param lines The lines of text to parse
+   *
+   * @return The corresponding PSML as a string.
+   */
+  private static String toPSML(List<String> lines, MarkdownInputOptions options) {
     try {
-      BlockParser parser = new BlockParser();
+      BlockParser parser = new BlockParser(options);
       List<PSMLElement> elements = parser.parse(lines);
       XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
       for (PSMLElement e : elements) {
