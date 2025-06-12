@@ -105,19 +105,90 @@ public final class MarkdownOutputOptions {
 
   }
 
+  /**
+   * Defines options for formatting superscript and subscript text in Markdown output.
+   */
+  public enum SuperSubFormat {
+
+    /**
+     * Superscripts and subscripts are represented using HTML tags (e.g.,
+     * {@code <sup>}, {@code }<sub>}).
+     */
+    HTML,
+
+    /**
+     * Superscripts and subscripts are represented using caret (^) and tilde (~) notation.
+     */
+    CARET_TILDE,
+
+    /**
+     * Superscript and subscript formatting is ignored and not rendered.
+     */
+    IGNORE
+  }
+
+  /**
+   * Specifies the underline formatting style for Markdown output generation.
+   */
+  public enum UnderlineFormat {
+
+    /**
+     * Underlines are represented using the HTML tag {@code <u>}).
+     */
+    HTML,
+
+    /**
+     * Underline formatting is ignored and not rendered.
+     */
+    IGNORE
+  }
+
+  /**
+   * Defines the possible formats for rendering properties in the Markdown output.
+   */
+  public enum PropertiesFormat {
+
+    /**
+     * Renders properties as value-pairs {e.g. {@code Title: Value}.
+     */
+    VALUE_PAIRS,
+
+    /**
+     * Renders properties as a table with the "Title" and "Value" headers.
+     */
+    TABLE
+
+  }
+
   private final boolean includeMetadata;
 
-  private final ImageFormat imageFormat;
+  private final ImageFormat image;
 
-  private final XrefFormat xrefFormat;
+  private final XrefFormat xref;
 
-  private final BlockFormat blockFormat;
+  private final BlockFormat block;
 
-  private MarkdownOutputOptions(boolean includeMetadata, ImageFormat image, XrefFormat xref, BlockFormat block) {
+  private final SuperSubFormat superSub;
+
+  private final UnderlineFormat underline;
+
+  private final PropertiesFormat properties;
+
+  private MarkdownOutputOptions(
+      boolean includeMetadata,
+      ImageFormat image,
+      XrefFormat xref,
+      BlockFormat block,
+      SuperSubFormat superSub,
+      UnderlineFormat underline,
+      PropertiesFormat properties) {
     this.includeMetadata = includeMetadata;
-    this.imageFormat = Objects.requireNonNull(image);
-    this.xrefFormat = Objects.requireNonNull(xref);
-    this.blockFormat = Objects.requireNonNull(block);
+    this.image = Objects.requireNonNull(image);
+    this.xref = Objects.requireNonNull(xref);
+    this.block = Objects.requireNonNull(block);
+    this.superSub = Objects.requireNonNull(superSub);
+    this.underline = Objects.requireNonNull(underline);
+    this.properties = Objects.requireNonNull(properties);
   }
 
   /**
@@ -132,7 +203,14 @@ public final class MarkdownOutputOptions {
    * @return the default {@code MarkdownOutputOptions} instance configured with standard settings.
    */
   public static MarkdownOutputOptions defaultOptions() {
-    return new MarkdownOutputOptions(true, ImageFormat.NONE, XrefFormat.BOLD_TEXT, BlockFormat.QUOTED);
+    return new MarkdownOutputOptions(true,
+        ImageFormat.LOCAL,
+        XrefFormat.BOLD_TEXT,
+        BlockFormat.QUOTED,
+        SuperSubFormat.IGNORE,
+        UnderlineFormat.IGNORE,
+        PropertiesFormat.TABLE
+    );
   }
 
   /**
@@ -149,8 +227,8 @@ public final class MarkdownOutputOptions {
    *
    * @return the image format option used for processing images.
    */
-  public ImageFormat imageFormat() {
-    return imageFormat;
+  public ImageFormat image() {
+    return image;
   }
 
   /**
@@ -159,8 +237,8 @@ public final class MarkdownOutputOptions {
    * @return the cross-reference formatting option (XrefFormat), which indicates how
    *         cross-references are rendered in the Markdown output.
    */
-  public XrefFormat xrefFormat() {
-    return xrefFormat;
+  public XrefFormat xref() {
+    return xref;
   }
 
   /**
@@ -169,8 +247,39 @@ public final class MarkdownOutputOptions {
    * @return the block formatting option (BlockFormat), which determines the rendering style
    *         for block label elements in the Markdown output.
    */
-  public BlockFormat blockFormat() {
-    return blockFormat;
+  public BlockFormat block() {
+    return block;
+  }
+
+  /**
+   * Retrieves the superscript and subscript formatting option for the Markdown output.
+   *
+   * @return the superscript and subscript formatting option (SuperSubFormat),
+   *         which defines how superscript and subscript elements are represented
+   *         in the Markdown output (e.g., HTML, caret/tilde, or ignored).
+   */
+  public SuperSubFormat superSub() {
+    return this.superSub;
+  }
+
+  /**
+   * Retrieves the underline formatting option for the Markdown output.
+   *
+   * @return the underline formatting option (UnderlineFormat), which determines
+   *         how underline elements are rendered in the Markdown output (e.g., HTML or ignored).
+   */
+  public UnderlineFormat underline() {
+    return this.underline;
+  }
+
+  /**
+   * Retrieves the properties formatting option for the Markdown output.
+   *
+   * @return the properties formatting option (PropertiesFormat),
+   *         which determines how properties are represented in the Markdown output.
+   */
+  public PropertiesFormat properties() {
+    return this.properties;
   }
 
   /**
@@ -179,7 +288,7 @@ public final class MarkdownOutputOptions {
    * @param includeMetadata true to include metadata in the output, false to exclude it.
    */
   public MarkdownOutputOptions includeMetadata(boolean includeMetadata) {
-    return new MarkdownOutputOptions(includeMetadata, this.imageFormat, this.xrefFormat, this.blockFormat);
+    return new MarkdownOutputOptions(includeMetadata, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);
   }
 
   /**
@@ -188,8 +297,8 @@ public final class MarkdownOutputOptions {
    * @param format the image formatting option to be applied.
    * @return a new instance of {@code MarkdownOutputOptions} with the updated image formatting setting.
    */
-  public MarkdownOutputOptions imageFormat(ImageFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, format, this.xrefFormat, this.blockFormat);
+  public MarkdownOutputOptions image(ImageFormat format) {
+    return new MarkdownOutputOptions(this.includeMetadata, format, this.xref, this.block, this.superSub, this.underline, this.properties);
   }
 
   /**
@@ -201,8 +310,8 @@ public final class MarkdownOutputOptions {
    *               TEXT for plain text representation without hyperlinks.
    * @return a new instance of {@code MarkdownOutputOptions} with the updated cross-reference format.
    */
-  public MarkdownOutputOptions xrefFormat(XrefFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, this.imageFormat, format, this.blockFormat);
+  public MarkdownOutputOptions xref(XrefFormat format) {
+    return new MarkdownOutputOptions(this.includeMetadata, this.image, format, this.block, this.superSub, this.underline, this.properties);
   }
 
   /**
@@ -213,22 +322,46 @@ public final class MarkdownOutputOptions {
    *               QUOTED for quoted format, and FENCED for fenced format.
    * @return a new instance of {@code MarkdownOutputOptions} with the updated block format.
    */
-  public MarkdownOutputOptions blockFormat(BlockFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, this.imageFormat, this.xrefFormat, format);
+  public MarkdownOutputOptions block(BlockFormat format) {
+    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, format, this.superSub, this.underline, this.properties);
   }
 
-  // Properties
-  // - As tables
-  // - As value-pairs
+  /**
+   * Sets the superscript and subscript formatting option for the Markdown output.
+   *
+   * @param format the superscript and subscript formatting to be applied. Possible values include:
+   *               HTML for HTML tag-based formatting,
+   *               CARET_TILDE for caret/tilde-based formatting, and
+   *               IGNORE to skip rendering superscripts and subscripts.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated superscript
+   *         and subscript formatting setting.
+   */
+  public MarkdownOutputOptions superSub(SuperSubFormat format) {
+    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, this.block, format, this.underline, this.properties);
+  }
 
-  // SuperScript/subscript
-  // - As HTML (with <sup> <sub)
-  // - As extended (with ^ and ~)
-  // - Ignore
+  /**
+   * Sets the underline formatting option for the Markdown output.
+   *
+   * @param format the underline formatting to be applied. Possible values include:
+   *               HTML for HTML tag-based formatting, and
+   *               IGNORE to skip rendering underlined elements.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated underline formatting setting.
+   */
+  public MarkdownOutputOptions underline(UnderlineFormat format) {
+    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, this.block, this.superSub, format, this.properties);
+  }
 
-  // Underline
-  // - As HTML (with <u>)
-  // - with `~` (Bear)
-  // - with `++` (Common)
+  /**
+   * Sets the properties formatting option for the Markdown output.
+   *
+   * @param format the properties formatting option to be applied. Possible values include:
+   *               VALUE_PAIRS for rendering properties as value pairs (e.g., Title: Value), and
+   *               TABLE for rendering properties as a table with "Title" and "Value" headers.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated properties formatting setting.
+   */
+  public MarkdownOutputOptions properties(PropertiesFormat format) {
+    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, this.block, this.superSub, this.underline, format);
+  }
 
 }

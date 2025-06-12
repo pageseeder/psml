@@ -16,6 +16,7 @@
 package org.pageseeder.psml.md;
 
 import java.io.*;
+import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,7 +77,12 @@ public final class MarkdownSerializerTest {
 
   @Test
   public void testImage() {
-    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>"));
+    MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
+    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions));
+    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.LOCAL)));
+    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.EXTERNAL)));
+    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.IMG_TAG)));
+    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.NONE)));
   }
 
   @Test
@@ -108,6 +114,10 @@ public final class MarkdownSerializerTest {
     System.out.println(out);
   }
 
+  private static String toMarkdown(String text) {
+    return toMarkdown(text, MarkdownOutputOptions.defaultOptions());
+  }
+
   /**
    * Returns the Markdown text as PSML using the inline parser.
    *
@@ -115,10 +125,11 @@ public final class MarkdownSerializerTest {
    *
    * @return The corresponding PSML as a string.
    */
-  private static String toMarkdown(String text) {
+  private static String toMarkdown(String text, MarkdownOutputOptions options) {
     try {
       PSMLElement element = PSML.load(new StringReader(text));
       MarkdownSerializer serializer = new MarkdownSerializer();
+      serializer.setOptions(options);
       StringWriter out = new StringWriter();
       serializer.serialize(element, out);
       return out.toString();
@@ -129,7 +140,7 @@ public final class MarkdownSerializerTest {
   }
 
   public static PSMLElement getTestFile(String filename) {
-    try (Reader r = new InputStreamReader(Tests.class.getResourceAsStream("/org/pageseeder/psml/md/"+filename))) {
+    try (Reader r = new InputStreamReader(Objects.requireNonNull(Tests.class.getResourceAsStream("/org/pageseeder/psml/md/" + filename)))) {
       return PSML.load(r);
     } catch (IOException ex) {
       throw new UncheckedIOException("Unable to load test file '"+filename+"'", ex);

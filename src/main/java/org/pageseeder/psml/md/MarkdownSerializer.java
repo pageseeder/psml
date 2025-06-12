@@ -348,7 +348,7 @@ public class MarkdownSerializer {
     }
 
     private void serializeBlock(PSMLElement block, Appendable out) throws IOException {
-      switch (options.blockFormat()) {
+      switch (options.block()) {
         case QUOTED:
           serializeBlockAsQuoted(block, out);
           break;
@@ -499,7 +499,7 @@ public class MarkdownSerializer {
         alt = src != null ? src.substring(src.lastIndexOf('/') + 1) : "";
       }
       out.append("\n");
-      switch (options.imageFormat()) {
+      switch (options.image()) {
         case LOCAL:
           out.append("![").append(alt).append("](").append(src).append(")");
           break;
@@ -761,7 +761,7 @@ public class MarkdownSerializer {
     private void serializeXref(PSMLElement link, Appendable out) throws IOException {
       String text = normalizeText(link.getText());
       String url = link.getAttribute("href");
-      switch (options.xrefFormat()) {
+      switch (options.xref()) {
         case EXTERNAL_LINK:
           // TODO Base URL
           out.append("[").append(text).append("](").append(url).append(")");
