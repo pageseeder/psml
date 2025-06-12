@@ -24,10 +24,7 @@ import org.pageseeder.psml.util.DiagnosticCollector;
 import org.pageseeder.psml.util.NilDiagnosticCollector;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,11 +69,39 @@ public class MarkdownSerializer {
     return options;
   }
 
+  /**
+   * Serializes the given PSMLElement into Markdown format and writes the output
+   * to the specified Appendable.
+   *
+   * @param element the {@code PSMLElement} to be serialized into Markdown format
+   * @param out the {@code Appendable} where the serialized Markdown output
+   *            will be written
+   * @throws IOException if an I/O error occurs during serialization
+   */
   public void serialize(PSMLElement element, Appendable out) throws IOException {
-    Instance instance = new Instance(this.options);
+    Instance instance = new Instance(this.options, new NilDiagnosticCollector());
     instance.serialize(element, out);
   }
 
+  /**
+   * Serializes the provided PSMLElement into Markdown format and writes the output
+   * to the specified Appendable. Additionally, diagnostic messages generated during
+   * the serialization process are collected in the provided DiagnosticCollector.
+   *
+   * @param element the {@code PSMLElement} to be serialized into Markdown format
+   * @param out the {@code Appendable} where the serialized Markdown output will be written
+   * @param collector the {@code DiagnosticCollector} used to collect diagnostic
+   *                  messages during the serialization process
+   * @throws IOException if an I/O error occurs during serialization
+   */
+  public void serialize(PSMLElement element, Appendable out, DiagnosticCollector collector) throws IOException {
+    Instance instance = new Instance(this.options, collector);
+    instance.serialize(element, out);
+  }
+
+  /**
+   * Normalizes the input text by collapsing consecutive whitespace characters into a single space.
+   */
   private static String normalizeText(String text) {
     return text.replaceAll("\\s+", " ");
   }
@@ -172,9 +197,9 @@ public class MarkdownSerializer {
 
     private final DiagnosticCollector collector;
 
-    Instance(MarkdownOutputOptions options) {
+    Instance(MarkdownOutputOptions options, DiagnosticCollector collector) {
       this.options = options;
-      this.collector = new NilDiagnosticCollector();
+      this.collector = Objects.requireNonNull(collector);
     }
 
     void serialize(PSMLElement element, Appendable out) throws IOException {
@@ -254,6 +279,10 @@ public class MarkdownSerializer {
           serializePreformat(element, out);
           break;
 
+        case PLACEHOLDER:
+          serializePlaceholder(element, out);
+          break;
+
         case PROPERTY:
           serializeProperty(element, out);
           break;
@@ -321,18 +350,18 @@ public class MarkdownSerializer {
     private void serializeBlock(PSMLElement block, Appendable out) throws IOException {
       switch (options.blockFormat()) {
         case QUOTED:
-          serializeBlock_Quoted(block, out);
+          serializeBlockAsQuoted(block, out);
           break;
         case FENCED:
-          serializeBlock_Fenced(block, out);
+          serializeBlockAsFenced(block, out);
           break;
         default:
-          serializeBlock_LabelText(block, out);
+          serializeBlockAsLabelText(block, out);
           break;
       }
     }
 
-    private void serializeBlock_Quoted(PSMLElement block, Appendable out) throws IOException {
+    private void serializeBlockAsQuoted(PSMLElement block, Appendable out) throws IOException {
       String label = block.getAttribute("label");
       out.append("> ");
       if (label != null) {
@@ -344,14 +373,14 @@ public class MarkdownSerializer {
       out.append(text).append('\n');
     }
 
-    private void serializeBlock_Fenced(PSMLElement block, Appendable out) throws IOException {
+    private void serializeBlockAsFenced(PSMLElement block, Appendable out) throws IOException {
       String label = block.getAttributeOrElse("label", "");
       out.append("~~~").append(label);
       processChildren(block, out);
       out.append("~~~\n");
     }
 
-    private void serializeBlock_LabelText(PSMLElement block, Appendable out) throws IOException {
+    private void serializeBlockAsLabelText(PSMLElement block, Appendable out) throws IOException {
       String label = block.getAttribute("label");
       if (label != null) {
         out.append("**").append(block.getAttribute("label")).append("**: ");
@@ -461,7 +490,7 @@ public class MarkdownSerializer {
     }
 
     private void serializeImage(PSMLElement image, Appendable out) throws IOException {
-      String src = image.getAttribute("src");
+      String src = image.getAttributeOrElse("src", "");
       String alt = image.getAttribute("alt");
       out.append("**").append(state.nextImage()).append("**");
       if (alt != null) {
@@ -472,26 +501,21 @@ public class MarkdownSerializer {
       out.append("\n");
       switch (options.imageFormat()) {
         case LOCAL:
-          if (src != null && !src.isEmpty()) {
-            out.append("![").append(alt).append("](").append(src).append(")");
-          }
+          out.append("![").append(alt).append("](").append(src).append(")");
           break;
         case EXTERNAL:
           // TODO requires base URI
-          if (src != null && !src.isEmpty()) {
-            out.append("![").append(alt).append("](").append(src).append(")");
-          }
+          out.append("![").append(alt).append("](").append(src).append(")");
           break;
         case DATA_URI:
           // TODO Not supported
+          collector.warn("Data URI images are not currently supported");
           break;
         case IMG_TAG:
           String width = image.getAttribute("width");
           String height = image.getAttribute("height");
           out.append("<img src=\"").append(src).append('"');
-          if (alt != null && !alt.isEmpty()) {
-            out.append(" alt=\"").append(alt).append('"');
-          }
+          out.append(" alt=\"").append(alt).append('"');
           if (width != null && !width.isEmpty()) {
             out.append(" width=\"").append(width).append('"');
           }
@@ -585,6 +609,12 @@ public class MarkdownSerializer {
       String text = element.getText();
       if (!text.startsWith("\n")) out.append("\n");
       out.append(text.replaceAll("\\s+$", "")).append("\n```\n");
+    }
+
+    private void serializePlaceholder(PSMLElement placeholder, Appendable out) throws IOException {
+      String name = placeholder.getAttributeOrElse("name", "");
+      String text = normalizeText(placeholder.getText());
+      out.append("[[").append(text.isEmpty() ? name : text).append("]]");
     }
 
     private void serializeProperty(PSMLElement property, Appendable out) throws IOException {
