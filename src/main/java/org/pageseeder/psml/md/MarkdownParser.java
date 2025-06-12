@@ -84,9 +84,8 @@ public class MarkdownParser extends Parser {
   @Override
   public PSMLElement parse(Reader reader) throws IOException {
     List<String> lines = toLines(reader);
-    BlockParser parser = new BlockParser();
-    parser.setConfiguration(this.config);
-    List<PSMLElement> elements = parser.parse(lines, this.config);
+    BlockParser parser = new BlockParser(config.toMarkdownInputOptions());
+    List<PSMLElement> elements = parser.parse(lines);
 
     // Wrap the element based on the configuration
     PSMLElement wrapper;
@@ -117,7 +116,7 @@ public class MarkdownParser extends Parser {
     List<HTMLElement> elements = parser.parse(lines, this.config);
 
     // Wrap the element based on the configuration
-    HTMLElement wrapper = null;
+    HTMLElement wrapper;
     if (this.config.isFragment()) {
       wrapper = new HTMLElement(HTMLElement.Name.SECTION);
     } else {

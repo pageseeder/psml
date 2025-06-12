@@ -26,8 +26,20 @@ import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
 
 /**
- * The block parser parses Markdown and generates the block-level elements
- * delegating inline elements to the inline parser.
+ * The {@code BlockParser} class provides functionality for parsing and processing
+ * Markdown input into structured PSML elements. This class supports customizable
+ * configuration options through the {@link MarkdownInputOptions} class.
+ *
+ * <p>It generates the block-level elements delegates inline elements to the inline parser.</p>
+ *
+ * <p>The {@code BlockParser} supports both instance-based parsing with options provided
+ * at construction, and static parsing methods. Some deprecated methods retain backward
+ * compatibility and are marked for eventual removal.
+ *
+ * <p>Deprecated methods include legacy behavior for configurations that have been replaced
+ * by {@link MarkdownInputOptions}.
+ *
+ * <p>Instances of this class are thread-safe</p>
  *
  * @author Christophe Lauret
  *
@@ -36,14 +48,30 @@ import org.pageseeder.psml.model.PSMLNode;
  */
 public class BlockParser {
 
-  private Configuration configuration;
+  /**
+   * Represents the configuration options used by the {@code BlockParser} for parsing Markdown input.
+   * This variable holds an instance of {@link MarkdownInputOptions}, which defines the behavior
+   * and rules applied during parsing, such as line break thresholds, document mode, and fragment handling.
+   */
+  private MarkdownInputOptions options;
 
-  public void setConfiguration(Configuration configuration) {
-    this.configuration = configuration;
+  /**
+   * Constructs a new instance of the BlockParser class with the default Markdown input options.
+   * This constructor initializes the parser using the default configuration provided by
+   * {@link MarkdownInputOptions#defaultFragmentOptions}.
+   */
+  public BlockParser() {
+    options = MarkdownInputOptions.defaultFragmentOptions();
   }
 
-  public Configuration getConfiguration() {
-    return this.configuration;
+  /**
+   * Constructs a new instance of the BlockParser class with the specified Markdown input options.
+   *
+   * @param options The {@link MarkdownInputOptions} instance defining custom configurations
+   *                for parsing Markdown input.
+   */
+  public BlockParser(MarkdownInputOptions options) {
+    this.options = options;
   }
 
   /**
@@ -54,7 +82,69 @@ public class BlockParser {
    * @return The corresponding list of PSML elements
    */
   public List<PSMLElement> parse(List<String> lines) {
-    return parse(lines, new Configuration());
+    return parse(lines, this.options);
+  }
+
+  /**
+   * Retrieves the current Markdown input options used for parsing.
+   *
+   * @return The current {@link MarkdownInputOptions} instance.
+   */
+  public MarkdownInputOptions getOptions() {
+    return options;
+  }
+
+  /**
+   * Sets the Markdown input options to configure parsing behavior.
+   *
+   * @param options The {@link MarkdownInputOptions} instance to define custom parsing configurations.
+   */
+  public void setOptions(MarkdownInputOptions options) {
+    this.options = options;
+  }
+
+  /**
+   * @deprecated Use {@link #setOptions(MarkdownInputOptions)} instead
+   */
+  @Deprecated(forRemoval = true, since = "1.6.0")
+  public void setConfiguration(Configuration configuration) {
+    this.options = configuration.toMarkdownInputOptions();
+  }
+
+  /**
+   * @deprecated Use {@link #getOptions()} instead
+   */
+  @Deprecated(forRemoval = true, since = "1.6.0")
+  public Configuration getConfiguration() {
+    return Configuration.fromMarkdownInputOptions(this.options);
+  }
+
+  /**
+   * Iterate over the lines and return corresponding PSML elements.
+   *
+   * @param lines The lines to parse
+   *
+   * @return The corresponding list of PSML elements
+   *
+   * @deprecated Use {@link #parse(List, MarkdownInputOptions)} instead.
+   */
+  @Deprecated(forRemoval = true, since = "1.6.0")
+  public List<PSMLElement> parse(List<String> lines, Configuration config) {
+    return parse(lines, config.toMarkdownInputOptions());
+  }
+
+  /**
+   * Process a single line
+   *
+   * @param line  The current line
+   * @param next  The next line
+   * @param state The state of the parser
+   *
+   * @deprecated Use {@link #processLine(String, String, State, MarkdownInputOptions)} instead.
+   */
+  @Deprecated(forRemoval = true, since = "1.6.0")
+  public void processLine(String line, @Nullable String next, State state, Configuration config) {
+    processLine(line, next, state, config.toMarkdownInputOptions());
   }
 
   /**
@@ -64,12 +154,12 @@ public class BlockParser {
    *
    * @return The corresponding list of PSML elements
    */
-  public List<PSMLElement> parse(List<String> lines, Configuration config) {
+  public static List<PSMLElement> parse(List<String> lines, MarkdownInputOptions options) {
     State state = new State();
     for (int i=0; i < lines.size(); i++) {
       String line = lines.get(i);
       String next = i < lines.size()-1? lines.get(i+1) : null;
-      processLine(line, next, state, config);
+      processLine(line, next, state, options);
     }
     state.commitAll();
     return state.elements;
@@ -82,21 +172,21 @@ public class BlockParser {
    * @param next  The next line
    * @param state The state of the parser
    */
-  public void processLine(String line, @Nullable String next, State state, Configuration config) {
+  public static void processLine(String line, @Nullable String next, State state, MarkdownInputOptions options) {
 
     // Lines made entirely of '=' or '-' are used for heading 1 and 2
     if (line.matches("\\s?(==+|--+)\\s*")) {
       // DO nothing, we've already handled it
 
       // Ensure that metadata is committed before we start with content
-      if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION)) {
+      if (options.isDocument() && !state.isDescendantOf(Name.SECTION)) {
         state.commitAll();
       }
     }
 
     // Separators
     else if (line.matches("\\s*\\*\\s?\\*\\s?\\*[\\s\\*]*")) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
         state.newFragment();
       }
@@ -109,7 +199,7 @@ public class BlockParser {
 
     // New list items starting with '+', '-', '*' or number followed by a '.'
     else if (line.matches("\\s*(-|\\+|\\*|\\d+\\.)\\s.+")) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
 
@@ -124,7 +214,7 @@ public class BlockParser {
         } else {
           // A new list! Clear the context...
           state.commitUpto(Name.FRAGMENT);
-          // An create a new list
+          // And create a new list
           PSMLElement list;
           if (no.matches("\\d+\\.")) {
             list = new PSMLElement(Name.NLIST);
@@ -144,7 +234,7 @@ public class BlockParser {
 
     // Continuation of a list item
     else if (state.isInList()) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
       if (!state.context.isEmpty() && state.text != null) {
@@ -154,7 +244,7 @@ public class BlockParser {
 
     // Lines starting with four spaces: preformatted code
     else if (line.matches("\\s{4}.*") && !state.isFenced()) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
       if (!state.isElement(Name.PREFORMAT)) {
@@ -167,7 +257,7 @@ public class BlockParser {
 
     // Beginning/end of a fenced code block
     else if (line.startsWith("```")) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
       if (state.isElement(Name.PREFORMAT)) {
@@ -190,7 +280,7 @@ public class BlockParser {
 
     // Beginning/end of fenced block labels
     else if (line.startsWith("~~~")) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
       if (state.isElement(Name.BLOCK)) {
@@ -210,7 +300,7 @@ public class BlockParser {
 
     // Lines starting with '>': quoted content
     else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.PREFORMAT)) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
       // remove chevron and leading space
@@ -242,7 +332,7 @@ public class BlockParser {
       }
     }
 
-    // Tables
+    // Tables starting with `|`
     else if (line.startsWith("|") && !state.isElement(Name.PREFORMAT)) {
       String[] columns = line.substring(1).split("\\|");
       boolean inTable = state.isDescendantOf(Name.TABLE);
@@ -251,18 +341,10 @@ public class BlockParser {
         PSMLElement table = new PSMLElement(Name.TABLE);
         String[] cols = next.substring(1).split("\\|");
         for (String col : cols) {
-          String text = col.trim();
-          boolean startWithColon = text.startsWith(":");
-          boolean endsWithColon = text.endsWith(":");
-          if (startWithColon && endsWithColon) {
-            table.addNode(new PSMLElement(Name.COL).setAttribute("align", "center"));
-          } else if (startWithColon) {
-            table.addNode(new PSMLElement(Name.COL).setAttribute("align", "left"));
-          } else if (endsWithColon) {
-            table.addNode(new PSMLElement(Name.COL).setAttribute("align", "right"));
-          } else {
-            table.addNode(new PSMLElement(Name.COL));
-          }
+          String align = toColAlign(col);
+          PSMLElement colElement = new PSMLElement(Name.COL);
+          if (align != null) colElement.setAttribute("align", align);
+          table.addNode(colElement);
         }
         state.push(table);
         inTable = true;
@@ -273,25 +355,27 @@ public class BlockParser {
         if (!line.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
           PSMLElement row = new PSMLElement(Name.ROW);
           if (isHeaderRow) row.setAttribute("part", "header");
+          state.push(row);
+
           for (String col : columns) {
             String text = col.trim();
-            // TODO Support inline style and replace <br>
             if (isHeaderRow && text.matches("^\\*\\*(.*)\\*\\*$")) {
               text = text.substring(2, text.length() - 2);
             }
-            PSMLElement cell = new PSMLElement(Name.CELL).setText(text);
-            row.addNode(cell);
+            state.push(Name.CELL, text);
+            state.commit();
           }
-          state.push(row);
+
           state.commit();
         }
       } else {
-        // TODO when it's not a table
+        // Not a table
+        state.push(Name.PARA, line.trim());
       }
     }
 
     // Metadata (document mode only)
-    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^[^:]+:\\s.*")) {
+    else if (options.isDocument() && !state.isDescendantOf(Name.SECTION) && line.matches("^[^:]+:\\s.*")) {
       int colon = line.indexOf(':');
       String title = line.substring(0, colon).trim();
       String name = title.toLowerCase().replaceAll("[^a-z0-9_-]", "_");
@@ -349,7 +433,7 @@ public class BlockParser {
 
     // Probably a paragraph or heading
     else {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
 
@@ -368,6 +452,12 @@ public class BlockParser {
           state.commitUpto(Name.FRAGMENT);
           String level = Integer.toString(m.group(1).length());
           String text = m.group(2).trim();
+
+          if (options.isNewFragmentPerHeading()) {
+            state.ensureFragment();
+            state.newFragment();
+          }
+
           PSMLElement heading = new PSMLElement(Name.HEADING);
           heading.setAttribute("level", level);
           state.push(heading, text);
@@ -382,14 +472,14 @@ public class BlockParser {
           if (next != null) {
             if (next.matches("\\s*==+\\s*")) {
               // We use the '====' as a marker for a new section
-              if (config.isDocumentMode() && !state.current().isEmpty()) {
+              if (options.isDocument() && !state.current().isEmpty()) {
                 state.newSection();
               }
               element = new PSMLElement(Name.HEADING);
               element.setAttribute("level", "1");
 
               // Special case for title section
-              if (config.isDocumentMode()) {
+              if (options.isDocument()) {
                 PSMLElement section = state.ancestor(Name.SECTION);
                 if (section != null && "title".equals(section.getAttribute("id"))) {
                   isTitle = true;
@@ -398,7 +488,7 @@ public class BlockParser {
 
             } else if (next.matches("\\s*--+\\s*")) {
               // We use the '---' as a marker for a new fragment
-              if (config.isDocumentMode() && !state.current().isEmpty()) {
+              if (options.isDocument() && !state.current().isEmpty()) {
                 state.newFragment();
               }
               element = new PSMLElement(Name.HEADING);
@@ -417,7 +507,7 @@ public class BlockParser {
           }
 
           // If the line break occurs before 66 characters, we assume it is intentional and insert a break
-          state.lineBreak = line.length() < config.getLineBreakThreshold();
+          state.lineBreak = line.length() < options.getLineBreakThreshold();
 
           // Special case: we terminate the section title
           if (isTitle) {
@@ -429,6 +519,26 @@ public class BlockParser {
 
   }
 
+  /**
+   * Determines the text alignment for a column based on its specification.
+   *
+   * <p>The method analyzes if the column definition starts and/or ends with a colon
+   * to infer the alignment: "center", "left", "right", or null if not specified.
+   *
+   * @param col The column specification string to evaluate. It may include colons
+   *            to indicate text alignment.
+   * @return A string indicating the column alignment ("center", "left", "right")
+   *         or null if the alignment is not specified.
+   */
+  private static @Nullable String toColAlign(String col) {
+    String colSpec = col.trim();
+    boolean startWithColon = colSpec.startsWith(":");
+    boolean endsWithColon = colSpec.endsWith(":");
+    if (startWithColon && endsWithColon) return "center";
+    if (startWithColon) return "left";
+    if (endsWithColon) return "right";
+    return null;
+  }
 
   /**
    * Maintains the state of the parser during processing.
@@ -723,7 +833,10 @@ public class BlockParser {
      */
     public void lineBreak() {
       commitText();
-      current().addNode(new PSMLElement(Name.BR));
+      PSMLElement current = current();
+      if (current != null) {
+        current.addNode(new PSMLElement(Name.BR));
+      }
       this.text = new StringBuilder();
     }
 
