@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
@@ -43,40 +44,40 @@ public final class Process {
   /**
    * The logger.
    */
-  private Logger logger = null;
+  private @Nullable Logger logger = null;
 
   /**
    * The folder containing the documents to process.
    */
-  private File src = null;
+  private @Nullable File src = null;
 
   /**
    * Where to export it.
    */
-  private File dest = null;
+  private @Nullable File dest = null;
 
   /**
    * A list of document filters.
    */
-  private boolean generatetoc = false;
+  private boolean generateToc = false;
 
   /**
-   * If only first error stops the process.
+   * If only the first error stops the process.
    */
   private boolean failOnError = true;
 
   /**
-   * Whether to change attribute level to "processed".
+   * Whether to change the attribute level to "processed".
    */
   private boolean processed = true;
 
   /**
    * If source documents are preserved or not
    */
-  private boolean preservesrc = false;
+  private boolean preserveSrc = false;
 
   /**
-   * If URL metadata is embedde din link elements
+   * If URL metadata is embedded in link elements
    */
   private boolean embedLinkMetadata = false;
 
@@ -108,57 +109,57 @@ public final class Process {
   /**
    * The manifest creator.
    */
-  private ManifestCreator manifestCreator = null;
+  private @Nullable ManifestCreator manifestCreator = null;
 
   /**
    * The pretransform details
    */
-  private XSLTTransformer pretransform = null;
+  private @Nullable XSLTTransformer preTransform = null;
 
   /**
    * How the xrefs are processed
    */
-  private XRefsTransclude xrefs = null;
+  private @Nullable XRefsTransclude xrefs = null;
 
   /**
    * Defines elements to strip
    */
-  private Strip strip = null;
+  private @Nullable Strip strip = null;
 
   /**
    * Defines images to process
    */
-  private Images imageHandling = null;
+  private @Nullable Images imageHandling = null;
 
   /**
    * Defines the images to process
    */
-  private IncludesExcludesMatcher imageMatcher = null;
+  private @Nullable IncludesExcludesMatcher imageMatcher = null;
 
   /**
    * Defines the numbering
    */
-  private PublicationConfig publicationConfig = null;
+  private @Nullable PublicationConfig publicationConfig = null;
 
   /**
    * Defines the numbering
    */
-  private String publicationRoot = null;
+  private @Nullable String publicationRoot = null;
 
   /**
    * The posttransform details.
    */
-  private XSLTTransformer posttransform = null;
+  private @Nullable XSLTTransformer postTransform = null;
 
   /**
    * The error handling details
    */
-  private ErrorHandling error = null;
+  private @Nullable ErrorHandling error = null;
 
   /**
    * The warning handling details
    */
-  private WarningHandling warning = null;
+  private @Nullable WarningHandling warning = null;
 
   /**
    * @param fail the failOnError to set
@@ -179,7 +180,7 @@ public final class Process {
    * @param preserve If source documents should be preserved
    */
   public void setPreserveSrc(boolean preserve) {
-    this.preservesrc = preserve;
+    this.preserveSrc = preserve;
   }
 
   /**
@@ -246,7 +247,7 @@ public final class Process {
   /**
    * @param manifestDoc the manifest document details
    */
-  public void setManifestDoc(ManifestDocument manifestDoc) {
+  public void setManifestDoc(@Nullable ManifestDocument manifestDoc) {
     if (manifestDoc != null)
       this.manifestCreator = new ManifestCreator(manifestDoc);
   }
@@ -254,17 +255,17 @@ public final class Process {
   /**
    * @param transform the transform details
    */
-  public void setPreTransform(XSLTTransformation transform) {
+  public void setPreTransform(@Nullable XSLTTransformation transform) {
     if (transform != null)
-      this.pretransform = new XSLTTransformer(transform);
+      this.preTransform = new XSLTTransformer(transform);
   }
 
   /**
    * @param transform the transform details
    */
-  public void setPostTransform(XSLTTransformation transform) {
+  public void setPostTransform(@Nullable XSLTTransformation transform) {
     if (transform != null)
-      this.posttransform = new XSLTTransformer(transform);
+      this.postTransform = new XSLTTransformer(transform);
   }
 
   /**
@@ -272,12 +273,12 @@ public final class Process {
    * @param root  the root file path
    * @param toc   whether to generate TOC
    */
-  public void setPublicationConfig(PublicationConfig cfg, String root, boolean toc) {
+  public void setPublicationConfig(@Nullable PublicationConfig cfg, @Nullable String root, boolean toc) {
     if (cfg == null || root == null)
       throw new IllegalArgumentException("Publication config and root cannot be null");
     this.publicationConfig = cfg;
     this.publicationRoot = root;
-    this.generatetoc = toc;
+    this.generateToc = toc;
     this.processXML = true;
   }
 
@@ -291,7 +292,7 @@ public final class Process {
   /**
    * @param err defines the error handling.
    */
-  public void setError(ErrorHandling err) {
+  public void setError(@Nullable ErrorHandling err) {
     if (err == null) return;
     this.error = err;
     if (this.error.getImageNotFound() || this.error.getXrefNotFound() || this.error.getXrefAmbiguous())
@@ -301,7 +302,7 @@ public final class Process {
   /**
    * @param warn defines the error handling.
    */
-  public void setWarning(WarningHandling warn) {
+  public void setWarning(@Nullable WarningHandling warn) {
     if (warn == null) return;
     this.warning = warn;
   }
@@ -309,7 +310,7 @@ public final class Process {
   /**
    * @param xr the xrefs processing details
    */
-  public void setXrefs(XRefsTransclude xr) {
+  public void setXrefs(@Nullable XRefsTransclude xr) {
     if (xr == null) return;
     this.xrefs = xr;
     this.processXML = true;
@@ -318,7 +319,7 @@ public final class Process {
   /**
    * @param stripDetails defines the elements to strip
    */
-  public void setStrip(Strip stripDetails) {
+  public void setStrip(@Nullable Strip stripDetails) {
     if (stripDetails == null) return;
     this.strip = stripDetails;
     this.processXML = true;
@@ -327,7 +328,7 @@ public final class Process {
   /**
    * @param img defines how the images paths are re-written.
    */
-  public void setImages(Images img) {
+  public void setImages(@Nullable Images img) {
     if (img == null) return;
     this.imageHandling = img;
     this.processXML = true;
@@ -378,7 +379,7 @@ public final class Process {
 
     String processID = "P"+System.currentTimeMillis();
     // start processing
-    this.logger.info("Found "+psml.size()+" PSML file(s) and "+rest.size()+" non PSML file(s)");
+    this.logger.info("Found {} PSML file(s) and {} non PSML file(s)", psml.size(), rest.size());
 
     // create manifest first
     File manifestFile = null;
@@ -399,22 +400,22 @@ public final class Process {
     try {
       // run pre transform
       File currentSource = this.src;
-      if (this.pretransform != null) {
-        this.logger.info("Running Pre Transform with "+this.pretransform.getXSLT());
-        this.pretransform.setLog(this.logger);
-        this.pretransform.setPreserveSrc(this.preservesrc);
-        this.pretransform.setFailOnError(this.failOnError);
-        boolean useOutputToTempDir = this.processXML || this.posttransform != null;
+      if (this.preTransform != null) {
+        this.logger.info("Running Pre Transform with {}", this.preTransform.getXSLT());
+        this.preTransform.setLog(this.logger);
+        this.preTransform.setPreserveSrc(this.preserveSrc);
+        this.preTransform.setFailOnError(this.failOnError);
+        boolean useOutputToTempDir = this.processXML || this.postTransform != null;
         File output;
         if (useOutputToTempDir) {
           output = new File(tempFolder, "pretransform-"+processID);
-          this.logger.debug("Creating temp output folder "+output.getAbsolutePath());
+          this.logger.debug("Creating temp output folder {}", output.getAbsolutePath());
           output.mkdirs();
           tempFoldersToDelete.add(output);
         } else {
           output = this.dest;
         }
-        this.pretransform.transform(psml, output);
+        this.preTransform.transform(psml, output);
         // reload psml source if needed
         if (useOutputToTempDir) {
           psml.clear();
@@ -429,11 +430,11 @@ public final class Process {
       // process PSML
       if (this.processXML) {
         this.logger.info("Processing content PSML (XRefs, images, strip, numbering)");
-        boolean useOutputToTempDir = this.posttransform != null;
+        boolean useOutputToTempDir = this.postTransform != null;
         File output;
         if (useOutputToTempDir) {
           output = new File(tempFolder, "process-"+processID);
-          this.logger.debug("Creating temp output folder "+output.getAbsolutePath());
+          this.logger.debug("Creating temp output folder {}", output.getAbsolutePath());
           output.mkdirs();
           tempFoldersToDelete.add(output);
         } else {
@@ -448,15 +449,15 @@ public final class Process {
       }
 
       // run post transform
-      if (this.posttransform != null) {
-        this.logger.info("Running Post Transform with "+this.posttransform.getXSLT());
-        this.posttransform.setLog(this.logger);
-        this.posttransform.setPreserveSrc(this.preservesrc);
-        this.posttransform.setFailOnError(this.failOnError);
-        this.posttransform.transform(psml, this.dest);
-      } else if (this.pretransform == null && !this.processXML) {
+      if (this.postTransform != null) {
+        this.logger.info("Running Post Transform with {}", this.postTransform.getXSLT());
+        this.postTransform.setLog(this.logger);
+        this.postTransform.setPreserveSrc(this.preserveSrc);
+        this.postTransform.setFailOnError(this.failOnError);
+        this.postTransform.transform(psml, this.dest);
+      } else if (this.preTransform == null && !this.processXML) {
         // move PSML files manually
-        this.logger.info("Moving "+psml.size()+" PSML content file(s)");
+        this.logger.info("Moving {} PSML content file(s)", psml.size());
         for (String relPath : psml.keySet()) {
           moveFile(psml.get(relPath), new File(this.dest, relPath));
         }
@@ -464,8 +465,8 @@ public final class Process {
 
       // move other files, including images to maybe a new location
       boolean moveImages = this.imageHandling != null && this.imageHandling.getLocation() != null;
-      this.logger.info("Moving "+rest.size()+" non PSML file(s)");
-      if (moveImages) this.logger.info("Moving images to "+this.imageHandling.getLocation());
+      this.logger.info("Moving {} non PSML file(s)", rest.size());
+      if (moveImages) this.logger.info("Moving images to {}", this.imageHandling.getLocation());
       for (String relPath : rest.keySet()) {
         // strip manifest?
         if ("META-INF/manifest.xml".equals(relPath) && this.strip != null && this.strip.stripManifest()) continue;
@@ -482,15 +483,15 @@ public final class Process {
 
       // remove temp folders
       if (!tempFoldersToDelete.isEmpty()) {
-        this.logger.debug("Removing "+tempFoldersToDelete.size()+" temp folder(s)");
+        this.logger.debug("Removing {} temp folder(s)", tempFoldersToDelete.size());
         for (File folder : tempFoldersToDelete) {
           if (!deleteDirectory(folder, true))
-            this.logger.warn("Failed to remove temp folder "+folder.getAbsolutePath());
+            this.logger.warn("Failed to remove temp folder {}", folder.getAbsolutePath());
         }
       }
 
       // remove the source psml documents
-      if (!this.preservesrc) {
+      if (!this.preserveSrc) {
         this.logger.debug("Removing source document(s)");
         if (!deleteDirectory(this.src, false))
           throw new ProcessException("Failed to delete source files");
@@ -504,15 +505,15 @@ public final class Process {
       // revert created files
       // first manifest
       if (manifestFile != null && manifestFile.exists() && !manifestFile.delete())
-        this.logger.warn("Failed to delete manifest file "+manifestFile.getAbsolutePath());
+        this.logger.warn("Failed to delete manifest file {}", manifestFile.getAbsolutePath());
       // then compare current destination files with original ones
       if (ffiles != null) for (File f : ffiles) {
         if (!originalFilesInDestination.contains(f)) {
           if (f.isFile()) {
             if (!f.delete())
-              this.logger.warn("Failed to delete created file "+f.getName());
+              this.logger.warn("Failed to delete created file {}", f.getName());
           } else if (!deleteDirectory(f, true))
-            this.logger.warn("Failed to delete created folder "+f.getName());
+            this.logger.warn("Failed to delete created folder {}", f.getName());
         }
       }
       throw ex;
@@ -546,7 +547,7 @@ public final class Process {
         tempOutput = File.createTempFile("temp", ".psml");
         fos = new FileOutputStream(tempOutput);
       } catch (IOException e) {
-        this.logger.error("Failed to create temp output file: "+e.getMessage(), e);
+        this.logger.error("Failed to create temp output file: {}", e.getMessage(), e);
         throw new ProcessException("Failed to create temp output file: "+e.getMessage(), e);
       }
       File psml = psmlFiles.get(relPath);
@@ -601,7 +602,7 @@ public final class Process {
       // add publication config
       try {
         if (this.publicationConfig != null && this.publicationRoot.equals(relPath)) {
-          handler1.setPublicationConfig(this.publicationConfig, psml, this.generatetoc);
+          handler1.setPublicationConfig(this.publicationConfig, psml, this.generateToc);
         }
         // add elements stripping details
         handler1.setStrip(this.strip);
@@ -634,7 +635,7 @@ public final class Process {
 //        }
 //      }
       // ok second pass now
-      this.logger.debug("Second pass file "+relPath);
+      this.logger.debug("Second pass file {}", relPath);
       try {
         File output = new File(destination, relPath);
         // just in case
@@ -663,7 +664,7 @@ public final class Process {
           numberingAndTOC.updatePublication();
           numberingAndTOC.setFragmentNumbering(
               new FragmentNumbering(numberingAndTOC.publicationTree(), this.publicationConfig));
-          handler2.setPublicationConfig(this.publicationConfig, numberingAndTOC, this.generatetoc);
+          handler2.setPublicationConfig(this.publicationConfig, numberingAndTOC, this.generateToc);
           //Map<String,Prefix> prefixes = numberingAndTOC.fragmentNumbering().getAllPrefixes();
           //String result = prefixes.entrySet()
           //    .stream().sorted(Map.Entry.comparingByKey())
@@ -708,7 +709,7 @@ public final class Process {
    */
   private void moveFile(File from, File to) throws ProcessException {
     to.getParentFile().mkdirs();
-    if (this.preservesrc) {
+    if (this.preserveSrc) {
       // copy file
       try {
         try (FileInputStream fis = new FileInputStream(from); FileOutputStream fos = new FileOutputStream(to)) {
@@ -764,7 +765,8 @@ public final class Process {
    * @param isRoot      if the current file is the root folder
    */
   private void collectFiles(File file, File root, Map<String, File> psml,
-                            Map<String, File> metadata, Map<String, File> others, boolean isRoot) {
+                            @Nullable Map<String, File> metadata,
+                            @Nullable Map<String, File> others, boolean isRoot) {
     if (file.isDirectory()) {
       File[] all = file.listFiles();
       if (all != null) for (File f : all) {
