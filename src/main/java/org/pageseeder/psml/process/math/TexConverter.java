@@ -10,7 +10,21 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 
-public class TexConverter {
+/**
+ * A utility class for converting TeX strings into MathML format using the KaTeX JavaScript library.
+ *
+ * <p>This class provides a static method to perform the conversion and uses an in-memory LRU
+ * (Least Recently Used) cache to optimize performance by avoiding repeated conversions for the
+ * same input.
+ *
+ * <p>Note: This class is not instantiable and provides utility functions only.
+ *
+ * @author Jean-Baptiste Reure
+ *
+ * @version 1.6.0
+ * @since 1.0
+ */
+public final class TexConverter {
 
   /**
    * No constructor
@@ -18,6 +32,9 @@ public class TexConverter {
   private TexConverter() {}
   private static final String JS_SCRIPT = "/org/pageseeder/psml/process/math/katex.0.16.9.min.js";
 
+  /**
+   * Note: The script doesn't need to be reset as it does not seem to get slower over time
+   */
   private static Invocable script = null;
 
   private static final Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
@@ -80,13 +97,6 @@ public class TexConverter {
     }
     return result;
   }
-
-  // Not required as the script doesn't seem to get slower over time
-  //public static void reset() {
-  //  synchronized (AsciiMathConverter.class) {
-  //    script = null;
-  //  }
-  //}
 
   /**
    * Load the script from the internal resource

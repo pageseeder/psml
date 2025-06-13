@@ -9,13 +9,34 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
 
-public class AsciiMathConverter {
+/**
+ * A utility class for converting AsciiMath expressions to MathML.
+ *
+ * <p></p>This class provides methods for converting AsciiMath strings into MathML format using a
+ * JavaScript engine. It also maintains a cache for previously converted expressions to improve
+ * performance.
+ *
+ * <p>The class is thread-safe, ensuring that concurrent access to shared resources does not
+ * create inconsistencies. It uses a synchronized cache and synchronized blocks to manage access
+ * to the JavaScript engine.
+ *
+ * <p>This class is not instantiable.
+ *
+ * @author Jean-Baptiste Reure
+ * @author Philip Rutherford
+ *
+ * @version 1.6.0
+ * @since 1.0
+ */
+public final class AsciiMathConverter {
 
   private static final String JS_SCRIPT = "/org/pageseeder/psml/process/math/ASCIIMathML.js";
 
-  private static Invocable SCRIPT = null;
+  private static Invocable script = null;
 
-  private final static Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
+  private static final Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
+
+  private AsciiMathConverter() {}
 
   public static String convert(String asciimath) {
     // sanity check
@@ -59,13 +80,13 @@ public class AsciiMathConverter {
    */
   public static void reset() {
     synchronized (AsciiMathConverter.class) {
-      SCRIPT = null;
+      script = null;
     }
   }
 
   private static Invocable script() throws ScriptException, IOException {
     synchronized (AsciiMathConverter.class) {
-      if (SCRIPT != null) return SCRIPT;
+      if (script != null) return script;
     }
 
     // load script
@@ -80,7 +101,7 @@ public class AsciiMathConverter {
           prefix(), "var parse = function(str) {asciimath.initSymbols(); return asciimath.parseMath(str, false).toXML();};"));
       cscript.eval();
       // create an Invocable object by casting the script engine object
-      SCRIPT = (Invocable) cscript.getEngine();
+      script = (Invocable) cscript.getEngine();
       return (Invocable) cscript.getEngine(); // don't return SCRIPT as it may have been reset by another thread
     } catch (ScriptException | IOException ex) {
       System.err.println("Failed to load ASCIIMath to MathML JS script: "+ex.getMessage());
