@@ -21,12 +21,12 @@ public final class XMLParserErrorHandler implements ErrorHandler {
   /**
    * Errors collected by error and fatal events.
    */
-  private final List<String> errors = new ArrayList<String>();
+  private final List<String> errors = new ArrayList<>();
 
   /**
    * Warnings collected.
    */
-  private final List<String> warnings = new ArrayList<String>();
+  private final List<String> warnings = new ArrayList<>();
 
   /**
    * {@inheritDoc}
