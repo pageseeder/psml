@@ -1137,7 +1137,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if (this.failOnError)
         throw new ProcessException("Failed to write contents of file " + f.getName() + ": " + ex.getMessage(), ex);
       else
-        this.logger.warn("Failed to write contents of file " + f.getName() + ": " + ex.getMessage());
+        this.logger.warn("Failed to write contents of file {}: {}", f.getName(), ex.getMessage());
     }
   }
 
