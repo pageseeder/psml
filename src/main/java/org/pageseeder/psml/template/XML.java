@@ -40,12 +40,11 @@ public final class XML {
 
   /**
    * @param cs the charset to use for the target XML output.
-   * @return The corresponding XML encoder or <code>null</code> is none exists.
+   * @return The corresponding XML encoder.
    */
-  public static @Nullable Encoder getEncoder(Charset cs) {
-    if (cs.equals(StandardCharsets.US_ASCII)) return ASCII_ENCODER;
-    if (cs.equals(StandardCharsets.UTF_8)) return UNICODE_ENCODER;
-    return null;
+  public static Encoder getEncoder(Charset cs) {
+    if (cs.equals(StandardCharsets.UTF_8) || cs.equals(StandardCharsets.UTF_16)) return UNICODE_ENCODER;
+    return ASCII_ENCODER;
   }
 
   /**
