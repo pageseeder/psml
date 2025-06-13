@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.math.TexConverter;
 import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -17,19 +18,22 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author Jean-Baptiste Reure
- * @version 31/10/2012
+ * Handles the transclusion of cross-references (xrefs) in documents.
  *
+ * @author Jean-Baptiste Reure
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class XRefTranscluder {
 
@@ -56,17 +60,17 @@ public final class XRefTranscluder {
   /**
    * List of XRef types to transclude.
    */
-  protected final List<String> xrefsTranscludeTypes = new ArrayList<>();
+  final List<String> xrefsTranscludeTypes = new ArrayList<>();
 
   /**
    * If the xrefs in an xref-fragment are ignored.
    */
-  protected boolean excludeXRefFragment = false;
+  boolean excludeXRefFragment = false;
 
   /**
    * If only the xrefs in an xref-fragment are included.
    */
-  protected boolean onlyXRefFrament = false;
+  boolean onlyXRefFrament = false;
 
   /**
    * If images are included.
@@ -93,7 +97,7 @@ public final class XRefTranscluder {
   /**
    * @param xrefTypes the types of the xrefs to transclude.
    */
-  public void addXRefsTypes(List<String> xrefTypes) {
+  public void addXRefsTypes(@Nullable List<String> xrefTypes) {
     if (xrefTypes != null) {
       this.xrefsTranscludeTypes.addAll(xrefTypes);
       this.isTranscluding = true;
@@ -134,7 +138,7 @@ public final class XRefTranscluder {
    * @param parent   a parent file
    * @param fragment the source fragment
    */
-  public void addParentFile(File parent, String fragment) {
+  public void addParentFile(@Nullable File parent, @Nullable String fragment) {
     if (parent != null && fragment != null) {
       List<String> fragments = this.parentFiles.get(parent);
       if (fragments == null) fragments = new ArrayList<>();
@@ -208,7 +212,7 @@ public final class XRefTranscluder {
           src = this.parentHandler.getSourceFile().getName();
           tgt = href;
         }
-        this.parentHandler.getLogger().warn("Transclusion/embed depth is suspiciously high (> "+WARNING_DEPTH+") for XRef from "+src+" to "+tgt+".");
+        this.parentHandler.getLogger().warn("Transclusion/embed depth is suspiciously high (> "+WARNING_DEPTH+") for XRef from {} to {}.", src, tgt);
       }
       // check for math xref
       if (mathTarget) {
@@ -239,7 +243,7 @@ public final class XRefTranscluder {
       if (fragments != null && fragments.contains(fragment)) {
         throw new InfiniteLoopException();
       }
-      this.parentHandler.getLogger().debug("Transcluding XRef to "+href);
+      this.parentHandler.getLogger().debug("Transcluding XRef to {}", href);
       // clone handler
       NumberedTOCGenerator numberingAndTOC = this.parentHandler.getNumberedTOCGenerator();
       String levelAtt = atts.getValue("level");
@@ -256,7 +260,7 @@ public final class XRefTranscluder {
       XMLUtils.parse(target, handler);
       // if publication then parse TOC
       if (numberingAndTOC != null) {
-        // process transclussions
+        // process transclusions
         XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
         TransclusionHandler thandler = new TransclusionHandler(out, "default", true, handler);
         XMLUtils.parse(target, thandler);
@@ -279,16 +283,12 @@ public final class XRefTranscluder {
    *
    * @return the target file object
    */
-  public File findXRefTarget(String href, String uriid, boolean link) {
+  public @Nullable File findXRefTarget(@Nullable String href, @Nullable String uriid, boolean link) {
     if (href == null) return null;
     String path = href.replaceFirst("\\?(.*?)?$", ""); // remove fragment from href
-    try {
-      path = URLDecoder.decode(path, "utf-8");
-    } catch (UnsupportedEncodingException ex) {
-      this.parentHandler.getLogger().error(ex.getMessage(), ex);
-    }
+    path = URLDecoder.decode(path, StandardCharsets.UTF_8);
     String dadPath = this.parentHandler.cleanUpParentFolder();
-    // find target file
+    // Find the target file
     File target;
     if (link) {
       try {
@@ -311,7 +311,7 @@ public final class XRefTranscluder {
         target = new File(this.parentHandler.getPSMLRoot(), "META-INF/" + dadPath + '/' + path + ".psml");
       }
       try {
-        // must use canonical file as some parent folders may not exist under META-INF causing ".." to not resolve on Linux
+        // must use a canonical file as some parent folders may not exist under META-INF causing ".." to not resolve on Linux
         target = target.getCanonicalFile();
       } catch (IOException ex) {
         this.parentHandler.getLogger().error(ex.getMessage(), ex);
@@ -325,14 +325,10 @@ public final class XRefTranscluder {
    *
    * @return the relative path of the target file if it exists, <code>null</code> otherwise
    */
-  public String findXRefRelativePath(String href) {
+  public @Nullable String findXRefRelativePath(@Nullable String href) {
     if (href == null) return null;
     String path = href.replaceFirst("\\?(.*?)?$", ""); // remove fragment from href and decode
-    try {
-      path = URLDecoder.decode(path, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      return null;
-    }
+    path = URLDecoder.decode(path, StandardCharsets.UTF_8);
     String dadPath = this.parentHandler.getParentFolderRelativePath();
     // find target file
     if (path.endsWith(".psml")) {
@@ -347,35 +343,42 @@ public final class XRefTranscluder {
   }
 
   /**
-  *
-  * @author Jean-Baptiste Reure
-  * @version 31/10/2012
-  *
-  */
- public static class XRefNotFoundException extends ProcessException {
-   /** used for serialization */
-   private static final long serialVersionUID = 1L;
- }
+   * Thrown to indicate that a cross-reference (XRef) could not be found during a processing operation.
+   */
+  public static class XRefNotFoundException extends ProcessException {
 
- /**
-  *
-  * @author Jean-Baptiste Reure
-  * @version 31/10/2012
-  *
-  */
- public static class InfiniteLoopException extends ProcessException {
-   /** used for serialization */
-   private static final long serialVersionUID = 1L;
- }
+    /** used for serialization */
+    private static final long serialVersionUID = 1L;
 
- /**
-  *
-  * @author Jean-Baptiste Reure
-  * @version 31/10/2012
-  *
-  */
- public static class TooDeepException extends ProcessException {
-   /** used for serialization */
-   private static final long serialVersionUID = 1L;
- }
+    XRefNotFoundException() {
+      super("XRef not found.");
+    }
+  }
+
+  /**
+   * Indicates that an infinite loop has been detected during a process execution.
+   */
+  public static class InfiniteLoopException extends ProcessException {
+
+    /** used for serialization */
+    private static final long serialVersionUID = 1L;
+
+    InfiniteLoopException() {
+      super("Infinite loop detected.");
+    }
+  }
+
+  /**
+   * Exception thrown to indicate that the processing or traversal depth has exceeded
+   * the allowed limit.
+   */
+  public static class TooDeepException extends ProcessException {
+
+    /** used for serialization */
+    private static final long serialVersionUID = 1L;
+
+    TooDeepException() {
+      super("Maximum processing depth ("+MAX_DEPTH+") exceeded.");
+    }
+  }
 }
