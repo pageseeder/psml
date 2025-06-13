@@ -160,9 +160,9 @@ final class TFragment {
      * @param name The name of the parameter to use.
      */
     public void pushValue(String name, boolean attribute) {
-      ParameterType type = this.types.getOrDefault(name, ParameterType.TEXT);
+      ParameterType paramType = this.types.getOrDefault(name, ParameterType.TEXT);
       String fallback = this.defaults.getOrDefault(name, "");
-      this.tokens.add(new TValue(name, fallback, type, attribute));
+      this.tokens.add(new TValue(name, fallback, paramType, attribute));
     }
 
     /**
