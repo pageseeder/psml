@@ -63,6 +63,64 @@ public final class MarkdownSerializerTest {
   }
 
   @Test
+  public void testUnderline() {
+    MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
+    Assert.assertEquals(MarkdownOutputOptions.UnderlineFormat.IGNORE, defaultOptions.underline());
+    MarkdownOutputOptions ignoreOption = defaultOptions.underline(MarkdownOutputOptions.UnderlineFormat.IGNORE);
+    Assert.assertEquals("test", toMarkdown("<underline>test</underline>", ignoreOption));
+    Assert.assertEquals("A test!", toMarkdown("<wrapper>A <underline>test</underline>!</wrapper>", ignoreOption));
+    Assert.assertEquals("", toMarkdown("<underline/>", ignoreOption));
+    MarkdownOutputOptions htmlOption = defaultOptions.underline(MarkdownOutputOptions.UnderlineFormat.HTML);
+    Assert.assertEquals("<u>test</u>", toMarkdown("<underline>test</underline>", htmlOption));
+    Assert.assertEquals("A <u>test</u>!", toMarkdown("<wrapper>A <underline>test</underline>!</wrapper>", htmlOption));
+    Assert.assertEquals("", toMarkdown("<underline/>", htmlOption));
+  }
+
+  @Test
+  public void testSuperScript() {
+    MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
+    Assert.assertEquals(MarkdownOutputOptions.SuperSubFormat.IGNORE, defaultOptions.superSub());
+    MarkdownOutputOptions ignoreOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.IGNORE);
+    Assert.assertEquals("trademark", toMarkdown("<sup>trademark</sup>", ignoreOption));
+    Assert.assertEquals("1st Ca2+", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", ignoreOption));
+    Assert.assertEquals("", toMarkdown("<sup/>", ignoreOption));
+    MarkdownOutputOptions extendedOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.CARET_TILDE);
+    Assert.assertEquals("^trademark^", toMarkdown("<sup>trademark</sup>", extendedOption));
+    Assert.assertEquals("1^st^ Ca^2+^", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", extendedOption));
+    Assert.assertEquals("", toMarkdown("<sup/>", extendedOption));
+    MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE_EQUIVALENT);
+    Assert.assertEquals("ᵗʳᵃᵈᵉᵐᵃʳᵏ", toMarkdown("<sup>trademark</sup>", unicodeOption));
+    Assert.assertEquals("1ˢᵗ Ca²⁺", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", unicodeOption));
+    Assert.assertEquals("", toMarkdown("<sup/>", unicodeOption));
+    MarkdownOutputOptions htmlOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.HTML);
+    Assert.assertEquals("<sup>trademark</sup>", toMarkdown("<sup>trademark</sup>", htmlOption));
+    Assert.assertEquals("1<sup>st</sup> Ca<sup>2+</sup>", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", htmlOption));
+    Assert.assertEquals("", toMarkdown("<sup/>", htmlOption));
+  }
+
+  @Test
+  public void testSubScript() {
+    MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
+    Assert.assertEquals(MarkdownOutputOptions.SuperSubFormat.IGNORE, defaultOptions.superSub());
+    MarkdownOutputOptions ignoreOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.IGNORE);
+    Assert.assertEquals("2(a)", toMarkdown("<sub>2(a)</sub>", ignoreOption));
+    Assert.assertEquals("H2O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", ignoreOption));
+    Assert.assertEquals("", toMarkdown("<sub/>", ignoreOption));
+    MarkdownOutputOptions extendedOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.CARET_TILDE);
+    Assert.assertEquals("~2(a)~", toMarkdown("<sub>2(a)</sub>", extendedOption));
+    Assert.assertEquals("H~2~O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", extendedOption));
+    Assert.assertEquals("", toMarkdown("<sub/>", extendedOption));
+    MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE_EQUIVALENT);
+    Assert.assertEquals("₂₍ₐ₎", toMarkdown("<sub>2(a)</sub>", unicodeOption));
+    Assert.assertEquals("H₂O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", unicodeOption));
+    Assert.assertEquals("", toMarkdown("<sub/>", unicodeOption));
+    MarkdownOutputOptions htmlOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.HTML);
+    Assert.assertEquals("<sub>2(a)</sub>", toMarkdown("<sub>2(a)</sub>", htmlOption));
+    Assert.assertEquals("H<sub>2</sub>O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", htmlOption));
+    Assert.assertEquals("", toMarkdown("<sub/>", htmlOption));
+  }
+
+  @Test
   public void testCodeEscape() {
 //    Assert.assertEquals("`` test ``", toMarkdown("<wrapper><monospace>test</monospace></wrapper>"));
 //    Assert.assertEquals("`` `test` ``", toMarkdown("<wrapper><monospace>`test`</monospace></wrapper>"));

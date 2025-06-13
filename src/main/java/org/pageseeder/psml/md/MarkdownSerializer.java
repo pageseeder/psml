@@ -22,6 +22,8 @@ import org.pageseeder.psml.model.PSMLNode;
 import org.pageseeder.psml.model.PSMLText;
 import org.pageseeder.psml.util.DiagnosticCollector;
 import org.pageseeder.psml.util.NilDiagnosticCollector;
+import org.pageseeder.psml.util.Subscripts;
+import org.pageseeder.psml.util.Superscripts;
 
 import java.io.IOException;
 import java.util.*;
@@ -675,13 +677,59 @@ public class MarkdownSerializer {
     }
 
     private void serializeSup(PSMLElement element, Appendable out) throws IOException {
-      collector.warn("Superscripts are not supported in Markdown");
-      processChildren(element, out);
+      if (element.isEmpty()) return;
+      switch (options.superSub()) {
+        case CARET_TILDE:
+          out.append("^");
+          processChildren(element, out);
+          out.append("^");
+          break;
+        case HTML:
+          out.append("<sup>");
+          processChildren(element, out);
+          out.append("</sup>");
+          break;
+        case UNICODE_EQUIVALENT:
+          if (!element.hasChildElements() && Superscripts.isReplaceable(element.getText())) {
+            out.append(Superscripts.toSuperscript(element.getText()));
+          } else {
+            collector.warn("Superscript text contains character for which there is no Unicode equivalent");
+            processChildren(element, out);
+          }
+          break;
+        case IGNORE: // default
+        default:
+          collector.warn("Superscripts are ignored in Markdown output format");
+          processChildren(element, out);
+      }
     }
 
     private void serializeSub(PSMLElement element, Appendable out) throws IOException {
-      collector.warn("Subscripts are not supported in Markdown");
-      processChildren(element, out);
+      if (element.isEmpty()) return;
+      switch (options.superSub()) {
+        case CARET_TILDE:
+          out.append("~");
+          processChildren(element, out);
+          out.append("~");
+          break;
+        case HTML:
+          out.append("<sub>");
+          processChildren(element, out);
+          out.append("</sub>");
+          break;
+        case UNICODE_EQUIVALENT:
+          if (!element.hasChildElements() && Subscripts.isReplaceable(element.getText())) {
+            out.append(Subscripts.toSubscript(element.getText()));
+          } else {
+            collector.warn("Subscript text contains character for which there is no Unicode equivalent");
+            processChildren(element, out);
+          }
+          break;
+        case IGNORE: // default
+        default:
+          collector.warn("Subscripts are ignored in Markdown output format");
+          processChildren(element, out);
+      }
     }
 
     private void serializeTable(PSMLElement table, Appendable out) throws IOException {
@@ -754,8 +802,15 @@ public class MarkdownSerializer {
     }
 
     private void serializeUnderline(PSMLElement element, Appendable out) throws IOException {
-      collector.warn("Underlines are not supported in Markdown");
-      processChildren(element, out);
+      if (element.isEmpty()) return;
+      if (options.underline() == MarkdownOutputOptions.UnderlineFormat.HTML) {
+        out.append("<u>");
+        processChildren(element, out);
+        out.append("</u>");
+      } else {
+        collector.warn("Underlines are ignored in Markdown output format");
+        processChildren(element, out);
+      }
     }
 
     private void serializeXref(PSMLElement link, Appendable out) throws IOException {
@@ -888,6 +943,7 @@ public class MarkdownSerializer {
     private static String textOf(@Nullable PSMLElement element) {
       return element == null ? "" : normalizeText(element.getText());
     }
+
   }
 }
 

@@ -122,6 +122,12 @@ public final class MarkdownOutputOptions {
     CARET_TILDE,
 
     /**
+     * Superscripts and subscripts are represented using their Unicode equivalent
+     * characters to render formatted text.
+     */
+    UNICODE_EQUIVALENT,
+
+    /**
      * Superscript and subscript formatting is ignored and not rendered.
      */
     IGNORE
@@ -364,4 +370,16 @@ public final class MarkdownOutputOptions {
     return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, this.block, this.superSub, this.underline, format);
   }
 
+  @Override
+  public String toString() {
+    return "MarkdownOutputOptions{" +
+        "includeMetadata=" + includeMetadata +
+        ", image=" + image +
+        ", xref=" + xref +
+        ", block=" + block +
+        ", superSub=" + superSub +
+        ", underline=" + underline +
+        ", properties=" + properties +
+        '}';
+  }
 }

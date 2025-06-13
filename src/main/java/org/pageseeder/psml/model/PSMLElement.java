@@ -995,6 +995,19 @@ public class PSMLElement implements PSMLNode {
     return this.nodes == null || this.nodes.isEmpty();
   }
 
+  /**
+   * Checks if the current object contains any child elements.
+   *
+   * @return true if there is at least one child element of type PSMLElement, false otherwise.
+   */
+  public boolean hasChildElements() {
+    if (this.nodes == null) return false;
+    for (PSMLNode node : this.nodes) {
+      if (node instanceof PSMLElement) return true;
+    }
+    return false;
+  }
+
   @Override
   public String getText() {
     if (this.nodes == null) return "";
