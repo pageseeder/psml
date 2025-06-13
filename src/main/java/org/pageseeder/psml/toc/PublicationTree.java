@@ -302,10 +302,9 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * @return the root of this tree.
    */
-  public DocumentTree root() {
+  public @Nullable DocumentTree root() {
     return this._map.get(this._rootid);
   }
-
 
   /**
    * @return the map of transcluded Id to a list of it's parent Ids in this publication.

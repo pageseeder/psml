@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.process.util;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public final class IncludesExcludesMatcher {
    *
    * @param patterns the list of patterns to include.
    */
-  public void addIncludePatterns(List<String> patterns) {
+  public void addIncludePatterns(@Nullable List<String> patterns) {
     if (patterns == null) return;
     for (String inc : patterns) {
       if (inc.length() > 0) this.includePatterns.add(createRegex(inc));
@@ -43,7 +45,7 @@ public final class IncludesExcludesMatcher {
    *
    * @param patterns the list of patterns to include.
    */
-  public void addIncludePatterns(String[] patterns) {
+  public void addIncludePatterns(@Nullable String[] patterns) {
     if (patterns == null) return;
     for (String inc : patterns) {
       if (inc.length() > 0) this.includePatterns.add(createRegex(inc));
@@ -57,7 +59,7 @@ public final class IncludesExcludesMatcher {
    *
    * @param pattern the pattern to include.
    */
-  public void addIncludePattern(String pattern) {
+  public void addIncludePattern(@Nullable String pattern) {
     if (pattern == null) return;
     this.includePatterns.add(createRegex(pattern));
   }
@@ -69,7 +71,7 @@ public final class IncludesExcludesMatcher {
    *
    * @param patterns the list of patterns to exclude.
    */
-  public void addExcludePatterns(List<String> patterns) {
+  public void addExcludePatterns(@Nullable List<String> patterns) {
     if (patterns == null) return;
     for (String exc : patterns) {
       if (exc.length() > 0) this.excludePatterns.add(createRegex(exc));
@@ -83,7 +85,7 @@ public final class IncludesExcludesMatcher {
    *
    * @param patterns the list of patterns to exclude.
    */
-  public void addExcludePatterns(String[] patterns) {
+  public void addExcludePatterns(@Nullable String[] patterns) {
     if (patterns == null) return;
     for (String exc : patterns) {
       if (exc.length() > 0) this.excludePatterns.add(createRegex(exc));
@@ -97,7 +99,7 @@ public final class IncludesExcludesMatcher {
    *
    * @param pattern the pattern to exclude.
    */
-  public void addExcludePattern(String pattern) {
+  public void addExcludePattern(@Nullable String pattern) {
     if (pattern == null) return;
     this.excludePatterns.add(createRegex(pattern));
   }
@@ -109,7 +111,7 @@ public final class IncludesExcludesMatcher {
    * @return <code>true</code> if excluded;
    *         <code>false</code> otherwise or if <code>null</code>.
    */
-  public boolean isExcluded(String path) {
+  public boolean isExcluded(@Nullable String path) {
     // match path with patterns, if one matches then excluded!
     if (path != null) for (String exc : this.excludePatterns) {
       if (path.matches(exc)) return true;
@@ -126,7 +128,7 @@ public final class IncludesExcludesMatcher {
    * @return <code>true</code> if included;
    *         <code>false</code> otherwise or if <code>null</code>.
    */
-  public boolean isIncluded(String path) {
+  public boolean isIncluded(@Nullable String path) {
     // match patterns
     if (!this.includePatterns.isEmpty()) {
       // there are patterns to match, if no path, then not good!

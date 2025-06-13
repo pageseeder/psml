@@ -14,14 +14,24 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.process.config.XSLTTransformation;
 import org.slf4j.Logger;
 
 /**
- * @author Jean-Baptiste Reure
- * @version 22/10/2012
+ * XSLTTransformer is responsible for performing XSLT transformations on a set of input files.
  *
+ * <p>It allows configuration of various behaviors such as error handling, validation, and
+ * file moving or copying.
+ *
+ * <p>This class is designed to work with specific XSLT transformation details and a given set
+ * of source files.
+ *
+ * @author Jean-Baptiste Reure
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class XSLTTransformer {
 
@@ -33,15 +43,15 @@ public final class XSLTTransformer {
   /**
    * The XSLT details
    */
-  private final XSLTTransformation transformationDetails;
+  private final @Nullable XSLTTransformation transformationDetails;
 
   /**
    * The parent task, for logging
    */
-  private Logger logger = null;
+  private @Nullable Logger logger = null;
 
   /**
-   * If original source should be preserved
+   * If the original source should be preserved
    */
   private boolean preserveSrc = false;
 
@@ -58,14 +68,14 @@ public final class XSLTTransformer {
   /**
    * If untransformed files should be moved to destination
    */
-  private boolean moveall = true;
+  private boolean moveAll = true;
 
   /**
    * Build a new transformer.
    *
    * @param xslt the details of the XSLT.
    */
-  public XSLTTransformer(XSLTTransformation xslt) {
+  public XSLTTransformer(@Nullable XSLTTransformation xslt) {
     if (xslt != null && xslt.getXSLT() == null)
       throw new IllegalArgumentException("XSLT script cannot be null");
     this.transformationDetails = xslt;
@@ -96,7 +106,7 @@ public final class XSLTTransformer {
    * @param moveall if untransformed files should be moved to destination
    */
   public void setMoveAll(boolean moveall) {
-    this.moveall = moveall;
+    this.moveAll = moveall;
   }
 
   /**
@@ -131,7 +141,7 @@ public final class XSLTTransformer {
     // log
     XSLTErrorListener listener = null;
     if (logger != null) {
-      logger.debug("Transform: Loading XSLT script " + xslt.getAbsolutePath());
+      logger.debug("Transform: Loading XSLT script {}", xslt.getAbsolutePath());
       listener = new XSLTErrorListener(logger);
     }
     Transformer transformer = XMLUtils.createTransformer(xslt, listener);
@@ -170,7 +180,7 @@ public final class XSLTTransformer {
       if (transform) {
         // log
         if (logger != null)
-          logger.debug("Transform: Transforming file "+relPath);
+          logger.debug("Transform: Transforming file {}", relPath);
         // run xslt script
         try {
           XMLUtils.transform(psmlFiles.get(relPath), output, transformer, schema, null, null);
@@ -178,7 +188,7 @@ public final class XSLTTransformer {
           if (this.failOnError) throw ex;
           else if (this.logger != null) this.logger.error(ex.getMessage());
         }
-      } else if (moveall) {
+      } else if (moveAll) {
         // move/copy it then
         moveFile(psmlFiles.get(relPath), output);
       }
@@ -258,6 +268,5 @@ public final class XSLTTransformer {
       this.log.error("Transformer error: {}", exception.getMessageAndLocation());
     }
   }
-
 
 }

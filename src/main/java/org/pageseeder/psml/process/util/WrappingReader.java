@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.process.util;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -54,7 +56,7 @@ public class WrappingReader extends Reader {
    * @param before       The text to put before.
    * @param after        The text to put after.
    */
-  public WrappingReader(Reader reader, String before, String after) throws IOException {
+  public WrappingReader(@Nullable Reader reader, @Nullable String before, @Nullable String after) throws IOException {
     this.originalReader = reader == null ? new StringReader("") : reader;
     if (before != null) {
       this.before.append(before);
