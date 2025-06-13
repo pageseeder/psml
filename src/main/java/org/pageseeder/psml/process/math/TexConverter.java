@@ -1,5 +1,6 @@
 package org.pageseeder.psml.process.math;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.util.WrappingReader;
 import org.pageseeder.psml.util.PSCache;
 
@@ -35,7 +36,7 @@ public final class TexConverter {
   /**
    * Note: The script doesn't need to be reset as it does not seem to get slower over time
    */
-  private static Invocable script = null;
+  private static @Nullable Invocable script = null;
 
   private static final Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
 
@@ -46,7 +47,7 @@ public final class TexConverter {
    *
    * @return the mathml content
    */
-  public static String convert(String input) {
+  public static String convert(@Nullable String input) {
     // sanity check
     if (input == null || input.trim().isEmpty()) return "";
 

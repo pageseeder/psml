@@ -1,5 +1,6 @@
 package org.pageseeder.psml.process.math;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.util.WrappingReader;
 import org.pageseeder.psml.util.PSCache;
 
@@ -32,13 +33,13 @@ public final class AsciiMathConverter {
 
   private static final String JS_SCRIPT = "/org/pageseeder/psml/process/math/ASCIIMathML.js";
 
-  private static Invocable script = null;
+  private static @Nullable Invocable script = null;
 
   private static final Map<String, String> cache = Collections.synchronizedMap(new PSCache<>(200));
 
   private AsciiMathConverter() {}
 
-  public static String convert(String asciimath) {
+  public static String convert(@Nullable String asciimath) {
     // sanity check
     if (asciimath == null || asciimath.isEmpty()) return "";
 
