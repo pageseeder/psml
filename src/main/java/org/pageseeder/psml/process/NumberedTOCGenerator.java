@@ -3,10 +3,9 @@
  */
 package org.pageseeder.psml.process;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.toc.*;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
-import org.pageseeder.xmlwriter.XML;
-import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 import java.io.IOException;
@@ -17,62 +16,64 @@ import java.util.*;
  *
  * @author Philip Rutherford
  *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class NumberedTOCGenerator {
 
   /**
    * The tree for the TOC
    */
-  private PublicationTree _publicationTree;
+  private PublicationTree publicationTree;
 
   /**
    * The numbering for the TOC
    */
-  private FragmentNumbering _fragmentNumbering = null;
+  private @Nullable FragmentNumbering fragmentNumbering = null;
 
   /**
    * Trees to add to publication keyed on URIID
    */
-  private Map<Long,DocumentTree> _addTrees = new HashMap<>();
+  private final Map<Long,DocumentTree> addTrees = new HashMap<>();
 
   /**
    * Whether the first toc element has been reached
    */
-  private boolean _afterTocElement = false;
+  private boolean afterTocElement = false;
 
   /**
    * Number of elements currently open
    */
-  private int _openElements = 0;
+  private int openElements = 0;
 
   /**
    * Constructor
    *
-   * @param tree            The tree for the TOC
+   * @param tree The tree for the TOC
    */
   public NumberedTOCGenerator(PublicationTree tree) {
-    this._publicationTree = tree;
+    this.publicationTree = tree;
   }
 
   /**
-   * @param numbering       The numbering for the publication
+   * @param numbering The numbering for the publication
    */
   public void setFragmentNumbering(FragmentNumbering numbering) {
-    this._fragmentNumbering = numbering;
+    this.fragmentNumbering = numbering;
   }
 
   /**
    * @return the publicationTree
    */
   public PublicationTree publicationTree() {
-    return this._publicationTree;
+    return this.publicationTree;
   }
 
   /**
    * @return the fragmentNumbering
    */
   public FragmentNumbering fragmentNumbering() {
-    return this._fragmentNumbering;
+    return this.fragmentNumbering;
   }
 
   /**
@@ -81,33 +82,33 @@ public class NumberedTOCGenerator {
    * @param tree  the tree to add
    */
   public void addTree(DocumentTree tree) {
-    this._addTrees.put(tree.id(), tree);
+    this.addTrees.put(tree.id(), tree);
   }
 
   /**
    * Update the publication with added trees.
    */
   public void updatePublication() {
-    this._publicationTree = this._publicationTree.modify(
-        Collections.emptyList(), this._addTrees, this._publicationTree.root().id());
+    this.publicationTree = this.publicationTree.modify(
+        Collections.emptyList(), this.addTrees, this.publicationTree.root().id());
   }
 
   /**
    * Serialize the publication as a TOC tree.
    *
-   * @param xml           The XML writer
+   * @param xml The XML writer
    *
    * @throws IOException If thrown by XML writer
    */
   public void toXML(XMLWriter xml) throws IOException {
     xml.openElement("toc-tree", true);
-    this._afterTocElement = false;
-    this._openElements = 0;
-    DocumentTree root = this._publicationTree.root();
+    this.afterTocElement = false;
+    this.openElements = 0;
+    DocumentTree root = this.publicationTree.root();
     if (root != null) {
       xml.attribute("title", root.title());
       Map<Long,Integer> doccount = new HashMap<>();
-      toXML(xml, root.id(), 1, doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT);
+      toXML(xml, root.id(), 1, doccount, 1, new ArrayList<>(), Reference.DEFAULT_FRAGMENT);
     }
     xml.closeElement();
   }
@@ -130,7 +131,7 @@ public class NumberedTOCGenerator {
     String key = id + "-" + fragment;
     if (ancestors.contains(key)) throw new IllegalStateException("XRef loop detected on URIID-fragment " + key);
     ancestors.add(key);
-    DocumentTree current = this._publicationTree.tree(id);
+    DocumentTree current = this.publicationTree.tree(id);
     if (!Reference.DEFAULT_FRAGMENT.equals(fragment)) {
       current = current.singleFragmentTree(fragment);
     }
@@ -159,7 +160,7 @@ public class NumberedTOCGenerator {
     // ignore paragraphs, transclusion end and toc marker
     if (element instanceof Paragraph || element instanceof TransclusionEnd) return;
     if (element instanceof Toc) {
-      this._afterTocElement = true;
+      this.afterTocElement = true;
       return;
     }
     boolean toNext = false;
@@ -172,7 +173,7 @@ public class NumberedTOCGenerator {
       targetFragment = ref.targetfragment();
       refType = ref.type();
       next = ref.uri();
-      nextTree = this._publicationTree.tree(next);
+      nextTree = this.publicationTree.tree(next);
       toNext = nextTree != null && Reference.Type.EMBED.equals(refType);
     }
 
@@ -209,8 +210,8 @@ public class NumberedTOCGenerator {
     for (Part<?> r : part.parts()) {
       toXML(xml, id, level+1, r, doccount, count, ancestors);
     }
-    if (!Reference.Type.TRANSCLUDE.equals(refType) && this._openElements > 0) {
-      _openElements--;
+    if (!Reference.Type.TRANSCLUDE.equals(refType) && this.openElements > 0) {
+      openElements--;
       xml.closeElement();
     }
   }
@@ -225,8 +226,8 @@ public class NumberedTOCGenerator {
    * @throws IOException if problem writing XML
    */
   public void partToXML(XMLWriter xml, int level,boolean children) throws IOException {
-    if (!this._afterTocElement) return;
-    _openElements++;
+    if (!this.afterTocElement) return;
+    openElements++;
     xml.openElement("toc-part", children);
     xml.attribute("level", level);
   }
@@ -246,18 +247,18 @@ public class NumberedTOCGenerator {
    */
   public void referenceToXML(XMLWriter xml, int level, Reference ref, long treeid, int count,
       DocumentTree target, boolean children) throws IOException {
-    if (!this._afterTocElement) return;
-    _openElements++;
+    if (!this.afterTocElement) return;
+    openElements++;
     xml.openElement("toc-part", children);
     xml.attribute("level", level);
-    // if display="document" use title from target document
+    // if display="document" use title from the target document
     if (ref.displaydocument() != null && ref.displaydocument()) {
       xml.attribute("title", target.title());
     } else {
       xml.attribute("title", ref.title());
     }
-    if (target.numbered() && this._fragmentNumbering != null) {
-      Prefix pref = this._fragmentNumbering.getPrefix(treeid, count);
+    if (target.numbered() && this.fragmentNumbering != null) {
+      Prefix pref = this.fragmentNumbering.getPrefix(treeid, count);
       if (pref != null) {
         xml.attribute("prefix", pref.value);
         xml.attribute("canonical", pref.canonical);
@@ -286,15 +287,15 @@ public class NumberedTOCGenerator {
    * @throws IOException if problem writing XML
    */
   public void headingToXML(XMLWriter xml, int level, Heading head, long treeid, int count, boolean children) throws IOException {
-    if (!this._afterTocElement) return;
-    _openElements++;
+    if (!this.afterTocElement) return;
+    openElements++;
     xml.openElement("toc-part", children);
     xml.attribute("level", level);
     if (!Element.NO_TITLE.equals(head.title())) {
       xml.attribute("title", head.title());
     }
-    if (head.numbered() && this._fragmentNumbering != null) {
-      Prefix pref = this._fragmentNumbering.getTranscludedPrefix(treeid, count, head.fragment(), head.index());
+    if (head.numbered() && this.fragmentNumbering != null) {
+      Prefix pref = this.fragmentNumbering.getTranscludedPrefix(treeid, count, head.fragment(), head.index());
       if (pref != null) {
         xml.attribute("prefix", pref.value);
         xml.attribute("canonical", pref.canonical);
