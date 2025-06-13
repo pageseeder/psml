@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.config.ManifestDocument;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.slf4j.Logger;
@@ -42,19 +43,19 @@ public final class ManifestCreator {
   /**
    * How the xrefs are processed
    */
-  private final ManifestDocument manifestDoc;
+  private final @Nullable ManifestDocument manifestDoc;
 
   /**
    * The parent task, for logging
    */
-  private Logger logger = null;
+  private @Nullable Logger logger = null;
 
   /**
    * Build a new processor.
    *
    * @param xr the details of the processing.
    */
-  public ManifestCreator(ManifestDocument xr) {
+  public ManifestCreator(@Nullable ManifestDocument xr) {
     if (xr != null && xr.getFilename() == null)
       throw new IllegalArgumentException("Filename cannot be null");
     this.manifestDoc = xr;
@@ -77,7 +78,7 @@ public final class ManifestCreator {
    *
    * @throws ProcessException if anything goes wrong
    */
-  public File createManifest(Map<String, File> psmlFiles, File destinationFolder) throws ProcessException {
+  public @Nullable File createManifest(Map<String, File> psmlFiles, File destinationFolder) throws ProcessException {
     // make sure we've got something to do
     if (this.manifestDoc == null) return null;
     String manifestFileName = this.manifestDoc.getFilename()+".psml";

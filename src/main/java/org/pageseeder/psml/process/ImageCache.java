@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.xml.sax.Attributes;
@@ -205,12 +206,12 @@ public final class ImageCache {
     /**
      * The URI ID.
      */
-    private String uriID = null;
+    private @Nullable String uriID = null;
 
     /**
      * The URI extension, loaded from the URI path.
      */
-    private String uriExtension = null;
+    private @Nullable String uriExtension = null;
 
     /**
      * Current state.
@@ -240,14 +241,14 @@ public final class ImageCache {
     /**
      * @return The URI extension, loaded from the URI path.
      */
-    public String getUriExtension() {
+    public @Nullable String getUriExtension() {
       return this.uriExtension;
     }
 
     /**
      * @return The URI ID.
      */
-    public String getUriID() {
+    public @Nullable String getUriID() {
       return this.uriID;
     }
   }
