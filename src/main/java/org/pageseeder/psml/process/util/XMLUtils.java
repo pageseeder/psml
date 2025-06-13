@@ -63,11 +63,11 @@ public final class XMLUtils {
    */
   public static String escape(String s) {
     // bypass null and empty strings
-    if (s == null || "".equals(s)) return s;
+    if (s == null || s.isEmpty()) return s;
     // do not process valid strings.
     if (s.indexOf('&') == -1 && s.indexOf('<') == -1) return s;
     // process the rest
-    StringBuffer valid = new StringBuffer(s);
+    StringBuilder valid = new StringBuilder(s);
     int shift = 0;
     for (int i = 0; i < s.length(); i++) {
       switch (s.charAt(i)) {
