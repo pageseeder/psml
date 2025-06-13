@@ -6,9 +6,7 @@ package org.pageseeder.psml.diff;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -31,7 +29,7 @@ public final class CompareHandler extends DefaultHandler {
   /**
    * Current state.
    */
-  private final Stack<String> elements = new Stack<>();
+  private final Deque<String> elements = new ArrayDeque<>();
 
   /**
    * Current fragment ID

@@ -8,6 +8,19 @@ import java.io.IOException;
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XMLWriter;
 
+/**
+ * Represents the title of a document.
+ *
+ * <p>A `DocumentTitle` is an immutable data structure
+ * that encapsulates the title of a document, providing the ability to render it as XML
+ * or print its string representation.
+ *
+ * @author Christophe Lauret
+ * @author Philip Rutherford
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 public final class DocumentTitle extends Element {
 
   /** As er requirement for Serialization*/

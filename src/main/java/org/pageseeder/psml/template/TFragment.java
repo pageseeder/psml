@@ -15,10 +15,9 @@
  */
 package org.pageseeder.psml.template;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.eclipse.jdt.annotation.Nullable;
+
+import java.util.*;
 
 /**
  * A PSML fragment definition.
@@ -30,61 +29,62 @@ final class TFragment {
   /**
    * The kind of fragment (fragment, media-fragment, xref-fragment, properties-fragment, etc...)
    */
-  private final String _kind;
+  private final String kind;
 
   /**
    * The type of fragment.
    */
-  private final String _type;
+  private final String type;
 
   /**
    * The mediatype of fragment (for 'media-fragment' only)
    */
-  private final String _mediatype;
+  private final @Nullable String mediatype;
 
   /**
    * The list of tokens this fragment is made of (does NOT include the fragment element).
    */
-  private final List<Token> _tokens;
+  private final List<Token> tokens;
 
   /**
    * Create a new template.
    *
-   * @param tokens the tokens this template is made of.
+   * @param builder the tokens this template is made of.
    */
   private TFragment(Builder builder) {
-    this._kind = builder.kind;
-    this._type = builder._type;
-    this._mediatype = builder.mediatype;
-    this._tokens = new ArrayList<Token>(builder.tokens);
+    assert builder.kind != null;
+    this.kind = builder.kind;
+    this.type = builder.type;
+    this.mediatype = builder.mediatype;
+    this.tokens = new ArrayList<>(builder.tokens);
   }
 
   /**
    * @return The kind of fragment (fragment, media-fragment, xref-fragment, properties-fragment, etc...)
    */
   public String kind() {
-    return this._kind;
+    return this.kind;
   }
 
   /**
    * @return The type of fragment.
    */
   public String type() {
-    return this._type;
+    return this.type;
   }
 
   /**
    * @return The type of fragment.
    */
-  public String mediatype() {
-    return this._mediatype;
+  public @Nullable String mediatype() {
+    return this.mediatype;
   }
 
   /**
    * @return The list of tokens this fragment is made of.
    */
   public List<Token> tokens() {
-    return this._tokens;
+    return this.tokens;
   }
 
   /**
@@ -95,36 +95,35 @@ final class TFragment {
     /**
      * The fragment type.
      */
-    private final String _type;
+    private final String type;
 
     /**
      * The kind of fragment.
      */
-    private String kind;
+    private @Nullable String kind;
 
     /**
      * The mediatype of the fragment.
      */
-    private String mediatype;
+    private @Nullable String mediatype;
 
     /**
      * The types for each parameter.
      */
-    private final Map<String, ParameterType> types = new HashMap<String, ParameterType>();
+    private final Map<String, ParameterType> types = new HashMap<>();
 
     /**
      * The default values.
      */
-    private final Map<String, String> defaults = new HashMap<String, String>();
+    private final Map<String, String> defaults = new HashMap<>();
 
     /**
      * The list of tokens this template is made of.
      */
-    private List<Token> tokens = new ArrayList<Token>();
+    private final List<Token> tokens = new ArrayList<>();
 
     public Builder(String type) {
-      if (type == null) throw new NullPointerException("Fragment type is required");
-      this._type = type;
+       this.type = Objects.requireNonNull(type, "Fragment type is required");
     }
 
     /**
@@ -137,7 +136,7 @@ final class TFragment {
     /**
      * @param mediatype the mediatype to set
      */
-    public void setMediatype(String mediatype) {
+    public void setMediatype(@Nullable String mediatype) {
       this.mediatype = mediatype;
     }
 
@@ -148,7 +147,7 @@ final class TFragment {
      * @param fallback The default value for the parameter
      * @param type     The type of parameter.
      */
-    public void addParameter(String name, String fallback, ParameterType type) {
+    public void addParameter(String name, @Nullable String fallback, ParameterType type) {
       this.types.put(name, type);
       if (fallback != null) {
         this.defaults.put(name, fallback);
@@ -161,15 +160,9 @@ final class TFragment {
      * @param name The name of the parameter to use.
      */
     public void pushValue(String name, boolean attribute) {
-      ParameterType type = this.types.get(name);
-      if (type == null) {
-        type = ParameterType.TEXT;
-      }
-      String fallback = this.defaults.get(name);
-      if (fallback == null) {
-        fallback = "";
-      }
-      this.tokens.add(new TValue(name, fallback, type, attribute));
+      ParameterType paramType = this.types.getOrDefault(name, ParameterType.TEXT);
+      String fallback = this.defaults.getOrDefault(name, "");
+      this.tokens.add(new TValue(name, fallback, paramType, attribute));
     }
 
     /**

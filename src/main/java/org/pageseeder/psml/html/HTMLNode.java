@@ -28,12 +28,15 @@ import org.pageseeder.xmlwriter.XMLWritable;
  * most elements do not require attributes.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public interface HTMLNode extends XMLWritable {
 
   /**
    * @return the text of this node.
    */
-  public String getText();
+  String getText();
 
 }

@@ -47,8 +47,8 @@ public final class XMLUtils {
    *
    * <p>these characters are:</p>
    * <ul>
-   *  <li>'&amp' by the ampersand entity "&amp;amp"</li>
-   *  <li>'&lt;' by the entity "&amp;lt;"</li>
+   *  <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
+   *  <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
    * </ul>
    *
    * <p>Empty strings or <code>null</code> return respectively "" and <code>null</code>.
@@ -61,13 +61,13 @@ public final class XMLUtils {
    *
    * @return a valid string or empty if s is <code>null</code> or empty.
    */
-  public static String escape(String s) {
+  public static String escape(@Nullable String s) {
     // bypass null and empty strings
-    if (s == null || "".equals(s)) return s;
+    if (s == null || s.isEmpty()) return s;
     // do not process valid strings.
     if (s.indexOf('&') == -1 && s.indexOf('<') == -1) return s;
     // process the rest
-    StringBuffer valid = new StringBuffer(s);
+    StringBuilder valid = new StringBuilder(s);
     int shift = 0;
     for (int i = 0; i < s.length(); i++) {
       switch (s.charAt(i)) {
@@ -92,10 +92,10 @@ public final class XMLUtils {
    *
    * <p>these characters are:</p>
    * <ul>
-   *  <li>'&amp' by the ampersand entity "&amp;amp"</li>
-   *  <li>'&lt;' by the entity "&amp;lt;"</li>
-   *  <li>'"' by the entity "&amp;quot;"</li>
-   *  <li>''' by the entity "&amp;apos;"</li>
+   *  <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
+   *  <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
+   *  <li>{@code '"'} by the entity {@code "&amp;quot;"}</li>
+   *  <li>{@code '''} by the entity {@code "&amp;apos;"}</li>
    * </ul>
    *
    * <p>Empty strings or <code>null</code> return respectively
@@ -103,19 +103,19 @@ public final class XMLUtils {
    *
    * <p>Note: this function assumes that there are no entities in
    * the given String. If there are existing entities, then the
-   * ampersand character will be escaped by the ampersand entity.
+   * ampersand entity will replace the ampersand character.
    *
    * @param  s The String to be parsed
    *
    * @return a valid string or empty if s is <code>null</code> or empty.
    */
-  public static String escapeForAttribute(String s) {
+  public static String escapeForAttribute(@Nullable String s) {
     // bypass null and empty strings
-    if (s == null || "".equals(s)) return s;
+    if (s == null || s.isEmpty()) return s;
     // do not process valid strings.
     if (s.indexOf('&') == -1 && s.indexOf('<') == -1 && s.indexOf('"') == -1) return s;
     // process the rest
-    StringBuffer valid = new StringBuffer(s);
+    StringBuilder valid = new StringBuilder(s);
     int shift = 0;
     for (int i = 0; i < s.length(); i++) {
       switch (s.charAt(i)) {
@@ -193,8 +193,14 @@ public final class XMLUtils {
    *
    * @throws ProcessException if the transformation failed
    */
-  public static void transform(File in, File out, Transformer t, URL schema,
-      List<String> errors, List<String> warnings) throws ProcessException {
+  public static void transform(
+      File in,
+      File out,
+      Transformer t,
+      @Nullable URL schema,
+      @Nullable List<String> errors,
+      @Nullable List<String> warnings
+  ) throws ProcessException {
     try {
       FileInputStream fis = new FileInputStream(in);
       FileOutputStream fos = new FileOutputStream(out);
@@ -275,7 +281,8 @@ public final class XMLUtils {
    * @throws ProcessException if the parsing failed
    */
   public static void parse(File in, ContentHandler handler,
-      List<String> errors, List<String> warnings) throws ProcessException {
+                           @Nullable List<String> errors,
+                           @Nullable List<String> warnings) throws ProcessException {
     try {
       parse(new FileInputStream(in), handler, errors, warnings);
     } catch (FileNotFoundException ex) {
@@ -306,7 +313,8 @@ public final class XMLUtils {
    * @throws ProcessException if the parsing failed
    */
   public static void parse(InputStream in, ContentHandler handler,
-      List<String> errors, List<String> warnings) throws ProcessException {
+                           @Nullable List<String> errors,
+                           @Nullable List<String> warnings) throws ProcessException {
 
     try {
       parse(new InputSource(in), handler, errors, warnings);
@@ -330,7 +338,8 @@ public final class XMLUtils {
    * @throws ProcessException if the parsing failed
    */
   public static void parse(InputSource in, ContentHandler handler,
-      @Nullable List<String> errors, @Nullable List<String> warnings) throws ProcessException {
+                           @Nullable List<String> errors,
+                           @Nullable List<String> warnings) throws ProcessException {
     try {
       // use the SAX parser factory to set features
       SAXParserFactory factory = SAXParserFactory.newInstance();

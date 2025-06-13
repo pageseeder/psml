@@ -29,17 +29,16 @@ public abstract class Element implements Serializable, XMLWritable {
   public static final String NO_FRAGMENT = "";
 
   /** Level of this element */
-  private final int _level;
+  private final int level;
 
   /** Text of the element */
-  private final String _title;
+  private final String title;
 
   /** Fragment ID this element starts in */
-  private final String _fragment;
-
+  private final String fragment;
 
   /** The original (untranscluded) Fragment ID this element starts in */
-  private final String _originalFragment;
+  private final String originalFragment;
 
   /**
    * Creates a new element with an empty title and fragment
@@ -47,10 +46,10 @@ public abstract class Element implements Serializable, XMLWritable {
    * @param level The level.
    */
   public Element(int level) {
-    this._level = level;
-    this._title = NO_TITLE;
-    this._fragment = NO_FRAGMENT;
-    this._originalFragment = NO_FRAGMENT;
+    this.level = level;
+    this.title = NO_TITLE;
+    this.fragment = NO_FRAGMENT;
+    this.originalFragment = NO_FRAGMENT;
   }
 
   /**
@@ -65,10 +64,10 @@ public abstract class Element implements Serializable, XMLWritable {
    */
   public Element(int level, String title, String fragment, String originalFragment) {
     if (level < 0) throw new IllegalArgumentException("Level must be > 0 but was "+level);
-    this._level = level;
-    this._title = title;
-    this._fragment = fragment;
-    this._originalFragment = originalFragment;
+    this.level = level;
+    this.title = title;
+    this.fragment = fragment;
+    this.originalFragment = originalFragment;
   }
 
   /**
@@ -77,7 +76,7 @@ public abstract class Element implements Serializable, XMLWritable {
    * @return Level of this element
    */
   public final int level() {
-    return this._level;
+    return this.level;
   }
 
   /**
@@ -86,21 +85,21 @@ public abstract class Element implements Serializable, XMLWritable {
    * @return Text of the element
    */
   public final String title() {
-    return this._title;
+    return this.title;
   }
 
   /**
    * @return Fragment ID that this element starts in
    */
   public String fragment() {
-    return this._fragment;
+    return this.fragment;
   }
 
   /**
    * @return The original (untranscluded) Fragment ID this element starts in
    */
   public String originalFragment() {
-    return this._originalFragment;
+    return this.originalFragment;
   }
 
   /**
@@ -109,7 +108,7 @@ public abstract class Element implements Serializable, XMLWritable {
    * @return true if the element has a title.
    */
   public final boolean hasTitle() {
-    return !NO_TITLE.equals(this._title);
+    return !NO_TITLE.equals(this.title);
   }
 
   @Override
@@ -123,8 +122,6 @@ public abstract class Element implements Serializable, XMLWritable {
    * Print a text representation of the structural element.
    *
    * @param out Where to print the structure
-   *
-   * @throws IOException If thrown by the appendable
    */
   public abstract void print(Appendable out);
 
@@ -151,7 +148,6 @@ public abstract class Element implements Serializable, XMLWritable {
    * @param count    The position (occurrence number) of the document in the publication.
    * @param numbered Whether the heading is auto-numbered
    * @param prefix   Any prefix given to the title.
-   * @param content  Whether this TOC element has children
    *
    * @throws IOException Should an I/O error occur
    */

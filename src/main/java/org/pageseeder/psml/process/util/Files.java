@@ -10,7 +10,9 @@ import java.io.IOException;
  * A general utility class.
  *
  * @author Jean-Baptiste Reure
- * @version 27 April 2012
+ *
+ * @version 1.0
+ * @since 1.0
  */
 public final class Files {
 

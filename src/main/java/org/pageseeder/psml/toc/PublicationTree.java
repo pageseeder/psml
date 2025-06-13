@@ -41,7 +41,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * Stores the state of the TOC as it is being serialized.
    *
    */
-  private final class TOCState {
+  private static final class TOCState {
 
     /**
      * The ID of the content tree (leaf).
@@ -302,10 +302,9 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   /**
    * @return the root of this tree.
    */
-  public DocumentTree root() {
+  public @Nullable DocumentTree root() {
     return this._map.get(this._rootid);
   }
-
 
   /**
    * @return the map of transcluded Id to a list of it's parent Ids in this publication.
@@ -321,7 +320,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @return the a tree in the publication.
    */
-  public DocumentTree tree(long id) {
+  public @Nullable DocumentTree tree(long id) {
     return this._map.get(id);
   }
 

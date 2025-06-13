@@ -17,37 +17,44 @@ package org.pageseeder.psml.template;
 
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Holds data to print out verbatim.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 final class TData implements Token {
 
   /**
    * Data to be copied.
    */
-  private final String _data;
+  private final String data;
 
   /**
    * Indicates whether it is ASCII safe.
    */
-  private final boolean _hasNonASCIIChar;
+  private final boolean hasNonASCIIChar;
 
   /**
    * @param data data to be copied.
    */
   public TData(String data) {
-    this._data = data;
-    this._hasNonASCIIChar = XML.hasNonASCIIChar(data);
+    this.data = Objects.requireNonNull(data);
+    this.hasNonASCIIChar = XML.hasNonASCIIChar(data);
   }
 
   @Override
   public void print(PrintWriter psml, Map<String, String> values, Charset charset) {
-    if (this._hasNonASCIIChar && charset.equals(Constants.ASCII)) {
-      XML.toASCII(this._data, psml);
+    if (this.hasNonASCIIChar && charset.equals(StandardCharsets.US_ASCII)) {
+      XML.toASCII(this.data, psml);
     } else {
-      psml.print(this._data);
+      psml.print(this.data);
     }
   }
 }

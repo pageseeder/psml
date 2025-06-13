@@ -22,17 +22,17 @@ public abstract class IncludeExcludeConfig {
   /**
    * List of single files to include or exclude
    */
-  private List<IncludeExclude> includeExcludes = new ArrayList<>();
+  private final List<IncludeExclude> includeExcludes = new ArrayList<>();
 
   /**
    * List of include patterns
    */
-  private List<String> includes = new ArrayList<>();
+  private final List<String> includes = new ArrayList<>();
 
   /**
    * List of exclude patterns
    */
-  private List<String> excludes = new ArrayList<>();
+  private final List<String> excludes = new ArrayList<>();
 
   /**
    * @param toAdd the object to add

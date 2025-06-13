@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="45513" schemaversion="1.4" type="iso_control" date="2025-05-20T18:11:54+10:00" status="Approved"
+          version="current" level="portable">
+  <documentinfo>
+    <uri id="45513" external="false" mediatype="application/vnd.pageseeder.psml+xml" documenttype="iso_control"
+         created="2023-09-18T15:35:20+10:00" modified="2025-05-20T18:11:54+10:00" scheme="http"
+         host="ps.example.org" port="80"
+         path="/ps/test/sample/iso_controls/8.17_clock_synchronisation.psml"
+         decodedpath="/ps/sample/iso_controls/8.17_clock_synchronisation.psml"
+         title="A.8.17 Clock Synchronization">
+      <displaytitle>A.8.17 Clock Synchronization</displaytitle>
+      <description>The clocks of all relevant information processing systems within an organization or security domain
+        must be synchronized to a single reference time source.
+      </description>
+    </uri>
+  </documentinfo>
+  <metadata editid="7002746" modified="2024-08-22T16:38:48+10:00">
+    <properties>
+      <property value="4" name="template_version" title="Template version"/>
+      <property name="iso_control_id" title="ISO Control ID" value="A.8.17"/>
+      <property name="iso_control_name" title="Control name" value="A.8.17 Clock Synchronization"/>
+      <property name="iso_control_theme" title="Control theme" value="A.8 Technological Controls"/>
+      <property name="iso_control_type" title="Control type" multiple="true">
+        <value>Detective</value>
+      </property>
+      <property name="iso_information_security_properties" title="Information security properties" multiple="true">
+        <value>Integrity</value>
+      </property>
+      <property name="iso_cybersecurity_concepts" title="Cybersecurity concepts" multiple="true">
+        <value>Protect</value>
+        <value>Detect</value>
+      </property>
+      <property name="iso_operational_capabilities" title="Operational capabilities" multiple="true">
+        <value>Information_security_event_management</value>
+      </property>
+      <property name="iso_security_domains" title="Security domains" multiple="true">
+        <value>Protection</value>
+        <value>Defence</value>
+      </property>
+      <property name="iso_2013_controls" title="ISO 2013 Controls" multiple="true">
+        <value>A.12.4.4 Clock synchronisation</value>
+      </property>
+    </properties>
+  </metadata>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1" prefix="A.8.17">Clock Synchronization</heading>
+    </fragment>
+  </section>
+  <section id="header">
+    <properties-fragment id="header">
+      <property name="owner" title="Owner" value="John Smith"/>
+      <property name="last_reviewed" title="Last reviewed" datatype="date" value="2025-01-10"/>
+    </properties-fragment>
+  </section>
+  <section id="core">
+    <properties-fragment id="core">
+      <property name="control" title="Control"
+                value="The clocks of information processing systems used by the organization should be synchronized to approved time sources."/>
+      <property name="purpose" title="Purpose"
+                value="To enable the correlation and analysis of security-related events and other recorded data, and to support investigations into information security incidents."/>
+      <property name="applicable" title="Applicable" value="Yes"/>
+      <property name="control_status" title="Status" value="Implemented"/>
+      <property name="control_notes" title="Control notes"
+                value="Clock synchronisation is automated to avoid clock drift."/>
+      <property name="control_requirements" title="Control requirements" multiple="true">
+        <value>ISO 27001 requirement</value>
+        <value>Business requirement</value>
+      </property>
+      <property name="justification_for_exclusion" title="Justification for exclusion" value=""/>
+      <property name="implementation_date" title="Date of implementation" datatype="date" value="2021-03-20"/>
+      <property name="assessment_date" title="Date of last assessment" datatype="date" value="2024-08-22"/>
+      <property name="acts_and_regulations" title="Acts, guidelines, regulations" datatype="xref" multiple="true">
+      </property>
+      <property name="policies" title="Policies and procedures" datatype="xref" multiple="true">
+        <xref id="12345" frag="default" reversefrag="core" reversetitle="Policies" reverselink="true" reversetype="none" display="document" type="none" uriid="6788" href="/ps/test/sample/policy/secure_development_policy.psml" urititle="Secure Development Policy" mediatype="application/vnd.pageseeder.psml+xml" documenttype="policy">Secure Development Policy</xref>
+        <xref id="12346" frag="default" reversefrag="core" reversetitle="Policies" reverselink="true" reversetype="none" display="document" type="none" uriid="6789" href="/ps/test/sample/guidelines/principles_for_trustworthy_secure_design.psml" urititle="Principles for Trustworthy Secure Design" mediatype="application/vnd.pageseeder.psml+xml" documenttype="default">Principles for Trustworthy Secure Design</xref>
+      </property>
+    </properties-fragment>
+  </section>
+  <section id="controls">
+    <title>Security controls</title>
+    <fragment id="controls">
+      <table>
+        <row part="header">
+          <cell>ID</cell>
+          <cell>Description</cell>
+          <cell>Status</cell>
+        </row>
+        <row>
+          <cell>
+            <bold>7600</bold>
+          </cell>
+          <cell>All systems must synchronize their clocks using NTP from the same set of servers.</cell>
+          <cell>
+            <bold>Implemented</bold>
+          </cell>
+        </row>
+        <row>
+          <cell>
+            <bold>7601</bold>
+          </cell>
+          <cell>Configuration of the NTP service is automated.</cell>
+          <cell>
+            <bold>Implemented</bold>
+          </cell>
+        </row>
+      </table>
+    </fragment>
+  </section>
+  <section id="details">
+    <title>Additional notes and details</title>
+    <fragment id="3">
+      <heading level="3">NTP Servers</heading>
+      <para>The following NTP servers are used:</para>
+      <list>
+        <item>0.au.pool.ntp.org</item>
+        <item>1.au.pool.ntp.org</item>
+        <item>2.au.pool.ntp.org</item>
+        <item>3.au.pool.ntp.org</item>
+      </list>
+    </fragment>
+  </section>
+</document>

@@ -83,7 +83,7 @@ public final class Reference extends Element implements Serializable {
   /**
    * Whether the XRef has display="document"
    */
-  private final Boolean _displaydocument;
+  private final @Nullable Boolean _displaydocument;
 
   /**
    * Creates a new reference at the specified level for a given URI.
@@ -145,7 +145,7 @@ public final class Reference extends Element implements Serializable {
   /**
    * @return Whether the XRef has display="document".
    */
-  public Boolean displaydocument() {
+  public @Nullable Boolean displaydocument() {
     return this._displaydocument;
   }
 

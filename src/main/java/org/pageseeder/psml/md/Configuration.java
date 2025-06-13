@@ -19,15 +19,12 @@ public class Configuration {
 
   private int lineBreakThreshold = 66;
 
-
   /**
    * Indicates whether the parser should generate a document or a fragment.
    */
   private boolean isDocumentMode = false;
 
-
-  public Configuration() {
-  }
+  private boolean newFragmentPerHeading = false;
 
   public void setFragmentMode(boolean isFragmentMode) {
     this.isDocumentMode = !isFragmentMode;
@@ -47,6 +44,26 @@ public class Configuration {
 
   public int getLineBreakThreshold() {
     return this.lineBreakThreshold;
+  }
+
+  public void setNewFragmentPerHeading(boolean newFragmentPerHeading) {
+    this.newFragmentPerHeading = newFragmentPerHeading;
+  }
+
+  public boolean isNewFragmentPerHeading() {
+    return newFragmentPerHeading;
+  }
+
+  public MarkdownInputOptions toMarkdownInputOptions() {
+    return new MarkdownInputOptions(this.lineBreakThreshold, this.isDocumentMode, this.newFragmentPerHeading);
+  }
+
+  static Configuration fromMarkdownInputOptions(MarkdownInputOptions options) {
+    Configuration config = new Configuration();
+    config.lineBreakThreshold = options.getLineBreakThreshold();
+    config.isDocumentMode = options.isDocument();
+    config.newFragmentPerHeading = options.isNewFragmentPerHeading();
+    return config;
   }
 
 }

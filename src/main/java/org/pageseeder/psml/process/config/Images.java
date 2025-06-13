@@ -10,7 +10,7 @@ package org.pageseeder.psml.process.config;
  * <p>Used to represent the inner ANT element:<p>
  *
  * <pre>
- * {@code<images
+ * {@code <images
  *             src="[uriid|permalink|location]"
  *             location="[folder path]"
  *             embedmetadata="[true|false]"
@@ -20,14 +20,14 @@ package org.pageseeder.psml.process.config;
  *
  * <p>Details are:</p>
  * <ul>
- *   <li>src:      Format of src attribute on {@code<image>} elements (i.e. uriid, uriidfolders
+ *   <li>src:      Format of src attribute on {@code <image>} elements (i.e. uriid, uriidfolders
  *                 permalink or location).
  *                 - If uriid use [uriid].[ext]
  *                 - If uriidfolders use [uriid billions]/[uriid millions]/[uriid thousands]/[uriid].[ext]
  *                   with leading zeros on folders (e.g. uriid 12345 would be 000/000/012/12345.png)
  *                 - if permalink use [ps.site.prefix]/uri/[uriid].[ext]
  *                 - default location.</li>
- *   <li>location: Move all {@code<image>} src files to this folder path. If
+ *   <li>location: Move all {@code <image>} src files to this folder path. If
  *                 src=uriid or permalink rename them to [uriid].[ext] otherwise use their path
  *                 relative to src (required if src=uriid).</li>
  * </ul>

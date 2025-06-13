@@ -15,9 +15,12 @@
  */
 package org.pageseeder.psml.template;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A PSML fragment template.
@@ -29,19 +32,19 @@ public final class FragmentTemplate implements Template {
   /**
    * The charset used for this template.
    */
-  private final Charset _charset;
+  private final Charset charset;
 
   /**
    * The abstract fragment
    */
-  private final TFragment _fragment;
+  private final TFragment fragment;
 
   /**
    * Create a new template.
    */
   private FragmentTemplate(TFragment fragment, Charset charset) {
-    this._fragment = fragment;
-    this._charset = charset;
+    this.fragment = Objects.requireNonNull(fragment);
+    this.charset = Objects.requireNonNull(charset);
   }
 
   /**
@@ -51,7 +54,7 @@ public final class FragmentTemplate implements Template {
    */
   @Override
   public Charset charset() {
-    return this._charset;
+    return this.charset;
   }
 
   /**
@@ -63,18 +66,18 @@ public final class FragmentTemplate implements Template {
   @Override
   public void process(PrintWriter psml, Map<String, String> values) {
     String id = values.get("ps.fragmentid");
-    String element = this._fragment.kind();
+    String element = this.fragment.kind();
     psml.append('<').append(element);
     if (id != null) {
       psml.append(" id=\"").append(id).append('"');
     }
-    psml.append(" type=\"").append(this._fragment.type()).append('"');
-    if (this._fragment.mediatype() != null) {
-      psml.append(" mediatype=\"").append(this._fragment.mediatype()).append('"');
+    psml.append(" type=\"").append(this.fragment.type()).append('"');
+    if (this.fragment.mediatype() != null) {
+      psml.append(" mediatype=\"").append(this.fragment.mediatype()).append('"');
     }
     psml.append('>');
-    for (Token token : this._fragment.tokens()) {
-      token.print(psml, values, this._charset);
+    for (Token token : this.fragment.tokens()) {
+      token.print(psml, values, this.charset);
     }
     psml.append("</").append(element).append('>');
     psml.flush();
@@ -99,21 +102,21 @@ public final class FragmentTemplate implements Template {
     /**
      * The charset used by the builder.
      */
-    private final Charset _charset;
+    private final Charset charset;
 
     /**
      * The fragment type created by the builder.
      */
-    private final String _type;
+    private final String type;
 
     /**
      * The fragment.
      */
-    private TFragment fragment = null;
+    private @Nullable TFragment fragment = null;
 
     public Builder(Charset charset, String type) {
-      this._charset = charset;
-      this._type = type;
+      this.charset = charset;
+      this.type = type;
     }
 
     @Override
@@ -138,7 +141,7 @@ public final class FragmentTemplate implements Template {
 
     @Override
     public void addFragment(TFragment fragment) {
-      if (fragment.type().equals(this._type)) {
+      if (fragment.type().equals(this.type)) {
         this.fragment = fragment;
       }
     }
@@ -146,7 +149,6 @@ public final class FragmentTemplate implements Template {
     /**
      * Adds a declared parameter
      *
-     * @param name     The name of the parameter
      * @param fragment The default value for the parameter
      */
     public void setFragment(TFragment fragment) {
@@ -159,9 +161,9 @@ public final class FragmentTemplate implements Template {
      * @return a new template instance.
      */
     @Override
-    public FragmentTemplate build() {
+    public @Nullable FragmentTemplate build() {
       if (this.fragment != null)
-        return new FragmentTemplate(this.fragment, this._charset);
+        return new FragmentTemplate(this.fragment, this.charset);
       else return null;
     }
   }

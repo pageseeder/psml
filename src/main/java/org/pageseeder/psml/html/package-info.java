@@ -16,4 +16,7 @@
 /**
  * A collection of classes to transform PSML to and from HTML.
  */
+@NonNullByDefault
 package org.pageseeder.psml.html;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;

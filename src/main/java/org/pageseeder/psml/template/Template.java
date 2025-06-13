@@ -20,7 +20,15 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
+ * Represents a template that can generate PSML documents with specified placeholder values.
+ *
+ * <p>This interface defines operations for getting the charset used by the template
+ * and processing PSML templates to populate placeholders with specified values.
+ *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public interface Template {
 

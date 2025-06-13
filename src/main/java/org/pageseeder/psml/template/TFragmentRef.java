@@ -21,38 +21,43 @@ import java.util.Map;
 
 /**
  * A fragment placeholder to resolve.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 final class TFragmentRef implements Token {
 
   /**
    * The ID of the fragment
    */
-  private final String _id;
+  private final String id;
 
   /**
    * The actual fragment being referenced
    */
-  private final TFragment _fragment;
+  private final TFragment fragment;
 
   /**
    * Creates a new fragment placeholder.
    */
   public TFragmentRef(String id, TFragment fragment) {
-    this._id = id;
-    this._fragment = fragment;
+    this.id = id;
+    this.fragment = fragment;
   }
 
   @Override
   public void print(PrintWriter psml, Map<String, String> values, Charset charset) {
-    String element = this._fragment.kind();
-    psml.append('<').append(element);
-    psml.append(" id=\"").append(this._id).append('"');
-    psml.append(" type=\"").append(this._fragment.type()).append('"');
-    if (this._fragment.mediatype() != null) {
-      psml.append(" mediatype=\"").append(this._fragment.mediatype()).append('"');
+    String element = this.fragment.kind();
+    psml.append('<').append(element)
+        .append(" id=\"").append(this.id).append('"')
+        .append(" type=\"").append(this.fragment.type()).append('"');
+    if (this.fragment.mediatype() != null) {
+      psml.append(" mediatype=\"").append(this.fragment.mediatype()).append('"');
     }
     psml.append('>');
-    for (Token token : this._fragment.tokens()) {
+    for (Token token : this.fragment.tokens()) {
       token.print(psml, values, charset);
     }
     psml.append("</").append(element).append('>');

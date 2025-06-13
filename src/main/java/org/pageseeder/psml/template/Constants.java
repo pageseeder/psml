@@ -16,11 +16,15 @@
 package org.pageseeder.psml.template;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Some useful constants
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class Constants {
 
@@ -30,13 +34,19 @@ public final class Constants {
 
   /**
    * Constant for US-ASCII charset.
+   *
+   * @deprecated Use {@link StandardCharsets#US_ASCII} instead
    */
-  public final static Charset ASCII = Charset.forName("US-ASCII");
+  @Deprecated(forRemoval = true, since = "1.2.0")
+  public static final Charset ASCII = StandardCharsets.US_ASCII;
 
   /**
    * Constant for UTF-8 charset.
+   *
+   * @deprecated Use {@link StandardCharsets#UTF_8} instead
    */
-  public final static Charset UTF8 = Charset.forName("UTF-8");
+  @Deprecated(forRemoval = true, since = "1.2.0")
+  public static final Charset UTF8 = StandardCharsets.UTF_8;
 
   /**
    * The namespace URI.

@@ -1,12 +1,25 @@
 package org.pageseeder.psml.toc;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.pageseeder.xmlwriter.XMLWritable;
 
+/**
+ * This interface represents a Tree structure. It provides methods to access
+ * metadata such as the document's ID and title, and methods to retrieve
+ * and manipulate references within the tree.
+ *
+ * <p>It extends XMLWritable for XML-based serialization and Serializable
+ * for general object serialization.
+ *
+ * @author Christophe Lauret
+ * @author Philip Rutherford
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 public interface Tree extends XMLWritable, Serializable {
 
   /**
@@ -33,8 +46,6 @@ public interface Tree extends XMLWritable, Serializable {
    * Print a text representation of the structural element.
    *
    * @param out Where to print the structure
-   *
-   * @throws IOException If thrown by the appendable
    */
   void print(Appendable out);
 
@@ -50,7 +61,7 @@ public interface Tree extends XMLWritable, Serializable {
    */
   default String toReverseReferencesString(String separator) {
     return listReverseReferences().stream()
-        .map(i -> i.toString())
+        .map(Object::toString)
         .collect(Collectors.joining(separator));
   }
 }

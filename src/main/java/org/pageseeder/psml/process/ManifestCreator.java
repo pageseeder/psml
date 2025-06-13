@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.config.ManifestDocument;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.slf4j.Logger;
@@ -23,8 +24,9 @@ import org.slf4j.Logger;
  * Class responsible for the creation of the manifest file in the export process.
  *
  * @author Jean-Baptiste Reure
- * @version 22/10/2012
  *
+ * @version 1.0
+ * @since 1.0
  */
 public final class ManifestCreator {
 
@@ -41,19 +43,19 @@ public final class ManifestCreator {
   /**
    * How the xrefs are processed
    */
-  private final ManifestDocument manifestDoc;
+  private final @Nullable ManifestDocument manifestDoc;
 
   /**
    * The parent task, for logging
    */
-  private Logger logger = null;
+  private @Nullable Logger logger = null;
 
   /**
    * Build a new processor.
    *
    * @param xr the details of the processing.
    */
-  public ManifestCreator(ManifestDocument xr) {
+  public ManifestCreator(@Nullable ManifestDocument xr) {
     if (xr != null && xr.getFilename() == null)
       throw new IllegalArgumentException("Filename cannot be null");
     this.manifestDoc = xr;
@@ -76,12 +78,12 @@ public final class ManifestCreator {
    *
    * @throws ProcessException if anything goes wrong
    */
-  public File createManifest(Map<String, File> psmlFiles, File destinationFolder) throws ProcessException {
+  public @Nullable File createManifest(Map<String, File> psmlFiles, File destinationFolder) throws ProcessException {
     // make sure we've got something to do
     if (this.manifestDoc == null) return null;
     String manifestFileName = this.manifestDoc.getFilename()+".psml";
     // log
-    this.logger.info("Manifest-Doc: Creating manifest file "+manifestFileName);
+    this.logger.info("Manifest-Doc: Creating manifest file {}", manifestFileName);
     // finding files to include
     // check if there's any matching to do
     IncludesExcludesMatcher matcher = this.manifestDoc.buildMatcher();
@@ -172,8 +174,10 @@ public final class ManifestCreator {
    * Used to order the files in alphabetical order.
    */
   private static class FileNameComparator implements Comparator<String> {
-    /** the list of all PSML files */
+
+    /** The list of all PSML files */
     private final Map<String, File> psmlFiles;
+
     /**
      * @param all the list of all PSML files
      */

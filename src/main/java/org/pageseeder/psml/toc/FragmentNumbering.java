@@ -29,9 +29,8 @@ public final class FragmentNumbering implements Serializable {
 
   /**
    * Specifies a heading/para location within a publication.
-   *
    */
-  private final class Location {
+  private static final class Location {
 
     /**
      * Current URI ID
@@ -69,8 +68,8 @@ public final class FragmentNumbering implements Serializable {
 
   /**
    * Map of [uriid]-[position]-[fragment][-index]], [prefix]
-   * where position is the number of times the document has been used (>=1)
-   * and index is the index of the heading/para in the fragment (>=1).
+   * where position is the number of times the document has been used (1 or greater)
+   * and index is the index of the heading/para in the fragment (1 or greater).
    */
   private final Map<String,Prefix> numbering = new HashMap<>();
 
@@ -79,8 +78,8 @@ public final class FragmentNumbering implements Serializable {
    * Numbering for transcluded content in context of parent fragment.
    *
    * Map of [uriid]-[position]-[fragment][-index]], [prefix]
-   * where position is the number of times the document has been used (>=1)
-   * and index is the index of the heading/para in the fragment (>=1).
+   * where position is the number of times the document has been used (1 or greater)
+   * and index is the index of the heading/para in the fragment (1 or greater).
    */
   private final Map<String,Prefix> transcludedNumbering = new HashMap<>();
 
@@ -99,7 +98,7 @@ public final class FragmentNumbering implements Serializable {
    * @throws XRefLoopException if an XRef loop is detected
    */
   public FragmentNumbering(PublicationTree pub, PublicationConfig config) throws XRefLoopException {
-    this(pub, config, new ArrayList<Long>(), new HashMap<Long,List<Long>>());
+    this(pub, config, new ArrayList<>(), new HashMap<>());
   }
 
   /**
@@ -151,7 +150,7 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the map of generators
    */
-  private Map<String, NumberingGenerator> getNumberingGenerators(PublicationConfig config) {
+  private Map<String, NumberingGenerator> getNumberingGenerators(@Nullable PublicationConfig config) {
     Map<String, NumberingGenerator> numbers = new HashMap<>();
     if (config != null) {
       for (PublicationNumbering numbering : config.getNumberingConfigs()) {
@@ -167,10 +166,8 @@ public final class FragmentNumbering implements Serializable {
    * @param config   the publication config
    * @param numbers  the numbering generators
    * @param tree     the document tree
-   *
-   * @return
    */
-  private NumberingGenerator getNumberingGenerator(PublicationConfig config,
+  private @Nullable NumberingGenerator getNumberingGenerator(@Nullable PublicationConfig config,
       Map<String, NumberingGenerator> numbers, DocumentTree tree) {
     // Use config to get the first numbering that matches in config order
     PublicationNumbering numbering = config == null ? null : config.getPublicationNumbering(tree.labels());
@@ -460,7 +457,7 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the prefix
    */
-  public Prefix getPrefix(long uriid, int position) {
+  public @Nullable Prefix getPrefix(long uriid, int position) {
     Prefix pref = this.numbering.get(uriid + "-" + position + "-default");
     if (pref == null) {
       LOGGER.debug("Numbering not found for uriid: {}, position: {}, fragment default",
@@ -501,7 +498,7 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the prefix
    */
-  public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index) {
+  public @Nullable Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index) {
     return getTranscludedPrefix(uriid, position, fragment, index, false);
   }
 
@@ -516,10 +513,10 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the prefix
    */
-  public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index, boolean undefined) {
+  public @Nullable Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index, boolean undefined) {
     Prefix pref = this.transcludedNumbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
     // don't return undefined prefix unless required
-    if (pref != null && "".equals(pref.value) && pref.canonical == null && !undefined) {
+    if (pref != null && pref.value.isEmpty() && pref.canonical == null && !undefined) {
       return null;
     }
     return pref;

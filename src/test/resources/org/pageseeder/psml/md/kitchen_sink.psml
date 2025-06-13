@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="220276" schemaversion="1.4" type="universal" date="2025-06-06T13:22:25+10:00" version="current"
+          level="portable">
+  <documentinfo>
+    <uri id="220276" external="false" mediatype="application/vnd.pageseeder.psml+xml" documenttype="universal"
+         created="2025-06-06T09:14:40+10:00" modified="2025-06-06T13:22:25+10:00" scheme="http" host="ps.example.org"
+         port="80" path="/ps/test/clauret/documents/sample/kitchen_sink.psml"
+         decodedpath="/ps/test/clauret/documents/sample/kitchen_sink.psml" title="Kitchen sink">
+      <displaytitle>Kitchen sink</displaytitle>
+      <description>Sample PSML document including many different PSML markup examples for testing purposes</description>
+      <labels>test,sample</labels>
+    </uri>
+  </documentinfo>
+  <fragmentinfo structure-modified="2025-06-06T09:42:19+10:00">
+    <locator id="173811" fragment="3" editid="972093" modified="2025-06-06T09:34:10+10:00"/>
+    <locator id="173812" fragment="4" editid="972108" modified="2025-06-06T10:09:49+10:00"/>
+    <locator id="173810" fragment="2" editid="972083" modified="2025-06-06T09:24:38+10:00"/>
+    <locator id="173815" fragment="7" editid="972113" modified="2025-06-06T12:07:32+10:00"/>
+    <locator id="173816" fragment="8" editid="972076" modified="2025-06-06T09:24:22+10:00"/>
+    <locator id="173813" fragment="5" editid="972115" modified="2025-06-06T13:22:25+10:00"/>
+    <locator id="173814" fragment="6" editid="972082" modified="2025-06-06T09:24:38+10:00"/>
+    <locator id="173819" fragment="11" editid="972107" modified="2025-06-06T10:08:18+10:00"/>
+    <locator id="173820" fragment="12" editid="972103" modified="2025-06-06T09:43:47+10:00"/>
+    <locator id="173817" fragment="9" editid="972110" modified="2025-06-06T10:14:03+10:00"/>
+    <locator id="173818" fragment="10" editid="972096" modified="2025-06-06T09:39:58+10:00"/>
+    <locator id="173821" fragment="13" editid="972104" modified="2025-06-06T09:43:47+10:00"/>
+    <locator id="173822" fragment="14" editid="972105" modified="2025-06-06T09:43:47+10:00"/>
+  </fragmentinfo>
+  <metadata editid="972073" modified="2025-06-06T09:20:36+10:00">
+    <properties>
+      <property name="purpose" title="Purpose" value="Testing"/>
+      <property name="review_date" title="Review date" datatype="date" value="2025-06-06"/>
+      <property name="owner" title="Owner" value="Christophe Lauret"/>
+    </properties>
+  </metadata>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Kitchen sink</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="2">
+      <heading level="2" numbered="true">Introduction</heading>
+      <para>This document contains different examples of PSML markup for testing export functions.</para>
+    </fragment>
+    <fragment id="11">
+      <heading level="2" numbered="true">Inline formatting</heading>
+      <para>
+        <bold>Bold text</bold>
+        is used to highlight important words or phrases, making them stand out for emphasis or easier scanning.
+      </para>
+      <para>
+        <bold>Italic</bold>
+        text is used to <italic>emphasize</italic> a word or phrase, indicate titles, or convey a different tone or
+        meaning.
+      </para>
+      <para>
+        <bold>Underline</bold>
+        is used to <underline>draw attention to specific text</underline>, often for emphasis or to indicate links in
+        digital content.
+      </para>
+      <para>
+        <bold>Subscript</bold>
+        is used to display characters slightly below the normal line of text, often in chemical formulas (e.g., H<sub>
+        2</sub>O), while <bold>superscript</bold> raises characters above the line, commonly used for exponents or
+        footnotes (e.g., x<sup>2</sup> or note<sup>2</sup>).
+      </para>
+      <para>
+        <bold>Monospace</bold>
+        or <bold>code</bold> text is used to display code, commands, or technical content with <monospace>uniform
+        character spacing
+      </monospace> for clarity and readability.
+      </para>
+    </fragment>
+    <fragment id="3">
+      <heading level="2" numbered="true">Text blocks</heading>
+    </fragment>
+    <fragment id="4">
+      <heading level="3">Paragraphs</heading>
+      <para>A paragraph is a distinct section of writing that focuses on a single idea or topic, helping to organize
+        content and guide the reader through a coherent flow of thought. It typically begins with a topic sentence that
+        introduces the main point, followed by supporting sentences that elaborate, explain, or provide evidence.
+      </para>
+      <para>Good paragraphs maintain unity, coherence, and appropriate transitions, making writing clearer and more
+        readable. Whether in essays, reports, or articles, paragraphs structure information logically and allow the
+        reader to process complex material in manageable segments.
+      </para>
+      <para indent="1" numbered="true">Focus on one main idea per paragraph.</para>
+      <para indent="1" numbered="true">Use clear topic sentences to guide the reader.</para>
+    </fragment>
+    <fragment id="5">
+      <heading level="3">Blocks</heading>
+      <block label="warning">
+        <para>Be careful not to write too much – excessive detail can overwhelm readers and obscure your main point.
+        </para>
+      </block>
+      <para>A longer block</para>
+      <block label="tips">
+        <para>Good writing style is clear, concise, and engaging, helping readers easily understand and stay interested
+          in the content:
+        </para>
+        <list>
+          <item>
+            <para>Be direct</para>
+          </item>
+          <item>
+            <para>Avoid jargon</para>
+          </item>
+          <item>
+            <para>Use active voice</para>
+          </item>
+          <item>
+            <para>Vary sentence length</para>
+          </item>
+          <item>
+            <para>Edit ruthlessly</para>
+          </item>
+        </list>
+      </block>
+    </fragment>
+    <fragment id="8">
+      <heading level="3">Lists</heading>
+      <para>Here's a simple list of fruits:</para>
+      <list>
+        <item>Apple</item>
+        <item>Banana</item>
+        <item>Orange</item>
+        <item>Mango</item>
+      </list>
+      <para>Here's a simple list of vegetables:</para>
+      <nlist>
+        <item>Carrot</item>
+        <item>Broccoli</item>
+        <item>Spinach</item>
+        <item>Potato</item>
+      </nlist>
+    </fragment>
+    <fragment id="10">
+      <heading level="3">Preformatted</heading>
+      <para>The following block contains JavaScript code:</para>
+      <preformat role="lang-javascript">let name = "Alice";
+let greeting = "Hello, " + name + "!";
+console.log(greeting);
+      </preformat>
+      <para>The following has no role:</para>
+      <preformat>Souvent, pour s’amuser, les hommes d’équipage
+Prennent des albatros, vastes oiseaux des mers,
+Qui suivent, indolents compagnons de voyage,
+Le navire glissant sur les gouffres amers.
+      </preformat>
+    </fragment>
+    <fragment id="6">
+      <heading level="2" numbered="true">Tables</heading>
+    </fragment>
+    <fragment id="7">
+      <heading level="3">Simple table</heading>
+      <para>The following table has a header row, a caption and simple text within each cell.</para>
+      <table>
+        <caption>Countries with their capitals and estimated populations in 2025.</caption>
+        <col part="header"/>
+        <col/>
+        <col part="body" align="right"/>
+        <row part="header">
+          <cell>
+            <bold>Country</bold>
+          </cell>
+          <cell>
+            <bold>Capital City</bold>
+          </cell>
+          <cell align="right">
+            <bold>Population (2025 est.)</bold>
+          </cell>
+        </row>
+        <row>
+          <hcell>United States</hcell>
+          <cell>Washington, D.C.</cell>
+          <cell align="right">339 million</cell>
+        </row>
+        <row>
+          <hcell>India</hcell>
+          <cell>New Delhi</cell>
+          <cell align="right">1.43 billion</cell>
+        </row>
+        <row>
+          <hcell>Brazil</hcell>
+          <cell>Brasília</cell>
+          <cell align="right">217 million</cell>
+        </row>
+        <row>
+          <hcell>Germany</hcell>
+          <cell>Berlin</cell>
+          <cell align="right">84 million</cell>
+        </row>
+      </table>
+    </fragment>
+    <fragment id="9">
+      <heading level="3">Complex table</heading>
+      <table>
+        <col/>
+        <col/>
+        <row>
+          <cell>
+            <para>A list of items</para>
+            <list>
+              <item>Item 1</item>
+              <item>Item 2</item>
+            </list>
+          </cell>
+          <cell>
+            <para>Another list</para>
+            <nlist>
+              <item>Item A</item>
+              <item>Item B</item>
+            </nlist>
+          </cell>
+        </row>
+        <row>
+          <cell align="center" colspan="2">
+            <para>
+              <italic>Merged cell</italic>
+            </para>
+          </cell>
+        </row>
+      </table>
+      <para/>
+    </fragment>
+    <fragment id="13">
+      <heading level="2" numbered="true">Media fragments</heading>
+    </fragment>
+    <media-fragment id="12" type="text" mediatype="text/plain">À peine les ont-ils déposés sur les planches,
+Que ces rois de l’azur, maladroits et honteux,
+Laissent piteusement leurs grandes ailes blanches
+Comme des avirons traîner à côté d’eux.
+    </media-fragment>
+    <media-fragment id="14" type="tex" mediatype="application/x-tex">- \frac{\hbar^2}{2m} \nabla^2 \psi(\mathbf{r}) +
+V(\mathbf{r}) \psi(\mathbf{r}) = E \psi(\mathbf{r})
+    </media-fragment>
+  </section>
+</document>

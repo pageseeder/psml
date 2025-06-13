@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -31,20 +32,64 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * This class loads
+ * Loader class for parsing XML inputs using SAX and converting them into PSMLElement models.
  *
- * @author clauret
+ * <p>This class provides functionality for transforming XML content into a structured representation
+ * while supporting lazy initialization of necessary components like the SAXParserFactory.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class Loader {
 
   /**
    * Lazily loaded SAX parser factory.
    */
-  private SAXParserFactory factory = null;
+  private @Nullable SAXParserFactory factory = null;
+
+  /**
+   * Indicates whether whitespace should be preserve even in contexts where
+   * it can be safely ignored, such as between tables cells and list items
+   */
+  private boolean preserveWhitespace = false;
 
   public Loader() {
   }
 
+  public Loader(boolean ignoreWhitespace) {
+    this.preserveWhitespace = ignoreWhitespace;
+  }
+
+  /**
+   * Configures whether whitespace should be preserve even in contexts where
+   * it can be safely ignored, such as between tables cells and list items
+   *
+   * @param preserveWhitespace If true, ignorable whitespace will be preserved; otherwise, it will be ignored.
+   */
+  public void setPreserveWhitespace(boolean preserveWhitespace) {
+    this.preserveWhitespace = preserveWhitespace;
+  }
+
+  /**
+   * Indicates whether the loader is configured to preserve whitespace even in
+   * contexts where it can be safely ignored, such as between table cells and
+   * list items.
+   *
+   * @return true if ignorable whitespace will be preserved; false if it will be ignored.
+   */
+  public boolean isPreserveWhitespace() {
+    return this.preserveWhitespace;
+  }
+
+  /**
+   * Parses the given reader input and returns the corresponding PSMLElement.
+   *
+   * @param reader the reader supplying the input data to parse.
+   * @return the resulting PSMLElement derived from the input data.
+   * @throws IOException if an I/O error occurs during parsing.
+   */
   public PSMLElement parse(Reader reader) throws IOException {
     InputSource source = new InputSource(reader);
     return parse(source);
@@ -60,7 +105,7 @@ public final class Loader {
    * @throws IOException Should an I/O error occur.
    */
   public PSMLElement parse(InputSource source) throws IOException {
-    Handler handler = new Handler();
+    Handler handler = new Handler(this.preserveWhitespace);
 
     // Initialize the factory if needed
     if (this.factory == null) {
@@ -77,8 +122,7 @@ public final class Loader {
     } catch (SAXException | ParserConfigurationException ex) {
       throw new IOException(ex);
     }
-    PSMLElement element = handler.result;
-    return element;
+    return handler.result;
   }
 
   /**
@@ -86,26 +130,32 @@ public final class Loader {
    */
   public static final class Handler extends DefaultHandler {
 
+    private final boolean preserveWhitespace;
+
+    public Handler(boolean preserveWhitespace) {
+      this.preserveWhitespace = preserveWhitespace;
+    }
+
     /**
      * The current context, before it is committed
      */
-    private List<PSMLElement> context = new ArrayList<>(8);
+    private final List<PSMLElement> context = new ArrayList<>(8);
 
     /**
      * Buffer for text nodes.
      */
-    private StringBuilder text = new StringBuilder();
+    private final StringBuilder text = new StringBuilder();
 
     /**
      * The current context, before it is committed
      */
-    private PSMLElement result = null;
+    private PSMLElement result = new PSMLElement(Name.UNKNOWN);
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
       // Commit any text
       commitText();
-      // Push new element
+      // Push a new element
       PSMLElement element = new PSMLElement(Name.forElement(qName));
       for (int i=0; i < attributes.getLength(); i++) {
         String name = attributes.getQName(i);
@@ -137,8 +187,8 @@ public final class Loader {
     /**
      * @return The current element in the stack.
      */
-    private PSMLElement current() {
-      if (this.context.size() == 0) return null;
+    private @Nullable PSMLElement current() {
+      if (this.context.isEmpty()) return null;
       return this.context.get(this.context.size()-1);
     }
 
@@ -162,12 +212,46 @@ public final class Loader {
 
     private void commitText() {
       PSMLElement current = current();
-      if (current != null) {
-        current.addNode(new PSMLText(this.text.toString()));
+      if (current != null && this.text.length() > 0) {
+        if (this.preserveWhitespace || !isIgnorableSpace(this.text, current)) {
+          current.addNode(new PSMLText(this.text.toString()));
+        }
         this.text.setLength(0);
       }
     }
 
+    /**
+     * Determines if the given text represents ignorable whitespace in the context of the specified element.
+     *
+     * @param text The character sequence to evaluate.
+     * @param element The PSMLElement used to determine contextual significance of the whitespace.
+     * @return {@code true} if the text consists entirely of whitespace and the specified element is of a type
+     *         where the whitespace can be considered ignorable; {@code false} otherwise.
+     */
+    private static boolean isIgnorableSpace(CharSequence text, PSMLElement element) {
+      return isWhiteSpace(text) &&
+          element.isAnyElement(
+              Name.DOCUMENT, Name.DOCUMENTINFO, Name.SECTION,
+              Name.FRAGMENT, Name.XREF_FRAGMENT, Name.PROPERTIES_FRAGMENT,
+              Name.TABLE, Name.ROW, Name.LIST, Name.NLIST
+          );
+    }
+
+    /**
+     * Determines if the provided character sequence consists entirely of whitespace characters.
+     *
+     * @param text The character sequence to check.
+     * @return {@code true} if all characters in the sequence are whitespace, or if the sequence is empty;
+     *         {@code false} otherwise.
+     */
+    private static boolean isWhiteSpace(CharSequence text) {
+      for (int i = 0; i < text.length(); i++) {
+        if (!Character.isWhitespace(text.charAt(i))) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
 
 }

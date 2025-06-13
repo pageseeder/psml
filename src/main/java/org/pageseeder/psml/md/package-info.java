@@ -16,4 +16,7 @@
 /**
  * A collection of classes to transform PSML to and from Markdown.
  */
+@NonNullByDefault
 package org.pageseeder.psml.md;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;

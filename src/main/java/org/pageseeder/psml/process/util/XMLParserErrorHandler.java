@@ -21,31 +21,41 @@ public final class XMLParserErrorHandler implements ErrorHandler {
   /**
    * Errors collected by error and fatal events.
    */
-  private final List<String> errors = new ArrayList<String>();
+  private final List<String> errors = new ArrayList<>();
 
   /**
    * Warnings collected.
    */
-  private final List<String> warnings = new ArrayList<String>();
+  private final List<String> warnings = new ArrayList<>();
 
   /**
-   * {@inheritDoc}
+   * Handles a recoverable parsing error by adding a formatted error message
+   * to the list of collected errors.
+   *
+   * @param exception The SAXParseException containing details of the parsing error.
+   * @throws SAXException If a SAX error occurs while processing the exception.
    */
   public void error(SAXParseException exception) throws SAXException {
     this.errors.add("ERROR: "+toMessage(exception));
   }
 
   /**
-   * {@inheritDoc}
+   * Handles a fatal parsing error by adding a formatted fatal error message
+   * to the list of collected errors.
+   *
+   * @param exception The SAXParseException containing details of the fatal parsing error.
+   * @throws SAXException If a SAX error occurs while processing the exception.
    */
-  public void fatalError(SAXParseException exception) throws SAXException {
+  public void fatalError(SAXParseException exception) {
     this.errors.add("FATAL: "+toMessage(exception));
   }
 
   /**
-   * Warnings are ignored.
+   * Handles a recoverable warning encountered during XML parsing by adding a formatted
+   * warning message to the list of collected warnings.
    *
-   * {@inheritDoc}
+   * @param exception The SAXParseException containing details of the warning encountered during parsing.
+   * @throws SAXException If a SAX error occurs while processing the exception.
    */
   public void warning(SAXParseException exception) throws SAXException {
     this.warnings.add("WARNING: "+toMessage(exception));

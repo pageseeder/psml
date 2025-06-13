@@ -21,6 +21,11 @@ import java.util.Map;
 
 /**
  * Represents one of the tokens in the template.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.0
+ * @since 1.0
  */
 interface Token {
 

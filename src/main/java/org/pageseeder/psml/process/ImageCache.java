@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.xml.sax.Attributes;
@@ -10,16 +11,22 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Jean-Baptiste Reure
- * @version 23/10/2012
+ * ImageCache is responsible for managing and providing new paths for images
+ * based on their relative paths and metadata.
  *
+ * <p>It provides functionality to  check if images are cached, generate new paths
+ * based on specific source  rewriting strategies, and to construct folder paths
+ * or unique filenames.
+ *
+ * @author Jean-Baptiste Reure
+ *
+ * @version 1.0
+ * @since 1.0
  */
 public final class ImageCache {
 
@@ -34,10 +41,10 @@ public final class ImageCache {
   private final Map<String, String> cache = new HashMap<>();
 
   /**
-   * @param metainf The folder where the metadata files are located.
+   * @param metaInf The folder where the metadata files are located.
    */
-  public ImageCache(File metainf) {
-    this.metaInfFolder = metainf;
+  public ImageCache(File metaInf) {
+    this.metaInfFolder = metaInf;
   }
 
   /**
@@ -134,7 +141,6 @@ public final class ImageCache {
    * Cache the image path.
    *
    * @param relativePath the image's relative path
-   *
    */
   public void cacheImagePath(String relativePath) {
     this.cache.put(relativePath, relativePath);
@@ -194,21 +200,18 @@ public final class ImageCache {
 
   /**
    * Handler used to load URI details from an image metadata file.
-   *
-   * @author Jean-Baptiste Reure
-   * @version 23/10/2012
-   *
    */
-  private class MetadataFileHandler extends DefaultHandler {
+  private static class MetadataFileHandler extends DefaultHandler {
+
     /**
      * The URI ID.
      */
-    private String uriID = null;
+    private @Nullable String uriID = null;
 
     /**
      * The URI extension, loaded from the URI path.
      */
-    private String uriExtension = null;
+    private @Nullable String uriExtension = null;
 
     /**
      * Current state.
@@ -238,14 +241,14 @@ public final class ImageCache {
     /**
      * @return The URI extension, loaded from the URI path.
      */
-    public String getUriExtension() {
+    public @Nullable String getUriExtension() {
       return this.uriExtension;
     }
 
     /**
      * @return The URI ID.
      */
-    public String getUriID() {
+    public @Nullable String getUriID() {
       return this.uriID;
     }
   }

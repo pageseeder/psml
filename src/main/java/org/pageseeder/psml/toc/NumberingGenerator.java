@@ -115,7 +115,7 @@ public final class NumberingGenerator {
         } else {
           while (levels.size() > level) {
             // restart numbering if default block
-            if ("".equals(label)) {
+            if (label.isEmpty()) {
               levels.pop();
             // restart numbering if block format contains this level
             } else {

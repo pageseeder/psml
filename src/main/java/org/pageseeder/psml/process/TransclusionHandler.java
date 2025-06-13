@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.xml.sax.Attributes;
@@ -11,16 +12,18 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Transcludes one level of <blockxref> with type="transclude" and href ending in ".psml".
+ * Transcludes one level of {@code <blockxref>} with type="transclude" and href ending in ".psml".
  *
  * @author Philip Rutherford
  *
+ * @version 1.6.0
+ * @since 1.0
  */
 public class TransclusionHandler extends DefaultHandler {
 
@@ -72,7 +75,7 @@ public class TransclusionHandler extends DefaultHandler {
   /**
    * The resolved content for the current placeholder
    */
-  private String placeholderContent = null;
+  private @Nullable String placeholderContent = null;
 
   /**
    * Document metadata (for placeholders)
@@ -100,7 +103,7 @@ public class TransclusionHandler extends DefaultHandler {
   /**
    * @return Publication metadata
    */
-  public Map<String,String> getPublicationMetadata() {
+  public @Nullable Map<String,String> getPublicationMetadata() {
     return this.publication ? this.documentMetadata : null;
   }
 
@@ -131,7 +134,7 @@ public class TransclusionHandler extends DefaultHandler {
         String value = atts.getValue("value") == null ? "" : atts.getValue("value");
         this.documentMetadata.put(atts.getValue("name"), value);
 
-      // if place holder, try to resolve
+      // if placeholder, try to resolve
       } else if ("placeholder".equals(qName) && atts.getValue("name") != null) {
         String name = atts.getValue("name");
         if (this.parentHandler.getPublicationMetadata() != null) {
@@ -150,7 +153,7 @@ public class TransclusionHandler extends DefaultHandler {
     // attributes
     for (int i = 0; i < atts.getLength(); i++) {
       String auri = atts.getURI(i);
-      if (auri != null && auri.length() == 0) {
+      if (auri != null && auri.isEmpty()) {
         auri = null;
       }
       try {
@@ -232,26 +235,22 @@ public class TransclusionHandler extends DefaultHandler {
    * @throws TransclusionException if the target is invalid or could not be read
    * @throws SAXException          if the target is not found
    */
-  private boolean resolveTransclusion(String href, String fragment)
+  private boolean resolveTransclusion(@Nullable String href, String fragment)
           throws TransclusionException, SAXException {
     if (href == null || !href.endsWith(".psml") || !this.transclude) return false;
-    try {
-      href = URLDecoder.decode(href, "utf-8");
-    } catch (UnsupportedEncodingException ex) {
-      this.parentHandler.getLogger().error(ex.getMessage(), ex);
-    }
+    href = URLDecoder.decode(href, StandardCharsets.UTF_8);
     String dadPath = this.parentHandler.getParentFolderRelativePath();
-    // find target file
+    // Find the target file
     File target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + href);
-    // make sure it's valid
-    if (target == null || !target.exists() || !target.isFile()) {
+    // Check it's valid
+    if (!target.exists() || !target.isFile()) {
       PSMLProcessHandler.handleError(
               "XRef transclusion not found for path: " + dadPath + '/' + href,
               this.parentHandler.getFailOnError(), this.parentHandler.getLogger(),
               this.parentHandler.getErrorXRefNotFound(), this.parentHandler.getWarnXRefNotFound());
       return false;
     }
-    // parse target
+    // Parse the target
     TransclusionHandler handler = new TransclusionHandler(this.xml, fragment, false, this.parentHandler);
     handler.documentMetadata = this.documentMetadata;
     try {
@@ -277,6 +276,7 @@ public class TransclusionHandler extends DefaultHandler {
     public TransclusionException(String msg) {
       super(msg);
     }
+
     /**
      * Create a new exception.
      * @param msg   the error message.

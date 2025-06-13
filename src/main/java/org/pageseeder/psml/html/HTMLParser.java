@@ -21,10 +21,18 @@ import java.io.Reader;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.spi.Parser;
 
+/**
+ * Implementation of the Parser for HTML content, specifically for XHTML.
+ *
+ * <p>This class is designed to parse XHTML content and generate corresponding PSML elements.
+ * It specifies the mediatype it supports as "application/xhtml+xml".
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
+ */
 public class HTMLParser extends Parser {
-
-  public HTMLParser() {
-  }
 
   @Override
   public String getMediatype() {
@@ -33,7 +41,7 @@ public class HTMLParser extends Parser {
 
   @Override
   public PSMLElement parse(Reader reader) throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Not yet implemented");
+    // TODO Implement!
   }
 }

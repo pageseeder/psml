@@ -3,7 +3,6 @@
  */
 package org.pageseeder.psml.split;
 
-import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.util.XSLT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

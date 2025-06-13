@@ -22,4 +22,7 @@
  * (e.g. namespaces and processing instructions) are not supported or simply
  * ignored.
  */
+@NonNullByDefault
 package org.pageseeder.psml.model;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;

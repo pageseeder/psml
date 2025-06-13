@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.md.BlockParser;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.process.XRefTranscluder.InfiniteLoopException;
@@ -33,12 +34,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-
 /**
  * Handle embedding and transcluding content and other processes.
  *
  * @author Jean-Baptiste Reure
  * @author Philip Rutherford
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class PSMLProcessHandler extends DefaultHandler {
 
@@ -46,20 +49,21 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * Check depth message
    */
   private static final String CHECK_DEPTH = " (check export depth): ";
+
   /**
    * The logger object
    */
-  private Logger logger = null;
+  private @Nullable Logger logger = null;
 
   /**
    * The XML writer where XML content is stored.
    */
-  private Writer xml;
+  private final Writer xml;
 
   /**
    * The parent handler if current content is transcluded.
    */
-  private PSMLProcessHandler parent;
+  private final PSMLProcessHandler parent;
 
   /**
    * Handle the transclusion of XRefs.
@@ -69,7 +73,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Details of elements/attributes to strip
    */
-  private Strip strip = null;
+  private @Nullable Strip strip = null;
 
   /**
    * If a non fatal error will stop the parsing.
@@ -139,23 +143,23 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Helper to compute numbering and TOC.
    */
-  private NumberedTOCGenerator numberingAndTOC = null;
+  private @Nullable NumberedTOCGenerator numberingAndTOC = null;
 
   /**
    * Config for publication.
    */
-  private PublicationConfig publicationConfig = null;
+  private @Nullable PublicationConfig publicationConfig = null;
 
   /**
    * Image cache where URI details for images are loaded from.
    */
-  private ImageCache imageCache = null;
+  private @Nullable ImageCache imageCache = null;
 
   /**
    * Site prefix, used to rewrite images paths to permalink
    * [siteprefix]/uri/[uriid].[extension].
    */
-  private String sitePrefix = null;
+  private @Nullable String sitePrefix = null;
 
   /**
    * The relative path of the parent folder (used to compute relative paths).
@@ -186,17 +190,17 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * A specific fragment to load, if it is not null only this fragment's content
    * will be loaded.
    */
-  private String fragmentToLoad = null;
+  private @Nullable String fragmentToLoad = null;
 
   /**
    * The URI ID of this document.
    */
-  private String uriID = null;
+  private @Nullable String uriID = null;
 
   /**
-   * The markdown or ascii content to convert.
+   * The Markdown or ascii content to convert.
    */
-  private StringBuilder convertContent = null;
+  private @Nullable StringBuilder convertContent = null;
 
   /**
    * The convert flag.
@@ -206,7 +210,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Number of times this URI has appeared.
    */
-  private Integer uriCount = null;
+  private @Nullable Integer uriCount = null;
 
   /**
    * All URI IDs in the document (including transcluded docs).
@@ -222,7 +226,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * Publication metadata (for placeholders)
    */
-  private Map<String,String> publicationMetadata = null;
+  private @Nullable Map<String,String> publicationMetadata = null;
 
   /**
    * Document metadata (for placeholders)
@@ -283,21 +287,21 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * The current fragment being processed.
    */
-  private String currentFragment = null;
+  private @Nullable String currentFragment = null;
 
   /**
    * The resolved content for the current placeholder
    */
-  private String placeholderContent = null;
+  private @Nullable String placeholderContent = null;
 
   /**
    * Values for pre-transcluded content handling (exported using process-publication=true)
    */
   private int preXrefLevel = 0;
-  private String preFragment = null;
+  private @Nullable String preFragment = null;
   private boolean inPreTranscluded = false;
-  private String preUriID = null;
-  private Integer preUriCount = null;
+  private @Nullable String preUriID = null;
+  private @Nullable Integer preUriCount = null;
   private boolean preEmbedHierarchy = false;
 
 
@@ -336,7 +340,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @return the list of URI IDs.
+   * @return a map where the keys are URI strings and the values are their corresponding integer IDs
    */
   public Map<String, Integer> getAllUriIDs() {
     return this.allUriIDs;
@@ -350,7 +354,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @return Map of number of URI/frag IDs in the each document sub-hierarchy
+   * @return Map of number of URI/frag IDs in each document sub-hierarchy
    */
   public Map<String, Map<String, Integer[]>> getHierarchyUriFragIDs() {
     return this.hierarchyUriFragIDs;
@@ -359,21 +363,21 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * @return Numbered TOC Generator
    */
-  public NumberedTOCGenerator getNumberedTOCGenerator() {
+  public @Nullable NumberedTOCGenerator getNumberedTOCGenerator() {
     return this.numberingAndTOC;
   }
 
   /**
    * @return Publication config
    */
-  public PublicationConfig getPublicationConfig() {
+  public @Nullable PublicationConfig getPublicationConfig() {
     return this.publicationConfig;
   }
 
   /**
    * @return Publication metadata
    */
-  public Map<String,String> getPublicationMetadata() {
+  public @Nullable Map<String,String> getPublicationMetadata() {
     return this.publicationMetadata;
   }
 
@@ -498,7 +502,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param fragid the fragment id (may be null)
    * @param embed  whether hierarchy has all embed XRefs
    */
-  public void addUriFragID(String uriid, String fragid, boolean embed) {
+  public void addUriFragID(@Nullable String uriid, @Nullable String fragid, boolean embed) {
     addKeyUriFragID(this.uriCount + "_" + this.uriID, uriid, fragid, embed);
     // if not root add to parent
     if (this.parent != null && !this.inAlternateXRef)
@@ -513,26 +517,26 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param fragid the fragment id (may be null)
    * @param embed  whether hierarchy has all embed XRefs
    */
-  public void addKeyUriFragID(String key, String uriid, String fragid, boolean embed) {
+  public void addKeyUriFragID(String key, @Nullable String uriid, @Nullable String fragid, boolean embed) {
     // can't XRef to alternate content
     if (this.inAlternateXRef) return;
-    Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs.get(key);
-    Integer global_count = this.allUriIDs.get(uriid);
+    Map<String, Integer[]> subHierarchy = this.hierarchyUriFragIDs.get(key);
+    Integer globalCount = this.allUriIDs.get(uriid);
     Integer[] counts = null;
-    if (sub_hierarchy == null) {
-      sub_hierarchy = new HashMap<>();
-      this.hierarchyUriFragIDs.put(key, sub_hierarchy);
+    if (subHierarchy == null) {
+      subHierarchy = new HashMap<>();
+      this.hierarchyUriFragIDs.put(key, subHierarchy);
     } else
-      counts = sub_hierarchy.get(uriid + (fragid == null ? "" : ("-" + fragid)));
+      counts = subHierarchy.get(uriid + (fragid == null ? "" : ("-" + fragid)));
     if (counts == null) {
-      counts = new Integer[]{global_count, 1, embed ? 1 : 0};
-      sub_hierarchy.put(uriid + (fragid == null ? "" : ("-" + fragid)), counts);
+      counts = new Integer[]{globalCount, 1, embed ? 1 : 0};
+      subHierarchy.put(uriid + (fragid == null ? "" : ("-" + fragid)), counts);
     } else {
       counts[1] = counts[1] + 1;
       if (embed) {
         // if first embed use this as the target
         if (counts[2] == 0) {
-          counts[0] = global_count;
+          counts[0] = globalCount;
         }
         counts[2] = counts[2] + 1;
       }
@@ -547,10 +551,10 @@ public final class PSMLProcessHandler extends DefaultHandler {
   }
 
   /**
-   * @param strp Details of elements/attributes to strip
+   * @param strip Details of elements/attributes to strip
    */
-  public void setStrip(Strip strp) {
-    this.strip = strp;
+  public void setStrip(Strip strip) {
+    this.strip = strip;
   }
 
   /**
@@ -560,7 +564,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @throws ProcessException  if problem parsing root file
    */
   public void setPublicationConfig(PublicationConfig config, File root, boolean toc) throws ProcessException {
-    // process transclussions
+    // process transclusions
     XMLStringWriter out = new XMLStringWriter(NamespaceAware.No);
     TransclusionHandler thandler = new TransclusionHandler(out, "default", true, this);
     XMLUtils.parse(root, thandler);
@@ -589,8 +593,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @param siteprefix    site prefix, used to rewrite images paths to permalink
    * @param embedMetadata if images are transcluded (metadata embedded)
    */
-  public void setImageHandling(ImageCache cache, ImageSrc src, boolean errorNotFound,
-                               boolean warnNotFound, String siteprefix, boolean embedMetadata) {
+  public void setImageHandling(@Nullable ImageCache cache, ImageSrc src, boolean errorNotFound,
+                               boolean warnNotFound, @Nullable String siteprefix, boolean embedMetadata) {
     // make sure the required bits are there
     if (src != ImageSrc.LOCATION && cache == null)
       throw new IllegalArgumentException("Required images metadata cache is missing");
@@ -692,10 +696,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
     return this.warnXRefNotFound;
   }
 
-
-  // --------------------------------- Content Handler methods
-  // --------------------------------------------
-
   @Override
   public void startDocument() throws SAXException {
     // start to write something just in case there's an IO error
@@ -711,11 +711,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+  public void startElement(@Nullable String uri, String localName, String qName, Attributes atts) throws SAXException {
     boolean noNamespace = uri == null || uri.isEmpty();
     // load URI ID of root document
     if (this.uriID == null && noNamespace && "document".equals(qName)) {
@@ -863,8 +860,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
           if (this.failOnError)
             throw new SAXException("Failed to rewrite src attribute " + atts.getValue(i) + ": " + ex.getMessage(), ex);
           else
-            this.logger.warn("Failed to rewrite image src attribute " + atts.getValue(i) + ": "
-                + ex.getMessage());
+            this.logger.warn("Failed to rewrite image src attribute {}: {}", atts.getValue(i), ex.getMessage());
         }
       } else {
         String value;
@@ -927,11 +923,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void endElement(String uri, String localName, String qName) throws SAXException {
+  public void endElement(@Nullable String uri, String localName, String qName) throws SAXException {
     // placeholder content
     if (this.placeholderContent != null) {
       if ("placeholder".equals(qName)) {
@@ -1144,7 +1137,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if (this.failOnError)
         throw new ProcessException("Failed to write contents of file " + f.getName() + ": " + ex.getMessage(), ex);
       else
-        this.logger.warn("Failed to write contents of file " + f.getName() + ": " + ex.getMessage());
+        this.logger.warn("Failed to write contents of file {}: {}", f.getName(), ex.getMessage());
     }
   }
 
@@ -1284,7 +1277,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         throw new SAXException("Failed to resolve XRef reference " + href + ": " + ex.getMessage(),
             ex);
       else
-        this.logger.warn("Failed to resolve XRef reference " + href + ": " + ex.getMessage());
+        this.logger.warn("Failed to resolve XRef reference {}: {}", href, ex.getMessage());
     }
   }
 
@@ -1408,23 +1401,16 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * @throws ProcessException If the metadata file is invlaid or couldn't be parsed
    * @throws SAXException     If writing the XML content failed
    */
-  private void handleImage(String src, String uriid, boolean alternateXRef)
+  private void handleImage(String src, @Nullable String uriid, boolean alternateXRef)
       throws ProcessException, SAXException {
     // decode src attribute
-    this.logger.debug("Handling image " + src + " (" + uriid + ")");
-    String finalSrc;
-    try {
-      finalSrc = URLDecoder.decode(src, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      // should not happen as we're using UTF-8
-      throw new ProcessException("Invalid encoding UTF-8", e);
-    }
-    this.logger.debug("Decoded src is " + finalSrc);
+    this.logger.debug("Handling image {} ({})", src, uriid);
+    String finalSrc = URLDecoder.decode(src, StandardCharsets.UTF_8);
+    this.logger.debug("Decoded src is {}", finalSrc);
     // find image file
     String relativePath = cleanUpParentFolder() + '/' + finalSrc;
-    this.logger.debug("Image file relative path is " + relativePath);
+    this.logger.debug("Image file relative path is {}", relativePath);
     File imageFile = new File(this.binaryRepository, relativePath);
-    //this.logger.debug("Image file is " + imageFile.getAbsolutePath());
     // log image not found
     if ((!imageFile.exists() || !imageFile.isFile())) {
       handleError("Image not found in URI " + this.uriID + " with src " + src + " and URI ID " + uriid,
@@ -1432,14 +1418,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
     if (uriid == null) {
       // unresolved image
-      this.logger.warn("Unresolved image in URI " + this.uriID + " with src " + src);
+      this.logger.warn("Unresolved image in URI {} with src {}", this.uriID, src);
     }
 
     // get canonical relative path
     relativePath = Files.computeRelativePath(imageFile, this.binaryRepository);
     if (relativePath == null) {
-      this.logger
-          .debug("Could not compute relative path for image src " + finalSrc + " (" + uriid + ")");
+      this.logger.debug("Could not compute relative path for image src {} ({})", finalSrc, uriid);
     } else {
       // if processing image paths
       if (this.imageSrc != ImageSrc.LOCATION) {
@@ -1452,7 +1437,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         if (suffix != null)
           finalSrc = (this.imageSrc == ImageSrc.PERMALINK ? this.sitePrefix + "/uri/" : "")
               + suffix;
-        this.logger.debug("Rewriting image src " + relativePath + " to " + finalSrc);
+        this.logger.debug("Rewriting image src {} to {}", relativePath, finalSrc);
       } else {
         if (this.imageCache != null) this.imageCache.cacheImagePath(relativePath);
         // add an href att to rewrite the path later
@@ -1475,17 +1460,12 @@ public final class PSMLProcessHandler extends DefaultHandler {
   public static String URLEncodeFilepath(String filepath) {
     StringBuilder path = new StringBuilder();
     String fp = filepath;
-    try {
-      while (fp.indexOf('/') != -1) {
-        path.append(URLEncoder.encode(fp.substring(0, fp.indexOf('/')), "UTF-8")).append('/');
-        fp = fp.substring(1 + fp.indexOf('/'));
-      }
-      // turn '+' to '%20'
-      return path.append(URLEncoder.encode(fp, "UTF-8")).toString().replace("+", "%20");
-    } catch (UnsupportedEncodingException ex) {
-      // extremely unlikely...
-      return null;
+    while (fp.indexOf('/') != -1) {
+      path.append(URLEncoder.encode(fp.substring(0, fp.indexOf('/')), StandardCharsets.UTF_8)).append('/');
+      fp = fp.substring(1 + fp.indexOf('/'));
     }
+    // turn '+' to '%20'
+    return path.append(URLEncoder.encode(fp, StandardCharsets.UTF_8)).toString().replace("+", "%20");
   }
 
   /**

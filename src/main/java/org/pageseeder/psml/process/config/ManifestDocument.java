@@ -4,12 +4,12 @@
 package org.pageseeder.psml.process.config;
 
 /**
- * Creates a PSML document of type "manifest" from the manifest.xml containing an {@code<xref>}
+ * Creates a PSML document of type "manifest" from the manifest.xml containing an {@code <xref>}
  * of type "embed" for each PSML file, in alphabetical order.
  * The generated file is included in PSML files for subsequent processing.
  *
  * <p>Used to represent the inner ANT element:<p>
- * <pre>{@code<manifestdoc
+ * <pre>{@code <manifestdoc
  *             filename="[filename]"
  *             includes="[patterns]"
  *             excludes="[patterns]">

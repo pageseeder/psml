@@ -19,13 +19,23 @@ import java.io.Writer;
 
 import org.pageseeder.psml.model.PSMLElement;
 
+/**
+ * The HTMLSerializer class is responsible for serializing PSMLElement objects
+ * into their HTML representation.
+ *
+ * <p>This class provides functionality to output the serialized HTML to a
+ * specified Writer object.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
+ */
 public class HTMLSerializer {
 
-  public HTMLSerializer() {
-  }
-
   public void serialize(PSMLElement element, Writer out) {
-    // TODO
+    throw new UnsupportedOperationException("Not yet implemented");
+    // TODO Implement!
   }
 
 }

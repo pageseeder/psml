@@ -19,13 +19,15 @@ package org.pageseeder.psml.template;
  * Builds a single fragment or document template.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 interface TemplateBuilder<T extends Template> {
 
   /**
    * Adds a declared parameter
    *
-   * @param name     The name of the parameter
    * @param fragment The default value for the parameter
    */
   void addFragment(TFragment fragment);
@@ -49,7 +51,7 @@ interface TemplateBuilder<T extends Template> {
   /**
    * A error reported by the parser
    *
-   * @param name The name of the parameter to use.
+   * @param error The name of the parameter to use.
    */
   void pushError(String error);
 

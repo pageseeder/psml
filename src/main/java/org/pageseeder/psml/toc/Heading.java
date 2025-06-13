@@ -22,16 +22,16 @@ public final class Heading extends Element implements Serializable {
   public static final String NO_BLOCK_LABEL = "";
 
   /** The location of this part in the content */
-  private final int _index;
+  private final int index;
 
   /** Whether the title is numbered */
-  private final boolean _numbered;
+  private final boolean numbered;
 
   /** Prefix of title if any */
-  private final String _prefix;
+  private final String prefix;
 
   /** Parent block label if any */
-  private final String _blocklabel;
+  private final String blocklabel;
 
   /**
    * Full constructor for a heading.
@@ -48,10 +48,10 @@ public final class Heading extends Element implements Serializable {
   private Heading(int level, String title, String fragment, String originalfrag,
       int index, boolean numbered, String prefix, String blocklabel) {
     super(level, title, fragment, originalfrag);
-    this._index = index;
-    this._numbered = numbered;
-    this._prefix = prefix;
-    this._blocklabel = blocklabel;
+    this.index = index;
+    this.numbered = numbered;
+    this.prefix = prefix;
+    this.blocklabel = blocklabel;
   }
 
   /**
@@ -87,35 +87,35 @@ public final class Heading extends Element implements Serializable {
    * @return The index of the heading in the document.
    */
   public int index() {
-    return this._index;
+    return this.index;
   }
 
   /**
    * @return The full title of this heading including the prefix
    */
   public String getPrefixedTitle() {
-    return !NO_PREFIX.equals(this._prefix)? this._prefix+" "+title() : title();
+    return !NO_PREFIX.equals(this.prefix)? this.prefix +" "+title() : title();
   }
 
   /**
    * @return The prefix given to this heading or empty if none.
    */
   public String prefix() {
-    return this._prefix;
+    return this.prefix;
   }
 
   /**
    * @return The blocklabel parent of this heading or empty if none.
    */
   public String blocklabel() {
-    return this._blocklabel;
+    return this.blocklabel;
   }
 
   /**
    * @return Whether the heading is automatically numbered
    */
   public boolean numbered() {
-    return this._numbered;
+    return this.numbered;
   }
 
   /**
@@ -127,7 +127,7 @@ public final class Heading extends Element implements Serializable {
    */
   public Heading title(String title) {
     if (title.equals(title())) return this;
-    return new Heading(level(), title, fragment(), originalFragment(), this._index, this._numbered, this._prefix, this._blocklabel);
+    return new Heading(level(), title, fragment(), originalFragment(), this.index, this.numbered, this.prefix, this.blocklabel);
   }
 
   /**
@@ -138,7 +138,7 @@ public final class Heading extends Element implements Serializable {
    * @return A new heading instance.
    */
   public Heading prefix(String prefix) {
-    return new Heading(level(), title(), fragment(), originalFragment(), this._index, this._numbered, prefix, this._blocklabel);
+    return new Heading(level(), title(), fragment(), originalFragment(), this.index, this.numbered, prefix, this.blocklabel);
   }
 
   /**
@@ -149,7 +149,7 @@ public final class Heading extends Element implements Serializable {
    * @return A new heading instance.
    */
   public Heading blocklabel(String blocklabel) {
-    return new Heading(level(), title(), fragment(), originalFragment(), this._index, this._numbered, this._prefix, blocklabel);
+    return new Heading(level(), title(), fragment(), originalFragment(), this.index, this.numbered, this.prefix, blocklabel);
   }
 
   /**
@@ -160,8 +160,8 @@ public final class Heading extends Element implements Serializable {
    * @return A new heading instance unless the numbered flag is equal to the numbered flag of current heading.
    */
   public Heading numbered(boolean numbered) {
-    if (this._numbered == numbered) return this;
-    return new Heading(level(), title(), fragment(), originalFragment(), this._index, numbered, this._prefix, this._blocklabel);
+    if (this.numbered == numbered) return this;
+    return new Heading(level(), title(), fragment(), originalFragment(), this.index, numbered, this.prefix, this.blocklabel);
   }
 
   @Override
@@ -175,7 +175,7 @@ public final class Heading extends Element implements Serializable {
         out.append(prefix()).append(' ');
       }
       out.append(title());
-      out.append(" [").append(Integer.toString(this._index)).append(']');
+      out.append(" [").append(Integer.toString(this.index)).append(']');
       out.append(" @").append(fragment());
     } catch (IOException ex) {
       // Ignore
@@ -190,19 +190,19 @@ public final class Heading extends Element implements Serializable {
       xml.attribute("title", title());
     }
     xml.attribute("fragment", fragment());
-    xml.attribute("index", this._index);
-    if (this._numbered) {
+    xml.attribute("index", this.index);
+    if (this.numbered) {
       xml.attribute("numbered", "true");
     }
-    if (this._numbered && number != null) {
-      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this._index);
+    if (this.numbered && number != null) {
+      Prefix pref = number.getTranscludedPrefix(treeid, count, fragment(), this.index);
       if (pref != null) {
         xml.attribute("prefix", pref.value);
         xml.attribute("canonical", pref.canonical);
       }
     } else {
-      if (!NO_PREFIX.equals(this._prefix)) {
-        xml.attribute("prefix", this._prefix);
+      if (!NO_PREFIX.equals(this.prefix)) {
+        xml.attribute("prefix", this.prefix);
       }
     }
     xml.closeElement();

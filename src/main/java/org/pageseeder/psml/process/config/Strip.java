@@ -9,7 +9,7 @@ package org.pageseeder.psml.process.config;
  * Provides finer control over the elements to strip.
  *
  * <p>Used to represent the inner ANT element:<p>
- * <pre>{@code<strip
+ * <pre>{@code <strip
  *             manifest="[true|false]"
  *             documentinfo="[all,docid,title,description,labels,publication,versions]"
  *             fragmentinfo="[all,labels]"
@@ -19,12 +19,12 @@ package org.pageseeder.psml.process.config;
  * <ul>
  *   <li>documentinfo: Comma separated list of items to strip (i.e. all, docid, title,
  *                     description, labels, publication, versions)
- *                     all strips {@code<documentinfo>} elements - default none.</li>
+ *                     all strips {@code <documentinfo>} elements - default none.</li>
  *   <li>fragmentinfo: Comma separated list of items to strip (i.e. all, labels)
- *                     all strips {@code<fragmentinfo>} elements - default none. </li>
+ *                     all strips {@code <fragmentinfo>} elements - default none. </li>
  *   <li>manifest:     If 'true' deletes the META-INF/manifest.xml file - default is false. </li>
  *   <li>xrefs:        Comma separated list of items to strip (i.e. all, docid, uriid, notfound, unresolved)
- *                     all, notfound, unresolved strips {@code<xref>} element but leaves its content - default none. </li>
+ *                     all, notfound, unresolved strips {@code <xref>} element but leaves its content - default none. </li>
  * </ul>
  *
  * @author Jean-Baptiste Reure

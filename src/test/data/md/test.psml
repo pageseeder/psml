@@ -1,9 +1,13 @@
 <document level="portable">
+  <documentinfo>
+    <uri>
+      <displaytitle>A simple test</displaytitle>
+      <description>This is a simple Markdown file to test the markdown parser</description>
+    </uri>
+  </documentinfo>
   <metadata>
     <properties>
-      <property name="Title" value="A simple test"/>
-      <property name="Author" value="Christophe Lauret"/>
-      <property name="Description" value="This is a simple Markdown file to test the markdown parser"/>
+      <property title="Author" name="author" value="Christophe Lauret"/>
     </properties>
   </metadata>
   <section id="title">
@@ -46,7 +50,7 @@ block</preformat>
       <block label="quoted">
         <para>Quoted line #5</para>
       </block>
-      <preformat role="javascript">
+      <preformat role="lang-javascript">
 function() {
 
   // do something
@@ -58,7 +62,7 @@ function() {
     <fragment id="4">
       <heading level="2">Second chapter</heading>
       <para>Until now, we've only been interested in whether or not a match is found at some location within a particular input string. We never cared about where in the string the match was taking place.</para>
-      <para><link href="https://api.bintray.com/packages/pageseeder/maven/xmlwriter/images/download.svg"> ![Download</link> ](<link href="https://bintray.com/pageseeder/maven/xmlwriter/_latestVersion">https://bintray.com/pageseeder/maven/xmlwriter/_latestVersion</link>)</para>
+      <para>Information on <link href="https://dev.pageseeder.com/psml/elements.html">PSML elements</link>.</para>
       <heading level="1">XML Writer</heading>
       <para>The XML Writer defines an API and implementations to write XML out to a reading, DOM or SAX.</para>
       <heading level="2">Example</heading>

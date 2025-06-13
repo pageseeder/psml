@@ -15,29 +15,36 @@
  */
 package org.pageseeder.psml.template;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A collection of utility classes for XML.
  *
  * @author  Christophe Lauret
+ *
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class XML {
 
   /**
    * Last ASCII character.
    */
-  private final static int ASCII_LAST_CHAR = 0x80;
+  private static final int ASCII_LAST_CHAR = 0x80;
+
+  private XML() {}
 
   /**
    * @param cs the charset to use for the target XML output.
-   * @return The corresponding XML encoder or <code>null</code> is none exists.
+   * @return The corresponding XML encoder.
    */
   public static Encoder getEncoder(Charset cs) {
-    if (cs.equals(Constants.ASCII)) return ASCII_ENCODER;
-    if (cs.equals(Constants.UTF8)) return UNICODE_ENCODER;
-    return null;
+    if (cs.equals(StandardCharsets.UTF_8) || cs.equals(StandardCharsets.UTF_16)) return UNICODE_ENCODER;
+    return ASCII_ENCODER;
   }
 
   /**
@@ -78,7 +85,7 @@ public final class XML {
   /**
    * Encodes the XML text and attribute values using the appropriate numeric character entity when required
    */
-  public static interface Encoder {
+  public interface Encoder {
 
     /**
      * Note: XML encoders can assume that attributes values are wrapped in double quotes.
@@ -86,7 +93,7 @@ public final class XML {
      * @param value Attribute value to XML encode.
      * @param xml   The XML output
      */
-    public void attribute(String value, StringBuilder xml);
+    void attribute(String value, StringBuilder xml);
 
     /**
      * XML encode for text value (reported by SAX <code>characters</code> method).
@@ -96,7 +103,7 @@ public final class XML {
      * @param length The number of characters to encode.
      * @param xml    The XML output
      */
-    public void text(char[] ch, int start, int length, StringBuilder xml);
+    void text(char[] ch, int start, int length, StringBuilder xml);
 
   }
 
@@ -106,7 +113,7 @@ public final class XML {
    * @param c   The character to check
    * @param xml The XML output
    */
-  private final static void attributeChar(char c, StringBuilder xml) {
+  private static void attributeChar(char c, StringBuilder xml) {
     switch (c) {
       case '&' :
         xml.append("&amp;");
@@ -129,7 +136,7 @@ public final class XML {
    * @param c   The character to check
    * @param xml The XML output
    */
-  private final static void textChar(char c, StringBuilder xml) {
+  private static void textChar(char c, StringBuilder xml) {
     switch (c) {
       case '&' :
         xml.append("&amp;");

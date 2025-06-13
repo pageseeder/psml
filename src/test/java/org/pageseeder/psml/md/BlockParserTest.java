@@ -24,56 +24,37 @@ import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.UncheckedIOException;
 import java.util.List;
 
 public class BlockParserTest {
 
-  public BlockParserTest() {
-  }
-
   @Test
-  public void testEscaping() throws Exception {
-    List<String> e1 = Arrays.asList("This is \\*escaped star\\*");
-    List<String> e2 = Arrays.asList("This is \\[escaped brackets\\]");
-    List<String> e3 = Arrays.asList(" \\- Red", " \\- Green", " \\- Blue");
+  public void testEscaping() {
+    List<String> e1 = List.of("This is \\*escaped star\\*");
+    List<String> e2 = List.of("This is \\[escaped brackets\\]");
+    List<String> e3 = List.of(" \\- Red", " \\- Green", " \\- Blue");
     Assert.assertEquals("<para>This is *escaped star*</para>", toPSML(e1));
     Assert.assertEquals("<para>This is [escaped brackets]</para>", toPSML(e2));
     Assert.assertEquals("<para>- Red<br/>\n- Green<br/>\n- Blue</para>", toPSML(e3));
   }
 
   @Test
-  public void testHeadingSetext() throws Exception {
-    List<String> h1 = Arrays.asList("This is an H1", "=============");
-    List<String> h2 = Arrays.asList("This is an H2", "-------------");
+  public void testHeadingSetext() {
+    List<String> h1 = List.of("This is an H1", "=============");
+    List<String> h2 = List.of("This is an H2", "-------------");
     Assert.assertEquals("<heading level=\"1\">This is an H1</heading>", toPSML(h1));
     Assert.assertEquals("<heading level=\"2\">This is an H2</heading>", toPSML(h2));
   }
 
   @Test
-  public void testHeadingATX() throws Exception {
-    List<String> h1 = Arrays.asList("# This is an H1");
-    List<String> h2 = Arrays.asList("## This is an H2");
-    List<String> h3 = Arrays.asList("### This is an H3");
-    List<String> h4 = Arrays.asList("#### This is an H4");
-    List<String> h5 = Arrays.asList("##### This is an H5");
-    List<String> h6 = Arrays.asList("###### This is an H6");
-    Assert.assertEquals("<heading level=\"1\">This is an H1</heading>", toPSML(h1));
-    Assert.assertEquals("<heading level=\"2\">This is an H2</heading>", toPSML(h2));
-    Assert.assertEquals("<heading level=\"3\">This is an H3</heading>", toPSML(h3));
-    Assert.assertEquals("<heading level=\"4\">This is an H4</heading>", toPSML(h4));
-    Assert.assertEquals("<heading level=\"5\">This is an H5</heading>", toPSML(h5));
-    Assert.assertEquals("<heading level=\"6\">This is an H6</heading>", toPSML(h6));
-  }
-
-  @Test
-  public void testHeadingATX2() throws Exception {
-    List<String> h1 = Arrays.asList("# This is an H1 #");
-    List<String> h2 = Arrays.asList("## This is an H2 ##");
-    List<String> h3 = Arrays.asList("### This is an H3 ###");
-    List<String> h4 = Arrays.asList("#### This is an H4 ####");
-    List<String> h5 = Arrays.asList("##### This is an H5 #####");
-    List<String> h6 = Arrays.asList("###### This is an H6 ######");
+  public void testHeadingATX()  {
+    List<String> h1 = List.of("# This is an H1");
+    List<String> h2 = List.of("## This is an H2");
+    List<String> h3 = List.of("### This is an H3");
+    List<String> h4 = List.of("#### This is an H4");
+    List<String> h5 = List.of("##### This is an H5");
+    List<String> h6 = List.of("###### This is an H6");
     Assert.assertEquals("<heading level=\"1\">This is an H1</heading>", toPSML(h1));
     Assert.assertEquals("<heading level=\"2\">This is an H2</heading>", toPSML(h2));
     Assert.assertEquals("<heading level=\"3\">This is an H3</heading>", toPSML(h3));
@@ -83,20 +64,36 @@ public class BlockParserTest {
   }
 
   @Test
-  public void testBlockquotes() throws Exception {
-    List<String> q1 = Arrays.asList("> Hello");
+  public void testHeadingATX2() {
+    List<String> h1 = List.of("# This is an H1 #");
+    List<String> h2 = List.of("## This is an H2 ##");
+    List<String> h3 = List.of("### This is an H3 ###");
+    List<String> h4 = List.of("#### This is an H4 ####");
+    List<String> h5 = List.of("##### This is an H5 #####");
+    List<String> h6 = List.of("###### This is an H6 ######");
+    Assert.assertEquals("<heading level=\"1\">This is an H1</heading>", toPSML(h1));
+    Assert.assertEquals("<heading level=\"2\">This is an H2</heading>", toPSML(h2));
+    Assert.assertEquals("<heading level=\"3\">This is an H3</heading>", toPSML(h3));
+    Assert.assertEquals("<heading level=\"4\">This is an H4</heading>", toPSML(h4));
+    Assert.assertEquals("<heading level=\"5\">This is an H5</heading>", toPSML(h5));
+    Assert.assertEquals("<heading level=\"6\">This is an H6</heading>", toPSML(h6));
+  }
+
+  @Test
+  public void testBlockquotes() {
+    List<String> q1 = List.of("> Hello");
     Assert.assertEquals("<block label=\"quoted\"><para>Hello</para></block>", toPSML(q1));
   }
 
   @Test
-  public void testParagraphs() throws Exception {
-    List<String> p1 = Arrays.asList("Hi!");
-    List<String> p2 = Arrays.asList("Hi!","","Welcome");
-    List<String> p3 = Arrays.asList("Hi!","Welcome");
-    List<String> p4 = Arrays.asList("Hi!","Welcome","","Test");
-    List<String> p5 = Arrays.asList("Hi!","","Welcome","Test");
-    List<String> p6 = Arrays.asList("Hi!","","Welcome","","Test");
-    List<String> p7 = Arrays.asList("This line is longer than sixty-six characters and should continue without", "a line break");
+  public void testParagraphs() {
+    List<String> p1 = List.of("Hi!");
+    List<String> p2 = List.of("Hi!","","Welcome");
+    List<String> p3 = List.of("Hi!","Welcome");
+    List<String> p4 = List.of("Hi!","Welcome","","Test");
+    List<String> p5 = List.of("Hi!","","Welcome","Test");
+    List<String> p6 = List.of("Hi!","","Welcome","","Test");
+    List<String> p7 = List.of("This line is longer than sixty-six characters and should continue without", "a line break");
     Assert.assertEquals("<para>Hi!</para>", toPSML(p1));
     Assert.assertEquals("<para>Hi!</para><para>Welcome</para>", toPSML(p2));
     Assert.assertEquals("<para>Hi!<br/>\nWelcome</para>", toPSML(p3));
@@ -106,54 +103,65 @@ public class BlockParserTest {
     Assert.assertEquals("<para>This line is longer than sixty-six characters and should continue without\na line break</para>", toPSML(p7));
   }
 
-
   @Test
-  public void testUnorderedList() throws Exception {
-    List<String> list1 = Arrays.asList(" * Red", " * Green", " * Blue");
-    List<String> list2 = Arrays.asList(" + Red", " + Green", " + Blue");
-    List<String> list3 = Arrays.asList(" - Red", " - Green", " - Blue");
+  public void testUnorderedList() {
+    List<String> list1 = List.of(" * Red", " * Green", " * Blue");
+    List<String> list2 = List.of(" + Red", " + Green", " + Blue");
+    List<String> list3 = List.of(" - Red", " - Green", " - Blue");
     Assert.assertEquals("<list><item>Red</item><item>Green</item><item>Blue</item></list>", toPSML(list1));
     Assert.assertEquals("<list><item>Red</item><item>Green</item><item>Blue</item></list>", toPSML(list2));
     Assert.assertEquals("<list><item>Red</item><item>Green</item><item>Blue</item></list>", toPSML(list3));
   }
 
   @Test
-  public void testOrderedList() throws Exception {
-    List<String> list1 = Arrays.asList(" 1. Bird", " 2. McHale", " 3. Parish");
-    List<String> list2 = Arrays.asList(" 1. Bird", " 1. McHale", " 1. Parish");
-    List<String> list3 = Arrays.asList(" 7. Bird", " 8. McHale", " 9. Parish");
-    List<String> list4 = Arrays.asList(" 3. Bird", " 1. McHale", " 8. Parish");
+  public void testOrderedList() {
+    List<String> list1 = List.of(" 1. Bird", " 2. McHale", " 3. Parish");
+    List<String> list2 = List.of(" 1. Bird", " 1. McHale", " 1. Parish");
+    List<String> list3 = List.of(" 7. Bird", " 8. McHale", " 9. Parish");
+    List<String> list4 = List.of(" 3. Bird", " 1. McHale", " 8. Parish");
     Assert.assertEquals("<nlist><item>Bird</item><item>McHale</item><item>Parish</item></nlist>", toPSML(list1));
     Assert.assertEquals("<nlist><item>Bird</item><item>McHale</item><item>Parish</item></nlist>", toPSML(list2));
     Assert.assertEquals("<nlist start=\"7\"><item>Bird</item><item>McHale</item><item>Parish</item></nlist>", toPSML(list3));
     Assert.assertEquals("<nlist start=\"3\"><item>Bird</item><item>McHale</item><item>Parish</item></nlist>", toPSML(list4));
   }
 
+  // Not supported yet
+  public void tesNestedLists() {
+    List<String> nested = List.of(
+        "- Fruits:",
+        "    - Apple",
+        "    - Banana",
+        "",
+        "- Vegetables:",
+        "    - Carrot"
+    );
+    Assert.assertEquals("", toPSML(nested));
+  }
+
   @Test
-  public void testOrderedListEscape() throws Exception {
-    List<String> list1 = Arrays.asList(" 1986. What a great season.");
-    List<String> list2 = Arrays.asList(" 1986\\. What a great season.");
+  public void testOrderedListEscape() {
+    List<String> list1 = List.of(" 1986. What a great season.");
+    List<String> list2 = List.of(" 1986\\. What a great season.");
     Assert.assertEquals("<nlist start=\"1986\"><item>What a great season.</item></nlist>", toPSML(list1));
     Assert.assertEquals("<para>1986. What a great season.</para>", toPSML(list2));
   }
 
   @Test
-  public void testCodeBlock() throws Exception {
-    List<String> pre = Arrays.asList("    This is a code block.");
+  public void testCodeBlock() {
+    List<String> pre = List.of("    This is a code block.");
     Assert.assertEquals("<preformat>This is a code block.</preformat>", toPSML(pre));
   }
 
-
   @Test
-  public void testFencedCode() throws Exception {
-    List<String> fencedCode1 = Arrays.asList("```", "function() { return 'Hello!';}", "```");
-    List<String> fencedCode2 = Arrays.asList("```javascript", "function() { return 'Hello!';}", "```");
-    List<String> fencedCode3 = Arrays.asList("```", "function() {", "  return 'Hello!';", "}", "```");
-    List<String> fencedCode4 = Arrays.asList("```", "function() {", "  if (a", "  > b) then a = b;", "}", "```");
-    List<String> fencedCode5 = Arrays.asList("```", "function() {","","return 'Hello!';}", "```");
-    List<String> fencedCode6 = Arrays.asList("```", "<report>","  <errors>","    <error>", "```");
+  public void testFencedCode() {
+    List<String> fencedCode1 = List.of("```", "function() { return 'Hello!';}", "```");
+    List<String> fencedCode2 = List.of("```javascript", "function() { return 'Hello!';}", "```");
+    List<String> fencedCode3 = List.of("```", "function() {", "  return 'Hello!';", "}", "```");
+    List<String> fencedCode4 = List.of("```", "function() {", "  if (a", "  > b) then a = b;", "}", "```");
+    List<String> fencedCode5 = List.of("```", "function() {","","return 'Hello!';}", "```");
+    List<String> fencedCode6 = List.of("```", "<report>","  <errors>","    <error>", "```");
     Assert.assertEquals("<preformat>\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode1));
-    Assert.assertEquals("<preformat role=\"javascript\">\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode2));
+    Assert.assertEquals("<preformat role=\"lang-javascript\">\nfunction() { return 'Hello!';}\n</preformat>", toPSML(fencedCode2));
     Assert.assertEquals("<preformat>\nfunction() {\n  return 'Hello!';\n}\n</preformat>", toPSML(fencedCode3));
     Assert.assertEquals("<preformat>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</preformat>", toPSML(fencedCode4));
     Assert.assertEquals("<preformat>\nfunction() {\n\nreturn 'Hello!';}\n</preformat>", toPSML(fencedCode5));
@@ -161,12 +169,26 @@ public class BlockParserTest {
   }
 
   @Test
-  public void testUC1() throws Exception {
-    List<String> mixed = Arrays.asList("`coconut`");
-    Assert.assertEquals("<para><monospace>coconut</monospace></para>", toPSML(mixed));
+  public void testFencedBlock() {
+    List<String> fencedBlock1 = List.of("~~~warning", "A warning!", "~~~");
+    List<String> fencedBlock2 = List.of("~~~", "Anonymous block", "~~~");
+    List<String> fencedBlock3 = List.of("~~~empty",  "~~~");
+    List<String> fencedBlock4 = List.of("~~~warning", "A double", "", "warning", "~~~");
+    List<String> fencedBlock5 = List.of("~~~note", " - apple", " - pear", "", "~~~");
+    List<String> fencedBlock6 = List.of("~~~wrap", "~~~warning", "The warning", "~~~", "~~~");
+    Assert.assertEquals("<block label=\"warning\"><para>A warning!</para></block>", toPSML(fencedBlock1));
+    Assert.assertEquals("<block><para>Anonymous block</para></block>", toPSML(fencedBlock2));
+    Assert.assertEquals("<block label=\"empty\"/>", toPSML(fencedBlock3));
+    Assert.assertEquals("<block label=\"warning\"><para>A double</para><para>warning</para></block>", toPSML(fencedBlock4));
+    Assert.assertEquals("<block label=\"note\"><list><item>apple</item><item>pear</item></list></block>", toPSML(fencedBlock5));
+    Assert.assertEquals("<block label=\"wrap\"><block label=\"warning\"><para>The warning</para></block></block>", toPSML(fencedBlock6));
   }
 
-
+  @Test
+  public void testUC1() {
+    List<String> mixed = List.of("`coconut`");
+    Assert.assertEquals("<para><monospace>coconut</monospace></para>", toPSML(mixed));
+  }
 
   // Testing the parser state
   // --------------------------------------------------------------------------------------------
@@ -177,71 +199,80 @@ public class BlockParserTest {
     state.commit();
     Assert.assertNull(state.current());
     // Empty fragment
-    state.push(Name.Fragment);
-    Assert.assertTrue(state.isElement(Name.Fragment));
+    state.push(Name.FRAGMENT);
+    Assert.assertTrue(state.isElement(Name.FRAGMENT));
     state.commit();
-    Assert.assertFalse(state.isElement(Name.Fragment));
+    Assert.assertFalse(state.isElement(Name.FRAGMENT));
     Assert.assertNull(state.current());
     // Empty fragment with paragraph
-    state.push(Name.Fragment);
-    state.push(Name.Para, "test");
-    Assert.assertTrue(state.isElement(Name.Para));
+    state.push(Name.FRAGMENT);
+    state.push(Name.PARA, "test");
+    Assert.assertTrue(state.isElement(Name.PARA));
     state.commit();
-    Assert.assertFalse(state.isElement(Name.Para));
-    Assert.assertTrue(state.isElement(Name.Fragment));
+    Assert.assertFalse(state.isElement(Name.PARA));
+    Assert.assertTrue(state.isElement(Name.FRAGMENT));
   }
 
   @Test
   public void testStateCurrent() {
     State state = new State();
     Assert.assertNull(state.current());
-    state.push(Name.Fragment);
-    Assert.assertEquals(Name.Fragment, state.current().getElement());
-    Assert.assertNotEquals(Name.Para, state.current().getElement());
-    state.push(Name.Para);
-    Assert.assertNotEquals(Name.Fragment, state.current().getElement());
-    Assert.assertEquals(Name.Para, state.current().getElement());
+    state.push(Name.FRAGMENT);
+    Assert.assertEquals(Name.FRAGMENT, state.current().getElement());
+    Assert.assertNotEquals(Name.PARA, state.current().getElement());
+    state.push(Name.PARA);
+    Assert.assertNotEquals(Name.FRAGMENT, state.current().getElement());
+    Assert.assertEquals(Name.PARA, state.current().getElement());
   }
 
   @Test
   public void testStateIsElement() {
     State state = new State();
     Assert.assertFalse(state.isElement(null));
-    Assert.assertFalse(state.isElement(Name.Fragment));
-    Assert.assertFalse(state.isElement(Name.Para));
-    state.push(Name.Fragment);
-    Assert.assertTrue(state.isElement(Name.Fragment));
-    Assert.assertFalse(state.isElement(Name.Para));
-    state.push(Name.Para);
-    Assert.assertFalse(state.isElement(Name.Fragment));
-    Assert.assertTrue(state.isElement(Name.Para));
+    Assert.assertFalse(state.isElement(Name.FRAGMENT));
+    Assert.assertFalse(state.isElement(Name.PARA));
+    state.push(Name.FRAGMENT);
+    Assert.assertTrue(state.isElement(Name.FRAGMENT));
+    Assert.assertFalse(state.isElement(Name.PARA));
+    state.push(Name.PARA);
+    Assert.assertFalse(state.isElement(Name.FRAGMENT));
+    Assert.assertTrue(state.isElement(Name.PARA));
   }
 
   @Test
   public void testStateIsDescendantOf() {
     State state = new State();
-    Assert.assertFalse(state.isDescendantOf(Name.Para));
-    state.push(Name.Fragment);
-    Assert.assertFalse(state.isDescendantOf(Name.Para));
-    state.push(Name.Para);
-    Assert.assertTrue(state.isDescendantOf(Name.Para));
-    state.push(Name.Bold);
-    Assert.assertTrue(state.isDescendantOf(Name.Para));
-    Assert.assertTrue(state.isDescendantOf(Name.Fragment));
+    Assert.assertFalse(state.isDescendantOf(Name.PARA));
+    state.push(Name.FRAGMENT);
+    Assert.assertFalse(state.isDescendantOf(Name.PARA));
+    state.push(Name.PARA);
+    Assert.assertTrue(state.isDescendantOf(Name.PARA));
+    state.push(Name.BOLD);
+    Assert.assertTrue(state.isDescendantOf(Name.PARA));
+    Assert.assertTrue(state.isDescendantOf(Name.FRAGMENT));
   }
 
   /**
    * Returns the Markdown text as PSML using the block parser.
    *
-   * @param text The text to parse
+   * @param lines The lines of text to parse
    *
    * @return The corresponding PSML as a string.
-   *
-   * @throws IOException If thrown by
    */
   private static String toPSML(List<String> lines) {
+    return toPSML(lines, MarkdownInputOptions.defaultFragmentOptions());
+  }
+
+  /**
+   * Returns the Markdown text as PSML using the block parser.
+   *
+   * @param lines The lines of text to parse
+   *
+   * @return The corresponding PSML as a string.
+   */
+  private static String toPSML(List<String> lines, MarkdownInputOptions options) {
     try {
-      BlockParser parser = new BlockParser();
+      BlockParser parser = new BlockParser(options);
       List<PSMLElement> elements = parser.parse(lines);
       XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
       for (PSMLElement e : elements) {
@@ -251,7 +282,7 @@ public class BlockParserTest {
       return xml.toString();
     } catch (IOException ex) {
       // Should never happen!
-      throw new RuntimeException(ex);
+      throw new UncheckedIOException(ex);
     }
   }
 
