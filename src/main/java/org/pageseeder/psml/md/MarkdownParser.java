@@ -26,6 +26,7 @@ import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.spi.Parser;
 import org.pageseeder.psml.util.DiagnosticCollector;
+import org.pageseeder.psml.util.NilDiagnosticCollector;
 
 /**
  * A parser for Markdown
@@ -84,26 +85,24 @@ public class MarkdownParser extends Parser {
    */
   @Override
   public PSMLElement parse(Reader reader) throws IOException {
-    List<String> lines = toLines(reader);
-    BlockParser parser = new BlockParser(config.toMarkdownInputOptions());
-    List<PSMLElement> elements = parser.parse(lines);
-
-    // Wrap the element based on the configuration
-    PSMLElement wrapper;
-    if (this.config.isFragment()) {
-      wrapper = new PSMLElement(Name.FRAGMENT);
-    } else {
-      wrapper = new PSMLElement(Name.DOCUMENT);
-      wrapper.setAttribute("level", "portable");
-    }
-    wrapper.addNodes(elements);
-
-    return wrapper;
+    return parse(reader, new NilDiagnosticCollector());
   }
 
+  /**
+   * Parses the content provided by a Reader into a PSMLElement structure.
+   * Processes the input lines to generate a structured representation and
+   * wraps them in an appropriate PSML element (e.g., document or fragment)
+   * based on the configuration.
+   *
+   * @param reader The Reader providing the content to be parsed.
+   * @param collector The DiagnosticCollector for collecting parsing diagnostics or errors.
+   * @return The root PSMLElement containing the parsed content, wrapped
+   *         in an appropriate structure based on the configuration.
+   * @throws IOException If an error occurs while reading from the provided Reader.
+   */
   public PSMLElement parse(Reader reader, DiagnosticCollector collector) throws IOException {
     List<String> lines = toLines(reader);
-    BlockParser parser = new BlockParser(config.toMarkdownInputOptions());
+    BlockParser parser = new BlockParser(this.config.toMarkdownInputOptions());
     List<PSMLElement> elements = parser.parse(lines, collector);
 
     // Wrap the element based on the configuration
