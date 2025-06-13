@@ -166,7 +166,9 @@ public final class MarkdownOutputOptions {
 
   }
 
-  private final boolean includeMetadata;
+  private final boolean metadata;
+
+  private final boolean captions;
 
   private final ImageFormat image;
 
@@ -181,14 +183,16 @@ public final class MarkdownOutputOptions {
   private final PropertiesFormat properties;
 
   private MarkdownOutputOptions(
-      boolean includeMetadata,
+      boolean metadata,
+      boolean captions,
       ImageFormat image,
       XrefFormat xref,
       BlockFormat block,
       SuperSubFormat superSub,
       UnderlineFormat underline,
       PropertiesFormat properties) {
-    this.includeMetadata = includeMetadata;
+    this.metadata = metadata;
+    this.captions = captions;
     this.image = Objects.requireNonNull(image);
     this.xref = Objects.requireNonNull(xref);
     this.block = Objects.requireNonNull(block);
@@ -210,6 +214,7 @@ public final class MarkdownOutputOptions {
    */
   public static MarkdownOutputOptions defaultOptions() {
     return new MarkdownOutputOptions(true,
+        false,
         ImageFormat.LOCAL,
         XrefFormat.BOLD_TEXT,
         BlockFormat.QUOTED,
@@ -224,8 +229,17 @@ public final class MarkdownOutputOptions {
    *
    * @return true if metadata is included in the output, false otherwise.
    */
-  public boolean includeMetadata() {
-    return includeMetadata;
+  public boolean metadata() {
+    return metadata;
+  }
+
+  /**
+   * Determines whether captions should be included as text in the Markdown output.
+   *
+   * @return true if captions is included in the output, false otherwise.
+   */
+  public boolean captions() {
+    return captions;
   }
 
   /**
@@ -291,10 +305,22 @@ public final class MarkdownOutputOptions {
   /**
    * Sets whether metadata should be included in the Markdown output.
    *
-   * @param includeMetadata true to include metadata in the output, false to exclude it.
+   * @param include true to include metadata in the output, false to exclude it.
    */
-  public MarkdownOutputOptions includeMetadata(boolean includeMetadata) {
-    return new MarkdownOutputOptions(includeMetadata, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);
+  public MarkdownOutputOptions metadata(boolean include) {
+    return new MarkdownOutputOptions(include, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);
+  }
+
+  /**
+   * Sets whether table captions, properties, and images alt text should be included as a paragraph
+   * before the table, properties, or images in the content.
+   *
+   * <p>For example, {@code **Image 2**: Network diagram}
+   *
+   * @param include true to include captions as text in the output, false to exclude it.
+   */
+  public MarkdownOutputOptions captions(boolean include) {
+    return new MarkdownOutputOptions(this.metadata, include, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);
   }
 
   /**
@@ -304,7 +330,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated image formatting setting.
    */
   public MarkdownOutputOptions image(ImageFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, format, this.xref, this.block, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, format, this.xref, this.block, this.superSub, this.underline, this.properties);
   }
 
   /**
@@ -317,7 +343,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated cross-reference format.
    */
   public MarkdownOutputOptions xref(XrefFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, this.image, format, this.block, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, format, this.block, this.superSub, this.underline, this.properties);
   }
 
   /**
@@ -329,7 +355,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated block format.
    */
   public MarkdownOutputOptions block(BlockFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, format, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, format, this.superSub, this.underline, this.properties);
   }
 
   /**
@@ -343,7 +369,7 @@ public final class MarkdownOutputOptions {
    *         and subscript formatting setting.
    */
   public MarkdownOutputOptions superSub(SuperSubFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, this.block, format, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, format, this.underline, this.properties);
   }
 
   /**
@@ -355,7 +381,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated underline formatting setting.
    */
   public MarkdownOutputOptions underline(UnderlineFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, this.block, this.superSub, format, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, format, this.properties);
   }
 
   /**
@@ -367,13 +393,14 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated properties formatting setting.
    */
   public MarkdownOutputOptions properties(PropertiesFormat format) {
-    return new MarkdownOutputOptions(this.includeMetadata, this.image, this.xref, this.block, this.superSub, this.underline, format);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, format);
   }
 
   @Override
   public String toString() {
     return "MarkdownOutputOptions{" +
-        "includeMetadata=" + includeMetadata +
+        "metadata=" + metadata +
+        ", captions=" + captions +
         ", image=" + image +
         ", xref=" + xref +
         ", block=" + block +

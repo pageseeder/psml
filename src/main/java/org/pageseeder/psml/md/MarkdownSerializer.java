@@ -26,8 +26,9 @@ import org.pageseeder.psml.util.Subscripts;
 import org.pageseeder.psml.util.Superscripts;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class is responsible for serializing PSML content into Markdown format.
@@ -122,6 +123,9 @@ public class MarkdownSerializer {
 
     private final int[] paraPrefix = new int[]{0, 0, 0, 0, 0};
 
+    private String host = "";
+    private String path = "";
+
     public void push(Name name) {
       this.context.push(name);
     }
@@ -140,6 +144,36 @@ public class MarkdownSerializer {
 
     String nextProperties() {
       return "Properties " + (++this.propertiesCounter);
+    }
+
+    String toRelativeLocalPath(String href) {
+      if (href.startsWith("http://") || href.startsWith("https://")) return href;
+      if (this.path.isEmpty()) return href;
+      // Compute path relative to state.path
+      Path base = Paths.get(this.path).getParent();
+      Path target = Paths.get(href);
+      if (base == null) {
+        return href;
+      }
+      Path relative = base.relativize(target);
+      return relative.toString().replace('\\', '/');
+    }
+
+    String toExternalUrl(String href) {
+      if (href.startsWith("http://") || href.startsWith("https://")) return href;
+      if (this.host.isEmpty()) return href;
+      String baseUrl = "https://" + this.host;
+      if (href.startsWith("/")) return baseUrl + href;
+      // Compute absolute path based on state.path
+      Path basePath = Paths.get(this.path).getParent();
+      Path resolvedPath = (basePath != null)
+          ? basePath.resolve(href).normalize()
+          : Paths.get(href).normalize();
+      String externalPath = resolvedPath.toString().replace('\\', '/');
+      if (!externalPath.startsWith("/")) {
+        externalPath = "/" + externalPath;
+      }
+      return baseUrl + externalPath;
     }
 
     String nextHeadingPrefix(int level) {
@@ -415,7 +449,7 @@ public class MarkdownSerializer {
 
     private void serializeDocument(PSMLElement document, Appendable out) throws IOException {
       // Include metadata as Yaml section at start of document
-      if (this.options.includeMetadata()) {
+      if (this.options.metadata()) {
         String status = document.getAttribute("status");
         PSMLElement documentInfo = document.getFirstChildElement(Name.DOCUMENTINFO);
         PSMLElement metadata = document.getFirstChildElement(Name.METADATA);
@@ -449,6 +483,8 @@ public class MarkdownSerializer {
         String title = textOf(uri.getFirstChildElement(Name.DISPLAYTITLE));
         String description = textOf(uri.getFirstChildElement(Name.DESCRIPTION));
         String labels = textOf(uri.getFirstChildElement(Name.LABELS));
+        state.host = uri.getAttributeOrElse("host", "");
+        state.path = uri.getAttributeOrElse("path", "");
         if (!title.isEmpty()) {
           out.append("Title: ").append(title).append('\n');
         }
@@ -494,20 +530,27 @@ public class MarkdownSerializer {
     private void serializeImage(PSMLElement image, Appendable out) throws IOException {
       String src = image.getAttributeOrElse("src", "");
       String alt = image.getAttribute("alt");
-      out.append("**").append(state.nextImage()).append("**");
-      if (alt != null) {
-        out.append(": ").append(alt);
-      } else {
-        alt = src != null ? src.substring(src.lastIndexOf('/') + 1) : "";
+      if (options.captions()) {
+        out.append("**").append(state.nextImage()).append("**");
+        if (alt != null) {
+          out.append(": ").append(alt);
+        }
+        out.append("\n");
       }
-      out.append("\n");
+      if (alt == null) {
+        alt = !src.isEmpty() ? src.substring(src.lastIndexOf('/') + 1) : "";
+      }
       switch (options.image()) {
         case LOCAL:
+          String href = state.toRelativeLocalPath(src);
           out.append("![").append(alt).append("](").append(src).append(")");
           break;
         case EXTERNAL:
-          // TODO requires base URI
-          out.append("![").append(alt).append("](").append(src).append(")");
+          if (state.host.isEmpty() || state.path.isEmpty()) {
+            collector.warn("Cannot generate external image URL without host and path information");
+          }
+          String url = state.toExternalUrl(src);
+          out.append("![").append(alt).append("](").append(url).append(")");
           break;
         case DATA_URI:
           // TODO Not supported
@@ -526,6 +569,7 @@ public class MarkdownSerializer {
           }
           out.append(" />");
           break;
+        default:
       }
     }
 
@@ -622,55 +666,65 @@ public class MarkdownSerializer {
     private void serializeProperty(PSMLElement property, Appendable out) throws IOException {
       String name = property.getAttributeOrElse("name", "");
       String title = property.getAttributeOrElse("title", name);
-      String value = property.getAttribute("value");
-      if (state.isDescendantOf(Name.METADATA)) {
-        // TODO xref and multiple values
-        out.append(normalizeText(title)).append(": ");
-        if (value != null) {
-          out.append(value);
-        } else {
-          List<PSMLElement> values = property.getChildElements(Name.VALUE);
-          List<PSMLElement> xrefs = property.getChildElements(Name.XREF);
-          if (!values.isEmpty()) {
-            out.append("[");
-            boolean first = true;
-            for (PSMLElement v : values) {
-              if (first) first = false;
-              else out.append(", ");
-              out.append(v.getText());
-            }
-            out.append("]");
-          } else if (!xrefs.isEmpty()) {
-            out.append("[");
-            boolean first = true;
-            for (PSMLElement xref : xrefs) {
-              if (first) first = false;
-              else out.append(", ");
-              out.append(xref.getText());
-            }
-            out.append("]");
-          }
-        }
-        out.append("\n");
-      } else if (state.isDescendantOf(Name.PROPERTIES_FRAGMENT)) {
-        out.append("| ").append(normalizeText(title).trim()).append(" | ");
-        if (value == null) {
-          value = property.getChildElements(Name.VALUE, Name.XREF).stream()
-              .map(PSMLElement::getText)
-              .map(MarkdownSerializer::normalizeText)
-              .collect(Collectors.joining(", "));
-        }
-        out.append(value);
-        // TODO handle markup, markdown, and xref
-        out.append(" |\n");
+      String value = toPropertyValue(property);
+      if (state.isDescendantOf(Name.METADATA) || options.properties() == MarkdownOutputOptions.PropertiesFormat.VALUE_PAIRS) {
+        out.append(normalizeText(title)).append(": ").append(value).append("\n");
+      } else {
+        out.append("| ").append(normalizeText(title)).append(" | ").append(value).append(" |\n");
       }
+    }
+
+    private String toPropertyValue(PSMLElement property) throws IOException {
+      String value = property.getAttribute("value");
+      // Single value
+      if (value != null) {
+        return normalizeText(value.replace("\n", "<br>"));
+      }
+      // Markdown
+      PSMLElement markdown = property.getFirstChildElement(Name.MARKDOWN);
+      if (markdown != null) {
+        return markdown.getText().replace("\n", "<br>");
+      }
+      StringBuilder out = new StringBuilder();
+      // Multiple values
+      List<PSMLElement> values = property.getChildElements(Name.VALUE);
+      if (!values.isEmpty()) {
+        out.append("[");
+        boolean first = true;
+        for (PSMLElement v : values) {
+          if (first) first = false;
+          else out.append(", ");
+          out.append(normalizeText(v.getText()));
+        }
+        out.append("]");
+        return out.toString();
+      }
+      // Xrefs
+      List<PSMLElement> xrefs = property.getChildElements(Name.XREF);
+      if (!xrefs.isEmpty()) {
+        boolean first = true;
+        for (PSMLElement xref : xrefs) {
+          if (first) first = false;
+          else out.append(", ");
+          serialize(xref, out);
+        }
+        return out.toString();
+      }
+
+      // Could be some markup
+      processChildren(property, out);
+      return normalizeText(out.toString().replace("\n", "<br>"));
     }
 
     private void serializePropertiesFragment(PSMLElement fragment, Appendable out) throws IOException {
       out.append('\n');
-      out.append("**").append(state.nextProperties()).append("**: ").append(fragment.getAttribute("id")).append('\n');
-      out.append("| Name | Value |\n");
-      out.append("|---|---|\n");
+      if (options.properties() == MarkdownOutputOptions.PropertiesFormat.TABLE) {
+        if (options.captions()) {
+          out.append("**").append(state.nextProperties()).append("**: ").append(fragment.getAttribute("id")).append('\n');
+        }
+        out.append("| Name | Value |\n");
+        out.append("|---|---|\n");
+      }
       for (PSMLElement property : fragment.getChildElements(Name.PROPERTY)) {
         serializeProperty(property, out);
       }
@@ -734,11 +788,13 @@ public class MarkdownSerializer {
 
     private void serializeTable(PSMLElement table, Appendable out) throws IOException {
       PSMLElement caption = table.getFirstChildElement(Name.CAPTION);
-      out.append("\n**").append(state.nextTable()).append("**");
-      if (caption != null) {
-        out.append(": ").append(caption.getText());
+      if (options.captions()) {
+        out.append("\n**").append(state.nextTable()).append("**");
+        if (caption != null) {
+          out.append(": ").append(caption.getText());
+        }
+        out.append("\n");
       }
-      out.append("\n");
       List<PSMLElement> columns = table.getChildElements(Name.COL);
       List<CellAlignment> align = toCellAlignments(columns);
       List<CellStyle> styles = toCellStyles(columns);

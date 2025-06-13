@@ -139,8 +139,8 @@ public final class MarkdownSerializerTest {
     Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions));
     Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.LOCAL)));
     Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.EXTERNAL)));
-    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.IMG_TAG)));
-    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.NONE)));
+    Assert.assertEquals("<img src=\"/path/to/img.jpg\" alt=\"Alt text\" />", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.IMG_TAG)));
+    Assert.assertEquals("", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.NONE)));
   }
 
   @Test
