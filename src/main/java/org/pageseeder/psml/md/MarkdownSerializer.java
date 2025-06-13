@@ -743,7 +743,7 @@ public class MarkdownSerializer {
           processChildren(element, out);
           out.append("</sup>");
           break;
-        case UNICODE_EQUIVALENT:
+        case UNICODE:
           if (!element.hasChildElements() && Superscripts.isReplaceable(element.getText())) {
             out.append(Superscripts.toSuperscript(element.getText()));
           } else {
@@ -771,7 +771,7 @@ public class MarkdownSerializer {
           processChildren(element, out);
           out.append("</sub>");
           break;
-        case UNICODE_EQUIVALENT:
+        case UNICODE:
           if (!element.hasChildElements() && Subscripts.isReplaceable(element.getText())) {
             out.append(Subscripts.toSubscript(element.getText()));
           } else {

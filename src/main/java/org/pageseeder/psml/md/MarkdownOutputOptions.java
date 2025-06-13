@@ -101,7 +101,7 @@ public final class MarkdownOutputOptions {
      * Represents a block label element rendered in a prefixed format in the Markdown output.
      * The specific rendering details for this format are not defined in the provided documentation.
      */
-    LABELED_TEXT
+    LABELED
 
   }
 
@@ -125,7 +125,7 @@ public final class MarkdownOutputOptions {
      * Superscripts and subscripts are represented using their Unicode equivalent
      * characters to render formatted text.
      */
-    UNICODE_EQUIVALENT,
+    UNICODE,
 
     /**
      * Superscript and subscript formatting is ignored and not rendered.

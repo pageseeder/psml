@@ -88,7 +88,7 @@ public final class MarkdownSerializerTest {
     Assert.assertEquals("^trademark^", toMarkdown("<sup>trademark</sup>", extendedOption));
     Assert.assertEquals("1^st^ Ca^2+^", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", extendedOption));
     Assert.assertEquals("", toMarkdown("<sup/>", extendedOption));
-    MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE_EQUIVALENT);
+    MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE);
     Assert.assertEquals("ᵗʳᵃᵈᵉᵐᵃʳᵏ", toMarkdown("<sup>trademark</sup>", unicodeOption));
     Assert.assertEquals("1ˢᵗ Ca²⁺", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", unicodeOption));
     Assert.assertEquals("", toMarkdown("<sup/>", unicodeOption));
@@ -110,7 +110,7 @@ public final class MarkdownSerializerTest {
     Assert.assertEquals("~2(a)~", toMarkdown("<sub>2(a)</sub>", extendedOption));
     Assert.assertEquals("H~2~O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", extendedOption));
     Assert.assertEquals("", toMarkdown("<sub/>", extendedOption));
-    MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE_EQUIVALENT);
+    MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE);
     Assert.assertEquals("₂₍ₐ₎", toMarkdown("<sub>2(a)</sub>", unicodeOption));
     Assert.assertEquals("H₂O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", unicodeOption));
     Assert.assertEquals("", toMarkdown("<sub/>", unicodeOption));
