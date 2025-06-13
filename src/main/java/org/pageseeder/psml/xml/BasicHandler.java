@@ -17,6 +17,7 @@ package org.pageseeder.psml.xml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.xmlwriter.XML;
@@ -52,14 +53,14 @@ public abstract class BasicHandler<T> extends Handler<T> {
   /**
    * The list of objects that have been retrieved from the XML.
    */
-  private List<T> list = new ArrayList<>();
+  private final List<T> list = new ArrayList<>();
 
   /**
    * The ancestry of element in the context.
    *
    * <p>The first element is the ancestor and the last element is the current element.
    */
-  private List<String> ancestorOrSelf = new ArrayList<>();
+  private final List<String> ancestorOrSelf = new ArrayList<>();
 
   /**
    * The buffer when capturing text values from elements.
@@ -105,7 +106,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
 
   @Override
   public final void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-    String element = localName.length() == 0 ? qName : localName;
+    String element = localName.isEmpty() ? qName : localName;
     this.ancestorOrSelf.add(element);
     if (this.xmlBuffer != null && !element.equals("xref") && !element.equals("image")) {
       this.xmlBuffer.openElement(element);
@@ -125,7 +126,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
 
   @Override
   public final void endElement(String uri, String localName, String qName) throws SAXException {
-    String element = localName.length() == 0 ? qName : localName;
+    String element = localName.isEmpty() ? qName : localName;
     endElement(element);
     if (!this.ancestorOrSelf.isEmpty()) {
       this.ancestorOrSelf.remove(this.ancestorOrSelf.size()-1);
@@ -169,7 +170,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
   /**
    * Initialises the buffer to capture characters with {@link #characters(char[], int, int)}.
    *
-   * Use this in the {@link #startElement(String, Attributes)} method when the element starts.
+   * <p>Use this in the {@link #startElement(String, Attributes)} method when the element starts.
    */
   protected final void newBuffer() {
     this.buffer = new StringBuilder();
@@ -205,7 +206,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
   /**
    * Initialises the heading buffer to capture text and character markup (except <image> and <xref>).
    *
-   * Use this in the {@link #startElement(String, Attributes)} method when the element starts.
+   * <p>Use this in the {@link #startElement(String, Attributes)} method when the element starts.
    */
   protected final void newXmlBuffer() {
     this.xmlBuffer = new XMLStringWriter(XML.NamespaceAware.No);
@@ -244,7 +245,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
   /**
    * Clears the buffer.
    *
-   * Calling this method will cause stop the {@link #characters(char[], int, int)} method
+   * <p>Calling this method will cause stop the {@link #characters(char[], int, int)} method
    * from recording in the buffer.
    */
   protected void clearBuffer() {
@@ -264,8 +265,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
    * @throws NullPointerException if the item is <code>null</code>
    */
   protected final void add(T item) {
-    if (item == null) throw new NullPointerException("Cannot add null item to list");
-    this.list.add(item);
+    this.list.add(Objects.requireNonNull(item, "Cannot add null item to list"));
   }
 
   // Manage items
@@ -377,11 +377,9 @@ public abstract class BasicHandler<T> extends Handler<T> {
    * @param name The name of the requested attribute.
    *
    * @return The corresponding value.
-   *
-   * @throws ContentException If the attribute is missing or could not be parsed as a long.
    */
   public static Long getLong(Attributes atts, String name) {
-    String value = atts.getValue(name);
+    @Nullable String value = atts.getValue(name);
     if (value == null) throw new MissingAttributeException(name);
     return toLong(value, name);
   }
@@ -392,8 +390,6 @@ public abstract class BasicHandler<T> extends Handler<T> {
    * @param fallback The value to return if the attribute is not specified
    *
    * @return The corresponding value or the fallback value.
-   *
-   * @throws ContentException If the attribute is missing or could not be parsed as a long.
    */
   public static Long getLong(Attributes atts, String name, Long fallback) {
     String value = atts.getValue(name);
@@ -450,7 +446,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
    * @throws MissingAttributeException If the attribute is missing or could not be parsed as an int.
    */
   public static int getInt(Attributes atts, String name) {
-    String value = atts.getValue(name);
+    @Nullable String value = atts.getValue(name);
     if (value == null) throw new MissingAttributeException(name);
     return toInt(value, name);
   }
