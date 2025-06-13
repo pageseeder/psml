@@ -12,15 +12,15 @@ import java.io.StringReader;
  *
  * @author Jean-Baptiste Reure
  *
- * @version 5.9100
- * @since 4.9019
+ * @version 1.6.0
+ * @since 1.0
  */
 public class WrappingReader extends Reader {
 
   /**
    * The original wrapped reader.
    */
-  private final Reader _originalReader;
+  private final Reader originalReader;
 
   /**
    * Flag indicating whether the original reader has been reader entirely
@@ -30,12 +30,12 @@ public class WrappingReader extends Reader {
   /**
    * The text to put before.
    */
-  private final StringBuilder _before = new StringBuilder();
+  private final StringBuilder before = new StringBuilder();
 
   /**
    * The text to put after
    */
-  private final StringBuilder _after = new StringBuilder();
+  private final StringBuilder after = new StringBuilder();
 
   /**
    * Index for the text before.
@@ -55,48 +55,48 @@ public class WrappingReader extends Reader {
    * @param after        The text to put after.
    */
   public WrappingReader(Reader reader, String before, String after) throws IOException {
-    this._originalReader = reader == null ? new StringReader("") : reader;
+    this.originalReader = reader == null ? new StringReader("") : reader;
     if (before != null) {
-      this._before.append(before);
+      this.before.append(before);
     }
     if (after != null) {
-      this._after.append(after);
+      this.after.append(after);
     }
     // check for XML declaration
     char[] beginning = new char[6];
-    int read = this._originalReader.read(beginning);
+    int read = this.originalReader.read(beginning);
     if (read == 6 && new String(beginning).equals("<?xml ")) {
       while (true) {
-        char c = (char) this._originalReader.read();
+        char c = (char) this.originalReader.read();
         if (c == '>') {
           break;
         }
       }
     } else if (read > 0) {
-      this._before.append(beginning, 0, read);
+      this.before.append(beginning, 0, read);
     }
   }
 
   @Override
   public int read(char[] cbuf, int off, int length) throws IOException {
     // finished?
-    if (this.readerFinished && this.secondIndex >= this._after.length())
+    if (this.readerFinished && this.secondIndex >= this.after.length())
       return -1;
     int i;
     for (i = 0; i < length; i++) {
       char c;
       // finished?
-      if (this.readerFinished && this.secondIndex >= this._after.length()) {
+      if (this.readerFinished && this.secondIndex >= this.after.length()) {
         break;
       } else if (this.readerFinished) {
-        c = this._after.charAt(this.secondIndex++);
-      } else if (this.firstIndex < this._before.length()) {
-        c = this._before.charAt(this.firstIndex++);
+        c = this.after.charAt(this.secondIndex++);
+      } else if (this.firstIndex < this.before.length()) {
+        c = this.before.charAt(this.firstIndex++);
       } else {
-        int r = this._originalReader.read();
+        int r = this.originalReader.read();
         this.readerFinished = r == -1;
-        if (this.readerFinished && this._after.length() != 0) {
-          c = this._after.charAt(this.secondIndex++);
+        if (this.readerFinished && this.after.length() != 0) {
+          c = this.after.charAt(this.secondIndex++);
         } else if (this.readerFinished) {
           break;
         } else {
@@ -110,6 +110,6 @@ public class WrappingReader extends Reader {
 
   @Override
   public void close() throws IOException {
-    this._originalReader.close();
+    this.originalReader.close();
   }
 }
