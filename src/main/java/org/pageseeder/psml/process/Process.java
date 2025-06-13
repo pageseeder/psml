@@ -458,8 +458,8 @@ public final class Process {
       } else if (this.preTransform == null && !this.processXML) {
         // move PSML files manually
         this.logger.info("Moving {} PSML content file(s)", psml.size());
-        for (String relPath : psml.keySet()) {
-          moveFile(psml.get(relPath), new File(this.dest, relPath));
+        for (Map.Entry<String, File> fileEntry : psml.entrySet()) {
+          moveFile(fileEntry.getValue(), new File(this.dest, fileEntry.getKey()));
         }
       }
 
@@ -467,10 +467,11 @@ public final class Process {
       boolean moveImages = this.imageHandling != null && this.imageHandling.getLocation() != null;
       this.logger.info("Moving {} non PSML file(s)", rest.size());
       if (moveImages) this.logger.info("Moving images to {}", this.imageHandling.getLocation());
-      for (String relPath : rest.keySet()) {
-        // strip manifest?
+      for (Map.Entry<String, File> fileEntry : rest.entrySet()) {
+        String relPath = fileEntry.getKey();
+        // Strip manifest?
         if ("META-INF/manifest.xml".equals(relPath) && this.strip != null && this.strip.stripManifest()) continue;
-        File other = rest.get(relPath);
+        File other = fileEntry.getValue();
         File target;
         if (moveImages && imageCache.isCached(relPath)) {
           String newPath = this.imageHandling.getSrc() == ImageSrc.LOCATION ? relPath : imageCache.getImageNewPath(relPath);
@@ -537,9 +538,10 @@ public final class Process {
     if (!this.processXML) return;
     AsciiMathConverter.reset();
     IncludesExcludesMatcher xrefsMatcher = this.xrefs == null ? null : this.xrefs.buildMatcher();
-    for (String relPath : psmlFiles.keySet()) {
+    for (Map.Entry<String, File> fileEntry : psmlFiles.entrySet()) {
+      String relPath = fileEntry.getKey();
       // log
-      this.logger.debug("Processing file {}",relPath);
+      this.logger.debug("Processing file {}", relPath);
       // create temp output file
       FileOutputStream fos;
       File tempOutput;
@@ -550,7 +552,7 @@ public final class Process {
         this.logger.error("Failed to create temp output file: {}", e.getMessage(), e);
         throw new ProcessException("Failed to create temp output file: "+e.getMessage(), e);
       }
-      File psml = psmlFiles.get(relPath);
+      File psml = fileEntry.getValue();
       // create handler
       PSMLProcessHandler handler1 = new PSMLProcessHandler(new OutputStreamWriter(fos, UTF8), null, psml, source, binaries);
       // set error handling details
