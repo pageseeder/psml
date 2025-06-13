@@ -7,8 +7,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
-import java.util.Stack;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
@@ -48,7 +49,7 @@ public final class DiffHandler extends DefaultHandler {
   /**
    * Current state.
    */
-  private final Stack<String> elements = new Stack<>();
+  private final Deque<String> elements = new ArrayDeque<>();
 
   /**
    * Current fragment ID
