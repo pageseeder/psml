@@ -165,7 +165,7 @@ public class HTMLInlineParser {
       else if (m.group(9) != null) {
         String code = m.group(10);
         HTMLElement monospace = new HTMLElement(Name.CODE);
-        if (code.length() > 0) {
+        if (!code.isEmpty()) {
           monospace.addNode(new HTMLText(code));
         }
         nodes.add(monospace);
@@ -174,7 +174,7 @@ public class HTMLInlineParser {
       else if (m.group(11) != null) {
         String code = m.group(12);
         HTMLElement monospace = new HTMLElement(Name.CODE);
-        if (code.length() > 0) {
+        if (!code.isEmpty()) {
           monospace.addNode(new HTMLText(code));
         }
         nodes.add(monospace);
