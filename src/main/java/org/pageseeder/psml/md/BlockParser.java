@@ -317,7 +317,7 @@ public class BlockParser {
           if (next != null) {
             if (next.matches("\\s*==+\\s*")) {
               // We use the '====' as a marker for a new section
-              if (options.isDocument() && !state.current().isEmpty()) {
+              if (options.isDocument() && !state.isEmpty()) {
                 state.newSection();
               }
               element = new PSMLElement(Name.HEADING);
@@ -333,7 +333,7 @@ public class BlockParser {
 
             } else if (next.matches("\\s*--+\\s*")) {
               // We use the '---' as a marker for a new fragment
-              if (options.isDocument() && !state.current().isEmpty()) {
+              if (options.isDocument() && !state.isEmpty()) {
                 state.newFragment();
               }
               element = new PSMLElement(Name.HEADING);
@@ -702,6 +702,11 @@ public class BlockParser {
     public @Nullable PSMLElement current() {
       if (this.context.isEmpty()) return null;
       return this.context.get(this.context.size()-1);
+    }
+
+    public boolean isEmpty() {
+      PSMLElement element = current();
+      return element == null || element.isEmpty();
     }
 
     /**

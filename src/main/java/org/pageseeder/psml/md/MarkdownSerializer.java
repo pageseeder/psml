@@ -256,7 +256,7 @@ public class MarkdownSerializer {
           break;
 
         case BR:
-          serializeBreak(element, out);
+          serializeBreak(out);
           break;
 
         case DOCUMENT:
@@ -439,7 +439,7 @@ public class MarkdownSerializer {
       out.append("__");
     }
 
-    private void serializeBreak(PSMLElement br, Appendable out) throws IOException {
+    private void serializeBreak(Appendable out) throws IOException {
       if (state.isDescendantOf(Name.TABLE)) {
         out.append("<br>");
       } else {
@@ -505,8 +505,6 @@ public class MarkdownSerializer {
     }
 
     private void serializeFragment(PSMLElement fragment, Appendable out) throws IOException {
-      // TODO option to include reference or anchor
-//      out.append("<a name=\"").append(fragment.getAttribute("id")).append("\"></a>");
       processChildElements(fragment, out);
     }
 
@@ -543,7 +541,7 @@ public class MarkdownSerializer {
       switch (options.image()) {
         case LOCAL:
           String href = state.toRelativeLocalPath(src);
-          out.append("![").append(alt).append("](").append(src).append(")");
+          out.append("![").append(alt).append("](").append(href).append(")");
           break;
         case EXTERNAL:
           if (state.host.isEmpty() || state.path.isEmpty()) {
@@ -871,14 +869,15 @@ public class MarkdownSerializer {
 
     private void serializeXref(PSMLElement link, Appendable out) throws IOException {
       String text = normalizeText(link.getText());
-      String url = link.getAttribute("href");
+      String url = link.getAttributeOrElse("href", "");
       switch (options.xref()) {
         case EXTERNAL_LINK:
-          // TODO Base URL
-          out.append("[").append(text).append("](").append(url).append(")");
+          String externalHref = state.toExternalUrl(url);
+          out.append("[").append(text).append("](").append(externalHref).append(")");
           break;
         case LOCAL_LINK:
-          out.append("[").append(text).append("](").append(url).append(")");
+          String localHref = state.toRelativeLocalPath(url);
+          out.append("[").append(text).append("](").append(localHref).append(")");
           break;
         case BOLD_TEXT:
           out.append("**").append(text).append("**");

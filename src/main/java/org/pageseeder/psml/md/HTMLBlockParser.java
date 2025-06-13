@@ -292,7 +292,7 @@ public class HTMLBlockParser {
               // Special case for title section
               if (config.isDocumentMode()) {
                 HTMLElement section = state.ancestor(Name.SECTION);
-                if ("title".equals(section.getAttribute("id"))) {
+                if (section != null && "title".equals(section.getAttribute("id"))) {
                   isTitle = true;
                 }
               }
@@ -609,7 +609,8 @@ public class HTMLBlockParser {
      */
     public void lineBreak() {
       commitText();
-      current().addNode(new HTMLElement(Name.BR));
+      HTMLElement current = current();
+      if (current != null) current.addNode(new HTMLElement(Name.BR));
       this.text = new StringBuilder();
     }
 
