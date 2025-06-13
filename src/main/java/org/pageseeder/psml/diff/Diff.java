@@ -18,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.diffx.config.TextGranularity;
 import org.pageseeder.diffx.config.WhiteSpaceProcessing;
 import org.pageseeder.psml.process.util.Files;
@@ -39,17 +40,17 @@ public final class Diff {
   /**
    * The logger.
    */
-  private Logger logger = null;
+  private @Nullable Logger logger = null;
 
   /**
    * The folder containing the documents to process.
    */
-  private File src = null;
+  private @Nullable File src = null;
 
   /**
    * Where to export it.
    */
-  private File dest = null;
+  private @Nullable File dest = null;
 
   /**
    * Max diff events allowed
@@ -69,7 +70,7 @@ public final class Diff {
   /**
    * Defines the images to process
    */
-  private IncludesExcludesMatcher filesMatcher = null;
+  private @Nullable IncludesExcludesMatcher filesMatcher = null;
 
   /**
    * @param destination the destination to set
@@ -119,7 +120,8 @@ public final class Diff {
 
   /**
    * Set maximum allowed diff events (default 4,000,000).
-   * Diff events are the number of elements/attributes/text in each fragment multiplied by each other.
+   *
+   * <p>Diff events are the number of elements/attributes/text in each fragment multiplied by each other.
    * When maxevents is reached the diff will set the coarsest granularity (TEXT) and try again.
    * If events is still larger than maxevents no diff element is generated for that fragment.
    * For reasonable performance maximum 4,000,000 is recommended.
@@ -156,34 +158,34 @@ public final class Diff {
     if (this.logger == null) this.logger = LoggerFactory.getLogger(Diff.class);
 
     // collect files
-    this.logger.debug("Collecting PSML files from "+this.src.getAbsolutePath());
+    this.logger.debug("Collecting PSML files from {}", this.src.getAbsolutePath());
     Map<String, File> psml = new HashMap<>();
     collectAll(this.src, psml);
 
     // loop through file list
-    for (String relPath : psml.keySet()) {
-
+    for (Map.Entry<String, File> psmlEntry : psml.entrySet()) {
+      String relPath = psmlEntry.getKey();
       // check pattern matching
       boolean matches = this.filesMatcher == null || !this.filesMatcher.hasPatterns() || this.filesMatcher.matches(relPath);
       if (!matches) continue;
 
-      this.logger.debug("Checking file "+relPath);
+      this.logger.debug("Checking file {}", relPath);
       // check if any compare fragments
       Map<String, String> compareFragments;
-      try (InputStream input = new FileInputStream(psml.get(relPath))) {
+      try (InputStream input = new FileInputStream(psmlEntry.getValue())) {
         compareFragments = comparePSML(input);
       } catch (ParserConfigurationException | SAXException | IOException ex) {
-        this.logger.error("Failed to parse input file "+relPath+" : "+ex.getMessage());
+        this.logger.error("Failed to parse input file {}: {}", relPath, ex.getMessage());
         throw new DiffException("Failed to parse input file "+relPath+" : "+ex.getMessage(), ex);
       }
       if (compareFragments.isEmpty() && !outputAll) {
         continue;
       }
 
-      this.logger.debug("Diffing file "+relPath);
+      this.logger.debug("Diffing file {}", relPath);
 
       FileOutputStream fos = null;
-      try (InputStream input = new FileInputStream(psml.get(relPath))) {
+      try (InputStream input = new FileInputStream(psmlEntry.getValue())) {
         File output = new File(this.dest, relPath);
         // just in case
         output.getParentFile().mkdirs();
@@ -192,7 +194,7 @@ public final class Diff {
         fos = new FileOutputStream(output);
         diffPSML(input, new OutputStreamWriter(fos, StandardCharsets.UTF_8), compareFragments);
       } catch (ParserConfigurationException | SAXException | IOException ex) {
-        this.logger.error("Failed to create output file: "+ex.getMessage(), ex);
+        this.logger.error("Failed to create output file: {}", ex.getMessage(), ex);
         throw new DiffException("Failed to create output file: "+ex.getMessage(), ex);
       } finally {
         // close streams
