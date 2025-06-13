@@ -137,8 +137,8 @@ public final class XSLTTransformer {
     Transformer transformer = XMLUtils.createTransformer(xslt, listener);
     transformer.setErrorListener(listener);
     Map<String, String> params = this.transformationDetails.getParams();
-    for (String p : params.keySet()) {
-      transformer.setParameter(p, params.get(p));
+    for (Map.Entry<String, String> p : params.entrySet()) {
+      transformer.setParameter(p.getKey(), p.getValue());
     }
     // find schema to validate output
     URL schema = null;
