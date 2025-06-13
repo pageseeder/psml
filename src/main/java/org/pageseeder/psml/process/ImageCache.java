@@ -15,9 +15,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Jean-Baptiste Reure
- * @version 23/10/2012
+ * ImageCache is responsible for managing and providing new paths for images
+ * based on their relative paths and metadata.
  *
+ * <p>It provides functionality to  check if images are cached, generate new paths
+ * based on specific source  rewriting strategies, and to construct folder paths
+ * or unique filenames.
+ *
+ * @author Jean-Baptiste Reure
+ *
+ * @version 1.0
+ * @since 1.0
  */
 public final class ImageCache {
 
@@ -32,10 +40,10 @@ public final class ImageCache {
   private final Map<String, String> cache = new HashMap<>();
 
   /**
-   * @param metainf The folder where the metadata files are located.
+   * @param metaInf The folder where the metadata files are located.
    */
-  public ImageCache(File metainf) {
-    this.metaInfFolder = metainf;
+  public ImageCache(File metaInf) {
+    this.metaInfFolder = metaInf;
   }
 
   /**
@@ -132,7 +140,6 @@ public final class ImageCache {
    * Cache the image path.
    *
    * @param relativePath the image's relative path
-   *
    */
   public void cacheImagePath(String relativePath) {
     this.cache.put(relativePath, relativePath);
@@ -192,12 +199,9 @@ public final class ImageCache {
 
   /**
    * Handler used to load URI details from an image metadata file.
-   *
-   * @author Jean-Baptiste Reure
-   * @version 23/10/2012
-   *
    */
-  private class MetadataFileHandler extends DefaultHandler {
+  private static class MetadataFileHandler extends DefaultHandler {
+
     /**
      * The URI ID.
      */

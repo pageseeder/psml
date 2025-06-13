@@ -23,8 +23,9 @@ import org.slf4j.Logger;
  * Class responsible for the creation of the manifest file in the export process.
  *
  * @author Jean-Baptiste Reure
- * @version 22/10/2012
  *
+ * @version 1.0
+ * @since 1.0
  */
 public final class ManifestCreator {
 
@@ -172,8 +173,10 @@ public final class ManifestCreator {
    * Used to order the files in alphabetical order.
    */
   private static class FileNameComparator implements Comparator<String> {
-    /** the list of all PSML files */
+
+    /** The list of all PSML files */
     private final Map<String, File> psmlFiles;
+
     /**
      * @param all the list of all PSML files
      */
