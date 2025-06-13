@@ -81,7 +81,7 @@ public final class ManifestCreator {
     if (this.manifestDoc == null) return null;
     String manifestFileName = this.manifestDoc.getFilename()+".psml";
     // log
-    this.logger.info("Manifest-Doc: Creating manifest file "+manifestFileName);
+    this.logger.info("Manifest-Doc: Creating manifest file {}", manifestFileName);
     // finding files to include
     // check if there's any matching to do
     IncludesExcludesMatcher matcher = this.manifestDoc.buildMatcher();
