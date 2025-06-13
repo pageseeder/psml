@@ -220,7 +220,7 @@ public class BlockParser {
 
     // Empty lines are used to separate the different kinds of blocks, except inside fenced (```) code
     else if (line.matches("\\s*") && !state.isCodeFenced()) {
-      state.commitUpto(state.isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
+      state.commitUpToBlockOrFragment();
     }
 
     // New list items starting with '+', '-', '*' or number followed by a '.'
@@ -244,7 +244,7 @@ public class BlockParser {
         state.ensureFragment();
       }
       if (!state.isElement(Name.PREFORMAT)) {
-        state.commitUpto(state.isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
+        state.commitUpToBlockOrFragment();
         state.push(Name.PREFORMAT, line.substring(4));
       } else {
         state.append(line.substring(4));
@@ -294,7 +294,7 @@ public class BlockParser {
         Pattern headingPattern = Pattern.compile("^\\s*(#{1,6})\\s+(.*?)(#{1,6})?$");
         Matcher m = headingPattern.matcher(line);
         if (m.matches()) {
-          state.commitUpto(state.isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
+          state.commitUpToBlockOrFragment();
           String level = Integer.toString(m.group(1).length());
           String text = m.group(2).trim();
 
@@ -342,7 +342,7 @@ public class BlockParser {
           }
 
           if (!state.isElement(element.getElement())) {
-            state.commitUpto(state.isDescendantOf(Name.BLOCK)? Name.BLOCK : Name.FRAGMENT);
+            state.commitUpToBlockOrFragment();
             state.push(element, line.trim());
           } else {
             if (state.lineBreak) {
@@ -379,7 +379,7 @@ public class BlockParser {
         state.commit();
       } else {
         // A new list! Clear the context...
-        state.commitUpto(state.isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
+        state.commitUpToBlockOrFragment();
         // And create a new list
         PSMLElement list;
         if (no.matches("\\d+\\.")) {
@@ -420,7 +420,7 @@ public class BlockParser {
         }
       }
     } else {
-      state.commitUpto(state.isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
+      state.commitUpToBlockOrFragment();
       // create new blockquote
       PSMLElement block = new PSMLElement(Name.BLOCK);
       block.setAttribute("label", "quoted");
@@ -536,9 +536,9 @@ public class BlockParser {
     if (state.isElement(Name.PREFORMAT)) {
       state.setCodeFence(false);
       state.append("");
-      state.commitUpto(state.isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
+      state.commitUpToBlockOrFragment();
     } else {
-      state.commitUpto(state.isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
+      state.commitUpToBlockOrFragment();
       PSMLElement pre = new PSMLElement(Name.PREFORMAT);
       if (line.length() > 3) {
         String language = line.substring(3).trim();
@@ -561,9 +561,11 @@ public class BlockParser {
       // End block
       state.commitUpto(Name.BLOCK);
       state.commit();
+      state.fencedLabel--;
     } else {
       // Start block
       state.commitUpto(Name.BLOCK);
+      state.fencedLabel++;
       PSMLElement block = new PSMLElement(Name.BLOCK);
       if (line.length() > 3) {
         if (!label.isEmpty()) {
@@ -651,6 +653,8 @@ public class BlockParser {
      */
     private boolean codeFence = false;
 
+    private int fencedLabel = 0;
+
     public State() {
       this.collector = new NilDiagnosticCollector();
     }
@@ -668,6 +672,10 @@ public class BlockParser {
      */
     public boolean isCodeFenced() {
       return this.codeFence;
+    }
+
+    public boolean isLabelFenced() {
+      return this.fencedLabel > 0;
     }
 
     public void setCodeFence(boolean fence) {
@@ -837,6 +845,10 @@ public class BlockParser {
         }
         size = this.context.size();
       }
+    }
+
+    public void commitUpToBlockOrFragment() {
+      commitUpto(fencedLabel > 0 && isDescendantOf(Name.BLOCK) ? Name.BLOCK : Name.FRAGMENT);
     }
 
     /**

@@ -1,8 +1,7 @@
 
 Title: A simple test
+Description: This is a simple Markdown file to test the markdown parser
 Author: Christophe Lauret
-Description: This is a simple Markdown file to test the markdown parser 
-
 
 Simple Test
 ===========
@@ -73,7 +72,7 @@ Until now, we've only been interested in whether or not a match is found at some
 
 
 
-[ ![Download](https://api.bintray.com/packages/pageseeder/maven/xmlwriter/images/download.svg) ](https://bintray.com/pageseeder/maven/xmlwriter/_latestVersion)
+Information on [PSML elements](https://dev.pageseeder.com/psml/elements.html).
 
 # XML Writer
 
