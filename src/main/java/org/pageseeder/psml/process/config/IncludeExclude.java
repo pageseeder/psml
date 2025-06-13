@@ -6,21 +6,24 @@ package org.pageseeder.psml.process.config;
 
 /**
  * Represent an ANT include or exclude.
- * Only attribute <code>name</code> is supported currently.
+ *
+ * <p>Only attribute <code>name</code> is supported.
  *
  * @author Jean-Baptiste Reure
- * @version 04/05/2015
+ * @version 1.6.0
+ * @since 1.0
  */
 public final class IncludeExclude {
+
   /**
    * include name.
    */
-  private String _name;
+  private String name;
 
   /**
    * if this is to include or exclude documents
    */
-  private final boolean _isInclude;
+  private final boolean isInclude;
 
   /**
    * @return a new include instance
@@ -51,32 +54,32 @@ public final class IncludeExclude {
   }
 
   /**
-   * @param inc if it's an include or an exclude
+   * @param include true if it's an include; false for an exclude.
    */
-  private IncludeExclude(String name, boolean inc) {
-    this._name = name;
-    this._isInclude = inc;
+  private IncludeExclude(String name, boolean include) {
+    this.name = name;
+    this.isInclude = include;
   }
 
   /**
-   * @param pname the new include name.
+   * @param name the new include name.
    */
-  public void setName(String pname) {
-    this._name = pname;
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
    * @return the include name.
    */
   public String getName() {
-    return _name;
+    return name;
   }
 
   /**
    * @return <code>true</code> if include, <code>false</code> if exclude
    */
   public boolean isInclude() {
-    return this._isInclude;
+    return this.isInclude;
   }
 
 }
