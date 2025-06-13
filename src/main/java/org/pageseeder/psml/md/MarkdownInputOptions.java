@@ -6,7 +6,7 @@ package org.pageseeder.psml.md;
  * @author Christophe Lauret
  *
  * @version 1.6.0
- * @since 1.0
+ * @since 1.6.0
  */
 public final class MarkdownInputOptions {
 
