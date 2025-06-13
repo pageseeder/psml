@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -57,7 +58,7 @@ public final class Processor {
   /**
    * The fragment to process if any, otherwise document.
    */
-  private String fragment;
+  private @Nullable String fragment;
 
   /**
    * Whether to fail when an error is found.
@@ -132,7 +133,7 @@ public final class Processor {
    * <p>Note this method will automatically select the correct encoding for the file output.
    *
    * @throws IOException Should an I/O error occur while reading the XML.
-   * @throws SAXException Should an error occur while parsing the XML.
+   * @throws TemplateException Should an error occur while processing the template.
    */
   public void process(Reader template, File psml, Map<String, String> values) throws IOException, TemplateException {
     InputSource source = new InputSource(template);
@@ -144,7 +145,7 @@ public final class Processor {
    * Process the template and generate the PSML using the specified values.
    *
    * @throws IOException Should an I/O error occur while reading the XML.
-   * @throws SAXException Should an error occur while parsing the XML.
+   * @throws TemplateException Should an error occur while procesing the template.
    */
   public void process(InputSource template, PrintWriter psml, Map<String, String> values) throws IOException, TemplateException {
     TemplateFactory factory = new TemplateFactory(this.charset);
@@ -154,10 +155,6 @@ public final class Processor {
     t.process(psml, values, this.failOnError);
   }
 
-  /**
-   *
-   * @param args
-   */
   public static void main(String[] args) throws IOException, TemplateException {
     if (args.length > 0) {
 

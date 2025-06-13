@@ -320,7 +320,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    *
    * @return the a tree in the publication.
    */
-  public DocumentTree tree(long id) {
+  public @Nullable DocumentTree tree(long id) {
     return this._map.get(id);
   }
 

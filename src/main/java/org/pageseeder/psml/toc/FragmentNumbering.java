@@ -29,9 +29,8 @@ public final class FragmentNumbering implements Serializable {
 
   /**
    * Specifies a heading/para location within a publication.
-   *
    */
-  private final class Location {
+  private static final class Location {
 
     /**
      * Current URI ID
@@ -458,7 +457,7 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the prefix
    */
-  public Prefix getPrefix(long uriid, int position) {
+  public @Nullable Prefix getPrefix(long uriid, int position) {
     Prefix pref = this.numbering.get(uriid + "-" + position + "-default");
     if (pref == null) {
       LOGGER.debug("Numbering not found for uriid: {}, position: {}, fragment default",
@@ -499,7 +498,7 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the prefix
    */
-  public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index) {
+  public @Nullable Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index) {
     return getTranscludedPrefix(uriid, position, fragment, index, false);
   }
 
@@ -514,10 +513,10 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the prefix
    */
-  public Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index, boolean undefined) {
+  public @Nullable Prefix getTranscludedPrefix(long uriid, int position, String fragment, int index, boolean undefined) {
     Prefix pref = this.transcludedNumbering.get(uriid + "-" + position + "-" + fragment + "-" + index);
     // don't return undefined prefix unless required
-    if (pref != null && "".equals(pref.value) && pref.canonical == null && !undefined) {
+    if (pref != null && pref.value.isEmpty() && pref.canonical == null && !undefined) {
       return null;
     }
     return pref;
