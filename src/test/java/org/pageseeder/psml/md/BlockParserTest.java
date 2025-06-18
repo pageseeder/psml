@@ -185,6 +185,22 @@ public class BlockParserTest {
   }
 
   @Test
+  public void testTable() {
+    List<String> table1 = List.of(
+        "| TH 1 | TH 2 | TH 3 |",
+        "|------|------|------|",
+        "| R1C1 | R1C2 | R1C3 |",
+        "| R2C1 | R2C2 | R2C3 |");
+    String expected = "<table>" +
+        "<col/><col/><col/>" +
+        "<row part=\"header\"><cell>TH 1</cell><cell>TH 2</cell><cell>TH 3</cell></row>" +
+        "<row><cell>R1C1</cell><cell>R1C2</cell><cell>R1C3</cell></row>" +
+        "<row><cell>R2C1</cell><cell>R2C2</cell><cell>R2C3</cell></row>" +
+        "</table>";
+    Assert.assertEquals(expected, toPSML(table1));
+  }
+
+  @Test
   public void testUC1() {
     List<String> mixed = List.of("`coconut`");
     Assert.assertEquals("<para><monospace>coconut</monospace></para>", toPSML(mixed));
