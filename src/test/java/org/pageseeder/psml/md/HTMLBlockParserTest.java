@@ -148,11 +148,43 @@ public class HTMLBlockParserTest {
     List<String> fencedCode5 = List.of("```", "function() {","","return 'Hello!';}", "```");
     List<String> fencedCode6 = List.of("```", "<report>","  <errors>","    <error>", "```");
     Assert.assertEquals("<pre>\nfunction() { return 'Hello!';}\n</pre>", toHTML(fencedCode1));
-    Assert.assertEquals("<pre><code class=\"javascript\">\nfunction() { return 'Hello!';}\n</code></pre>", toHTML(fencedCode2));
+    Assert.assertEquals("<pre><code class=\"lang-javascript\">\nfunction() { return 'Hello!';}\n</code></pre>", toHTML(fencedCode2));
     Assert.assertEquals("<pre>\nfunction() {\n  return 'Hello!';\n}\n</pre>", toHTML(fencedCode3));
     Assert.assertEquals("<pre>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</pre>", toHTML(fencedCode4));
     Assert.assertEquals("<pre>\nfunction() {\n\nreturn 'Hello!';}\n</pre>", toHTML(fencedCode5));
     Assert.assertEquals("<pre>\n&lt;report&gt;\n  &lt;errors&gt;\n    &lt;error&gt;\n</pre>", toHTML(fencedCode6));
+  }
+
+  @Test
+  public void testFencedBlock() {
+    List<String> fencedBlock1 = List.of("~~~warning", "A warning!", "~~~");
+    List<String> fencedBlock2 = List.of("~~~", "Anonymous block", "~~~");
+    List<String> fencedBlock3 = List.of("~~~empty",  "~~~");
+    List<String> fencedBlock4 = List.of("~~~warning", "A double", "", "warning", "~~~");
+    List<String> fencedBlock5 = List.of("~~~note", " - apple", " - pear", "", "~~~");
+    List<String> fencedBlock6 = List.of("~~~wrap", "~~~warning", "The warning", "~~~", "~~~");
+    Assert.assertEquals("<div class=\"label-warning\" label=\"warning\"><p>A warning!</p></div>", toHTML(fencedBlock1));
+    Assert.assertEquals("<div><p>Anonymous block</p></div>", toHTML(fencedBlock2));
+    Assert.assertEquals("<div class=\"label-empty\" label=\"empty\"/>", toHTML(fencedBlock3));
+    Assert.assertEquals("<div class=\"label-warning\" label=\"warning\"><p>A double</p><p>warning</p></div>", toHTML(fencedBlock4));
+    Assert.assertEquals("<div class=\"label-note\" label=\"note\"><ul><li>apple</li><li>pear</li></ul></div>", toHTML(fencedBlock5));
+    Assert.assertEquals("<div class=\"label-wrap\" label=\"wrap\"><div class=\"label-warning\"><para>The warning</para></div></div>", toHTML(fencedBlock6));
+  }
+
+  @Test
+  public void testTable() {
+    List<String> table1 = List.of(
+        "| TH 1 | TH 2 | TH 3 |",
+        "|------|------|------|",
+        "| R1C1 | R1C2 | R1C3 |",
+        "| R2C1 | R2C2 | R2C3 |");
+    String expected = "<table>" +
+        "<col/><col/><col/>" +
+        "<tr><th>TH 1</th><th>TH 2</th><th>TH 3</th></tr>" +
+        "<tr><td>R1C1</td><td>R1C2</td><td>R1C3</td></tr>" +
+        "<tr><td>R2C1</td><td>R2C2</td><td>R2C3</td></tr>" +
+        "</table>";
+    Assert.assertEquals(expected, toHTML(table1));
   }
 
   @Test
