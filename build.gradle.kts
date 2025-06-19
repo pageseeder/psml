@@ -1,14 +1,16 @@
 plugins {
-  `java-library`
-  `maven-publish`
-  id("io.codearte.nexus-staging") version "0.30.0"
+  id("java-library")
+  id("maven-publish")
+  alias(libs.plugins.jreleaser)
 }
+
+val title: String by project
+val gitName: String by project
+val website: String by project
 
 group = "org.pageseeder"
 version = file("version.txt").readText().trim()
-description = project.findProperty("title") as? String ?: "Default Title"
-
-apply(from = "gradle/publish-mavencentral.gradle")
+description = title
 
 repositories {
   mavenCentral {
@@ -19,8 +21,6 @@ repositories {
   }
 }
 
-
-// Use Java toolchain to ensure the correct JVM is used by Gradle
 java {
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
@@ -51,5 +51,62 @@ dependencies {
   testRuntimeOnly(libs.rhino.engine) {
     because("Required by TeX/AsciiMath conversion in Java 15+")
   }
+}
 
+tasks.wrapper {
+  gradleVersion = "8.13"
+  distributionType = Wrapper.DistributionType.BIN
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("mavenJava") {
+      from(components["java"])
+      groupId = group as String?
+//      artifactId = "pso-psml"
+      pom {
+        name.set(title)
+        description.set(project.description)
+        url.set(website)
+        licenses {
+          license {
+            name.set("The Apache Software License, Version 2.0")
+            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+          }
+        }
+        organization {
+          name.set("Allette Systems")
+          url.set("https://www.allette.com.au")
+        }
+        scm {
+          url.set("git@github.com:pageseeder/${gitName}.git")
+          connection.set("scm:git:git@github.com:pageseeder/${gitName}.git")
+          developerConnection.set("scm:git:git@github.com:pageseeder/${gitName}.git")
+        }
+        developers {
+          developer {
+            name.set("Alberto Santos")
+            email.set("asantos@allette.com.au")
+          }
+          developer {
+            name.set("Christophe Lauret")
+            email.set("clauret@weborganic.com")
+          }
+          developer {
+            name.set("Jean-Baptiste Reure")
+            email.set("jbreure@weborganic.com")
+          }
+          developer {
+            name.set("Philip Rutherford")
+            email.set("philipr@weborganic.com")
+          }
+        }
+      }
+    }
+  }
+  repositories {
+    maven {
+      url = uri(layout.buildDirectory.dir("staging-deploy").get().asFile)
+    }
+  }
 }
