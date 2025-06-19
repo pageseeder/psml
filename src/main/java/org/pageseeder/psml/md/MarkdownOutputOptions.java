@@ -112,7 +112,7 @@ public final class MarkdownOutputOptions {
 
     /**
      * Superscripts and subscripts are represented using HTML tags (e.g.,
-     * {@code <sup>}, {@code }<sub>}).
+     * {@code <sup>}, {@code <sub>}).
      */
     HTML,
 
@@ -306,6 +306,7 @@ public final class MarkdownOutputOptions {
    * Sets whether metadata should be included in the Markdown output.
    *
    * @param include true to include metadata in the output, false to exclude it.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated metadata formatting setting.
    */
   public MarkdownOutputOptions metadata(boolean include) {
     return new MarkdownOutputOptions(include, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);
@@ -318,6 +319,7 @@ public final class MarkdownOutputOptions {
    * <p>For example, {@code **Image 2**: Network diagram}
    *
    * @param include true to include captions as text in the output, false to exclude it.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated caption formatting setting.
    */
   public MarkdownOutputOptions captions(boolean include) {
     return new MarkdownOutputOptions(this.metadata, include, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);

@@ -91,6 +91,10 @@ public final class TemplateFactory {
 
   /**
    * Creates a new processor to generate the PSML using the specified encoding.
+   *
+   * @param charset The charset to use
+   *
+   * @throws IllegalArgumentException if the charset is not supported
    */
   public TemplateFactory(Charset charset) {
     if (!isSupported(charset)) throw new IllegalArgumentException("Unsupported encoding");

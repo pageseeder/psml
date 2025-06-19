@@ -51,7 +51,10 @@ public interface Template {
    * Generate a new PSML document by filling out the values in the template using the charset used by the template.
    *
    * @param psml   The PSML template
-   * @param values The values to use for the place holders
+   * @param values The values to use for the placeholders
+   * @param failOnError When true the process will fail if an error occurs
+   *
+   * @throws TemplateException If a fatal error occurs during processing
    */
   void process(PrintWriter psml, Map<String, String> values, boolean failOnError) throws TemplateException;
 

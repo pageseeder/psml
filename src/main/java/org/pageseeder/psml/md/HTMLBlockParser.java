@@ -77,6 +77,7 @@ public class HTMLBlockParser {
    * Iterate over the lines and return corresponding PSML elements.
    *
    * @param lines The lines to parse
+   * @param config The configuration to use
    *
    * @return The corresponding list of PSML elements
    *
@@ -91,6 +92,7 @@ public class HTMLBlockParser {
    * Iterate over the lines and return corresponding HTML elements.
    *
    * @param lines The lines to parse
+   * @param options The markdown options to use
    *
    * @return The corresponding list of HTML elements
    */
@@ -139,6 +141,7 @@ public class HTMLBlockParser {
    * @param line  The current line
    * @param next  The next line
    * @param state The state of the parser
+   * @param config The configuration to use
    */
   @Deprecated(forRemoval = true, since = "1.6.1")
   public void processLine(String line, @Nullable String next, State state, Configuration config) {
@@ -151,6 +154,7 @@ public class HTMLBlockParser {
    * @param line  The current line
    * @param next  The next line
    * @param state The state of the parser
+   * @param options The markdown options to use
    */
   public static void processLine(String line, @Nullable String next, State state, MarkdownInputOptions options) {
     // Lines made entirely of '=' or '-' are used for heading 1 and 2
@@ -714,6 +718,7 @@ public class HTMLBlockParser {
 
     /**
      * Append text to the current text node preceded by a new line.
+     * @param text The text to append
      */
     public void append(String text) {
       this.text.append('\n').append(text);
@@ -741,6 +746,7 @@ public class HTMLBlockParser {
     /**
      * Commit the elements in the current stack up to the specified element
      * and attach the text to the current node.
+     * @param name The name of the element where we stop committing.
      */
     public void commitUpto(Name name) {
       this.lineBreak = false;

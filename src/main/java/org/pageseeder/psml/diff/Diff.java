@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Adds <diff> elements to portable PSML files.
+ * Adds {@code <diff>} elements to portable PSML files.
  *
  * @see <a href="https://dev.pageseeder.com/guide/publishing/ant_api/tasks/task_diff.html">Task Diff</a>
  *
@@ -133,7 +133,7 @@ public final class Diff {
   }
 
   /**
-   * Adds diff elements to portable PSML files (only if they have compare <content> elements).
+   * Adds diff elements to portable PSML files (only if they have compare {@code <content>} elements).
    * Files under <code>[src]/WEB-INF</code> are ignored.
    *
    * @param outputAll  if <code>true</code> output all PSML files to <code>[dest]</code> even if no compare elements.
@@ -213,7 +213,7 @@ public final class Diff {
    *
    * @param in  the PSML document
    *
-   * @return map of fragment ID to current fragment with a corresponding <compare> element.
+   * @return map of fragment ID to current fragment with a corresponding {@code <compare>} element.
    *
    * @throws ParserConfigurationException if problem getting parser
    * @throws SAXException if problem parsing PSML
@@ -229,11 +229,11 @@ public final class Diff {
   }
 
   /**
-   * Adds <diff> elements for compare fragments in portable PSML.
+   * Adds {@code <diff>} elements for compare fragments in portable PSML.
    *
    * @param in                the PSML document
    * @param out               the result PSML document
-   * @param compareFragments  map of fragment ID to current fragment with a corresponding <compare> element.
+   * @param compareFragments  map of fragment ID to current fragment with a corresponding {@code <compare>} element.
    *
    * @throws ParserConfigurationException if problem getting parser
    * @throws SAXException if problem parsing PSML

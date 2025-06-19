@@ -8,7 +8,7 @@ package org.pageseeder.psml.process.config;
  * of type "embed" for each PSML file, in alphabetical order.
  * The generated file is included in PSML files for subsequent processing.
  *
- * <p>Used to represent the inner ANT element:<p>
+ * <p>Used to represent the inner ANT element:
  * <pre>{@code <manifestdoc
  *             filename="[filename]"
  *             includes="[patterns]"

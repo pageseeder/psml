@@ -8,7 +8,7 @@ package org.pageseeder.psml.process.config;
 /**
  * Provides finer control over the elements to strip.
  *
- * <p>Used to represent the inner ANT element:<p>
+ * <p>Used to represent the inner ANT element:
  * <pre>{@code <strip
  *             manifest="[true|false]"
  *             documentinfo="[all,docid,title,description,labels,publication,versions]"

@@ -36,18 +36,30 @@ public final class TemplateException extends Exception {
 
   /**
    * Constructs a new exception with the specified detail message.
+   *
+   * @param message the detail message associated with this exception
    */
   public TemplateException(String message) {
     super(message);
   }
 
+  /**
+   * Constructs a new TemplateException with the specified detail message and cause.
+   *
+   * @param message the detail message associated with this exception
+   * @param cause   the cause of the exception, which can be retrieved later using {@link Throwable#getCause()}
+   */
   public TemplateException(String message, Throwable cause) {
     super(message, cause);
   }
 
+  /**
+   * Constructs a new TemplateException with the specified cause.
+   *
+   * @param cause the underlying cause of the exception, which can be retrieved later using {@link Throwable#getCause()}
+   */
   public TemplateException(Throwable cause) {
     super(cause);
   }
-
 
 }

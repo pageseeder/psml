@@ -304,6 +304,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
 
   /**
    * List of all forward references to documents and document fragments (including transclusions).
+   * @return The corresponding references
    */
   public List<Reference> listReferences() {
     List<Reference> refs = new ArrayList<>();
@@ -440,6 +441,8 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
    * <p>If they match, the first heading is removed and other headings adjusted according.
    *
    * <p>If they don't, this content tree is returned.
+   *
+   * @param collapse how headings should be computed
    *
    * @return a normalized version of this content tree.
    */
@@ -660,6 +663,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
      * Creates a new builder for this content tree.
      *
      * @param id The URI ID of the document.
+     * @param title The title of the document.
      */
     public Builder(long id, String title) {
       this(id);

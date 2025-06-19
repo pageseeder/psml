@@ -7,7 +7,7 @@ package org.pageseeder.psml.process.config;
  * This element provides options to control how images are managed and will
  * rewrite the path accordingly.
  *
- * <p>Used to represent the inner ANT element:<p>
+ * <p>Used to represent the inner ANT element:
  *
  * <pre>
  * {@code <images

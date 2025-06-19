@@ -161,6 +161,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   /**
    * Find the reference matching the URI in the specified part.
    *
+   * @param part the part within which we search
    * @param uri The URI ID for this reference
    *
    * @return the reference in this tree.

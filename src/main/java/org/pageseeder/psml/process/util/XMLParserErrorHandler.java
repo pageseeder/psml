@@ -44,7 +44,6 @@ public final class XMLParserErrorHandler implements ErrorHandler {
    * to the list of collected errors.
    *
    * @param exception The SAXParseException containing details of the fatal parsing error.
-   * @throws SAXException If a SAX error occurs while processing the exception.
    */
   public void fatalError(SAXParseException exception) {
     this.errors.add("FATAL: "+toMessage(exception));

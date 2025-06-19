@@ -682,6 +682,10 @@ public class PSMLElement implements PSMLNode {
 
   /**
    * Indicates whether the name of this element matches the specified name.
+   *
+   * @param names Names of any of the elements to match
+   *
+   * @return true if any of the names matches; false if none of them match
    */
   public boolean isAnyElement(Name... names) {
     for (Name element : names) {
@@ -706,6 +710,7 @@ public class PSMLElement implements PSMLNode {
    * Returns the attribute value for the specified attribute.
    *
    * @param name The name of the attribute.
+   * @param defaultValue The default value if the attribute is not specified
    *
    * @return The corresponding value or <code>null</code>.
    */
@@ -719,6 +724,7 @@ public class PSMLElement implements PSMLNode {
    * Returns the attribute value for the specified attribute.
    *
    * @param name The name of the attribute.
+   * @param defaultValue The default value if the attribute is not specified
    *
    * @return The corresponding value or <code>null</code>.
    */

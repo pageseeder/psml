@@ -147,7 +147,8 @@ public abstract class Element implements Serializable, XMLWritable {
    * @param treeid   The ID of the current document tree.
    * @param count    The position (occurrence number) of the document in the publication.
    * @param numbered Whether the heading is auto-numbered
-   * @param prefix   Any prefix given to the title.
+   * @param prefix   Any prefix given to the title
+   * @param children Whether the it has children
    *
    * @throws IOException Should an I/O error occur
    */

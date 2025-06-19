@@ -204,7 +204,8 @@ public abstract class BasicHandler<T> extends Handler<T> {
   }
 
   /**
-   * Initialises the heading buffer to capture text and character markup (except <image> and <xref>).
+   * Initialises the heading buffer to capture text and character markup
+   * (except {@code <image>} and {@code <xref>}).
    *
    * <p>Use this in the {@link #startElement(String, Attributes)} method when the element starts.
    */

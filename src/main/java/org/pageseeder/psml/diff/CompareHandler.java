@@ -42,7 +42,7 @@ public final class CompareHandler extends DefaultHandler {
   private final Map<String, String> compareFragments = new HashMap<>();
 
   /**
-   * @return map of fragment ID to current fragment with a corresponding <compare> element.
+   * @return map of fragment ID to current fragment with a corresponding {@code <compare>} element.
    */
   public Map<String, String> getCompareFragments() {
     return this.compareFragments;

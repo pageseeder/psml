@@ -306,6 +306,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
 
 
   /**
+   * @param parent         the parent handler
    * @param out            where the resulting XML should be written.
    * @param file           the source file.
    * @param root           the root folder of the PSML files (used to compute relative
@@ -560,6 +561,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
   /**
    * @param config the publication config to set
    * @param root   the publication root file
+   * @param toc whether to generate the Table of Contents
    *
    * @throws ProcessException  if problem parsing root file
    */
@@ -1118,7 +1120,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
    * Write the contents of the file provided to the current writer.
    *
    * @param f the file to load the contents from
-   * @throws SAXException if there was an error reading the file's contents
+   * @throws ProcessException if there was an error reading the file's contents
    */
   public void writeFileContents(File f) throws ProcessException {
     try (FileInputStream in = new FileInputStream(f)) {

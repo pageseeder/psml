@@ -279,7 +279,9 @@ public final class XRefTranscluder {
   }
 
   /**
-   * @param href the href attribute of the XRef.
+   * @param href the href attribute of the xref.
+   * @param uriid The URI ID of the xref
+   * @param link Whether it is a link
    *
    * @return the target file object
    */

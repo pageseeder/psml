@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Provides a mechanism to process PSML files with XSLT.
  *
- * <p>Used to represent the inner ANT element:<p>
+ * <p>Used to represent the inner ANT element:
  * <pre>{@code <pretransform
  *             xslt="[pre XSLT path]"
  *             includes="[patterns]"
