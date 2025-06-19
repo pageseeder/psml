@@ -1,0 +1,22 @@
+[versions]
+slf4j = "2.0.17"
+hamcrest = "2.0.0.0"
+xmlunit = "2.10.0"
+
+[libraries]
+annotations = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version = "2.3.100" }
+commons-io = { module = "commons-io:commons-io", version = "2.19.0" }
+hamcrest-java = { module = "org.hamcrest:java-hamcrest", version.ref = "hamcrest"}
+hamcrest-junit = { module = "org.hamcrest:hamcrest-junit", version.ref = "hamcrest"}
+junit = { module = "junit:junit", version = "4.13.1" }
+pso-diffx = { module = "org.pageseeder.diffx:pso-diffx", version = "1.2.0" }
+pso-xmlwriter = { module = "org.pageseeder.xmlwriter:pso-xmlwriter", version = "1.0.4" }
+rhino-engine = { module = "org.mozilla:rhino-engine", version = "1.7.14" }
+saxon-he = { module ="net.sf.saxon:Saxon-HE", version = "9.9.1-5" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+xmlunit-core = { module = "org.xmlunit:xmlunit-core", version.ref = "xmlunit"}
+xmlunit-matchers = { module = "org.xmlunit:xmlunit-matchers", version.ref = "xmlunit"}
+
+[plugins]
+sonar = { id = "org.sonarqube", version = "6.2.0.5505" }
