@@ -16,12 +16,7 @@ version = file("version.txt").readText().trim()
 description = findProperty("description") as String?
 
 repositories {
-  mavenCentral {
-    url = uri("https://maven-central.storage.googleapis.com/maven2")
-  }
-  maven {
-    url = uri("https://s01.oss.sonatype.org/content/groups/public/")
-  }
+  mavenCentral()
 }
 
 java {
