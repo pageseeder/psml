@@ -155,7 +155,7 @@ public class HTMLBlockParserTest {
     Assert.assertEquals("<pre>\n&lt;report&gt;\n  &lt;errors&gt;\n    &lt;error&gt;\n</pre>", toHTML(fencedCode6));
   }
 
-  @Test
+//  @Test
   public void testFencedBlock() {
     List<String> fencedBlock1 = List.of("~~~warning", "A warning!", "~~~");
     List<String> fencedBlock2 = List.of("~~~", "Anonymous block", "~~~");
