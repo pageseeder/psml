@@ -13,7 +13,7 @@ val website: String by project
 
 group = "org.pageseeder"
 version = file("version.txt").readText().trim()
-description = title
+description = findProperty("description") as String?
 
 repositories {
   mavenCentral {
