@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.model.PSMLElement;
@@ -33,7 +34,7 @@ import org.pageseeder.psml.util.NilDiagnosticCollector;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.1
  * @since 1.0
  */
 public class MarkdownParser extends Parser {
@@ -118,8 +119,6 @@ public class MarkdownParser extends Parser {
     return wrapper;
   }
 
-
-
   /**
    * Parses the contents provided by a reader into an HTML representation.
    * The method processes the input to produce a structured hierarchy of HTML elements.
@@ -131,9 +130,8 @@ public class MarkdownParser extends Parser {
    */
   public HTMLElement parseToHTML(Reader reader) throws IOException {
     List<String> lines = toLines(reader);
-    HTMLBlockParser parser = new HTMLBlockParser();
-    parser.setConfiguration(this.config);
-    List<HTMLElement> elements = parser.parse(lines, this.config);
+    HTMLBlockParser parser = new HTMLBlockParser(this.config.toMarkdownInputOptions());
+    List<HTMLElement> elements = parser.parse(lines);
 
     // Wrap the element based on the configuration
     HTMLElement wrapper;
@@ -156,14 +154,9 @@ public class MarkdownParser extends Parser {
    * @throws IOException If an error occurs while reading from the provided Reader.
    */
   private static List<String> toLines(Reader reader) throws IOException {
-    List<String> lines = new ArrayList<>();
-    BufferedReader r = new BufferedReader(reader);
-    String line = r.readLine();
-    while (line != null) {
-      lines.add(line);
-      line = r.readLine();
+    try (BufferedReader br = new BufferedReader(reader)) {
+      return br.lines().collect(Collectors.toList());
     }
-    return lines;
   }
 
 }

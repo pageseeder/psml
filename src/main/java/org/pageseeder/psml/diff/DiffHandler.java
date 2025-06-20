@@ -20,7 +20,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Adds <diff> elements to compare fragments in portable PSML.
+ * Adds {@code <diff>} elements to compare fragments in portable PSML.
  *
  * @author Philip Rutherford
  */
@@ -65,7 +65,7 @@ public final class DiffHandler extends DefaultHandler {
    * Constructor.
    *
    * @param out                for writing the result XML
-   * @param comparefragments   map of fragment ID to current fragment with a corresponding <compare> element.
+   * @param comparefragments   map of fragment ID to current fragment with a corresponding {@code <compare>} element.
    * @param diff               differ to use for comparing fragments
    *
    */

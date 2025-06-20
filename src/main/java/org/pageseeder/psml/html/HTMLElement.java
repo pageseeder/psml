@@ -553,7 +553,7 @@ public class HTMLElement implements HTMLNode {
      *
      * @see <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ul">HTML ul element</a>
      */
-    UL(true),
+    UL(false),
 
     /**
      * &lt;var&lt; element
@@ -570,7 +570,7 @@ public class HTMLElement implements HTMLNode {
     VIDEO(false),
 
     /**
-     * This element is used for any unrecognized PSML element.
+     * This element is used for any unrecognized HTML element.
      */
     UNKNOWN(false);
 

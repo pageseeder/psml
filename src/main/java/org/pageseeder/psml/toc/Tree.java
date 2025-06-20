@@ -57,6 +57,7 @@ public interface Tree extends XMLWritable, Serializable {
   }
 
   /**
+   * @param separator The string used to separate each reference
    * @return the list of reverse references as string
    */
   default String toReverseReferencesString(String separator) {

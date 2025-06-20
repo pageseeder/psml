@@ -293,6 +293,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
   }
 
   /**
+   * @param id The URI ID to look for
    * @return Indicates whether this publication contains the tree specified by its URI ID.
    */
   public boolean containsTree(long id) {
@@ -344,6 +345,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param removeIds   The IDs of trees to remove
    * @param trees       The map of new document trees to add
    * @param rootid      The ID of the root tree for this publication
+   *
+   * @return The modified publication tree
    */
   public PublicationTree modify(List<Long> removeIds, Map<Long, DocumentTree> trees, long rootid) {
     return new PublicationTree(this, removeIds, trees, rootid);
@@ -360,6 +363,8 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
    * @param transclusions Map of transcluded Id to a list of it's parent Ids in this publication.
    *                      If list contains -1 then Id is also embedded.
    * @param rootid        The ID of the root tree for this publication
+   *
+   * @return The modified publication tree
    */
   public PublicationTree modify(List<Long> removeIds, Map<Long, DocumentTree> trees,
       Map<Long,List<Long>> transclusions, long rootid) {

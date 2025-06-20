@@ -26,6 +26,7 @@ public final class IncludeExclude {
   private final boolean isInclude;
 
   /**
+   * @param name Name to include
    * @return a new include instance
    */
   public static IncludeExclude createInclude(String name) {
@@ -33,6 +34,7 @@ public final class IncludeExclude {
   }
 
   /**
+   * @param name Name to exclude
    * @return a new exclude instance
    */
   public static IncludeExclude createExclude(String name) {

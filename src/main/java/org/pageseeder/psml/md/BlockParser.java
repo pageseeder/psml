@@ -118,6 +118,7 @@ public class BlockParser {
   }
 
   /**
+   * @param configuration The configuration to use as Markdown options
    * @deprecated Use {@link #setOptions(MarkdownInputOptions)} instead
    */
   @Deprecated(forRemoval = true, since = "1.6.0")
@@ -126,6 +127,7 @@ public class BlockParser {
   }
 
   /**
+   * @return The configuration corresponding the Markdown options used in this class
    * @deprecated Use {@link #getOptions()} instead
    */
   @Deprecated(forRemoval = true, since = "1.6.0")
@@ -137,6 +139,7 @@ public class BlockParser {
    * Iterate over the lines and return corresponding PSML elements.
    *
    * @param lines The lines to parse
+   * @param config The configuration to use
    *
    * @return The corresponding list of PSML elements
    *
@@ -153,6 +156,7 @@ public class BlockParser {
    * @param line  The current line
    * @param next  The next line
    * @param state The state of the parser
+   * @param config The configuration to use
    *
    * @deprecated Use {@link #processLine(String, String, State, MarkdownInputOptions)} instead.
    */
@@ -165,6 +169,7 @@ public class BlockParser {
    * Iterate over the lines and return corresponding PSML elements.
    *
    * @param lines The lines to parse
+   * @param options Markdown options to use
    *
    * @return The corresponding list of PSML elements
    */
@@ -196,6 +201,7 @@ public class BlockParser {
    * @param line  The current line
    * @param next  The next line
    * @param state The state of the parser
+   * @param options Markdown options to use
    */
   public static void processLine(String line, @Nullable String next, State state, MarkdownInputOptions options) {
     state.line++;
@@ -827,6 +833,7 @@ public class BlockParser {
 
     /**
      * Append text to the current text node preceded by a new line.
+     * @param text Text to append
      */
     public void append(String text) {
       if (this.text == null) throw new NullPointerException("Failed to add text "+text);
@@ -859,6 +866,7 @@ public class BlockParser {
     /**
      * Commit the elements in the current stack up to the specified element
      * and attach the text to the current node.
+     * @param name The name of the element where we stop committing.
      */
     public void commitUpto(Name name) {
       this.lineBreak = false;

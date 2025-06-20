@@ -6,7 +6,7 @@ package org.pageseeder.psml.process.config;
 /**
  * Defines how to traverse XRefs, including the XRefs types and some patterns to include/exclude.
  *
- * <p>Used to represent the inner ANT element:<p>
+ * <p>Used to represent the inner ANT element:
  * <pre>{@code <xrefs
  *       types="[xref types]"
  *       levels="[true|false]"

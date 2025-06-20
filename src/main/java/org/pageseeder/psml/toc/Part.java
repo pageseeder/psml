@@ -79,8 +79,8 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    *
    * @return A new part instance
    */
-  public Part<T> element(Element element) {
-    return new Part<>((T)element, this.parts);
+  public Part<T> element(T element) {
+    return new Part<>(element, this.parts);
   }
 
   /**
@@ -150,7 +150,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @return <code>true</code> if the levels are consistent;
    *         <code>false</code> otherwise.
    */
-  protected final boolean isLevelConsistent(int level) {
+  boolean isLevelConsistent(int level) {
     if (this.element.level() != level) return false;
     for (Part<?> p: this.parts) {
       if (!p.isLevelConsistent(level+1)) return false;
@@ -161,14 +161,18 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   /**
    * Find the reference matching the URI in the specified part.
    *
+   * @param part the part within which we search
    * @param uri The URI ID for this reference
    *
    * @return the reference in this tree.
    */
+  @SuppressWarnings("unchecked")
   public static @Nullable Part<Reference> find(Part<?> part, long uri) {
     Element element = part.element();
     // Found it!
-    if (element instanceof Reference && ((Reference)element).uri() == uri) return (Part<Reference>)part;
+    if (element instanceof Reference && ((Reference)element).uri() == uri) {
+      return (Part<Reference>)part;
+    }
     // Look for sub-parts
     for (Part<?> p : part.parts()) {
       Part<Reference> found = find(p, uri);

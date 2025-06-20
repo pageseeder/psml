@@ -6,7 +6,7 @@ package org.pageseeder.psml.process.config;
 /**
  * This element is used to customise error handling.
  *
- * <p>Used to represent the inner ANT element:<p>
+ * <p>Used to represent the inner ANT element:
  * <pre>{@code <error
  *            xrefnotfound="[true|false]"
  *            xrefambiguous="[true|false]"

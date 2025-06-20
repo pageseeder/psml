@@ -74,6 +74,7 @@ public final class Processor {
 
   /**
    * Creates a new processor to generate the PSML using the specified encoding.
+   * @param charset The charset to use for the template factory
    */
   public Processor(Charset charset) {
     if (!TemplateFactory.isSupported(charset)) throw new IllegalArgumentException("Unsupported encoding");
@@ -118,8 +119,12 @@ public final class Processor {
    *
    * <p>Note this method will automatically select the correct encoding for the file output.
    *
+   * @param template The file containing the template to process
+   * @param psml The target PSML file to generate
+   * @param values The parameters to use in the template for processing
+   *
    * @throws IOException Should an I/O error occur while reading the XML.
-   * @throws SAXException Should an error occur while parsing the XML.
+   * @throws TemplateException Should an error occur while parsing the XML.
    */
   public void process(File template, File psml, Map<String, String> values) throws IOException, TemplateException {
     InputSource source = new InputSource(template.toURI().toASCIIString());
@@ -132,6 +137,10 @@ public final class Processor {
    *
    * <p>Note this method will automatically select the correct encoding for the file output.
    *
+   * @param template A reader the template to process
+   * @param psml The target PSML file to generate
+   * @param values The parameters to use in the template for processing
+   *
    * @throws IOException Should an I/O error occur while reading the XML.
    * @throws TemplateException Should an error occur while processing the template.
    */
@@ -143,6 +152,10 @@ public final class Processor {
 
   /**
    * Process the template and generate the PSML using the specified values.
+   *
+   * @param template An XML input source the template to process
+   * @param psml A writer for the target PSML file to generate
+   * @param values The parameters to use in the template for processing
    *
    * @throws IOException Should an I/O error occur while reading the XML.
    * @throws TemplateException Should an error occur while procesing the template.

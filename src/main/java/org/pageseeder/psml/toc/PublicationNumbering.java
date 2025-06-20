@@ -256,6 +256,8 @@ public final class PublicationNumbering {
    *
    * @param level      the level of the scheme
    * @param blocklabel the parent block label name
+   *
+   * @return The numbering format
    */
   public @Nullable String getNumberFormat(int level, String blocklabel) {
     return this.formats.get(level + "-" + blocklabel);
@@ -265,10 +267,12 @@ public final class PublicationNumbering {
    * Get a numbering type. If none found for blocklabel returns type for no blocklabel.
    *
    * @param level      the level of the scheme
-   * @param blocklabel the parent block label name
+   * @param blockLabel the parent block label name
+   *
+   * @return The number type for the block label
    */
-  public NumberType getNumberType(int level, String blocklabel) {
-    NumberType type = this.types.get(level + "-" + blocklabel);
+  public NumberType getNumberType(int level, String blockLabel) {
+    NumberType type = this.types.get(level + "-" + blockLabel);
     if (type == null) type = this.types.get(level + "-");
     return type;
   }

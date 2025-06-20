@@ -55,6 +55,8 @@ public class WrappingReader extends Reader {
    * @param reader       The reader to wrap.
    * @param before       The text to put before.
    * @param after        The text to put after.
+   *
+   * @throws IOException If thrown by the reader
    */
   public WrappingReader(@Nullable Reader reader, @Nullable String before, @Nullable String after) throws IOException {
     this.originalReader = reader == null ? new StringReader("") : reader;

@@ -17,6 +17,7 @@ package org.pageseeder.psml.md;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,19 +32,34 @@ import org.pageseeder.psml.html.HTMLNode;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.1
  * @since 1.0
  */
 public class HTMLBlockParser {
 
-  private Configuration configuration;
+  /**
+   * Represents the configuration options used for parsing Markdown input.
+   */
+  private MarkdownInputOptions options;
 
-  public void setConfiguration(Configuration configuration) {
-    this.configuration = configuration;
+  /**
+   * Constructs a new instance of the parser with the default Markdown input options.
+   *
+   * <p>This constructor initializes the parser using the default configuration provided by
+   * {@link MarkdownInputOptions#defaultFragmentOptions}.
+   */
+  public HTMLBlockParser() {
+    this.options = MarkdownInputOptions.defaultFragmentOptions();
   }
 
-  public Configuration getConfiguration() {
-    return this.configuration;
+  /**
+   * Constructs a new instance of the parser with the specified Markdown input options.
+   *
+   * @param options The {@link MarkdownInputOptions} instance defining custom configurations
+   *                for parsing Markdown input.
+   */
+  public HTMLBlockParser(MarkdownInputOptions options) {
+    this.options = Objects.requireNonNull(options);
   }
 
   /**
@@ -54,25 +70,69 @@ public class HTMLBlockParser {
    * @return The corresponding list of HTML elements
    */
   public List<HTMLElement> parse(List<String> lines) {
-    return parse(lines, new Configuration());
+    return parse(lines, this.options);
+  }
+
+  /**
+   * Iterate over the lines and return corresponding PSML elements.
+   *
+   * @param lines The lines to parse
+   * @param config The configuration to use
+   *
+   * @return The corresponding list of PSML elements
+   *
+   * @deprecated Use {@link #parse(List, MarkdownInputOptions)} instead.
+   */
+  @Deprecated(forRemoval = true, since = "1.6.1")
+  public List<HTMLElement> parse(List<String> lines, Configuration config) {
+    return parse(lines, config.toMarkdownInputOptions());
   }
 
   /**
    * Iterate over the lines and return corresponding HTML elements.
    *
    * @param lines The lines to parse
+   * @param options The markdown options to use
    *
    * @return The corresponding list of HTML elements
    */
-  public List<HTMLElement> parse(List<String> lines, Configuration config) {
+  public List<HTMLElement> parse(List<String> lines, MarkdownInputOptions options) {
     State state = new State();
     for (int i=0; i < lines.size(); i++) {
       String line = lines.get(i);
       String next = i < lines.size()-1? lines.get(i+1) : null;
-      processLine(line, next, state, config);
+      processLine(line, next, state, options);
     }
     state.commitAll();
     return state.elements;
+  }
+
+  /**
+   * Retrieves the current Markdown input options used for parsing.
+   *
+   * @return The current {@link MarkdownInputOptions} instance.
+   */
+  public MarkdownInputOptions getOptions() {
+    return options;
+  }
+
+  /**
+   * Sets the Markdown input options to configure parsing behavior.
+   *
+   * @param options The {@link MarkdownInputOptions} instance to define custom parsing configurations.
+   */
+  public void setOptions(MarkdownInputOptions options) {
+    this.options = options;
+  }
+
+  @Deprecated(forRemoval = true, since = "1.6.1")
+  public void setConfiguration(Configuration configuration) {
+    this.options = configuration.toMarkdownInputOptions();
+  }
+
+  @Deprecated(forRemoval = true, since = "1.6.1")
+  public Configuration getConfiguration() {
+    return Configuration.fromMarkdownInputOptions(this.options);
   }
 
   /**
@@ -81,9 +141,22 @@ public class HTMLBlockParser {
    * @param line  The current line
    * @param next  The next line
    * @param state The state of the parser
+   * @param config The configuration to use
    */
+  @Deprecated(forRemoval = true, since = "1.6.1")
   public void processLine(String line, @Nullable String next, State state, Configuration config) {
+    processLine(line, next, state, config.toMarkdownInputOptions());
+  }
 
+  /**
+   * Process a single line
+   *
+   * @param line  The current line
+   * @param next  The next line
+   * @param state The state of the parser
+   * @param options The markdown options to use
+   */
+  public static void processLine(String line, @Nullable String next, State state, MarkdownInputOptions options) {
     // Lines made entirely of '=' or '-' are used for heading 1 and 2
     if (line.matches("\\s?(==+|--+)\\s*")) {
       // DO nothing, we've already handled it
@@ -91,7 +164,7 @@ public class HTMLBlockParser {
 
     // Separators
     else if (line.matches("\\s*\\*\\s?\\*\\s?\\*[\\s\\*]*")) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
         state.newFragment();
       }
@@ -104,42 +177,12 @@ public class HTMLBlockParser {
 
     // New list items starting with '+', '-', '*' or number followed by a '.'
     else if (line.matches("\\s*(-|\\+|\\*|\\d+\\.)\\s.+")) {
-      if (config.isDocumentMode()) {
-        state.ensureFragment();
-      }
-
-      // Create a new item
-      Pattern x  = Pattern.compile("^\\s*(-|\\+|\\*|\\d+\\.)\\s+(.+)$");
-      Matcher m = x.matcher(line);
-      if (m.matches()) {
-        String no = m.group(1);
-        if (state.isInList()) {
-          // Already in a list, let's commit the previous item
-          state.commit();
-        } else {
-          // A new list! Clear the context...
-          state.commitUpto(Name.SECTION);
-          // An create a new list
-          HTMLElement list;
-          if (no.matches("\\d+\\.")) {
-            list = new HTMLElement(Name.OL);
-            String initial = no.substring(0, no.length()-1);
-            if (!"1".equals(initial)) {
-              list.setAttribute("start", initial);
-            }
-          } else {
-            list = new HTMLElement(Name.UL);
-          }
-          state.push(list);
-        }
-        // Create a new item
-        state.push(Name.LI, m.group(2).trim());
-      }
+      processListItem(line, state, options);
     }
 
     // Continuation of a list item
     else if (state.isInList()) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
       if (!state.context.isEmpty() && state.text != null) {
@@ -149,7 +192,7 @@ public class HTMLBlockParser {
 
     // Lines starting with four spaces: preformatted code
     else if (line.matches("\\s{4}.*") && !state.isFenced()) {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
       if (!state.isElement(Name.PRE)) {
@@ -162,97 +205,32 @@ public class HTMLBlockParser {
 
     // Beginning/end of fenced code block
     else if (line.startsWith("```")) {
-      if (config.isDocumentMode()) {
-        state.ensureFragment();
-      }
-      if (state.isElement(Name.PRE) || (state.isElement(Name.CODE) && state.isDescendantOf(Name.PRE))) {
-        state.setFenced(false);
-        state.append("");
-        state.commitUpto(Name.SECTION);
-      } else {
-        state.commitUpto(Name.SECTION);
-        HTMLElement pre = new HTMLElement(Name.PRE);
-        state.push(pre, "");
-        state.setFenced(true);
-        if (line.length() > 3) {
-          HTMLElement code = new HTMLElement(Name.CODE);
-          String language = line.substring(3).trim();
-          if (!language.isEmpty()) {
-            code.setAttribute("class", language);
-          }
-          state.push(code, "");
-        }
-      }
+      processFencedCode(line, state, options);
     }
 
     // Beginning/end of fenced block labels
     else if (line.startsWith("~~~")) {
-      if (config.isDocumentMode()) {
-        state.ensureFragment();
-      }
-      if (state.isElement(Name.DIV)) {
-        state.commitUpto(Name.SECTION);
-      } else {
-        state.commitUpto(Name.SECTION);
-        HTMLElement pre = new HTMLElement(Name.DIV);
-        if (line.length() > 3) {
-          String label = line.substring(3).trim();
-          if (!label.isEmpty()) {
-            pre.setAttribute("label", label);
-            pre.setAttribute("class", "label-"+label);
-          }
-        }
-        state.push(pre, "");
-      }
+      processFencedLabel(line, state, options);
     }
 
     // Lines starting with '>': quoted content
     else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.PRE)) {
-      if (config.isDocumentMode()) {
-        state.ensureFragment();
-      }
-      String text = line.substring(line.indexOf('>') + 1).replaceFirst("^\\s+", "");
-      // check if already in a blockquote
-      HTMLElement current = state.current();
-      if (current != null && current.isElement(Name.BLOCKQUOTE)) {
-        List<HTMLNode> children = current.getNodes();
-        HTMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
-        if (last instanceof HTMLElement) {
-          HTMLElement lastElement = (HTMLElement) last;
-          if (lastElement.isElement(Name.P)) {
-            if (text.matches("\\s*")) {
-              current.addNode(new HTMLElement(Name.P));
-            } else {
-              lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
-            }
-          }
-        }
-      } else {
-        state.commitUpto(Name.SECTION);
-        // create new blockquote
-        HTMLElement block = new HTMLElement(Name.BLOCKQUOTE);
-        HTMLElement p = new HTMLElement(Name.P);
-        p.setText(text);
-        block.addNode(p);
-        state.push(block);
-      }
+      processQuoteBlock(line, state, options);
+    }
+
+    // Tables starting with `|`
+    else if (line.startsWith("|") && !state.isElement(Name.PRE)) {
+      processTableRow(line, next, state, options);
     }
 
     // Metadata (document mode only)
-    else if (config.isDocumentMode() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+\\:\\s.*")) {
-      int colon = line.indexOf(':');
-      if (!state.isDescendantOf(Name.DL)) {
-        state.push(Name.DL);
-      }
-      // Create and commit a definition list
-      state.push(Name.DT, line.substring(0,colon));
-      state.push(Name.DD, line.substring(colon+2).trim());
-      state.commit();
+    else if (options.isDocument() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+:\\s.*")) {
+      processMetadataDefinition(line, state, options);
     }
 
     // Probably a paragraph or heading
     else {
-      if (config.isDocumentMode()) {
+      if (options.isDocument()) {
         state.ensureFragment();
       }
 
@@ -284,13 +262,13 @@ public class HTMLBlockParser {
           if (next != null) {
             if (next.matches("\\s*==+\\s*")) {
               // We use the '====' as a marker for a new section
-              if (config.isDocumentMode() && !state.current().isEmpty()) {
+              if (options.isDocument() && !state.current().isEmpty()) {
                 state.newSection();
               }
               element = newHeadingElement(1);
 
               // Special case for title section
-              if (config.isDocumentMode()) {
+              if (options.isDocument()) {
                 HTMLElement section = state.ancestor(Name.SECTION);
                 if (section != null && "title".equals(section.getAttribute("id"))) {
                   isTitle = true;
@@ -299,7 +277,7 @@ public class HTMLBlockParser {
 
             } else if (next.matches("\\s*--+\\s*")) {
               // We use the '----' as a marker for a new fragment
-              if (config.isDocumentMode() && !state.current().isEmpty()) {
+              if (options.isDocument() && !state.current().isEmpty()) {
                 state.newFragment();
               }
               element = newHeadingElement(2);
@@ -317,8 +295,8 @@ public class HTMLBlockParser {
             state.append(line.trim());
           }
 
-          // If the line breaks occurs before 66 characters, we assume it is intentional and insert a line break
-          state.lineBreak = line.length() < config.getLineBreakThreshold();
+          // If the line break occurs before 66 characters, we assume it is intentional and insert a line break
+          state.lineBreak = line.length() < options.getLineBreakThreshold();
 
           // Special case: we terminate the section title
           if (isTitle) {
@@ -347,6 +325,190 @@ public class HTMLBlockParser {
     }
   }
 
+  private static void processListItem(String line, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+
+    // Create a new item
+    Pattern x  = Pattern.compile("^\\s*(-|\\+|\\*|\\d+\\.)\\s+(.+)$");
+    Matcher m = x.matcher(line);
+    if (m.matches()) {
+      String no = m.group(1);
+      if (state.isInList()) {
+        // Already in a list, let's commit the previous item
+        state.commit();
+      } else {
+        // A new list! Clear the context...
+        state.commitUpto(Name.SECTION);
+        // An create a new list
+        HTMLElement list;
+        if (no.matches("\\d+\\.")) {
+          list = new HTMLElement(Name.OL);
+          String initial = no.substring(0, no.length()-1);
+          if (!"1".equals(initial)) {
+            list.setAttribute("start", initial);
+          }
+        } else {
+          list = new HTMLElement(Name.UL);
+        }
+        state.push(list);
+      }
+      // Create a new item
+      state.push(Name.LI, m.group(2).trim());
+    }
+  }
+
+  private static void processFencedCode(String line, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+    if (state.isElement(Name.PRE) || (state.isElement(Name.CODE) && state.isDescendantOf(Name.PRE))) {
+      state.setFenced(false);
+      state.append("");
+      state.commitUpto(Name.SECTION);
+    } else {
+      state.commitUpto(Name.SECTION);
+      HTMLElement pre = new HTMLElement(Name.PRE);
+      state.push(pre, "");
+      state.setFenced(true);
+      if (line.length() > 3) {
+        HTMLElement code = new HTMLElement(Name.CODE);
+        String language = line.substring(3).trim();
+        if (!language.isEmpty()) {
+          code.setAttribute("class", "lang-"+language);
+        }
+        state.push(code, "");
+      }
+    }
+  }
+
+  private static void processFencedLabel(String line, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+    if (state.isElement(Name.DIV)) {
+      state.commitUpto(Name.SECTION);
+    } else {
+      state.commitUpto(Name.SECTION);
+      HTMLElement pre = new HTMLElement(Name.DIV);
+      if (line.length() > 3) {
+        String label = line.substring(3).trim();
+        if (!label.isEmpty()) {
+          pre.setAttribute("label", label);
+          pre.setAttribute("class", "label-"+label);
+        }
+      }
+      state.push(pre, "");
+    }
+  }
+
+  private static void processQuoteBlock(String line, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+    String text = line.substring(line.indexOf('>') + 1).replaceFirst("^\\s+", "");
+    // check if already in a blockquote
+    HTMLElement current = state.current();
+    if (current != null && current.isElement(Name.BLOCKQUOTE)) {
+      List<HTMLNode> children = current.getNodes();
+      HTMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
+      if (last instanceof HTMLElement) {
+        HTMLElement lastElement = (HTMLElement) last;
+        if (lastElement.isElement(Name.P)) {
+          if (text.matches("\\s*")) {
+            current.addNode(new HTMLElement(Name.P));
+          } else {
+            lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
+          }
+        }
+      }
+    } else {
+      state.commitUpto(Name.SECTION);
+      // create new blockquote
+      HTMLElement block = new HTMLElement(Name.BLOCKQUOTE);
+      HTMLElement p = new HTMLElement(Name.P);
+      p.setText(text);
+      block.addNode(p);
+      state.push(block);
+    }
+  }
+
+  private static void processMetadataDefinition(String line, State state, MarkdownInputOptions options) {
+    int colon = line.indexOf(':');
+    if (!state.isDescendantOf(Name.DL)) {
+      state.push(Name.DL);
+    }
+    // Create and commit a definition list
+    state.push(Name.DT, line.substring(0,colon));
+    state.push(Name.DD, line.substring(colon+2).trim());
+    state.commit();
+  }
+
+  private static void processTableRow(String line, @Nullable String next, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+    assert line.startsWith("|");
+    String[] columns = line.substring(1).split("\\|");
+    boolean inTable = state.isDescendantOf(Name.TABLE);
+    boolean isHeaderRow = false;
+    if (!inTable && next != null && next.startsWith("|") && next.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
+      HTMLElement table = new HTMLElement(Name.TABLE);
+      String[] cols = next.substring(1).split("\\|");
+      for (String col : cols) {
+        String align = toColAlign(col);
+        HTMLElement colElement = new HTMLElement(Name.COL);
+        if (align != null) colElement.setAttribute("align", align);
+        table.addNode(colElement);
+      }
+      state.push(table);
+      inTable = true;
+      isHeaderRow = true;
+    }
+
+    if (inTable) {
+      if (!line.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
+        HTMLElement row = new HTMLElement(Name.TR);
+        state.push(row);
+
+        for (String col : columns) {
+          String text = col.trim();
+          if (isHeaderRow && text.matches("^\\*\\*(.*)\\*\\*$")) {
+            text = text.substring(2, text.length() - 2);
+          }
+          state.push(isHeaderRow ? Name.TH : Name.TD, text);
+          state.commit();
+        }
+
+        state.commit();
+      }
+    } else {
+      // Not a table
+      state.push(Name.P, line.trim());
+    }
+  }
+
+  /**
+   * Determines the text alignment for a column based on its specification.
+   *
+   * <p>The method analyzes if the column definition starts and/or ends with a colon
+   * to infer the alignment: "center", "left", "right", or null if not specified.
+   *
+   * @param col The column specification string to evaluate. It may include colons
+   *            to indicate text alignment.
+   * @return A string indicating the column alignment ("center", "left", "right")
+   *         or null if the alignment is not specified.
+   */
+  private static @Nullable String toColAlign(String col) {
+    String colSpec = col.trim();
+    boolean startWithColon = colSpec.startsWith(":");
+    boolean endsWithColon = colSpec.endsWith(":");
+    if (startWithColon && endsWithColon) return "center";
+    if (startWithColon) return "left";
+    if (endsWithColon) return "right";
+    return null;
+  }
 
   /**
    * Maintains the state of the parser during processing.
@@ -556,6 +718,7 @@ public class HTMLBlockParser {
 
     /**
      * Append text to the current text node preceded by a new line.
+     * @param text The text to append
      */
     public void append(String text) {
       this.text.append('\n').append(text);
@@ -583,6 +746,7 @@ public class HTMLBlockParser {
     /**
      * Commit the elements in the current stack up to the specified element
      * and attach the text to the current node.
+     * @param name The name of the element where we stop committing.
      */
     public void commitUpto(Name name) {
       this.lineBreak = false;

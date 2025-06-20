@@ -27,6 +27,8 @@ public final class TreeExpander {
    * Used for paragraphs end transclusion start/end.
    *
    * @param element The new element to add
+   *
+   * @return This tree expander instance for method chaining
    */
   public TreeExpander addLeaf(Element element) {
     MutablePart current = this._parts.peek();
@@ -42,6 +44,8 @@ public final class TreeExpander {
    * Add a new element to the list.
    *
    * @param element The new element to add
+   *
+   * @return This tree expander instance for method chaining
    */
   public TreeExpander add(Element element) {
     return add(element, element.level());
@@ -52,6 +56,8 @@ public final class TreeExpander {
    *
    * @param element      The new element to add
    * @param elementlevel The level for the element
+   *
+   * @return This tree expander instance for method chaining
    */
   public TreeExpander add(Element element, int elementlevel) {
     // level = size(parts) = level(current) + 1;

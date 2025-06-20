@@ -255,7 +255,7 @@ public final class PublicationConfig implements Cloneable {
   }
 
   /**
-   * @returnthe the numberingConfigs
+   * @return the the numberingConfigs
    */
   public List<PublicationNumbering> getNumberingConfigs() {
     return this.numberingConfigs;
@@ -263,7 +263,7 @@ public final class PublicationConfig implements Cloneable {
 
   /**
    * Return the first numbering config with one of the specified labels.
-   * If none found return the first config with no label, otherwise <code>null<code>.
+   * If none found return the first config with no label, otherwise <code>null</code>.
    *
    * @param labels a comma separated list of document labels
    *
@@ -290,7 +290,7 @@ public final class PublicationConfig implements Cloneable {
    *
    * @return the loaded config
    *
-   * @throws PageseederException If invalid file or parsing the file failed
+   * @throws IOException If invalid file or parsing the file failed
    */
   public static PublicationConfig loadPublicationConfigFile(File configFile) throws IOException {
     if (!configFile.exists() || !configFile.isFile())
@@ -309,7 +309,7 @@ public final class PublicationConfig implements Cloneable {
    *
    * @return the loaded config
    *
-   * @throws PageseederException If invalid file or parsing the file failed
+   * @throws IOException If invalid file or parsing the file failed
    */
   public static PublicationConfig loadPublicationConfig(InputStream in) throws IOException {
     PublicationConfigHandler handler = new PublicationConfigHandler();

@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * A utility class for converting AsciiMath expressions to MathML.
  *
- * <p></p>This class provides methods for converting AsciiMath strings into MathML format using a
+ * <p>This class provides methods for converting AsciiMath strings into MathML format using a
  * JavaScript engine. It also maintains a cache for previously converted expressions to improve
  * performance.
  *

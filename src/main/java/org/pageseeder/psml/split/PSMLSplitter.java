@@ -42,7 +42,7 @@ public final class PSMLSplitter {
   /**
    * Split the psml.
    *
-   * @throws IOException
+   * @throws IOException If an error occurred while moving the file
    */
   public void process() throws IOException {
 
@@ -260,7 +260,7 @@ public final class PSMLSplitter {
 
     /**
      * @param params the custom XSLT parameters
-     * @return
+     * @return this builder
      */
     public Builder params(Map<String, String> params) {
       this.params = params;
