@@ -19,4 +19,4 @@ xmlunit-core = { module = "org.xmlunit:xmlunit-core", version.ref = "xmlunit"}
 xmlunit-matchers = { module = "org.xmlunit:xmlunit-matchers", version.ref = "xmlunit"}
 
 [plugins]
-jreleaser = { id = "org.jreleaser", version = "1.17.0" }
+jreleaser = { id = "org.jreleaser", version = "1.18.0" }
