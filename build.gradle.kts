@@ -1,3 +1,6 @@
+import org.jreleaser.model.Active
+import org.jreleaser.model.Signing
+
 plugins {
   id("java-library")
   id("maven-publish")
@@ -60,7 +63,7 @@ tasks.wrapper {
 
 publishing {
   publications {
-    create<MavenPublication>("mavenJava") {
+    create<MavenPublication>("maven") {
       from(components["java"])
       groupId = group as String?
 //      artifactId = "pso-psml"
@@ -106,7 +109,28 @@ publishing {
   }
   repositories {
     maven {
-      url = uri(layout.buildDirectory.dir("staging-deploy").get().asFile)
+      url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+    }
+  }
+}
+
+jreleaser {
+
+  signing {
+    active = Active.ALWAYS
+    armored = true
+    mode = Signing.Mode.FILE
+  }
+
+  deploy {
+    maven {
+      mavenCentral {
+        register("sonatype") {
+          active = Active.ALWAYS
+          url = "https://central.sonatype.com/api/v1/publisher"
+          stagingRepository("build/staging-deploy")
+        }
+      }
     }
   }
 }
