@@ -260,7 +260,7 @@ public class HTMLBlockParserTest {
   /**
    * Returns the Markdown text as HTML using the block parser.
    *
-   * @param text The text to parse
+   * @param lines The text to parse
    *
    * @return The corresponding HTML as a string.
    *
