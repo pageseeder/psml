@@ -60,8 +60,6 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
-      groupId = group as String?
-//      artifactId = "pso-psml"
       pom {
         name.set(title)
         description.set(project.description)
