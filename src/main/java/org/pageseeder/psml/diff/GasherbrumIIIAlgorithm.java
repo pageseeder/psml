@@ -49,9 +49,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    * GasherbrumIIIAlgorithm class to identify and process specific blocks
    * during XML token comparisons and transformations.
    */
-  private static final Set<String> BLOCKS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-      "heading", "item", "para", "preformat", "row"
-  )));
+  private static final Set<String> BLOCKS = Set.of("heading", "item", "para", "preformat", "row");
 
   /**
    * The default similarity threshold used to determine whether two tokens
