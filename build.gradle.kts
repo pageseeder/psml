@@ -1,6 +1,3 @@
-import org.jreleaser.model.Active
-import org.jreleaser.model.Signing
-
 plugins {
   id("java-library")
   id("maven-publish")
@@ -54,6 +51,12 @@ dependencies {
 tasks.wrapper {
   gradleVersion = "8.13"
   distributionType = Wrapper.DistributionType.BIN
+}
+
+tasks.withType<Javadoc> {
+  options {
+    encoding = "UTF-8"
+  }
 }
 
 publishing {

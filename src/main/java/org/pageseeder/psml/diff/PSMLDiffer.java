@@ -130,7 +130,7 @@ public final class PSMLDiffer {
     loader.setConfig(this.config);
     ExtendedWhitespaceStripper stripper = new ExtendedWhitespaceStripper();
     stripper.setAlwaysIgnore("fragment", "table", "row", "list", "nlist");
-    stripper.setMaybeIgnore("item", "block", "para");
+    stripper.setMaybeIgnore("item", "block", "cell", "hcell");
     Sequence seqB = stripper.process(loader.load(to));
     Sequence seqA = stripper.process(loader.load(from));
     LOGGER.debug("Sequence A: {} (granularity={})", seqA.size(), this.config.granularity());
