@@ -21,7 +21,7 @@ import org.pageseeder.diffx.format.XMLDiffOutput;
 import org.pageseeder.diffx.handler.CoalescingFilter;
 import org.pageseeder.diffx.load.SAXLoader;
 import org.pageseeder.diffx.token.XMLToken;
-import org.pageseeder.diffx.util.WhitespaceStripper;
+import org.pageseeder.diffx.util.ExtendedWhitespaceStripper;
 import org.pageseeder.diffx.xml.NamespaceSet;
 import org.pageseeder.diffx.xml.Sequence;
 import org.pageseeder.xmlwriter.UndeclaredNamespaceException;
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Philip Rutherford
  *
  * @since 0.3.7
- * @version 1.5.1
+ * @version 1.6.2
  */
 public final class PSMLDiffer {
 
@@ -128,9 +128,11 @@ public final class PSMLDiffer {
     // Load tokens from XML
     SAXLoader loader = new SAXLoader();
     loader.setConfig(this.config);
-    WhitespaceStripper stripper = new WhitespaceStripper("fragment", "table", "row", "list", "nlist");
-    Sequence seqB = stripper.strip(loader.load(to));
-    Sequence seqA = stripper.strip(loader.load(from));
+    ExtendedWhitespaceStripper stripper = new ExtendedWhitespaceStripper();
+    stripper.setAlwaysIgnore("fragment", "table", "row", "list", "nlist");
+    stripper.setMaybeIgnore("item", "block", "para");
+    Sequence seqB = stripper.process(loader.load(to));
+    Sequence seqA = stripper.process(loader.load(from));
     LOGGER.debug("Sequence A: {} (granularity={})", seqA.size(), this.config.granularity());
     LOGGER.debug("Sequence B: {} (granularity={})", seqB.size(), this.config.granularity());
 
@@ -192,7 +194,7 @@ public final class PSMLDiffer {
    * @return {@code true} if the operation completed successfully, {@code false} if an error occurred.
    */
   private boolean diffGasherbrum(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
-    GasherbrumIIIAlgorithm algorithm = new GasherbrumIIIAlgorithm(.5f);
+    GasherbrumIVAlgorithm algorithm = new GasherbrumIVAlgorithm(.5f);
     algorithm.diff(from, to, handler);
     return !algorithm.hasError();
   }
