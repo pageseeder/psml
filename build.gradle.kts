@@ -53,6 +53,12 @@ tasks.wrapper {
   distributionType = Wrapper.DistributionType.BIN
 }
 
+tasks.withType<Javadoc> {
+  options {
+    encoding = "UTF-8"
+  }
+}
+
 publishing {
   publications {
     create<MavenPublication>("maven") {
