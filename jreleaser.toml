@@ -1,0 +1,60 @@
+[project]
+name = "psml"
+description = "PageSeeder Markup language API"
+longDescription = """
+The PageSeeder Markup Language (PSML) API provides a comprehensive set of tools for working with PSML documents.
+PSML is an XML-based markup language specifically designed for structured content management in the PageSeeder platform.
+
+This library enables developers to create, parse, manipulate, and transform PSML documents programmatically
+in Java applications. It offers seamless conversion between PSML and other popular formats including HTML and Markdown.
+
+Key features include:
+- Full support for PSML document structure and semantics
+- Robust XML parsing and serialization
+- Bidirectional conversion with HTML and Markdown
+- Document validation against PSML schemas
+- Support for PSML fragments and sections
+- Utilities for extracting and manipulating document metadata
+- Integration with the PageSeeder platform's content management capabilities
+
+The PSML API is designed for both standalone use and as part of PageSeeder-based content management solutions. It
+follows best practices for XML processing while providing a developer-friendly interface to handle structured documents
+efficiently.
+
+Maintained by Allette Systems since 2016, this library is part of the PageSeeder ecosystem for managing structured
+content in enterprise applications.
+"""
+tags = ["xml", "psml", "html", "markdown", "pageseeder", "java"]
+authors = ["Alberto Santos", "Christophe Lauret", "Jean-Baptiste Reure", "Philip Rutherford"]
+license = "Apache-2.0"
+inceptionYear = "2016"
+vendor = "Allette Systems"
+
+# Organization info
+[project.links]
+homepage = "https://github.com/pageseeder/psml"
+documentation = "https://dev.pageseeder.com"
+license = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+
+# Java-specific configuration
+[project.languages.java]
+groupId = "org.pageseeder"
+
+# Git configuration
+[release.github]
+owner = "pageseeder"
+name = "psml"
+username = "pageseeder"
+branch = "master"
+
+# Signing configuration
+[signing]
+active = "ALWAYS"
+armored = true
+mode = "FILE"
+
+# Maven deployment configuration
+[deploy.maven.mavenCentral.sonatype]
+active = "ALWAYS"
+url = "https://central.sonatype.com/api/v1/publisher"
+stagingRepositories = ["build/staging-deploy"]

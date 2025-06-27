@@ -13,15 +13,10 @@ val website: String by project
 
 group = "org.pageseeder"
 version = file("version.txt").readText().trim()
-description = title
+description = findProperty("description") as String?
 
 repositories {
-  mavenCentral {
-    url = uri("https://maven-central.storage.googleapis.com/maven2")
-  }
-  maven {
-    url = uri("https://s01.oss.sonatype.org/content/groups/public/")
-  }
+  mavenCentral()
 }
 
 java {
@@ -65,8 +60,6 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
-      groupId = group as String?
-//      artifactId = "pso-psml"
       pom {
         name.set(title)
         description.set(project.description)
@@ -115,22 +108,5 @@ publishing {
 }
 
 jreleaser {
-
-  signing {
-    active = Active.ALWAYS
-    armored = true
-    mode = Signing.Mode.FILE
-  }
-
-  deploy {
-    maven {
-      mavenCentral {
-        register("sonatype") {
-          active = Active.ALWAYS
-          url = "https://central.sonatype.com/api/v1/publisher"
-          stagingRepository("build/staging-deploy")
-        }
-      }
-    }
-  }
+  configFile.set(file("jreleaser.toml"))
 }

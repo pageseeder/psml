@@ -1,16 +1,17 @@
 package org.pageseeder.psml.diff;
 
-
 import org.pageseeder.diffx.action.Operation;
 import org.pageseeder.diffx.action.OperationsBuffer;
 import org.pageseeder.diffx.algorithm.MatrixXMLAlgorithm;
-import org.pageseeder.diffx.algorithm.MyersGreedyAlgorithm;
 import org.pageseeder.diffx.api.DiffAlgorithm;
 import org.pageseeder.diffx.api.DiffHandler;
 import org.pageseeder.diffx.api.Operator;
-import org.pageseeder.diffx.handler.PostXMLFixer;
-import org.pageseeder.diffx.similarity.Similarity;
+import org.pageseeder.diffx.handler.XMLEventBalancer;
+import org.pageseeder.diffx.similarity.EditSimilarity;
+import org.pageseeder.diffx.similarity.ElementSimilarity;
 import org.pageseeder.diffx.similarity.SimilarityWagnerFischerAlgorithm;
+import org.pageseeder.diffx.token.EndElementToken;
+import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.XMLTokenType;
 import org.pageseeder.diffx.token.impl.XMLElement;
@@ -18,6 +19,7 @@ import org.pageseeder.diffx.token.impl.XMLEndElement;
 import org.pageseeder.diffx.token.impl.XMLStartElement;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This algorithm class is designed to compare and compute differences between
@@ -27,7 +29,7 @@ import java.util.*;
  * algorithm for token matching and structural diffing.
  *
  * <p>This implementation supports a two-step diff strategy:
- * 1. Structural comparison using GToken lists for block-level grouping.
+ * 1. Structural comparison using ElementToken lists for block-level grouping.
  * 2. Detailed comparison within block elements using nested algorithms.
  *
  * <p>The algorithm iteratively processes tokens, handling structural and textual
@@ -38,24 +40,26 @@ import java.util.*;
  *
  * @author Christophe Lauret
  *
- * @since 1.5.1
- * @version 1.5.1
+ * @since 1.6.2
+ * @version 1.6.2
  */
-public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
+public class GasherbrumIVAlgorithm implements DiffAlgorithm<XMLToken> {
 
-  /**
-   * A predefined immutable set of block names representing specific structural elements
-   * in XML documents. These block names are used in various methods of the
-   * GasherbrumIIIAlgorithm class to identify and process specific blocks
-   * during XML token comparisons and transformations.
-   */
-  private static final Set<String> BLOCKS = Set.of("heading", "item", "para", "preformat", "row");
+  private static final Set<String> DEFAULT_BLOCKS = Set.of(
+      "heading", "item", "para", "preformat", "row"
+  );
 
   /**
    * The default similarity threshold used to determine whether two tokens
    * are considered similar in the context of the diffing algorithm.
    */
   public static final float DEFAULT_SIMILARITY_THRESHOLD = 0.5f;
+
+  /**
+   * The default similarity threshold used to determine whether two tokens
+   * are considered similar in the context of the diffing algorithm.
+   */
+  public static final double DEFAULT_LENGTH_BOOST_FACTOR = 0.1;
 
   /**
    * Defines the similarity threshold used to determine whether two tokens
@@ -65,16 +69,38 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    * threshold is treated as a match. This is primarily used in the equality
    * checks of {@code GToken} instances.
    */
-  private final float similarityThreshold;
+  private float similarityThreshold;
 
   private boolean hasError = false;
 
-  public GasherbrumIIIAlgorithm() {
+  private Set<StartElementToken> blocks = DEFAULT_BLOCKS.stream().map(XMLStartElement::new).collect(Collectors.toSet());
+
+  public GasherbrumIVAlgorithm() {
     this.similarityThreshold = DEFAULT_SIMILARITY_THRESHOLD;
   }
 
-  public GasherbrumIIIAlgorithm(float similarityThreshold) {
+  public GasherbrumIVAlgorithm(float similarityThreshold) {
     this.similarityThreshold = similarityThreshold;
+  }
+
+  public void setSimilarityThreshold(float similarityThreshold) {
+    this.similarityThreshold = similarityThreshold;
+  }
+
+  public float getSimilarityThreshold() {
+    return this.similarityThreshold;
+  }
+
+  public void setBlocks(Collection<String> blocks) {
+    this.blocks = blocks.stream().map(XMLStartElement::new).collect(Collectors.toSet());
+  }
+
+  public boolean hasError() {
+    return hasError;
+  }
+
+  public Set<StartElementToken> getBlocks() {
+    return this.blocks;
   }
 
   @Override
@@ -84,20 +110,11 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
     OperationsBuffer<XMLToken> buffer = diffBySimilarity(gFrom, gTo);
 
     // Diff within each structural block
-    PostXMLFixer fixer = new PostXMLFixer(handler);
+    XMLEventBalancer fixer = new XMLEventBalancer(handler);
     fixer.start();
     diffAndUnfold(gFrom, gTo, buffer, fixer);
     fixer.end();
-    hasError = fixer.hasError();
-  }
-
-  /**
-   * Indicates whether an error occurred during the operation or processing.
-   *
-   * @return true if an error has occurred; false otherwise.
-   */
-  boolean hasError() {
-    return hasError;
+    this.hasError = fixer.hasError();
   }
 
   /**
@@ -112,7 +129,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    */
   private OperationsBuffer<XMLToken> diffBySimilarity(List<XMLToken> from, List<XMLToken> to) {
     DiffAlgorithm<XMLToken> algorithm = new SimilarityWagnerFischerAlgorithm<>(
-        new XMLTokenSimilarityFunction(),
+        new ElementSimilarity(new EditSimilarity<>(), DEFAULT_LENGTH_BOOST_FACTOR),
         this.similarityThreshold
     );
     OperationsBuffer<XMLToken> buffer = new OperationsBuffer<>();
@@ -196,7 +213,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
     List<XMLToken> children = null;
     for (XMLToken token : in) {
       if (children != null) {
-        if (token.getType() == XMLTokenType.END_ELEMENT && BLOCKS.contains(token.getName())
+        if (token.getType() == XMLTokenType.END_ELEMENT && isBlock(token)
             && stack.size() == 1 && stack.peek().getName().equals(token.getName())) {
           XMLStartElement start = (XMLStartElement) stack.pop();
           XMLEndElement end = (XMLEndElement) token;
@@ -211,7 +228,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
           children.add(token);
         }
       } else {
-        if (token.getType() == XMLTokenType.START_ELEMENT && BLOCKS.contains(token.getName())) {
+        if (token.getType() == XMLTokenType.START_ELEMENT && isBlock(token)) {
           children = new ArrayList<>();
           stack.push(token);
         } else {
@@ -233,7 +250,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    *         that matches a block start token from {@code BLOCK_STARTS} and both have
    *         more than two child elements, {@code false} otherwise.
    */
-  private static boolean childHasBlock(XMLElement from, XMLElement to) {
+  private boolean childHasBlock(XMLElement from, XMLElement to) {
     if (from.getContent().size() > 2 && to.getContent().size() > 2) {
       return childHasBlock(from) || childHasBlock(to);
     }
@@ -247,88 +264,23 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    * @param element The {@link XMLElement} to be checked, must not be null.
    * @return {@code true} if a matching child block is found, {@code false} otherwise.
    */
-  private static boolean childHasBlock(XMLElement element) {
+  private boolean childHasBlock(XMLElement element) {
     for (XMLToken t : element.getContent()) {
-      if (t.getType() == XMLTokenType.START_ELEMENT && BLOCKS.contains(t.getName())) {
+      if (t.getType() == XMLTokenType.START_ELEMENT && isBlock(t)) {
         return true;
       }
     }
     return false;
   }
 
-  /**
-   * A token similarity function implementation for comparing {@link XMLToken} instances
-   * based on their type and content. This similarity function can handle both simple
-   * token comparison and hierarchical structure similarity for XML element tokens.
-   *
-   * <p>This class is primarily used in the context of computing differences between lists
-   * of {@link XMLToken} objects, where similarity between individual tokens influences
-   * the resulting edit operations.
-   */
-  private static class XMLTokenSimilarityFunction implements Similarity<XMLToken> {
-
-    @Override
-    public float score(XMLToken a, XMLToken b) {
-      if (a.getType() == XMLTokenType.ELEMENT && b.getType() == XMLTokenType.ELEMENT) {
-        return scoreForElement((XMLElement) a, (XMLElement) b);
-      }
-      return a.equals(b) ? 1.0f : 0;
+  private boolean isBlock(XMLToken token) {
+    if (token instanceof StartElementToken) {
+      return this.blocks.contains(token);
     }
-
-    public float scoreForElement(XMLElement a, XMLElement b) {
-      boolean sameElementName = a.getStart().equals(b.getStart());
-      // Don't bother if the first token is different
-      if (!sameElementName) return 0;
-
-      // Empty it's a match
-      if (a.getContent().isEmpty() && b.getContent().isEmpty())
-        return 1;
-
-      // Multiple tokens
-      MyersGreedyAlgorithm<XMLToken> alg = new MyersGreedyAlgorithm<>();
-      EditCounter counter = new EditCounter();
-      alg.diff(a.getContent(), b.getContent(), counter);
-      return counter.score();
+    if (token instanceof EndElementToken) {
+      return this.blocks.contains(((EndElementToken) token).getStartElement());
     }
-  }
-
-  /**
-   * A private helper class that implements the {@link DiffHandler} interface for calculating
-   * and maintaining the number of edits and tokens involved in a diff operation. Specifically,
-   * it provides methods to compute an overall score representing the similarity between two
-   * lists of {@link XMLToken} objects.
-   */
-  private static class EditCounter implements DiffHandler<XMLToken> {
-
-    int edits = 0;
-    int tokens = 0;
-
-    @Override
-    public void handle(Operator operator, XMLToken token) {
-      if (token.getType() == XMLTokenType.TEXT) {
-        if (operator == Operator.MATCH) {
-          tokens += 2;
-        } else {
-          edits += 1;
-          tokens += 1;
-        }
-      }
-    }
-
-    float editScore() {
-      if (tokens == 0) return .5f;
-      if (edits == 0) return 1;
-      return 1 - (edits / (float)tokens);
-    }
-
-    float lengthBonus() {
-      return (float) Math.log(1.0 + tokens - edits) / 10f;
-    }
-
-    float score() {
-      return editScore() + lengthBonus();
-    }
-
+    return false;
   }
 
 }
