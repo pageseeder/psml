@@ -108,22 +108,5 @@ publishing {
 }
 
 jreleaser {
-
-  signing {
-    active = Active.ALWAYS
-    armored = true
-    mode = Signing.Mode.FILE
-  }
-
-  deploy {
-    maven {
-      mavenCentral {
-        register("sonatype") {
-          active = Active.ALWAYS
-          url = "https://central.sonatype.com/api/v1/publisher"
-          stagingRepository("build/staging-deploy")
-        }
-      }
-    }
-  }
+  configFile.set(file("jreleaser.toml"))
 }
