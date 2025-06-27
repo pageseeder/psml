@@ -1,6 +1,3 @@
-import org.jreleaser.model.Active
-import org.jreleaser.model.Signing
-
 plugins {
   id("java-library")
   id("maven-publish")
