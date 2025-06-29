@@ -15,55 +15,57 @@
  */
 package org.pageseeder.psml.model;
 
+import org.junit.jupiter.api.Test;
+import org.pageseeder.psml.model.PSMLElement.Name;
+
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.pageseeder.psml.model.PSMLElement.Name;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class LoaderTest {
+class LoaderTest {
 
   @Test
-  public void testParse_Document() throws IOException {
+  void testParse_Document() throws IOException {
     Loader loader = new Loader();
     String psml = "<document/>";
     PSMLElement element = loader.parse(new StringReader(psml));
-    Assert.assertNotNull(element);
-    Assert.assertEquals(Name.DOCUMENT, element.getElement());
-    Assert.assertEquals(psml, element.toString());
+    assertNotNull(element);
+    assertEquals(Name.DOCUMENT, element.getElement());
+    assertEquals(psml, element.toString());
   }
 
   @Test
-  public void testParse_Metadata() throws IOException {
+  void testParse_Metadata() throws IOException {
     Loader loader = new Loader();
     String psml = "<document><metadata></metadata></document>";
     PSMLElement element = loader.parse(new StringReader(psml));
-    Assert.assertNotNull(element);
-    Assert.assertEquals(Name.DOCUMENT, element.getElement());
+    assertNotNull(element);
+    assertEquals(Name.DOCUMENT, element.getElement());
     System.out.println(element);
   }
 
   @Test
-  public void testParse_ParaMixedContent() throws IOException {
+  void testParse_ParaMixedContent() throws IOException {
     Loader loader = new Loader();
     String psml = "<para>A <bold>test</bold>!</para>";
     PSMLElement element = loader.parse(new StringReader(psml));
-    Assert.assertNotNull(element);
-    Assert.assertEquals(Name.PARA, element.getElement());
+    assertNotNull(element);
+    assertEquals(Name.PARA, element.getElement());
     System.out.println(element);
   }
 
   @Test
-  public void testParse_List() throws IOException {
+  void testParse_List() throws IOException {
     Loader loader = new Loader();
     String psml = "<list><item>A</item><item>B</item></list>";
     PSMLElement element = loader.parse(new StringReader(psml));
-    Assert.assertNotNull(element);
-    Assert.assertEquals(Name.LIST, element.getElement());
-    Assert.assertEquals(2, element.getNodes().size());
-    Assert.assertEquals(Name.ITEM, ((PSMLElement)element.getNodes().get(0)).getElement());
-    Assert.assertEquals(Name.ITEM, ((PSMLElement)element.getNodes().get(1)).getElement());
+    assertNotNull(element);
+    assertEquals(Name.LIST, element.getElement());
+    assertEquals(2, element.getNodes().size());
+    assertEquals(Name.ITEM, ((PSMLElement) element.getNodes().get(0)).getElement());
+    assertEquals(Name.ITEM, ((PSMLElement) element.getNodes().get(1)).getElement());
     System.out.println(element);
   }
 
