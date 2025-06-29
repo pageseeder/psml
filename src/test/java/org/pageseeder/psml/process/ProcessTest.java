@@ -17,9 +17,8 @@ package org.pageseeder.psml.process;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
@@ -41,6 +40,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProcessTest {
 
@@ -52,16 +53,13 @@ public class ProcessTest {
   private static final String COPY_FOLDER = "build/test/process/copy";
   private static final String IMAGE_FOLDER = "build/test/process/image";
 
-  public ProcessTest() {
-  }
-
-  @BeforeClass
-  public static void setup() {
+  @BeforeAll
+  static void setup() {
     System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
   }
 
   @Test
-  public void testNoProcess() throws IOException, ProcessException {
+  void testNoProcess() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -79,30 +77,30 @@ public class ProcessTest {
     p.process();
 
     // check results
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_0.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0a.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0a.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0a2.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_0a2.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a2.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_1.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_1.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_1.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_2.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/ref_2.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_2.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_1.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_1.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/content/content_1.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_2.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_2.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/content/content_2.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_3.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/content/content_3.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/content/content_3.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/META-INF/content.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/META-INF/content.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/content.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/META-INF/manifest.xml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(SOURCE_FOLDER + "/META-INF/manifest.xml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/manifest.xml").toPath()));
   }
 
   @Test
-  public void testNoProcessPreserve() throws IOException, ProcessException {
+  void testNoProcessPreserve() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -121,30 +119,30 @@ public class ProcessTest {
     p.process();
 
     // check results
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_0.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0a.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0a.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0a2.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_0a2.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_0a2.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_1.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_1.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_1.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_2.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/ref_2.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/ref_2.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_1.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_1.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/content/content_1.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_2.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_2.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/content/content_2.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_3.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/content/content_3.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/content/content_3.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/META-INF/content.psml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/META-INF/content.psml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/content.psml").toPath()));
-    Assert.assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/META-INF/manifest.xml").toPath()),
+    assertArrayEquals(Files.readAllBytes(new File(COPY_FOLDER + "/META-INF/manifest.xml").toPath()),
         Files.readAllBytes(new File(DEST_FOLDER + "/META-INF/manifest.xml").toPath()));
   }
 
   @Test
-  public void testManifestDoc() throws IOException, ProcessException {
+  void testManifestDoc() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -168,12 +166,12 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename + ".psml");
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref)", equalTo("27")));
+    String xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref)", equalTo("27")));
   }
 
   @Test
-  public void testManifestDocXrefs() throws IOException, ProcessException {
+  void testManifestDocXrefs() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -195,18 +193,18 @@ public class ProcessTest {
     p.setManifestDoc(doc);
     XRefsTransclude xrefs = new XRefsTransclude();
     xrefs.setTypes("embed");
-    xrefs.setIncludes(filename +".psml");
+    xrefs.setIncludes(filename + ".psml");
     p.setXrefs(xrefs);
     p.process();
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename + ".psml");
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref/document)", equalTo("6")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref/document)", equalTo("6")));
   }
 
   @Test
-  public void testStripDocumentInfo() throws IOException, ProcessException {
+  void testStripDocumentInfo() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -230,17 +228,17 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo)", equalTo("true")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("not(/document/documentinfo)", equalTo("true")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/content.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo)", equalTo("true")));
+    xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("not(/document/documentinfo)", equalTo("true")));
   }
 
   @Test
-  public void testStripDocumentInfoDocids() throws IOException, ProcessException {
+  void testStripDocumentInfoDocids() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -264,19 +262,19 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@id)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@docid)", equalTo("true")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/@id)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/@docid)", equalTo("true")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/content.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@id)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@docid)", equalTo("true")));
+    xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/@id)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/@docid)", equalTo("true")));
   }
 
   @Test
-  public void testStripDocumentInfoLabels() throws IOException, ProcessException {
+  void testStripDocumentInfoLabels() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -300,19 +298,19 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/labels)", equalTo("true")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/labels)", equalTo("true")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/content.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/labels)", equalTo("true")));
+    xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/labels)", equalTo("true")));
   }
 
   @Test
-  public void testStripDocumentInfoDescription() throws IOException, ProcessException {
+  void testStripDocumentInfoDescription() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -336,19 +334,19 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/description)", equalTo("true")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/description)", equalTo("true")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/content.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/description)", equalTo("true")));
+    xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/description)", equalTo("true")));
   }
 
   @Test
-  public void testStripDocumentInfoPublication() throws IOException, ProcessException {
+  void testStripDocumentInfoPublication() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -372,12 +370,12 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(/document/documentinfo/publication)", equalTo("0")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("count(/document/documentinfo/publication)", equalTo("0")));
   }
 
   @Test
-  public void testStripDocumentInfoVersions() throws IOException, ProcessException {
+  void testStripDocumentInfoVersions() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -401,12 +399,12 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(/document/documentinfo/versions)", equalTo("0")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("count(/document/documentinfo/versions)", equalTo("0")));
   }
 
   @Test
-  public void testStripDocumentInfoTitle() throws IOException, ProcessException {
+  void testStripDocumentInfoTitle() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -430,21 +428,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@title)", equalTo("true")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/displaytitle)", equalTo("true")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/@title)", equalTo("true")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/displaytitle)", equalTo("true")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/content.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/@title)", equalTo("true")));
-    Assert.assertThat(xml, hasXPath("not(/document/documentinfo/uri/displaytitle)", equalTo("true")));
+    xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri)", equalTo("false")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/@title)", equalTo("true")));
+    assertThat(xml, hasXPath("not(/document/documentinfo/uri/displaytitle)", equalTo("true")));
   }
 
   @Test
-  public void testStripReverseXRefs() throws IOException, ProcessException {
+  void testStripReverseXRefs() throws IOException, ProcessException {
     String filename = "ref_0.psml";
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
@@ -472,28 +470,28 @@ public class ProcessTest {
 
     // check xref result
     File result = new File(dest, filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
-    Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
-    Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
+    assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
 
     // check document result
     result = new File(dest, "/content/content_3.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
-    Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
-    Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
+    xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
+    assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
 
     // check metadata result
-    result = new File(dest,"/META-INF/images/diagram1.jpg.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
-    Assert.assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
-    Assert.assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
+    result = new File(dest, "/META-INF/images/diagram1.jpg.psml");
+    xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    assertThat(xml, hasXPath("not(//reversexrefs)", equalTo("true")));
+    assertThat(xml, hasXPath("not(//reversexref)", equalTo("true")));
   }
 
   @Test
-  public void testStripImageURIIDs() throws IOException, ProcessException {
+  void testStripImageURIIDs() throws IOException, ProcessException {
     String filename = "images.psml";
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
@@ -517,14 +515,14 @@ public class ProcessTest {
 
     // check xref result
     File result = new File(dest, filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(//image/@src)", equalTo("4")));
-    Assert.assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("0")));
-    Assert.assertThat(xml, hasXPath("count(//image/@docid)", equalTo("2")));
+    String xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("count(//image/@src)", equalTo("4")));
+    assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("0")));
+    assertThat(xml, hasXPath("count(//image/@docid)", equalTo("2")));
   }
 
   @Test
-  public void testStripImageDocIDs() throws IOException, ProcessException {
+  void testStripImageDocIDs() throws IOException, ProcessException {
     String filename = "images.psml";
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
@@ -548,14 +546,14 @@ public class ProcessTest {
 
     // check xref result
     File result = new File(dest, filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(//image/@src)", equalTo("4")));
-    Assert.assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("4")));
-    Assert.assertThat(xml, hasXPath("count(//image/@docid)", equalTo("0")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("count(//image/@src)", equalTo("4")));
+    assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("4")));
+    assertThat(xml, hasXPath("count(//image/@docid)", equalTo("0")));
   }
 
   @Test
-  public void testMathMLNsPrefix() throws IOException, ProcessException {
+  void testMathMLNsPrefix() throws IOException, ProcessException {
     String filename = "mathml_ns_prefix.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -571,15 +569,15 @@ public class ProcessTest {
 
     // check result
     File result = new File(MATH_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = Files.readString(result.toPath());
     //System.out.println(xml);
     // validate
-    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
-    Assert.assertThat(xml, hasXPath("namespace-uri(//*[local-name()='math'])", equalTo("http://www.w3.org/1998/Math/MathML")));
+    assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    assertThat(xml, hasXPath("namespace-uri(//*[local-name()='math'])", equalTo("http://www.w3.org/1998/Math/MathML")));
   }
 
   @Test
-  public void testLevelProcessed() throws IOException, ProcessException {
+  void testLevelProcessed() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -602,21 +600,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/images space.psml");
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
-    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images space.psml")));
-    Assert.assertThat(xml, hasXPath("//image[1]/@src", equalTo("images/diagram space.jpg")));
-    Assert.assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images space.psml")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images space.psml")));
+    assertThat(xml, hasXPath("//image[1]/@src", equalTo("images/diagram space.jpg")));
+    assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images space.psml")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/images/diagram space.jpg.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
-    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("../images space.psml")));
+    xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("../images space.psml")));
   }
 
   @Test
-  public void testLevelPortable() throws IOException, ProcessException {
+  void testLevelPortable() throws IOException, ProcessException {
     // make a copy of source docs so they can be moved
     File src = new File(SOURCE_FOLDER);
     File copy = new File(COPY_FOLDER);
@@ -637,21 +635,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/images space.psml");
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("portable")));
-    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images%20space.psml")));
-    Assert.assertThat(xml, hasXPath("//image[1]/@src", equalTo("images/diagram%20space.jpg")));
-    Assert.assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images%20space.psml")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("document/@level", equalTo("portable")));
+    assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images%20space.psml")));
+    assertThat(xml, hasXPath("//image[1]/@src", equalTo("images/diagram%20space.jpg")));
+    assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images%20space.psml")));
 
     // check metadata result
     result = new File(DEST_FOLDER + "/META-INF/images/diagram space.jpg.psml");
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("metadata")));
-    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("../images%20space.psml")));
+    xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("document/@level", equalTo("metadata")));
+    assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("../images%20space.psml")));
   }
 
   @Test
-  public void testMathMLNoNsPrefix() throws IOException, ProcessException {
+  void testMathMLNoNsPrefix() throws IOException, ProcessException {
     String filename = "mathml_no_ns_prefix.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -667,15 +665,15 @@ public class ProcessTest {
 
     // check result
     File result = new File(MATH_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = Files.readString(result.toPath());
     //System.out.println(xml);
     // validate
-    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
-    Assert.assertThat(xml, hasXPath("namespace-uri(//*[local-name()='math'])", equalTo("http://www.w3.org/1998/Math/MathML")));
+    assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    assertThat(xml, hasXPath("namespace-uri(//*[local-name()='math'])", equalTo("http://www.w3.org/1998/Math/MathML")));
   }
 
   @Test
-  public void testAsciiMathConverter() throws IOException, ProcessException {
+  void testAsciiMathConverter() throws IOException, ProcessException {
     //for (int i = 1; i < 1000; i++) {
     //  String math = "10=-2x+" + (1000 - i);
     //  if (i == 500) AsciiMathConverter.reset();
@@ -686,7 +684,7 @@ public class ProcessTest {
   }
 
   @Test
-  public void testTexConverter() throws IOException, ProcessException {
+  void testTexConverter() throws IOException, ProcessException {
     //String tex = "y = x ^ 2";
     //String tex = "\\frac{2}{3}";
     //String tex = "\\begin{aligned}a&=b+c\\\\a-c&=b\\end{aligned}";
@@ -709,7 +707,7 @@ public class ProcessTest {
   }
 
   @Test
-  public void testTexConvert() throws IOException, ProcessException {
+  void testTexConvert() throws IOException, ProcessException {
     String filename = "katex_conversion.psml";
     String filename_expected = "katex_conversion_result.psml";
     Process p = new Process();
@@ -727,18 +725,18 @@ public class ProcessTest {
 
     // check result
     File expected = new File(SOURCE_FOLDER + "/" + filename_expected);
-    String xml_expected = new String (Files.readAllBytes(expected.toPath()), StandardCharsets.UTF_8);
+    String xml_expected = Files.readString(expected.toPath());
     File result = new File(MATH_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
 //    System.out.println(xml);
     // validate
-    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
-    Assert.assertThat(xml, hasXPath("count(inline[@label = 'tex'])", equalTo("0")));
-    Assert.assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace());
+    assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    assertThat(xml, hasXPath("count(inline[@label = 'tex'])", equalTo("0")));
+    assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace());
   }
 
   @Test
-  public void testAsciiMathConvert() throws IOException, ProcessException {
+  void testAsciiMathConvert() throws IOException, ProcessException {
     String filename = "asciimath_conversion.psml";
     String filename_expected = "asciimath_conversion_result.psml";
     Process p = new Process();
@@ -756,18 +754,18 @@ public class ProcessTest {
 
     // check result
     File expected = new File(SOURCE_FOLDER + "/" + filename_expected);
-    String xml_expected = new String (Files.readAllBytes(expected.toPath()), StandardCharsets.UTF_8);
+    String xml_expected = Files.readString(expected.toPath());
     File result = new File(MATH_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = Files.readString(result.toPath());
 //    System.out.println(xml);
     // validate
-    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
-    Assert.assertThat(xml, hasXPath("count(inline[@label = 'asciimath'])", equalTo("0")));
-    Assert.assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace());
+    assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    assertThat(xml, hasXPath("count(inline[@label = 'asciimath'])", equalTo("0")));
+    assertThat(xml, CompareMatcher.isSimilarTo(xml_expected).normalizeWhitespace());
   }
 
-  @Test(expected=ProcessException.class)
-  public void testAsciiMathConvertClassFail() throws IOException, ProcessException {
+  @Test
+  void testAsciiMathConvertClassFail() throws IOException {
     Process p = new Process();
     p.setConvertAsciiMath(true);
     p.setPreserveSrc(true);
@@ -780,11 +778,11 @@ public class ProcessTest {
     p.setDest(dest);
     ErrorHandling error = new ErrorHandling();
     p.setError(error);
-    p.process();
+    assertThrows(ProcessException.class, p::process);
   }
 
-  @Test(expected=ProcessException.class)
-  public void testAsciiMathConvertIDFail() throws IOException, ProcessException {
+  @Test
+  void testAsciiMathConvertIDFail() throws IOException {
     Process p = new Process();
     p.setConvertAsciiMath(true);
     p.setPreserveSrc(true);
@@ -797,11 +795,11 @@ public class ProcessTest {
     p.setDest(dest);
     ErrorHandling error = new ErrorHandling();
     p.setError(error);
-    p.process();
+    assertThrows(ProcessException.class, p::process);
   }
 
   @Test
-  public void testGenerateTOC() throws IOException, ProcessException {
+  void testGenerateTOC() throws IOException, ProcessException {
     String filename = "toc.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -821,83 +819,83 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
     //System.out.println(xml);
     // validate
-    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     // test xpaths
-    Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC test")));
-    Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("22")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title",  equalTo("Ref 1 embed")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title",  equalTo("Ref 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[3][@level='2']/@title",  equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[4][@level='3']/@title",  equalTo("Content 3")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[5][@level='3']/@title",  equalTo("Content 2")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[6][@level='1']/@title",  equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[7][@level='2']/@title",  equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[8][@level='3']/@title",  equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[9][@level='4']/@title",  equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[10][@level='5']/@title", equalTo("Ref 2 embed")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[11][@level='6']/@title", equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[12][@level='7']/@title", equalTo("Content 3")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[13][@level='6']/@title", equalTo("Content 2")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[14][@level='1']/@title", equalTo("Ref 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[15][@level='2']/@title", equalTo("Content 2")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[16][@level='2']/@title", equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[17][@level='3']/@title", equalTo("Content 4")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[18][@level='3']/@title", equalTo("Content 4.1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[19][@level='2']/@title", equalTo("Content 4 embed")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[20][@level='3']/@title", equalTo("Content 4")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[21][@level='3']/@title", equalTo("Content 4.1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[22][@level='1']/@title", equalTo("TOC heading 2")));
-    Assert.assertThat(xml, hasXPath("count(//heading)", equalTo("23")));
-    Assert.assertThat(xml, hasXPath("(//heading)[1][not(@prefix)][@level='1']/@id",        equalTo("21926-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[2][not(@prefix)][@level='2']/@id",        equalTo("21926-1-1-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[3][not(@prefix)][@level='3']/@id",        equalTo("21926-1-1-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[4][not(@prefix)]/@level",                 equalTo("1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[5][@prefix='1.1.'][@level='2']/@id",      equalTo("21927-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[6][not(@prefix)]/@level",                 equalTo("2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[7][@prefix='1.2.'][@level='2']/@id",      equalTo("21927-1-2-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[8][@prefix='1.2.1.'][@level='3']/@id",    equalTo("21934-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[9][@prefix='1.2.2.'][@level='3']/@id",    equalTo("21931-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[10][@prefix='2.'][@level='1']/@id",        equalTo("21926-1-2-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[11][@prefix='2.1.'][@level='2']/@id",      equalTo("21926-1-2-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[12][@prefix='(a)'][@level='5']/@id",       equalTo("21928-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[13][not(@prefix)]/@level",                equalTo("2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[14][@prefix='(i)'][@level='6']/@id",      equalTo("21930-4-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[15][@prefix='(A)'][@level='7']/@id",      equalTo("21934-2-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[16][@prefix='(ii)'][@level='6']/@id",     equalTo("21931-2-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[17][@prefix='3.'][@level='1']/@id",       equalTo("21926-1-2-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[18][@prefix='3.1.'][@level='2']/@id",     equalTo("21931-3-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[19][@prefix='3.1.2.'][@level='3']/@id",   equalTo("219350-1-1-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[20][@prefix='3.1.3.'][@level='3']/@id",   equalTo("219350-1-1-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[21][@prefix='3.1.4.'][@level='3']/@id",   equalTo("219350-2-1-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[22][@prefix='3.1.5.'][@level='3']/@id",   equalTo("219350-2-1-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[23][@prefix='4.'][@level='1']/@id",       equalTo("21926-1-3-3")));
-    Assert.assertThat(xml, hasXPath("count(//para[@numbered='true'])", equalTo("7")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[1][@indent=4]/@prefix",    equalTo("1.2.1.1&")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[2][@indent=8]/@prefix",    equalTo("(I)")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[3][@indent=4]/@prefix",    equalTo("3.1.1.1&")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[4][@indent=5]/@prefix",    equalTo("(a)")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[5][@indent=4]/@prefix",    equalTo("3.1.3.2&")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[6][@indent=5]/@prefix",    equalTo("(a)")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[7]/@prefix",               equalTo("")));
-    Assert.assertThat(xml, hasXPath("count(//xref[@display='template'])",     equalTo("7")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[1]",       equalTo("Parentnumber 2.1.1.1&(a) Prefix (i)")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[2]/@type", equalTo("alternate")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]",       equalTo("1.2.1. Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]/sup",   equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]",       equalTo("2.1.1.1&(a)(i)(A) Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]/sup",   equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[5]",       equalTo("2.1.1.1&(a)(i)(A)(I)")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]",       equalTo("2.1.1.1&(a)(i)(A) Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]/sup",   equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[7]",       equalTo("1.3.2 Accounts")));
+    assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
+    assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC test")));
+    assertThat(xml, hasXPath("count(//toc-part)", equalTo("22")));
+    assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title", equalTo("Ref 1 embed")));
+    assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title", equalTo("Ref 1")));
+    assertThat(xml, hasXPath("(//toc-part)[3][@level='2']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[4][@level='3']/@title", equalTo("Content 3")));
+    assertThat(xml, hasXPath("(//toc-part)[5][@level='3']/@title", equalTo("Content 2")));
+    assertThat(xml, hasXPath("(//toc-part)[6][@level='1']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[7][@level='2']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[8][@level='3']/@title", equalTo("")));
+    assertThat(xml, hasXPath("(//toc-part)[9][@level='4']/@title", equalTo("")));
+    assertThat(xml, hasXPath("(//toc-part)[10][@level='5']/@title", equalTo("Ref 2 embed")));
+    assertThat(xml, hasXPath("(//toc-part)[11][@level='6']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[12][@level='7']/@title", equalTo("Content 3")));
+    assertThat(xml, hasXPath("(//toc-part)[13][@level='6']/@title", equalTo("Content 2")));
+    assertThat(xml, hasXPath("(//toc-part)[14][@level='1']/@title", equalTo("Ref 1")));
+    assertThat(xml, hasXPath("(//toc-part)[15][@level='2']/@title", equalTo("Content 2")));
+    assertThat(xml, hasXPath("(//toc-part)[16][@level='2']/@title", equalTo("")));
+    assertThat(xml, hasXPath("(//toc-part)[17][@level='3']/@title", equalTo("Content 4")));
+    assertThat(xml, hasXPath("(//toc-part)[18][@level='3']/@title", equalTo("Content 4.1")));
+    assertThat(xml, hasXPath("(//toc-part)[19][@level='2']/@title", equalTo("Content 4 embed")));
+    assertThat(xml, hasXPath("(//toc-part)[20][@level='3']/@title", equalTo("Content 4")));
+    assertThat(xml, hasXPath("(//toc-part)[21][@level='3']/@title", equalTo("Content 4.1")));
+    assertThat(xml, hasXPath("(//toc-part)[22][@level='1']/@title", equalTo("TOC heading 2")));
+    assertThat(xml, hasXPath("count(//heading)", equalTo("23")));
+    assertThat(xml, hasXPath("(//heading)[1][not(@prefix)][@level='1']/@id", equalTo("21926-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[2][not(@prefix)][@level='2']/@id", equalTo("21926-1-1-2")));
+    assertThat(xml, hasXPath("(//heading)[3][not(@prefix)][@level='3']/@id", equalTo("21926-1-1-3")));
+    assertThat(xml, hasXPath("(//heading)[4][not(@prefix)]/@level", equalTo("1")));
+    assertThat(xml, hasXPath("(//heading)[5][@prefix='1.1.'][@level='2']/@id", equalTo("21927-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[6][not(@prefix)]/@level", equalTo("2")));
+    assertThat(xml, hasXPath("(//heading)[7][@prefix='1.2.'][@level='2']/@id", equalTo("21927-1-2-1")));
+    assertThat(xml, hasXPath("(//heading)[8][@prefix='1.2.1.'][@level='3']/@id", equalTo("21934-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[9][@prefix='1.2.2.'][@level='3']/@id", equalTo("21931-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[10][@prefix='2.'][@level='1']/@id", equalTo("21926-1-2-1")));
+    assertThat(xml, hasXPath("(//heading)[11][@prefix='2.1.'][@level='2']/@id", equalTo("21926-1-2-2")));
+    assertThat(xml, hasXPath("(//heading)[12][@prefix='(a)'][@level='5']/@id", equalTo("21928-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[13][not(@prefix)]/@level", equalTo("2")));
+    assertThat(xml, hasXPath("(//heading)[14][@prefix='(i)'][@level='6']/@id", equalTo("21930-4-1-1")));
+    assertThat(xml, hasXPath("(//heading)[15][@prefix='(A)'][@level='7']/@id", equalTo("21934-2-1-1")));
+    assertThat(xml, hasXPath("(//heading)[16][@prefix='(ii)'][@level='6']/@id", equalTo("21931-2-1-1")));
+    assertThat(xml, hasXPath("(//heading)[17][@prefix='3.'][@level='1']/@id", equalTo("21926-1-2-3")));
+    assertThat(xml, hasXPath("(//heading)[18][@prefix='3.1.'][@level='2']/@id", equalTo("21931-3-1-1")));
+    assertThat(xml, hasXPath("(//heading)[19][@prefix='3.1.2.'][@level='3']/@id", equalTo("219350-1-1-2")));
+    assertThat(xml, hasXPath("(//heading)[20][@prefix='3.1.3.'][@level='3']/@id", equalTo("219350-1-1-3")));
+    assertThat(xml, hasXPath("(//heading)[21][@prefix='3.1.4.'][@level='3']/@id", equalTo("219350-2-1-2")));
+    assertThat(xml, hasXPath("(//heading)[22][@prefix='3.1.5.'][@level='3']/@id", equalTo("219350-2-1-3")));
+    assertThat(xml, hasXPath("(//heading)[23][@prefix='4.'][@level='1']/@id", equalTo("21926-1-3-3")));
+    assertThat(xml, hasXPath("count(//para[@numbered='true'])", equalTo("7")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[1][@indent=4]/@prefix", equalTo("1.2.1.1&")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[2][@indent=8]/@prefix", equalTo("(I)")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[3][@indent=4]/@prefix", equalTo("3.1.1.1&")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[4][@indent=5]/@prefix", equalTo("(a)")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[5][@indent=4]/@prefix", equalTo("3.1.3.2&")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[6][@indent=5]/@prefix", equalTo("(a)")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[7]/@prefix", equalTo("")));
+    assertThat(xml, hasXPath("count(//xref[@display='template'])", equalTo("7")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[1]", equalTo("Parentnumber 2.1.1.1&(a) Prefix (i)")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[2]/@type", equalTo("alternate")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[3]", equalTo("1.2.1. Content 3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[3]/sup", equalTo("3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[4]", equalTo("2.1.1.1&(a)(i)(A) Content 3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[4]/sup", equalTo("3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[5]", equalTo("2.1.1.1&(a)(i)(A)(I)")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[6]", equalTo("2.1.1.1&(a)(i)(A) Content 3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[6]/sup", equalTo("3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[7]", equalTo("1.3.2 Accounts")));
   }
 
   @Test
-  public void testGenerateTOCRelative() throws IOException, ProcessException {
+  void testGenerateTOCRelative() throws IOException, ProcessException {
     String filename = "toc.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -917,82 +915,82 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = Files.readString(result.toPath());
     // validate
-    Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+    assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     // test xpaths
-    Assert.assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC test")));
-    Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("22")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title",  equalTo("Ref 1 embed")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title",  equalTo("Ref 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[3][@level='2']/@title",  equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[4][@level='3']/@title",  equalTo("Content 3")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[5][@level='3']/@title",  equalTo("Content 2")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[6][@level='1']/@title",  equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[7][@level='2']/@title",  equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[8][@level='3']/@title",  equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[9][@level='4']/@title",  equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[10][@level='5']/@title", equalTo("Ref 2 embed")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[11][@level='6']/@title", equalTo("Content 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[12][@level='7']/@title", equalTo("Content 3")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[13][@level='6']/@title", equalTo("Content 2")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[14][@level='1']/@title", equalTo("Ref 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[15][@level='2']/@title", equalTo("Content 2")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[16][@level='2']/@title", equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[17][@level='3']/@title", equalTo("Content 4")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[18][@level='3']/@title", equalTo("Content 4.1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[19][@level='2']/@title", equalTo("Content 4 embed")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[20][@level='3']/@title", equalTo("Content 4")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[21][@level='3']/@title", equalTo("Content 4.1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[22][@level='1']/@title", equalTo("TOC heading 2")));
-    Assert.assertThat(xml, hasXPath("count(//heading)", equalTo("23")));
-    Assert.assertThat(xml, hasXPath("(//heading)[1][not(@prefix)][@level='1']/@id",        equalTo("21926-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[2][not(@prefix)][@level='2']/@id",        equalTo("21926-1-1-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[3][not(@prefix)][@level='3']/@id",        equalTo("21926-1-1-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[4][not(@prefix)]/@level",               equalTo("1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[5][@prefix='1.1.'][@level='2']/@id",    equalTo("21927-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[6][not(@prefix)]/@level",               equalTo("2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[7][@prefix='1.2.'][@level='2']/@id",    equalTo("21927-1-2-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[8][@prefix='2.'][@level='1']/@id",      equalTo("21934-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[9][@prefix='4.'][@level='1']/@id",      equalTo("21931-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[10][@prefix='5.'][@level='1']/@id",      equalTo("21926-1-2-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[11][@prefix='5.1.'][@level='2']/@id",    equalTo("21926-1-2-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[12][@prefix='5.1.1.'][@level='3']/@id",  equalTo("21928-1-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[13][not(@prefix)]/@level",              equalTo("2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[14][@prefix='5.1.2.'][@level='3']/@id", equalTo("21930-4-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[15][@prefix='5.1.3.'][@level='3']/@id", equalTo("21934-2-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[16][@prefix='5.1.5.'][@level='3']/@id", equalTo("21931-2-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[17][@prefix='6.'][@level='1']/@id",     equalTo("21926-1-2-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[18][@prefix='7.'][@level='1']/@id",     equalTo("21931-3-1-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[19][@prefix='7.2.'][@level='2']/@id",   equalTo("219350-1-1-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[20][@prefix='7.3.'][@level='2']/@id",   equalTo("219350-1-1-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[21][@prefix='7.4.'][@level='2']/@id",   equalTo("219350-2-1-2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[22][@prefix='7.5.'][@level='2']/@id",   equalTo("219350-2-1-3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[23][@prefix='8.'][@level='1']/@id",     equalTo("21926-1-3-3")));
-    Assert.assertThat(xml, hasXPath("count(//para[@numbered='true'])", equalTo("7")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[1][@indent=1]/@prefix",    equalTo("3.")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[2][@indent=3]/@prefix",    equalTo("5.1.4.")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[3][@indent=3]/@prefix",    equalTo("7.1.1.")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[4][@indent=3]/@prefix",    equalTo("7.3.1.")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[5][@indent=3]/@prefix",    equalTo("7.3.2.")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[6][@indent=3]/@prefix",    equalTo("7.5.1.")));
-    Assert.assertThat(xml, hasXPath("(//para[@numbered='true'])[7]/@prefix",               equalTo("9.")));
-    Assert.assertThat(xml, hasXPath("count(//xref[@display='template'])", equalTo("7")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[1]",       equalTo("Parentnumber  Prefix 5.1.2.")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[2]/@type", equalTo("alternate")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]",       equalTo("2. Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[3]/sup",   equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]",       equalTo("5.1.3. Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[4]/sup",   equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[5]",       equalTo("5.1.4.")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]",       equalTo("5.1.3. Content 3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[6]/sup",   equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@display='template'])[7]",       equalTo("1.3.2 Accounts")));
+    assertThat(xml, hasXPath("count(//toc-tree)", equalTo("1")));
+    assertThat(xml, hasXPath("//toc-tree/@title", equalTo("TOC test")));
+    assertThat(xml, hasXPath("count(//toc-part)", equalTo("22")));
+    assertThat(xml, hasXPath("(//toc-part)[1][@level='1']/@title", equalTo("Ref 1 embed")));
+    assertThat(xml, hasXPath("(//toc-part)[2][@level='2']/@title", equalTo("Ref 1")));
+    assertThat(xml, hasXPath("(//toc-part)[3][@level='2']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[4][@level='3']/@title", equalTo("Content 3")));
+    assertThat(xml, hasXPath("(//toc-part)[5][@level='3']/@title", equalTo("Content 2")));
+    assertThat(xml, hasXPath("(//toc-part)[6][@level='1']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[7][@level='2']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[8][@level='3']/@title", equalTo("")));
+    assertThat(xml, hasXPath("(//toc-part)[9][@level='4']/@title", equalTo("")));
+    assertThat(xml, hasXPath("(//toc-part)[10][@level='5']/@title", equalTo("Ref 2 embed")));
+    assertThat(xml, hasXPath("(//toc-part)[11][@level='6']/@title", equalTo("Content 1")));
+    assertThat(xml, hasXPath("(//toc-part)[12][@level='7']/@title", equalTo("Content 3")));
+    assertThat(xml, hasXPath("(//toc-part)[13][@level='6']/@title", equalTo("Content 2")));
+    assertThat(xml, hasXPath("(//toc-part)[14][@level='1']/@title", equalTo("Ref 1")));
+    assertThat(xml, hasXPath("(//toc-part)[15][@level='2']/@title", equalTo("Content 2")));
+    assertThat(xml, hasXPath("(//toc-part)[16][@level='2']/@title", equalTo("")));
+    assertThat(xml, hasXPath("(//toc-part)[17][@level='3']/@title", equalTo("Content 4")));
+    assertThat(xml, hasXPath("(//toc-part)[18][@level='3']/@title", equalTo("Content 4.1")));
+    assertThat(xml, hasXPath("(//toc-part)[19][@level='2']/@title", equalTo("Content 4 embed")));
+    assertThat(xml, hasXPath("(//toc-part)[20][@level='3']/@title", equalTo("Content 4")));
+    assertThat(xml, hasXPath("(//toc-part)[21][@level='3']/@title", equalTo("Content 4.1")));
+    assertThat(xml, hasXPath("(//toc-part)[22][@level='1']/@title", equalTo("TOC heading 2")));
+    assertThat(xml, hasXPath("count(//heading)", equalTo("23")));
+    assertThat(xml, hasXPath("(//heading)[1][not(@prefix)][@level='1']/@id", equalTo("21926-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[2][not(@prefix)][@level='2']/@id", equalTo("21926-1-1-2")));
+    assertThat(xml, hasXPath("(//heading)[3][not(@prefix)][@level='3']/@id", equalTo("21926-1-1-3")));
+    assertThat(xml, hasXPath("(//heading)[4][not(@prefix)]/@level", equalTo("1")));
+    assertThat(xml, hasXPath("(//heading)[5][@prefix='1.1.'][@level='2']/@id", equalTo("21927-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[6][not(@prefix)]/@level", equalTo("2")));
+    assertThat(xml, hasXPath("(//heading)[7][@prefix='1.2.'][@level='2']/@id", equalTo("21927-1-2-1")));
+    assertThat(xml, hasXPath("(//heading)[8][@prefix='2.'][@level='1']/@id", equalTo("21934-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[9][@prefix='4.'][@level='1']/@id", equalTo("21931-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[10][@prefix='5.'][@level='1']/@id", equalTo("21926-1-2-1")));
+    assertThat(xml, hasXPath("(//heading)[11][@prefix='5.1.'][@level='2']/@id", equalTo("21926-1-2-2")));
+    assertThat(xml, hasXPath("(//heading)[12][@prefix='5.1.1.'][@level='3']/@id", equalTo("21928-1-1-1")));
+    assertThat(xml, hasXPath("(//heading)[13][not(@prefix)]/@level", equalTo("2")));
+    assertThat(xml, hasXPath("(//heading)[14][@prefix='5.1.2.'][@level='3']/@id", equalTo("21930-4-1-1")));
+    assertThat(xml, hasXPath("(//heading)[15][@prefix='5.1.3.'][@level='3']/@id", equalTo("21934-2-1-1")));
+    assertThat(xml, hasXPath("(//heading)[16][@prefix='5.1.5.'][@level='3']/@id", equalTo("21931-2-1-1")));
+    assertThat(xml, hasXPath("(//heading)[17][@prefix='6.'][@level='1']/@id", equalTo("21926-1-2-3")));
+    assertThat(xml, hasXPath("(//heading)[18][@prefix='7.'][@level='1']/@id", equalTo("21931-3-1-1")));
+    assertThat(xml, hasXPath("(//heading)[19][@prefix='7.2.'][@level='2']/@id", equalTo("219350-1-1-2")));
+    assertThat(xml, hasXPath("(//heading)[20][@prefix='7.3.'][@level='2']/@id", equalTo("219350-1-1-3")));
+    assertThat(xml, hasXPath("(//heading)[21][@prefix='7.4.'][@level='2']/@id", equalTo("219350-2-1-2")));
+    assertThat(xml, hasXPath("(//heading)[22][@prefix='7.5.'][@level='2']/@id", equalTo("219350-2-1-3")));
+    assertThat(xml, hasXPath("(//heading)[23][@prefix='8.'][@level='1']/@id", equalTo("21926-1-3-3")));
+    assertThat(xml, hasXPath("count(//para[@numbered='true'])", equalTo("7")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[1][@indent=1]/@prefix", equalTo("3.")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[2][@indent=3]/@prefix", equalTo("5.1.4.")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[3][@indent=3]/@prefix", equalTo("7.1.1.")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[4][@indent=3]/@prefix", equalTo("7.3.1.")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[5][@indent=3]/@prefix", equalTo("7.3.2.")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[6][@indent=3]/@prefix", equalTo("7.5.1.")));
+    assertThat(xml, hasXPath("(//para[@numbered='true'])[7]/@prefix", equalTo("9.")));
+    assertThat(xml, hasXPath("count(//xref[@display='template'])", equalTo("7")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[1]", equalTo("Parentnumber  Prefix 5.1.2.")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[2]/@type", equalTo("alternate")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[3]", equalTo("2. Content 3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[3]/sup", equalTo("3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[4]", equalTo("5.1.3. Content 3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[4]/sup", equalTo("3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[5]", equalTo("5.1.4.")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[6]", equalTo("5.1.3. Content 3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[6]/sup", equalTo("3")));
+    assertThat(xml, hasXPath("(//xref[@display='template'])[7]", equalTo("1.3.2 Accounts")));
   }
 
   @Test
-  public void testProcessDiff() throws IOException, ProcessException {
+  void testProcessDiff() throws IOException, ProcessException {
     String filename = "compare_ref.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1012,21 +1010,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(//diff//xref)", equalTo("9")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[1]", equalTo("1.3. Heading Ax")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[2]", equalTo("1.4. Heading B")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[3]", equalTo("1.2. Compare 2content.")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[4]", equalTo("1.2. Compare 2content.")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[5]", equalTo("2. Compare 2content.")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[6]", equalTo("3.3. Heading Ax")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[7]", equalTo("3.4. Heading B")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[8]", equalTo("3.2. Compare 2content.")));
-    Assert.assertThat(xml, hasXPath("(//diff//xref)[9]", equalTo("3.2. Compare 2content.")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("count(//diff//xref)", equalTo("9")));
+    assertThat(xml, hasXPath("(//diff//xref)[1]", equalTo("1.3. Heading Ax")));
+    assertThat(xml, hasXPath("(//diff//xref)[2]", equalTo("1.4. Heading B")));
+    assertThat(xml, hasXPath("(//diff//xref)[3]", equalTo("1.2. Compare 2content.")));
+    assertThat(xml, hasXPath("(//diff//xref)[4]", equalTo("1.2. Compare 2content.")));
+    assertThat(xml, hasXPath("(//diff//xref)[5]", equalTo("2. Compare 2content.")));
+    assertThat(xml, hasXPath("(//diff//xref)[6]", equalTo("3.3. Heading Ax")));
+    assertThat(xml, hasXPath("(//diff//xref)[7]", equalTo("3.4. Heading B")));
+    assertThat(xml, hasXPath("(//diff//xref)[8]", equalTo("3.2. Compare 2content.")));
+    assertThat(xml, hasXPath("(//diff//xref)[9]", equalTo("3.2. Compare 2content.")));
   }
 
   @Test
-  public void testProcessImagesFilename() throws IOException, ProcessException {
+  void testProcessImagesFilename() throws IOException, ProcessException {
     String filename = "images.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1048,22 +1046,22 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("diagram1.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("diagram1-2.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("diagram2.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("diagram1-3.jpg")));
-    Assert.assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("4")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("diagram1.jpg")));
+    assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("diagram1-2.jpg")));
+    assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("diagram2.jpg")));
+    assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("diagram1-3.jpg")));
+    assertThat(xml, hasXPath("count(//image/@uriid)", equalTo("4")));
 
     // check files
-    Assert.assertTrue("Image 1 missing", new File(image, "diagram1.jpg").exists());
-    Assert.assertTrue("Image 2 missing", new File(image, "diagram1-2.jpg").exists());
-    Assert.assertTrue("Image 3 missing", new File(image, "diagram2.jpg").exists());
-    Assert.assertTrue("Image 4 missing", new File(image, "diagram1-3.jpg").exists());
+    assertTrue(new File(image, "diagram1.jpg").exists(), "Image 1 missing");
+    assertTrue(new File(image, "diagram1-2.jpg").exists(), "Image 2 missing");
+    assertTrue(new File(image, "diagram2.jpg").exists(), "Image 3 missing");
+    assertTrue(new File(image, "diagram1-3.jpg").exists(), "Image 4 missing");
   }
 
   @Test
-  public void testProcessImagesFilenameEncode() throws IOException, ProcessException {
+  void testProcessImagesFilenameEncode() throws IOException, ProcessException {
     String filename = "images space.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1085,18 +1083,18 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("document/@level", equalTo("processed")));
-    Assert.assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images space.psml")));
-    Assert.assertThat(xml, hasXPath("//image[1]/@src", equalTo("diagram%20space.jpg")));
-    Assert.assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images space.psml")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("document/@level", equalTo("processed")));
+    assertThat(xml, hasXPath("//reversexref[1]/@href", equalTo("images space.psml")));
+    assertThat(xml, hasXPath("//image[1]/@src", equalTo("diagram%20space.jpg")));
+    assertThat(xml, hasXPath("//xref[1]/@href", equalTo("images space.psml")));
 
     // check files
-    Assert.assertTrue("Image 1 missing", new File(image, "diagram%20space.jpg").exists());
+    assertTrue(new File(image, "diagram%20space.jpg").exists(), "Image 1 missing");
   }
 
   @Test
-  public void testProcessImagesLocation() throws IOException, ProcessException {
+  void testProcessImagesLocation() throws IOException, ProcessException {
     String filename = "images.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1118,21 +1116,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("images/diagram1.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("images/test/diagram1.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("images/test/diagram2.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("images/test2/diagram1.jpg")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("images/diagram1.jpg")));
+    assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("images/test/diagram1.jpg")));
+    assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("images/test/diagram2.jpg")));
+    assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("images/test2/diagram1.jpg")));
 
     // check files
-    Assert.assertTrue("Image 1 missing", new File(image, "images/diagram1.jpg").exists());
-    Assert.assertTrue("Image 2 missing", new File(image, "images/test/diagram1.jpg").exists());
-    Assert.assertTrue("Image 3 missing", new File(image, "images/test/diagram2.jpg").exists());
-    Assert.assertTrue("Image 4 missing", new File(image, "images/test2/diagram1.jpg").exists());
+    assertTrue(new File(image, "images/diagram1.jpg").exists(), "Image 1 missing");
+    assertTrue(new File(image, "images/test/diagram1.jpg").exists(), "Image 2 missing");
+    assertTrue(new File(image, "images/test/diagram2.jpg").exists(), "Image 3 missing");
+    assertTrue(new File(image, "images/test2/diagram1.jpg").exists(), "Image 4 missing");
   }
 
   @Test
-  public void testProcessImagesPermalink() throws IOException, ProcessException {
+  void testProcessImagesPermalink() throws IOException, ProcessException {
     String filename = "images.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1155,21 +1153,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("/ps/uri/21941.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("/ps/uri/21942.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("/ps/uri/21943.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("/ps/uri/21944.jpg")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("/ps/uri/21941.jpg")));
+    assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("/ps/uri/21942.jpg")));
+    assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("/ps/uri/21943.jpg")));
+    assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("/ps/uri/21944.jpg")));
 
     // check files
-    Assert.assertTrue("Image 1 missing", new File(image, "21941.jpg").exists());
-    Assert.assertTrue("Image 2 missing", new File(image, "21942.jpg").exists());
-    Assert.assertTrue("Image 3 missing", new File(image, "21943.jpg").exists());
-    Assert.assertTrue("Image 4 missing", new File(image, "21944.jpg").exists());
+    assertTrue(new File(image, "21941.jpg").exists(), "Image 1 missing");
+    assertTrue(new File(image, "21942.jpg").exists(), "Image 2 missing");
+    assertTrue(new File(image, "21943.jpg").exists(), "Image 3 missing");
+    assertTrue(new File(image, "21944.jpg").exists(), "Image 4 missing");
   }
 
   @Test
-  public void testProcessImagesUriid() throws IOException, ProcessException {
+  void testProcessImagesUriid() throws IOException, ProcessException {
     String filename = "images.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1191,21 +1189,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("21941.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("21942.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("21943.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("21944.jpg")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("21941.jpg")));
+    assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("21942.jpg")));
+    assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("21943.jpg")));
+    assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("21944.jpg")));
 
     // check files
-    Assert.assertTrue("Image 1 missing", new File(image, "21941.jpg").exists());
-    Assert.assertTrue("Image 2 missing", new File(image, "21942.jpg").exists());
-    Assert.assertTrue("Image 3 missing", new File(image, "21943.jpg").exists());
-    Assert.assertTrue("Image 4 missing", new File(image, "21944.jpg").exists());
+    assertTrue(new File(image, "21941.jpg").exists(), "Image 1 missing");
+    assertTrue(new File(image, "21942.jpg").exists(), "Image 2 missing");
+    assertTrue(new File(image, "21943.jpg").exists(), "Image 3 missing");
+    assertTrue(new File(image, "21944.jpg").exists(), "Image 4 missing");
   }
 
   @Test
-  public void testProcessImagesUriidFolders() throws IOException, ProcessException {
+  void testProcessImagesUriidFolders() throws IOException, ProcessException {
     String filename = "images.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1227,21 +1225,21 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("000/000/021/21941.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("000/000/021/21942.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("000/000/021/21943.jpg")));
-    Assert.assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("000/000/021/21944.jpg")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//image)[1]/@src", equalTo("000/000/021/21941.jpg")));
+    assertThat(xml, hasXPath("(//image)[2]/@src", equalTo("000/000/021/21942.jpg")));
+    assertThat(xml, hasXPath("(//image)[3]/@src", equalTo("000/000/021/21943.jpg")));
+    assertThat(xml, hasXPath("(//image)[4]/@src", equalTo("000/000/021/21944.jpg")));
 
     // check files
-    Assert.assertTrue("Image 1 missing", new File(image, "000/000/021/21941.jpg").exists());
-    Assert.assertTrue("Image 2 missing", new File(image, "000/000/021/21942.jpg").exists());
-    Assert.assertTrue("Image 3 missing", new File(image, "000/000/021/21943.jpg").exists());
-    Assert.assertTrue("Image 4 missing", new File(image, "000/000/021/21944.jpg").exists());
+    assertTrue(new File(image, "000/000/021/21941.jpg").exists(), "Image 1 missing");
+    assertTrue(new File(image, "000/000/021/21942.jpg").exists(), "Image 2 missing");
+    assertTrue(new File(image, "000/000/021/21943.jpg").exists(), "Image 3 missing");
+    assertTrue(new File(image, "000/000/021/21944.jpg").exists(), "Image 4 missing");
   }
 
   @Test
-  public void testProcessEmbedLinkMetadata() throws IOException, ProcessException {
+  void testProcessEmbedLinkMetadata() throws IOException, ProcessException {
     String filename = "links.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1260,16 +1258,16 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//link)[1]/document/documentinfo/uri/@id", equalTo("475607")));
-    Assert.assertThat(xml, hasXPath("(//link)[2]/document/documentinfo/uri/@id", equalTo("475600")));
-    Assert.assertThat(xml, hasXPath("(//link)[3]/document/documentinfo/uri/@id", equalTo("475609")));
-    Assert.assertThat(xml, hasXPath("(//link)[4]/document/documentinfo/uri/@id", equalTo("475616")));
-    Assert.assertThat(xml, hasXPath("(//xref)[1]/document/documentinfo/uri/@id", equalTo("219401")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//link)[1]/document/documentinfo/uri/@id", equalTo("475607")));
+    assertThat(xml, hasXPath("(//link)[2]/document/documentinfo/uri/@id", equalTo("475600")));
+    assertThat(xml, hasXPath("(//link)[3]/document/documentinfo/uri/@id", equalTo("475609")));
+    assertThat(xml, hasXPath("(//link)[4]/document/documentinfo/uri/@id", equalTo("475616")));
+    assertThat(xml, hasXPath("(//xref)[1]/document/documentinfo/uri/@id", equalTo("219401")));
   }
 
   @Test
-  public void testProcessEmbedLinkMetadataPre() throws IOException, ProcessException {
+  void testProcessEmbedLinkMetadataPre() throws IOException, ProcessException {
     String filename = "links.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1291,19 +1289,19 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//link)[1]/document/documentinfo/uri/@id", equalTo("475607")));
-    Assert.assertThat(xml, hasXPath("(//link)[2]/document/documentinfo/uri/@id", equalTo("475600")));
-    Assert.assertThat(xml, hasXPath("(//link)[3]/document/documentinfo/uri/@id", equalTo("475609")));
-    Assert.assertThat(xml, hasXPath("(//link)[4]/document/documentinfo/uri/@id", equalTo("475616")));
-    Assert.assertThat(xml, hasXPath("(//xref)[1]/document/documentinfo/uri/@id", equalTo("219401")));
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[2]", equalTo("x")));
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[3]", equalTo("x")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//link)[1]/document/documentinfo/uri/@id", equalTo("475607")));
+    assertThat(xml, hasXPath("(//link)[2]/document/documentinfo/uri/@id", equalTo("475600")));
+    assertThat(xml, hasXPath("(//link)[3]/document/documentinfo/uri/@id", equalTo("475609")));
+    assertThat(xml, hasXPath("(//link)[4]/document/documentinfo/uri/@id", equalTo("475616")));
+    assertThat(xml, hasXPath("(//xref)[1]/document/documentinfo/uri/@id", equalTo("219401")));
+    assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
+    assertThat(xml, hasXPath("(//displaytitle)[2]", equalTo("x")));
+    assertThat(xml, hasXPath("(//displaytitle)[3]", equalTo("x")));
   }
 
   @Test
-  public void testProcessImagesEmbedMetadata() throws IOException, ProcessException {
+  void testProcessImagesEmbedMetadata() throws IOException, ProcessException {
     Process p = new Process();
     p.setPreserveSrc(true);
     p.setSrc(new File(SOURCE_FOLDER_META));
@@ -1319,14 +1317,14 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/content/content_1.psml");
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("//image/@src", equalTo("../images/diagram1.jpg")));
-    Assert.assertThat(xml, hasXPath("//image//property[@name='hi-res']/xref/@href",
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("//image/@src", equalTo("../images/diagram1.jpg")));
+    assertThat(xml, hasXPath("//image//property[@name='hi-res']/xref/@href",
         equalTo("../images/diagram space.jpg")));
   }
 
   @Test
-  public void testProcessXRefsMetadataLevel() throws IOException, ProcessException {
+  void testProcessXRefsMetadataLevel() throws IOException, ProcessException {
     Process p = new Process();
     p.setPreserveSrc(true);
     p.setSrc(new File(SOURCE_FOLDER_META));
@@ -1342,14 +1340,14 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/META-INF/images/diagram1.jpg.psml");
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//xref)[1]//documentinfo/uri/@id", equalTo("219290")));
-    Assert.assertThat(xml, hasXPath("(//xref)[2]//documentinfo/uri/@id", equalTo("219290")));
-    Assert.assertThat(xml, hasXPath("(//xref)[3]//documentinfo/uri/@id", equalTo("21930")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//xref)[1]//documentinfo/uri/@id", equalTo("219290")));
+    assertThat(xml, hasXPath("(//xref)[2]//documentinfo/uri/@id", equalTo("219290")));
+    assertThat(xml, hasXPath("(//xref)[3]//documentinfo/uri/@id", equalTo("21930")));
   }
 
   @Test
-  public void testProcessXRefs() throws IOException, ProcessException {
+  void testProcessXRefs() throws IOException, ProcessException {
     String filename = "ref_0.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1367,29 +1365,29 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
-    Assert.assertThat(xml, hasXPath("(//xref)[1]/@href", equalTo("#21934-1")));
-    Assert.assertThat(xml, hasXPath("(//xref)[2]/@href", equalTo("#21931")));
-    Assert.assertThat(xml, hasXPath("(//xref)[3]/@href", equalTo("content/content_5.psml")));
-    Assert.assertThat(xml, hasXPath("(//xref)[4]/@href", equalTo("#2_21934-1")));
-    Assert.assertThat(xml, hasXPath("(//xref)[5]/@href", equalTo("#2_21931")));
-    Assert.assertThat(xml, hasXPath("(//xref)[6]/@href", equalTo("content/content_5.psml")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
+    assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
+    assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
+    assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
+    assertThat(xml, hasXPath("(//xref)[1]/@href", equalTo("#21934-1")));
+    assertThat(xml, hasXPath("(//xref)[2]/@href", equalTo("#21931")));
+    assertThat(xml, hasXPath("(//xref)[3]/@href", equalTo("content/content_5.psml")));
+    assertThat(xml, hasXPath("(//xref)[4]/@href", equalTo("#2_21934-1")));
+    assertThat(xml, hasXPath("(//xref)[5]/@href", equalTo("#2_21931")));
+    assertThat(xml, hasXPath("(//xref)[6]/@href", equalTo("content/content_5.psml")));
   }
 
   @Test
-  public void testProcessXRefsAmbiguous() throws IOException, ProcessException {
+  void testProcessXRefsAmbiguous() throws IOException, ProcessException {
     String filename = "ref_0a.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1414,24 +1412,24 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[13]/@href", equalTo("#21931")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
+    assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
+    assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
+    assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
+    assertThat(xml, hasXPath("(//blockxref)[13]/@href", equalTo("#21931")));
   }
 
-  @Test(expected=ProcessException.class)
-  public void testProcessXRefsAmbiguousFail() throws IOException, ProcessException {
+  @Test
+  void testProcessXRefsAmbiguousFail() throws IOException {
     String filename = "ref_0a.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1448,11 +1446,11 @@ public class ProcessTest {
     ErrorHandling error = new ErrorHandling();
     error.setXrefAmbiguous(true);
     p.setError(error);
-    p.process();
+    assertThrows(ProcessException.class, p::process);
   }
 
   @Test
-  public void testProcessXRefsAmbiguous2() throws IOException, ProcessException {
+  void testProcessXRefsAmbiguous2() throws IOException, ProcessException {
     String filename = "ref_0a2.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1470,26 +1468,25 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[13]/@href", equalTo("#21930")));
-    Assert.assertThat(xml, hasXPath("(//blockxref)[14]/@href", equalTo("#21934")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//blockxref)[1]/@href", equalTo("ref_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[2]/@href", equalTo("content/content_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[3]/@href", equalTo("content/content_3.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[4]/@href", equalTo("content/content_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[5]/@href", equalTo("#21930")));
+    assertThat(xml, hasXPath("(//blockxref)[6]/@href", equalTo("#21934")));
+    assertThat(xml, hasXPath("(//blockxref)[7]/@href", equalTo("ref_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[8]/@href", equalTo("content/content_1.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[9]/@href", equalTo("content/content_3.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[10]/@href", equalTo("content/content_2.psml")));
+    assertThat(xml, hasXPath("(//blockxref)[11]/@href", equalTo("#2_21930")));
+    assertThat(xml, hasXPath("(//blockxref)[12]/@href", equalTo("#2_21934")));
+    assertThat(xml, hasXPath("(//blockxref)[13]/@href", equalTo("#21930")));
+    assertThat(xml, hasXPath("(//blockxref)[14]/@href", equalTo("#21934")));
   }
 
-
-  @Test(expected=ProcessException.class)
-  public void testProcessXRefsAmbiguous2Fail() throws IOException, ProcessException {
+  @Test
+  void testProcessXRefsAmbiguous2Fail() throws IOException {
     String filename = "ref_0a2.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1506,11 +1503,11 @@ public class ProcessTest {
     ErrorHandling error = new ErrorHandling();
     error.setXrefAmbiguous(true);
     p.setError(error);
-    p.process();
+    assertThrows(ProcessException.class, p::process);
   }
 
-  @Test(expected=ProcessException.class)
-  public void testProcessXRefsLoopFail() throws IOException, ProcessException {
+  @Test
+  void testProcessXRefsLoopFail() throws IOException {
     String filename = "ref_5.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1524,11 +1521,11 @@ public class ProcessTest {
     xrefs.setTypes("embed,transclude");
     xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
-    p.process();
+    assertThrows(ProcessException.class, p::process);
   }
 
   @Test
-  public void testXRefsImagesNotFound() throws IOException, ProcessException {
+  void testXRefsImagesNotFound() throws IOException, ProcessException {
     String filename = "ref_6.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1559,7 +1556,7 @@ public class ProcessTest {
    * Test processing PSML with pre-transcluded content from process-publication=true export.
    */
   @Test
-  public void testProcessXRefsPretranscluded() throws IOException, ProcessException {
+  void testProcessXRefsPretranscluded() throws IOException, ProcessException {
     String filename = "transclude.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1577,32 +1574,32 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//fragment)[1]/@id", equalTo("988295-1")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[2]/@id", equalTo("988295-3")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[3]/@id", equalTo("921771-3")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[4]/@id", equalTo("988297-1")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[5]/@id", equalTo("988297-2")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[6]/@id", equalTo("988295-4")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[7]/@id", equalTo("988295-5")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[8]/@id", equalTo("988295-2")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[9]/@id", equalTo("2_921771-3")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[10]/@id", equalTo("2_988297-1")));
-    Assert.assertThat(xml, hasXPath("(//fragment)[11]/@id", equalTo("2_988297-2")));
-    Assert.assertThat(xml, hasXPath("(//media-fragment)[1]/@id", equalTo("media")));
-    Assert.assertThat(xml, hasXPath("(//media-fragment)[2]/@id", equalTo("227-1")));
-    Assert.assertThat(xml, hasXPath("(//media-fragment)[3]/@id", equalTo("208-1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[2]/@level", equalTo("2")));
-    Assert.assertThat(xml, hasXPath("(//heading)[3]/@level", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("(//heading)[4]/@level", equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//heading)[5]/@level", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("(//xref[@type='none'])[1]/@href", equalTo("#921771-3")));
-    Assert.assertThat(xml, hasXPath("(//xref[@type='none'])[2]/@href", equalTo("#988297-1")));
-    Assert.assertThat(xml, hasXPath("(//xref[@type='none'])[3]/@href", equalTo("#2_988297-1")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//fragment)[1]/@id", equalTo("988295-1")));
+    assertThat(xml, hasXPath("(//fragment)[2]/@id", equalTo("988295-3")));
+    assertThat(xml, hasXPath("(//fragment)[3]/@id", equalTo("921771-3")));
+    assertThat(xml, hasXPath("(//fragment)[4]/@id", equalTo("988297-1")));
+    assertThat(xml, hasXPath("(//fragment)[5]/@id", equalTo("988297-2")));
+    assertThat(xml, hasXPath("(//fragment)[6]/@id", equalTo("988295-4")));
+    assertThat(xml, hasXPath("(//fragment)[7]/@id", equalTo("988295-5")));
+    assertThat(xml, hasXPath("(//fragment)[8]/@id", equalTo("988295-2")));
+    assertThat(xml, hasXPath("(//fragment)[9]/@id", equalTo("2_921771-3")));
+    assertThat(xml, hasXPath("(//fragment)[10]/@id", equalTo("2_988297-1")));
+    assertThat(xml, hasXPath("(//fragment)[11]/@id", equalTo("2_988297-2")));
+    assertThat(xml, hasXPath("(//media-fragment)[1]/@id", equalTo("media")));
+    assertThat(xml, hasXPath("(//media-fragment)[2]/@id", equalTo("227-1")));
+    assertThat(xml, hasXPath("(//media-fragment)[3]/@id", equalTo("208-1")));
+    assertThat(xml, hasXPath("(//heading)[2]/@level", equalTo("2")));
+    assertThat(xml, hasXPath("(//heading)[3]/@level", equalTo("1")));
+    assertThat(xml, hasXPath("(//heading)[4]/@level", equalTo("3")));
+    assertThat(xml, hasXPath("(//heading)[5]/@level", equalTo("1")));
+    assertThat(xml, hasXPath("(//xref[@type='none'])[1]/@href", equalTo("#921771-3")));
+    assertThat(xml, hasXPath("(//xref[@type='none'])[2]/@href", equalTo("#988297-1")));
+    assertThat(xml, hasXPath("(//xref[@type='none'])[3]/@href", equalTo("#2_988297-1")));
   }
 
   @Test
-  public void testProcessXRefsMathml() throws IOException, ProcessException {
+  void testProcessXRefsMathml() throws IOException, ProcessException {
     String filename = "ref_3.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1619,23 +1616,23 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(//xref)",                          equalTo("4")));
-    Assert.assertThat(xml, hasXPath("count(//xref/media-fragment)",           equalTo("3")));
-    Assert.assertThat(xml, hasXPath("(//xref)[1]/@href",                      equalTo("content/equation_1.mathml")));
-    Assert.assertThat(xml, hasXPath("(//xref)[1]/media-fragment/@mediatype",  equalTo("application/mathml+xml")));
-    Assert.assertThat(xml, hasXPath("count((//xref)[1]/media-fragment/math)", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("(//xref)[2]/@href",                      equalTo("content/equation_2.mml")));
-    Assert.assertThat(xml, hasXPath("(//xref)[2]/media-fragment/@mediatype",  equalTo("application/mathml+xml")));
-    Assert.assertThat(xml, hasXPath("count((//xref)[2]/media-fragment/math)", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("(//xref)[3]/@href",                      equalTo("content/equation_3.psml")));
-    Assert.assertThat(xml, hasXPath("(//xref)[3]/@frag",                      equalTo("mathml")));
-    Assert.assertThat(xml, hasXPath("(//xref)[3]/media-fragment/@mediatype",  equalTo("application/mathml+xml")));
-    Assert.assertThat(xml, hasXPath("count((//xref)[3]/media-fragment/math)", equalTo("1")));
+    String xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    assertThat(xml, hasXPath("count(//xref)", equalTo("4")));
+    assertThat(xml, hasXPath("count(//xref/media-fragment)", equalTo("3")));
+    assertThat(xml, hasXPath("(//xref)[1]/@href", equalTo("content/equation_1.mathml")));
+    assertThat(xml, hasXPath("(//xref)[1]/media-fragment/@mediatype", equalTo("application/mathml+xml")));
+    assertThat(xml, hasXPath("count((//xref)[1]/media-fragment/math)", equalTo("1")));
+    assertThat(xml, hasXPath("(//xref)[2]/@href", equalTo("content/equation_2.mml")));
+    assertThat(xml, hasXPath("(//xref)[2]/media-fragment/@mediatype", equalTo("application/mathml+xml")));
+    assertThat(xml, hasXPath("count((//xref)[2]/media-fragment/math)", equalTo("1")));
+    assertThat(xml, hasXPath("(//xref)[3]/@href", equalTo("content/equation_3.psml")));
+    assertThat(xml, hasXPath("(//xref)[3]/@frag", equalTo("mathml")));
+    assertThat(xml, hasXPath("(//xref)[3]/media-fragment/@mediatype", equalTo("application/mathml+xml")));
+    assertThat(xml, hasXPath("count((//xref)[3]/media-fragment/math)", equalTo("1")));
   }
 
   @Test
-  public void testPlaceholders() throws IOException, ProcessException {
+  void testPlaceholders() throws IOException, ProcessException {
     String filename = "placeholders.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1655,54 +1652,54 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = Files.readString(result.toPath());
     //System.out.println(xml);
-    Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("5")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[1]/@title", equalTo("Content doc first 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[2]/@title", equalTo("Placeholder 2  here.")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[3]/@title", equalTo("Content root first 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[4]/@title", equalTo("Placeholder 2 root second here.")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[5]/@title", equalTo("Placeholder 1 root first here.")));
-    Assert.assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("24")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[1][@unresolved='true']", equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[2][@unresolved='true']", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[3][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[4][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[5][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[6][@unresolved='true']", equalTo("my prop1")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[7][@unresolved='true']", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[8][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[9][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[10][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("doc first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[14][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[15][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[18][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[19][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[20][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[23][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[24][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[25][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[28][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[29][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[30][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[33][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[34][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[35][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("count(//toc-part)", equalTo("5")));
+    assertThat(xml, hasXPath("(//toc-part)[1]/@title", equalTo("Content doc first 1")));
+    assertThat(xml, hasXPath("(//toc-part)[2]/@title", equalTo("Placeholder 2  here.")));
+    assertThat(xml, hasXPath("(//toc-part)[3]/@title", equalTo("Content root first 1")));
+    assertThat(xml, hasXPath("(//toc-part)[4]/@title", equalTo("Placeholder 2 root second here.")));
+    assertThat(xml, hasXPath("(//toc-part)[5]/@title", equalTo("Placeholder 1 root first here.")));
+    assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("24")));
+    assertThat(xml, hasXPath("(//placeholder)[1][@unresolved='true']", equalTo("")));
+    assertThat(xml, hasXPath("(//placeholder)[2][@unresolved='true']", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[3][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[4][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[5][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[6][@unresolved='true']", equalTo("my prop1")));
+    assertThat(xml, hasXPath("(//placeholder)[7][@unresolved='true']", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[8][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[9][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[10][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("doc first")));
+    assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("")));
+    assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("")));
+    assertThat(xml, hasXPath("(//placeholder)[14][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[15][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[18][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[19][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[20][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[23][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[24][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[25][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[28][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[29][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[30][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[33][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[34][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[35][@unresolved='true']", equalTo("my prop5")));
   }
 
   @Test
-  public void testPlaceholdersPub() throws IOException, ProcessException {
+  void testPlaceholdersPub() throws IOException, ProcessException {
     String filename = "placeholders_pub.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1722,55 +1719,55 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = Files.readString(result.toPath());
     //System.out.println(xml);
-    Assert.assertThat(xml, hasXPath("count(/document/documentinfo/publication)", equalTo("1")));
-    Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("5")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[1]/@title", equalTo("Content root first 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[2]/@title", equalTo("Placeholder 2 root second here.")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[3]/@title", equalTo("Content root first 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[4]/@title", equalTo("Placeholder 2 root second here.")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[5]/@title", equalTo("Placeholder 1 root first here.")));
-    Assert.assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("21")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[3][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[4][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[5][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[6]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[7]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[8][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[9][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[10][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[13][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[14][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[15][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[18][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[19][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[20][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[23][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[24][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[25][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[28][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[29][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[30][@unresolved='true']", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("root first")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("root second")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[33][@unresolved='true']", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[34][@unresolved='true']", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[35][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("count(/document/documentinfo/publication)", equalTo("1")));
+    assertThat(xml, hasXPath("count(//toc-part)", equalTo("5")));
+    assertThat(xml, hasXPath("(//toc-part)[1]/@title", equalTo("Content root first 1")));
+    assertThat(xml, hasXPath("(//toc-part)[2]/@title", equalTo("Placeholder 2 root second here.")));
+    assertThat(xml, hasXPath("(//toc-part)[3]/@title", equalTo("Content root first 1")));
+    assertThat(xml, hasXPath("(//toc-part)[4]/@title", equalTo("Placeholder 2 root second here.")));
+    assertThat(xml, hasXPath("(//toc-part)[5]/@title", equalTo("Placeholder 1 root first here.")));
+    assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("21")));
+    assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[3][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[4][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[5][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[6]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[7]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[8][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[9][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[10][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[13][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[14][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[15][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[18][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[19][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[20][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[23][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[24][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[25][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[28][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[29][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[30][@unresolved='true']", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("root first")));
+    assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("root second")));
+    assertThat(xml, hasXPath("(//placeholder)[33][@unresolved='true']", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[34][@unresolved='true']", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[35][@unresolved='true']", equalTo("my prop5")));
   }
 
   @Test
-  public void testPlaceholdersUnresolved() throws IOException, ProcessException {
+  void testPlaceholdersUnresolved() throws IOException, ProcessException {
     String filename = "placeholders.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1789,54 +1786,54 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
+    String xml = Files.readString(result.toPath());
     //System.out.println(xml);
-    Assert.assertThat(xml, hasXPath("count(//toc-part)", equalTo("5")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[1]/@title", equalTo("Content [my-prop1] 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[2]/@title", equalTo("Placeholder 2 [my-prop2] here.")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[3]/@title", equalTo("Content [my-prop1] 1")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[4]/@title", equalTo("Placeholder 2 [my-prop2] here.")));
-    Assert.assertThat(xml, hasXPath("(//toc-part)[5]/@title", equalTo("Placeholder 1 [my-prop1] here.")));
-    Assert.assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("0")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[3]", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[4]", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[5]", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[6]", equalTo("my prop1")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[7]", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[8]", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[9]", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[10]", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("my prop1")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[14]", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[15]", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[18]", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[19]", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[20]", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("my prop1")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[23]", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[24]", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[25]", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("my prop1")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[28]", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[29]", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[30]", equalTo("my prop5")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("my prop1")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("my prop2")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[33]", equalTo("my prop3")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[34]", equalTo("my prop4")));
-    Assert.assertThat(xml, hasXPath("(//placeholder)[35]", equalTo("my prop5")));
+    assertThat(xml, hasXPath("count(//toc-part)", equalTo("5")));
+    assertThat(xml, hasXPath("(//toc-part)[1]/@title", equalTo("Content [my-prop1] 1")));
+    assertThat(xml, hasXPath("(//toc-part)[2]/@title", equalTo("Placeholder 2 [my-prop2] here.")));
+    assertThat(xml, hasXPath("(//toc-part)[3]/@title", equalTo("Content [my-prop1] 1")));
+    assertThat(xml, hasXPath("(//toc-part)[4]/@title", equalTo("Placeholder 2 [my-prop2] here.")));
+    assertThat(xml, hasXPath("(//toc-part)[5]/@title", equalTo("Placeholder 1 [my-prop1] here.")));
+    assertThat(xml, hasXPath("count(//placeholder[@unresolved='true'])", equalTo("0")));
+    assertThat(xml, hasXPath("(//placeholder)[1]", equalTo("")));
+    assertThat(xml, hasXPath("(//placeholder)[2]", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[3]", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[4]", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[5]", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[6]", equalTo("my prop1")));
+    assertThat(xml, hasXPath("(//placeholder)[7]", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[8]", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[9]", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[10]", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[11]", equalTo("my prop1")));
+    assertThat(xml, hasXPath("(//placeholder)[12]", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[13]", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[14]", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[15]", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[16]", equalTo("")));
+    assertThat(xml, hasXPath("(//placeholder)[17]", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[18]", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[19]", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[20]", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[21]", equalTo("my prop1")));
+    assertThat(xml, hasXPath("(//placeholder)[22]", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[23]", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[24]", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[25]", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[26]", equalTo("my prop1")));
+    assertThat(xml, hasXPath("(//placeholder)[27]", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[28]", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[29]", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[30]", equalTo("my prop5")));
+    assertThat(xml, hasXPath("(//placeholder)[31]", equalTo("my prop1")));
+    assertThat(xml, hasXPath("(//placeholder)[32]", equalTo("my prop2")));
+    assertThat(xml, hasXPath("(//placeholder)[33]", equalTo("my prop3")));
+    assertThat(xml, hasXPath("(//placeholder)[34]", equalTo("my prop4")));
+    assertThat(xml, hasXPath("(//placeholder)[35]", equalTo("my prop5")));
   }
 
   @Test
-  public void testPreTransform() throws IOException, ProcessException {
+  void testPreTransform() throws IOException, ProcessException {
     String path1 = "content/content_2.psml";
     String path2 = "META-INF/images/diagram1.jpg.psml";
     String path3 = "images.psml";
@@ -1862,20 +1859,20 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + path1);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//heading)[1]/@level", equalTo("3")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//heading)[1]/@level", equalTo("3")));
     result = new File(DEST_FOLDER + "/" + path2);
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
+    xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
     result = new File(DEST_FOLDER + "/" + path3);
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[2]", equalTo("x")));
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[3]", equalTo("x")));
+    xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
+    assertThat(xml, hasXPath("(//displaytitle)[2]", equalTo("x")));
+    assertThat(xml, hasXPath("(//displaytitle)[3]", equalTo("x")));
   }
 
   @Test
-  public void testPostTransform() throws IOException, ProcessException {
+  void testPostTransform() throws IOException, ProcessException {
     String path1 = "content/content_2.psml";
     String path2 = "META-INF/images/diagram1.jpg.psml";
     Process p = new Process();
@@ -1894,15 +1891,15 @@ public class ProcessTest {
 
     // check result
     File result = new File(DEST_FOLDER + "/" + path1);
-    String xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//heading)[1]/@level", equalTo("3")));
+    String xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//heading)[1]/@level", equalTo("3")));
     result = new File(DEST_FOLDER + "/" + path2);
-    xml = new String (Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
+    xml = Files.readString(result.toPath());
+    assertThat(xml, hasXPath("(//displaytitle)[1]", equalTo("x")));
   }
 
-  @Test(expected=ProcessException.class)
-  public void testPostTransformFail() throws IOException, ProcessException {
+  @Test
+  void testPostTransformFail() throws IOException {
     String path1 = "content/content_2.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1916,11 +1913,11 @@ public class ProcessTest {
     xslt.setXSLT(SOURCE_FOLDER + "/transform2.xsl");
     xslt.setIncludes(path1);
     p.setPostTransform(xslt);
-    p.process();
+    assertThrows(ProcessException.class, p::process);
   }
 
-  @Test(expected=ProcessException.class)
-  public void testPostTransformMetadataFail() throws IOException, ProcessException {
+  @Test
+  void testPostTransformMetadataFail() throws IOException {
     String path2 = "META-INF/images/diagram1.jpg.psml";
     Process p = new Process();
     p.setPreserveSrc(true);
@@ -1934,7 +1931,7 @@ public class ProcessTest {
     xslt.setXSLT(SOURCE_FOLDER + "/transform2.xsl");
     xslt.setIncludes(path2);
     p.setPostTransform(xslt);
-    p.process();
+    assertThrows(ProcessException.class, p::process);
   }
 
   private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {
@@ -1943,7 +1940,7 @@ public class ProcessTest {
 
   public static Source getSchema(String filename) {
     try {
-      String pathToSchema = "/org/pageseeder/psml/process/util/"+filename;
+      String pathToSchema = "/org/pageseeder/psml/process/util/" + filename;
       URL url = Tests.class.getResource(pathToSchema);
       StreamSource schema = new StreamSource(url.openStream());
       schema.setSystemId(url.toURI().toString());

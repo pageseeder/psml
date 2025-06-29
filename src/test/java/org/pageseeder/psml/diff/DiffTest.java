@@ -1,20 +1,21 @@
 package org.pageseeder.psml.diff;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
 
-public class DiffTest {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class DiffTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/diff";
   private static final String SOURCE_FOLDER_XREFS = "src/test/data/diffxrefs";
@@ -32,7 +33,7 @@ public class DiffTest {
   private static final File CM = new File(DEST2, "compare_mathml.psml");
 
   @Test
-  public void testDiffAll() throws IOException, DiffException {
+  void testDiffAll() throws IOException, DiffException {
     Diff d = new Diff();
     d.setSrc(new File(SOURCE_FOLDER));
     if (DEST.exists()) {
@@ -43,20 +44,20 @@ public class DiffTest {
     d.addDiffElements(false);
 
     // check results
-    Assert.assertTrue(C1.exists());
-    Assert.assertTrue(C2.exists());
-    Assert.assertTrue(C3.exists());
-    Assert.assertFalse(C4.exists());
-    String xml = new String (Files.readAllBytes(C1.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("1")));
-    xml = new String (Files.readAllBytes(C2.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("1")));
-    xml = new String (Files.readAllBytes(C3.toPath()), StandardCharsets.UTF_8);
-    Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
+    assertTrue(C1.exists());
+    assertTrue(C2.exists());
+    assertTrue(C3.exists());
+    assertFalse(C4.exists());
+    String xml = Files.readString(C1.toPath());
+    assertThat(xml, hasXPath("count(//diff)", equalTo("1")));
+    xml = Files.readString(C2.toPath());
+    assertThat(xml, hasXPath("count(//diff)", equalTo("1")));
+    xml = Files.readString(C3.toPath());
+    assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
   }
 
   @Test
-  public void testDiffOutputAll() throws IOException, DiffException {
+  void testDiffOutputAll() throws IOException, DiffException {
     Diff d = new Diff();
     d.setSrc(new File(SOURCE_FOLDER));
     if (DEST.exists()) {
@@ -67,14 +68,14 @@ public class DiffTest {
     d.addDiffElements(true);
 
     // check results
-    Assert.assertTrue(C1.exists());
-    Assert.assertTrue(C2.exists());
-    Assert.assertTrue(C3.exists());
-    Assert.assertTrue(C4.exists());
+    assertTrue(C1.exists());
+    assertTrue(C2.exists());
+    assertTrue(C3.exists());
+    assertTrue(C4.exists());
   }
 
   @Test
-  public void testDiffExclude() throws IOException, DiffException {
+  void testDiffExclude() throws IOException, DiffException {
     Diff d = new Diff();
     d.setSrc(new File(SOURCE_FOLDER));
     if (DEST.exists()) {
@@ -88,14 +89,14 @@ public class DiffTest {
     d.addDiffElements(false);
 
     // check results
-    Assert.assertFalse(C1.exists());
-    Assert.assertTrue(C2.exists());
-    Assert.assertTrue(C3.exists());
-    Assert.assertFalse(C4.exists());
+    assertFalse(C1.exists());
+    assertTrue(C2.exists());
+    assertTrue(C3.exists());
+    assertFalse(C4.exists());
   }
 
   @Test
-  public void testDiffInclude() throws IOException, DiffException {
+  void testDiffInclude() throws IOException, DiffException {
     Diff d = new Diff();
     d.setSrc(new File(SOURCE_FOLDER));
     if (DEST.exists()) {
@@ -109,14 +110,14 @@ public class DiffTest {
     d.addDiffElements(false);
 
     // check results
-    Assert.assertFalse(C1.exists());
-    Assert.assertTrue(C2.exists());
-    Assert.assertFalse(C3.exists());
-    Assert.assertFalse(C4.exists());
+    assertFalse(C1.exists());
+    assertTrue(C2.exists());
+    assertFalse(C3.exists());
+    assertFalse(C4.exists());
   }
 
   @Test
-  public void testDiffXRefs() throws IOException, DiffException {
+  void testDiffXRefs() throws IOException, DiffException {
     Diff d = new Diff();
     d.setSrc(new File(SOURCE_FOLDER_XREFS));
     if (DEST.exists()) {
@@ -127,14 +128,14 @@ public class DiffTest {
     d.addDiffElements(false);
 
     // check results
-    Assert.assertFalse(CR.exists());
-    Assert.assertTrue(C1.exists());
-    Assert.assertTrue(C2.exists());
-    Assert.assertFalse(MI.exists());
+    assertFalse(CR.exists());
+    assertTrue(C1.exists());
+    assertTrue(C2.exists());
+    assertFalse(MI.exists());
   }
 
   @Test
-  public void testDiffMathML() throws IOException, DiffException {
+  void testDiffMathML() throws IOException, DiffException {
     Diff d = new Diff();
     d.setSrc(new File(SOURCE_FOLDER + "2"));
     if (DEST2.exists()) {
@@ -145,10 +146,10 @@ public class DiffTest {
     d.addDiffElements(false);
 
     // check results
-    Assert.assertTrue(CM.exists());
-    String xml = new String (Files.readAllBytes(CM.toPath()), StandardCharsets.UTF_8);
+    assertTrue(CM.exists());
+    String xml = Files.readString(CM.toPath());
     System.out.println(xml);
-    Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
+    assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
   }
 
   private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {

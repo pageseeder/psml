@@ -1,36 +1,31 @@
 package org.pageseeder.psml.diff;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Map;
+import org.hamcrest.Matcher;
+import org.junit.jupiter.api.Test;
+import org.pageseeder.psml.toc.Tests;
+import org.pageseeder.psml.toc.Tests.Validates;
+import org.xml.sax.SAXException;
+import org.xmlunit.matchers.EvaluateXPathMatcher;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Map;
 
-import org.hamcrest.Matcher;
-import org.junit.Assert;
-import org.junit.Test;
-import org.pageseeder.psml.toc.Tests;
-import org.pageseeder.psml.toc.Tests.Validates;
-import org.xml.sax.SAXException;
-import org.xmlunit.matchers.EvaluateXPathMatcher;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public final class DiffHandlerTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/diff";
 
   @Test
-  public void testParseCompare3() throws SAXException, IOException {
+  void testParseCompare3() throws SAXException, IOException {
     File src = new File(SOURCE_FOLDER, "compare_3.psml");
     try {
       // get compare fragments
@@ -38,7 +33,7 @@ public final class DiffHandlerTest {
       SAXParserFactory factory = SAXParserFactory.newInstance();
       SAXParser parser = factory.newSAXParser();
       parser.parse(new FileInputStream(src), handler);
-      Map<String,String> fragments = handler.getCompareFragments();
+      Map<String, String> fragments = handler.getCompareFragments();
       //System.out.println(fragments);
 
       // add diff elements
@@ -49,12 +44,12 @@ public final class DiffHandlerTest {
       String xml = out.toString();
       //System.out.println(xml);
       // validate
-      Assert.assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
+      assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
       // test xpaths
-      Assert.assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
-      Assert.assertThat(xml, hasXPath("/document/fragmentinfo/locator[@fragment='2']/compare/diff",
+      assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
+      assertThat(xml, hasXPath("/document/fragmentinfo/locator[@fragment='2']/compare/diff",
           equalTo("Some new content.")));
-      Assert.assertThat(xml, hasXPath("/document/fragmentinfo/locator[@fragment='3']/compare/diff",
+      assertThat(xml, hasXPath("/document/fragmentinfo/locator[@fragment='3']/compare/diff",
           equalTo("Some new fragment.")));
     } catch (ParserConfigurationException | IOException ex) {
       throw new SAXException(ex);
@@ -67,7 +62,7 @@ public final class DiffHandlerTest {
 
   public static Source getSchema(String filename) {
     try {
-      String pathToSchema = "/org/pageseeder/psml/process/util/"+filename;
+      String pathToSchema = "/org/pageseeder/psml/process/util/" + filename;
       URL url = Tests.class.getResource(pathToSchema);
       StreamSource schema = new StreamSource(url.openStream());
       schema.setSystemId(url.toURI().toString());

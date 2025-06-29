@@ -1,14 +1,14 @@
 package org.pageseeder.psml.template;
 
+import org.junit.jupiter.api.Test;
+import org.xml.sax.InputSource;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-import org.xml.sax.InputSource;
 
 class ProcessorTest {
 
@@ -17,7 +17,7 @@ class ProcessorTest {
     File template = new File("src/test/data/template/template1.psml");
     Processor processor = new Processor(StandardCharsets.UTF_8);
     processor.setFailOnError(true);
-    Map<String, String> parameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<>();
     parameters.put("ps.title", "My Title");
     parameters.put("ps.filename", "instance.psml");
     parameters.put("ps.description", "A description");
