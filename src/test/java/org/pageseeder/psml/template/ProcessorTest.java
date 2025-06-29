@@ -3,23 +3,19 @@ package org.pageseeder.psml.template;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.InputSource;
 
-public class ProcessorTest {
-
-  public ProcessorTest() {
-    // TODO Auto-generated constructor stub
-  }
+class ProcessorTest {
 
   @Test
-  public void testProcess() throws IOException, TemplateException {
+  void testProcess() throws IOException, TemplateException {
     File template = new File("src/test/data/template/template1.psml");
-    Processor processor = new Processor(Charset.forName("UTF-8"));
+    Processor processor = new Processor(StandardCharsets.UTF_8);
     processor.setFailOnError(true);
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("ps.title", "My Title");
