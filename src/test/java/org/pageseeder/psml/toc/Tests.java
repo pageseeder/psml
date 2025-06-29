@@ -4,7 +4,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.junit.Assert;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWritable;
@@ -21,7 +20,6 @@ import javax.xml.parsers.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -30,6 +28,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Tests {
 
@@ -106,7 +106,7 @@ public class Tests {
     return heading(5, title, fragment, index);
   }
 
-  public static Part<Heading> h5(String title, String fragment, int index,  @NonNull Part<?>... parts) {
+  public static Part<Heading> h5(String title, String fragment, int index, @NonNull Part<?>... parts) {
     return heading(5, title, fragment, index, parts);
   }
 
@@ -114,19 +114,19 @@ public class Tests {
     return heading(6, title, fragment, index);
   }
 
-  public static Part<Heading> h6(String title, String fragment, int index,  @NonNull Part<?>... parts) {
+  public static Part<Heading> h6(String title, String fragment, int index, @NonNull Part<?>... parts) {
     return heading(6, title, fragment, index, parts);
   }
 
-  public static Part<Heading> heading(int level,  String title, String fragment, int index) {
+  public static Part<Heading> heading(int level, String title, String fragment, int index) {
     return new Part<>(new Heading(level, title, fragment, fragment, index));
   }
 
-  public static Part<Heading> heading(int level,  String title, String fragment, int index, @NonNull Part<?>... parts) {
+  public static Part<Heading> heading(int level, String title, String fragment, int index, @NonNull Part<?>... parts) {
     return new Part<>(new Heading(level, title, fragment, fragment, index), parts);
   }
 
-  public static Part<Heading> heading(int level,  String title, String fragment, int index, String blocklabel, @NonNull Part<?>... parts) {
+  public static Part<Heading> heading(int level, String title, String fragment, int index, String blocklabel, @NonNull Part<?>... parts) {
     return new Part<>(new Heading(level, title, fragment, fragment, index).blocklabel(blocklabel), parts);
   }
 
@@ -210,11 +210,11 @@ public class Tests {
     return heading(5, title, fragment, index, numbered, prefix);
   }
 
-  public static Part<Heading> h5(String title, String fragment, int index, boolean numbered, String prefix,  @NonNull Part<?>... parts) {
+  public static Part<Heading> h5(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return heading(5, title, fragment, index, numbered, prefix, parts);
   }
 
-  public static Part<Heading> h5(String title, String fragment, String origfrag, int index, boolean numbered, String prefix,  @NonNull Part<?>... parts) {
+  public static Part<Heading> h5(String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return heading(5, title, fragment, origfrag, index, numbered, prefix, parts);
   }
 
@@ -222,78 +222,78 @@ public class Tests {
     return heading(6, title, fragment, index, numbered, prefix);
   }
 
-  public static Part<Heading> h6(String title, String fragment, int index, boolean numbered, String prefix,  @NonNull Part<?>... parts) {
+  public static Part<Heading> h6(String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return heading(6, title, fragment, index, numbered, prefix, parts);
   }
 
-  public static Part<Heading> heading(int level,  String title, String fragment, int index, boolean numbered, String prefix) {
+  public static Part<Heading> heading(int level, String title, String fragment, int index, boolean numbered, String prefix) {
     return new Part<>(new Heading(level, title, fragment, fragment, index).numbered(numbered).prefix(prefix));
   }
 
-  public static Part<Heading> heading(int level,  String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+  public static Part<Heading> heading(int level, String title, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return new Part<>(new Heading(level, title, fragment, fragment, index).numbered(numbered).prefix(prefix), parts);
   }
 
-  public static Part<Heading> heading(int level,  String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+  public static Part<Heading> heading(int level, String title, String fragment, String origfrag, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return new Part<>(new Heading(level, title, fragment, origfrag, index).numbered(numbered).prefix(prefix), parts);
   }
 
-  public static Part<Heading> heading(int level,  String title, String fragment, String origfrag, int index, boolean numbered, String prefix, String blocklabel, @NonNull Part<?>... parts) {
+  public static Part<Heading> heading(int level, String title, String fragment, String origfrag, int index, boolean numbered, String prefix, String blocklabel, @NonNull Part<?>... parts) {
     return new Part<>(new Heading(level, title, fragment, origfrag, index).numbered(numbered).prefix(prefix).blocklabel(blocklabel), parts);
   }
 
-  public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix) {
+  public static Part<Paragraph> p(int level, String fragment, int index, boolean numbered, String prefix) {
     return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix));
   }
 
-  public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, String blocklabel) {
+  public static Part<Paragraph> p(int level, String fragment, int index, boolean numbered, String prefix, String blocklabel) {
     return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix).blocklabel(blocklabel));
   }
 
-  public static Part<Paragraph> p(int level,  String title, String fragment, int index, boolean numbered, String prefix, String blocklabel) {
+  public static Part<Paragraph> p(int level, String title, String fragment, int index, boolean numbered, String prefix, String blocklabel) {
     return new Part<>(new Paragraph(level, fragment, fragment, index).title(title).numbered(numbered).prefix(prefix).blocklabel(blocklabel));
   }
 
-  public static Part<Paragraph> p(int level,  String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
+  public static Part<Paragraph> p(int level, String fragment, int index, boolean numbered, String prefix, @NonNull Part<?>... parts) {
     return new Part<>(new Paragraph(level, fragment, fragment, index).numbered(numbered).prefix(prefix), parts);
   }
 
   public static void assertElementEquals(Element e, Element f) {
-    Assert.assertEquals(e.getClass(), f.getClass());
+    assertEquals(e.getClass(), f.getClass());
     if (e instanceof Heading) {
-      assertHeadingEquals((Heading)e, (Heading)f);
+      assertHeadingEquals((Heading) e, (Heading) f);
     } else if (e instanceof Reference) {
-      assertEmbedEquals((Reference)e, (Reference)f);
+      assertEmbedEquals((Reference) e, (Reference) f);
     } else if (e instanceof Phantom) {
-      Assert.assertEquals(e.level(), f.level());
-      Assert.assertEquals(e.title(), f.title());
+      assertEquals(e.level(), f.level());
+      assertEquals(e.title(), f.title());
     }
   }
 
   public static void assertHeadingEquals(Heading e, Heading f) {
-    Assert.assertEquals("Heading levels don't match", e.level(), f.level());
-    Assert.assertEquals("Heading titles don't match", e.title(), f.title());
-    Assert.assertEquals("Heading fragments don't match", e.fragment(), f.fragment());
-    Assert.assertEquals("Heading original fragments don't match", e.originalFragment(), f.originalFragment());
-    Assert.assertEquals("Heading prefixes don't match", e.prefix(), f.prefix());
-    Assert.assertEquals("Heading indexes don't match", e.index(), f.index());
+    assertEquals(e.level(), f.level(), "Heading levels don't match");
+    assertEquals(e.title(), f.title(), "Heading titles don't match");
+    assertEquals(e.fragment(), f.fragment(), "Heading fragments don't match");
+    assertEquals(e.originalFragment(), f.originalFragment(), "Heading original fragments don't match");
+    assertEquals(e.prefix(), f.prefix(), "Heading prefixes don't match");
+    assertEquals(e.index(), f.index(), "Heading indexes don't match");
   }
 
   public static void assertEmbedEquals(Reference e, Reference f) {
-    Assert.assertEquals("Reference levels don't match", e.level(), f.level());
-    Assert.assertEquals("Reference titles don't match", e.title(), f.title());
-    Assert.assertEquals("Reference types don't match", e.documenttype(), f.documenttype());
-    Assert.assertEquals("Reference URIs don't match", e.uri(), f.uri());
-    Assert.assertEquals("Reference targetfragments don't match", e.targetfragment(), f.targetfragment());
+    assertEquals(e.level(), f.level(), "Reference levels don't match");
+    assertEquals(e.title(), f.title(), "Reference titles don't match");
+    assertEquals(e.documenttype(), f.documenttype(), "Reference types don't match");
+    assertEquals(e.uri(), f.uri(), "Reference URIs don't match");
+    assertEquals(e.targetfragment(), f.targetfragment(), "Reference targetfragments don't match");
   }
 
 
   public static void assertPartEquals(Part<?> p, Part<?> q) {
     try {
       assertElementEquals(p.element(), q.element());
-      Assert.assertEquals(p.getClass(), q.getClass());
-      Assert.assertEquals(p.size(), q.size());
-      for (int i=0; i < p.size(); i++) {
+      assertEquals(p.getClass(), q.getClass());
+      assertEquals(p.size(), q.size());
+      for (int i = 0; i < p.size(); i++) {
         assertPartEquals(p.parts().get(i), q.parts().get(i));
       }
     } catch (AssertionError ex) {
@@ -307,16 +307,16 @@ public class Tests {
 
   public static void assertDocumentTreeEquals(DocumentTree p, DocumentTree q) {
     try {
-      Assert.assertEquals(p.getClass(), q.getClass());
-      Assert.assertEquals("Document titles don't match", p.title(), q.title());
-      Assert.assertEquals("Document levels don't match", p.level(), q.level());
-      Assert.assertEquals("Document prefixes don't match", p.prefix(), q.prefix());
-      Assert.assertEquals("Document numbereds don't match", p.numbered(), q.numbered());
-      Assert.assertEquals("Document labels don't match", p.labels(), q.labels());
-      Assert.assertEquals("Document parts size don't match", p.parts().size(), q.parts().size());
-      Assert.assertEquals("Forward references don't match", p.listForwardReferences(), q.listForwardReferences());
-      Assert.assertEquals("Reverse references don't match", p.listReverseReferences(), q.listReverseReferences());
-      for (int i=0; i < p.parts().size(); i++) {
+      assertEquals(p.getClass(), q.getClass());
+      assertEquals(p.title(), q.title(), "Document titles don't match");
+      assertEquals(p.level(), q.level(), "Document levels don't match");
+      assertEquals(p.prefix(), q.prefix(), "Document prefixes don't match");
+      assertEquals(p.numbered(), q.numbered(), "Document numbereds don't match");
+      assertEquals(p.labels(), q.labels(), "Document labels don't match");
+      assertEquals(p.parts().size(), q.parts().size(), "Document parts size don't match");
+      assertEquals(p.listForwardReferences(), q.listForwardReferences(), "Forward references don't match");
+      assertEquals(p.listReverseReferences(), q.listReverseReferences(), "Reverse references don't match");
+      for (int i = 0; i < p.parts().size(); i++) {
         assertPartEquals(p.parts().get(i), q.parts().get(i));
       }
     } catch (AssertionError ex) {
@@ -330,12 +330,12 @@ public class Tests {
 
 
   public static DocumentTree parse(long id, String filename) throws SAXException {
-    InputStream in = DocumentTreeHandlerTest.class.getResourceAsStream("/org/pageseeder/psml/toc/"+filename);
+    InputStream in = DocumentTreeHandlerTest.class.getResourceAsStream("/org/pageseeder/psml/toc/" + filename);
     return parse(id, in);
   }
 
   public static PublicationConfig parseConfig(String filename) throws IOException {
-    InputStream in = DocumentTreeHandlerTest.class.getResourceAsStream("/org/pageseeder/psml/toc/"+filename);
+    InputStream in = DocumentTreeHandlerTest.class.getResourceAsStream("/org/pageseeder/psml/toc/" + filename);
     return PublicationConfig.loadPublicationConfig(in);
   }
 
@@ -359,7 +359,6 @@ public class Tests {
    * Generate the DOM Source instance from the response content.
    *
    * @param o The writable object
-   *
    * @return The corresponding DOM source
    */
   public static DOMSource toDOMSource(XMLWritable o) {
@@ -377,7 +376,6 @@ public class Tests {
    * Generate the DOM Source instance from the specified reader
    *
    * @param reader The reader to parse as DOM
-   *
    * @return The corresponding DOM source
    */
   public static DOMSource toDOMSource(Reader reader) {
@@ -388,7 +386,6 @@ public class Tests {
    * Generate the DOM Source instance from the specified reader
    *
    * @param reader The reader to parse as DOM
-   *
    * @return The corresponding DOM source
    */
   public static Node toNode(Reader reader) {
@@ -403,7 +400,7 @@ public class Tests {
 
   public static Source getSchema(String filename) {
     try {
-      String pathToSchema = "/org/pageseeder/psml/toc/"+filename;
+      String pathToSchema = "/org/pageseeder/psml/toc/" + filename;
       URL url = Tests.class.getResource(pathToSchema);
       StreamSource schema = new StreamSource(url.openStream());
       schema.setSystemId(url.toURI().toString());
@@ -413,7 +410,7 @@ public class Tests {
     }
   }
 
-  public static Validates validates(String spec){
+  public static Validates validates(String spec) {
     Source schema = getSchema(spec);
     return new Validates(schema);
   }
@@ -431,7 +428,7 @@ public class Tests {
   }
 
   public static void print(PublicationTree o, long cid, int cposition, @Nullable FragmentNumbering number,
-      @Nullable PublicationConfig config, boolean externalrefs) {
+                           @Nullable PublicationConfig config, boolean externalrefs) {
     XMLStringWriter xml = new XMLStringWriter(NamespaceAware.No);
     xml.setIndentChars("  ");
     try {
@@ -466,7 +463,7 @@ public class Tests {
     }
 
     @Override
-    public void describeTo(Description description){
+    public void describeTo(Description description) {
       description.appendText("validates schema=").appendText(this._schema.getSystemId());
     }
 
