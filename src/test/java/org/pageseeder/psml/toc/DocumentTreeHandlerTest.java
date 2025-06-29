@@ -1,20 +1,19 @@
 package org.pageseeder.psml.toc;
 
-import static org.pageseeder.psml.toc.Tests.*;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public final class DocumentTreeHandlerTest {
+import static org.pageseeder.psml.toc.Tests.*;
+
+final class DocumentTreeHandlerTest {
 
   @Test
-  public void testParseContent1() throws SAXException, IOException {
+  void testParseContent1() throws SAXException {
     DocumentTree tree = parse(1, "content1.psml");
     Part<?> p = h1("Test", "1", 1,
         h2("A", "2", 1,
@@ -39,7 +38,7 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseContent1_normalizedAuto() throws SAXException, IOException {
+  void testParseContent1_normalizedAuto() throws SAXException {
     DocumentTree tree = parse(1, "content1.psml");
     List<Part<?>> parts = Arrays.asList(
         h2("A", "2", 1,
@@ -64,7 +63,7 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseContent2() throws SAXException, IOException {
+  void testParseContent2() throws SAXException {
     DocumentTree tree = parse(2, "content2.psml");
     List<Part<?>> parts = Arrays.asList(
         h1("Test #2", "1", 1),
@@ -91,20 +90,20 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseContent3() throws SAXException, IOException {
+  void testParseContent3() throws SAXException {
     DocumentTree tree = parse(3, "content3.psml");
     Part<Heading> p1 =
-      h1("Test 3", "1.1", 1,
-        phantom(2,
-          phantom(3,
-            phantom(4,
-              phantom(5,
-                h6("_._._._.i", "1.2", 1)),
-              h5("_._._.x", "1.2", 2)),
-            h4("_._.a", "1.2", 3)),
-          h3("_.0", "1.2", 4)),
-        h2("A", "1.2", 5,
-          p(0, "", "1.2", 6, false, "", "")));
+        h1("Test 3", "1.1", 1,
+            phantom(2,
+                phantom(3,
+                    phantom(4,
+                        phantom(5,
+                            h6("_._._._.i", "1.2", 1)),
+                        h5("_._._.x", "1.2", 2)),
+                    h4("_._.a", "1.2", 3)),
+                h3("_.0", "1.2", 4)),
+            h2("A", "1.2", 5,
+                p(0, "", "1.2", 6, false, "", "")));
     List<Long> reverse = Arrays.asList(197490L);
     DocumentTree expected = new DocumentTree(4, "Test 3", "", null, null, reverse, Collections.singletonList(p1),
         Collections.emptyMap(), Collections.emptyMap());
@@ -112,17 +111,17 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseContent3_normalizedAuto() throws SAXException, IOException {
+  void testParseContent3_normalizedAuto() throws SAXException {
     DocumentTree tree = parse(3, "content3.psml").normalize(TitleCollapse.auto);
     Part<Phantom> p1 =
         phantom(2,
-          phantom(3,
-            phantom(4,
-              phantom(5,
-                h6("_._._._.i", "1.2", 1)),
-              h5("_._._.x", "1.2", 2)),
-            h4("_._.a", "1.2", 3)),
-          h3("_.0", "1.2", 4));
+            phantom(3,
+                phantom(4,
+                    phantom(5,
+                        h6("_._._._.i", "1.2", 1)),
+                    h5("_._._.x", "1.2", 2)),
+                h4("_._.a", "1.2", 3)),
+            h3("_.0", "1.2", 4));
     Part<Heading> p2 = h2("A", "1.2", 5,
         p(0, "", "1.2", 6, false, "", ""));
     List<Long> reverse = Arrays.asList(197490L);
@@ -132,20 +131,20 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseContent4() throws SAXException, IOException {
+  void testParseContent4() throws SAXException {
     DocumentTree tree = parse(4, "content4.psml");
     Part<Phantom> p1 =
-      phantom(1,
-        phantom(2,
-          h3("Test 4", "1", 1,
-            h4("Another heading", "2", 1))));
+        phantom(1,
+            phantom(2,
+                h3("Test 4", "1", 1,
+                    h4("Another heading", "2", 1))));
     DocumentTree expected = new DocumentTree(4, "Test 4", "", null, null, Collections.emptyList(), Collections.singletonList(p1),
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
   }
 
   @Test
-  public void testParseContent4_normalizedAuto() throws SAXException, IOException {
+  void testParseContent4_normalizedAuto() throws SAXException {
     DocumentTree tree = parse(4, "content4.psml").normalize(TitleCollapse.auto);
     Part<Heading> p1 = h4("Another heading", "2", 1);
     DocumentTree expected = new DocumentTree(4, "Test 4", "", null, null, Collections.emptyList(), Collections.singletonList(p1),
@@ -154,7 +153,7 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseReferences1() throws SAXException, IOException {
+  void testParseReferences1() throws SAXException {
     DocumentTree tree = parse(1, "references1.psml");
     Part<Heading> p = h1("A", "1", 1,
         toc(),
@@ -167,7 +166,7 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseReferences1_normalizeAuto() throws SAXException, IOException {
+  void testParseReferences1_normalizeAuto() throws SAXException {
     DocumentTree tree = parse(1, "references1.psml");
     List<Part<?>> parts = Arrays.asList(
         toc(),
@@ -181,7 +180,7 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseReferences2() throws SAXException, IOException {
+  void testParseReferences2() throws SAXException {
     DocumentTree tree = parse(1, "references2.psml");
     Part<Heading> p = h1("Test References #2", "1", 1,
         toc(),
@@ -201,7 +200,7 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseMedia() throws SAXException, IOException {
+  void testParseMedia() throws SAXException {
     DocumentTree tree = parse(1, "media.psml");
     DocumentTree expected = new DocumentTree(5, "Clipboard01.jpg", "", null, null, Collections.emptyList(), Collections.emptyList(),
         Collections.emptyMap(), Collections.emptyMap());
@@ -211,7 +210,7 @@ public final class DocumentTreeHandlerTest {
 
 
   @Test
-  public void testParseTransclusions() throws SAXException, IOException {
+  void testParseTransclusions() throws SAXException {
     DocumentTree tree = parse(1, "transclusions.psml");
     List<Part<?>> p = Arrays.asList(
         h1("Assembly", "1", 1,
@@ -228,7 +227,7 @@ public final class DocumentTreeHandlerTest {
                     h4("Division a", "2", 5,
                         p(0, "", "2", 6, false, "", ""),
                         tend("2")))),
-             h2("Part B", "2", 7)));
+            h2("Part B", "2", 7)));
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(5, "Assembly", "", null, null, Collections.emptyList(), p,
         Collections.emptyMap(), Collections.emptyMap());
@@ -236,7 +235,7 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseTransclusions_normalizedAuto() throws SAXException, IOException {
+  void testParseTransclusions_normalizedAuto() throws SAXException {
     DocumentTree tree = parse(6, "transclusions.psml");
     List<Part<?>> p = Arrays.asList(
         toc(),
@@ -252,7 +251,7 @@ public final class DocumentTreeHandlerTest {
                 h4("Division a", "2", 5,
                     p(0, "", "2", 6, false, "", ""),
                     tend("2")))),
-         h2("Part B", "2", 7));
+        h2("Part B", "2", 7));
     Tests.print(tree);
     tree.print(System.out);
     DocumentTree expected = new DocumentTree(6, 2, "Assembly", "", Collections.emptyList(),
@@ -266,35 +265,35 @@ public final class DocumentTreeHandlerTest {
   }
 
   @Test
-  public void testParseWACCC() throws SAXException, IOException {
+  void testParseWACCC() throws SAXException {
     DocumentTree tree = parse(1, "waccc.psml");
     tree.normalize(TitleCollapse.auto);
     // TODO Write test
   }
 
   @Test
-  public void testParseHub() throws SAXException, IOException {
+  void testParseHub() throws SAXException {
     DocumentTree tree = parse(1, "hub.psml").normalize(TitleCollapse.auto);
     tree.normalize(TitleCollapse.auto);
     // TODO Write test
   }
 
   @Test
-  public void testParseXrefLevel1() throws SAXException, IOException {
+  void testParseXrefLevel1() throws SAXException {
     DocumentTree tree = parse(1, "xref-level1.psml");
     Tests.print(tree);
     Part<Heading> p = h1("Test doc 1", "1", 1,
-      phantom(2,
-        phantom(3,
-          ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
-        ref(1, "Another heading 2", 199328),
-        ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
-          ref(2, "Another heading 2a", 199326))),
-      h2("Related", "default", 1,
-          p(1, "", "4", 1, false, "", ""),
-          p(1, "A numbered para", "4", 2, true, "", ""),
-          p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
-          p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
+        phantom(2,
+            phantom(3,
+                ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
+            ref(1, "Another heading 2", 199328),
+            ref(1, "Test doc 1.pdf", "content", 6173, null, "default",
+                ref(2, "Another heading 2a", 199326))),
+        h2("Related", "default", 1,
+            p(1, "", "4", 1, false, "", ""),
+            p(1, "A numbered para", "4", 2, true, "", ""),
+            p(1, "A long long long long long long long lon...", "4", 3, true, "", ""),
+            p(1, "A long long long long long long long long long long long block labeled numbered para", "4", 4, true, "", "block1")));
     List<Long> reverse = new ArrayList<>();
     DocumentTree expected = new DocumentTree(4, "Test doc 1", "doc1,doc2", null, null, reverse, Collections.singletonList(p),
         Collections.emptyMap(), Collections.emptyMap());
@@ -303,11 +302,11 @@ public final class DocumentTreeHandlerTest {
     Tests.print(tree);
     List<Part<?>> parts = Arrays.asList(
         phantom(2,
-          phantom(3,
-            ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
-          ref(1, "Another heading 2", 199328),
-          ref(1, "Test doc 1.pdf", "content", 6173, null, null, "default",
-            ref(2, "Another heading 2a", 199326))),
+            phantom(3,
+                ref(2, "Test doc 1", "content", 199329, Reference.DEFAULT_TYPE, "2")),
+            ref(1, "Another heading 2", 199328),
+            ref(1, "Test doc 1.pdf", "content", 6173, null, null, "default",
+                ref(2, "Another heading 2a", 199326))),
         h2("Related", "default", 1,
             p(1, "", "4", 1, false, "", ""),
             p(1, "A numbered para", "4", 2, true, "", ""),

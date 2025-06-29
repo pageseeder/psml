@@ -1,11 +1,12 @@
 package org.pageseeder.psml.toc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.pageseeder.psml.toc.Tests.*;
 
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.jdt.annotation.Nullable;
-import org.junit.Assert;
-import org.junit.Test;
-import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.toc.DocumentTree.Builder;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
@@ -18,25 +19,25 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public final class PublicationTreeTest {
+final class PublicationTreeTest {
 
   @Test
-  public void testEmpty() {
+  void testEmpty() {
     DocumentTree tree = new DocumentTree.Builder(1).build();
     PublicationTree publication = new PublicationTree(tree);
-    Assert.assertEquals(1, publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(1, publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(1));
     Tests.assertDocumentTreeEquals(tree, publication.root());
     assertValidPublication(publication);
   }
 
   @Test
-  public void testSimpleReference() throws SAXException {
+  void testSimpleReference() throws SAXException {
     DocumentTree tree = new DocumentTree.Builder(1).part(ref(1, "A", 100L)).part(ref(1, "A", 100L)).build();
     PublicationTree publication = new PublicationTree(tree);
-    Assert.assertEquals(1, publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(1, publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(1));
     Tests.assertDocumentTreeEquals(tree, publication.root());
     assertValidPublication(publication);
@@ -45,12 +46,12 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testSimpleReferenceWithTitle() throws SAXException {
+  void testSimpleReferenceWithTitle() throws SAXException {
     DocumentTree tree = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 100L)).build();
     tree = tree.normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(tree);
-    Assert.assertEquals(tree.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(tree.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(1));
     Tests.assertDocumentTreeEquals(tree, publication.root());
     assertValidPublication(publication);
@@ -59,13 +60,13 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testTwoLevels() throws SAXException {
+  void testTwoLevels() throws SAXException {
     DocumentTree root = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 101L)).build();
     DocumentTree tree = new DocumentTree.Builder(100).title("T").part(h1("T", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
     PublicationTree publication = new PublicationTree(tree);
     publication = publication.root(root);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(100));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
@@ -74,19 +75,19 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testModify() throws SAXException {
+  void testModify() throws SAXException {
     DocumentTree root = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 101L)).build();
     DocumentTree tree = new DocumentTree.Builder(100).title("T").part(h1("T", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
     DocumentTree tree2 = new DocumentTree.Builder(101).title("B").part(h1("B", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
     PublicationTree publication = new PublicationTree(tree);
     publication = publication.root(root);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(100));
     Tests.assertDocumentTreeEquals(root, publication.root());
     publication = publication.modify(Arrays.asList(1L, 100L), Collections.singletonMap(101L, tree2), Collections.emptyMap(), 1L);
     Tests.assertDocumentTreeEquals(root, publication.root());
-    Assert.assertNull(publication.tree(100));
+    assertNull(publication.tree(100));
     Tests.assertDocumentTreeEquals(tree2, publication.tree(101));
     assertValidPublication(publication);
 //    Tests.print(publication);
@@ -95,15 +96,15 @@ public final class PublicationTreeTest {
 
 
   @Test
-  public void testThreeLevels() throws SAXException {
+  void testThreeLevels() throws SAXException {
     DocumentTree root = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 101L)).build();
     DocumentTree inter = new DocumentTree.Builder(100).title("A").part(h1("A", "1", 1)).part(ref(1, "X", 1000L)).part(ref(1, "Y", 1001L)).build();
     DocumentTree tree = new DocumentTree.Builder(1001).title("Y").part(h1("a", "1", 1)).part(h1("b", "1", 1, h2("x", "1", 2))).part(h1("c", "1", 3)).build();
     PublicationTree publication = new PublicationTree(tree);
     publication = publication.root(inter);
     publication = publication.root(root);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
@@ -112,7 +113,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testAutoNumbering() throws SAXException, IOException, XRefLoopException, XRefLoopException {
+  void testAutoNumbering() throws SAXException, IOException, XRefLoopException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -170,8 +171,8 @@ public final class PublicationTreeTest {
     publication = publication.add(tree2);
     publication = publication.add(tree3);
     publication = publication.add(tree4);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
@@ -222,11 +223,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1003-2-default","1.2.(a)","(iv)",6,"0.1.2.0.1.4.");
     assertHasPrefix(prefixes,"101-1-1-1",null,"1.2.",3,"0.1.2.");
     assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
-    Assert.assertEquals(35, prefixes.size());
+    assertEquals(35, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingTranscluded() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingTranscluded() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -327,23 +328,23 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"101-1-2-7","1.3.2.","(b)",5,"0.1.3.2.2.");
     assertHasPrefix(prefixes,"101-1-2-8",null,"x.x.x.x",6,null);
     assertHasPrefix(prefixes,"101-1-2-9",null,"1.3.3.",4,"0.1.3.3.");
-    Assert.assertEquals(32, prefixes.size());
+    assertEquals(32, prefixes.size());
     String tresult = transclusions.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("Transclusions:\n" + tresult);
     List<Long> t = transclusions.get(1001L);
-    Assert.assertNotNull(t);
-    Assert.assertEquals(2, t.size());
-    Assert.assertEquals(-1, t.get(0).longValue());
-    Assert.assertEquals(101, t.get(1).longValue());
-    Assert.assertEquals(1, transclusions.size());
+    assertNotNull(t);
+    assertEquals(2, t.size());
+    assertEquals(-1, t.get(0).longValue());
+    assertEquals(101, t.get(1).longValue());
+    assertEquals(1, transclusions.size());
   }
 
 
   @Test
-  public void testAutoNumberingBlank() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingBlank() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -366,8 +367,8 @@ public final class PublicationTreeTest {
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(tree);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-blank.xml");
@@ -385,14 +386,14 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-1-2-1",null,"x.x.x",3,null);
     assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",4,null);
     assertHasPrefix(prefixes,"1000-1-default",null,"",2,null);
-    Assert.assertEquals(4, prefixes.size());
+    assertEquals(4, prefixes.size());
     System.out.println("unusedIds: " + unusedIds);
-    Assert.assertEquals(1, unusedIds.size());
-    Assert.assertEquals(100, unusedIds.get(0).longValue());
+    assertEquals(1, unusedIds.size());
+    assertEquals(100, unusedIds.get(0).longValue());
   }
 
   @Test
-  public void testAutoNumberingBlockLabels() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingBlockLabels() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
                 ref(0, "X", 1000L,
@@ -431,8 +432,8 @@ public final class PublicationTreeTest {
     publication = publication.add(tree1);
     publication = publication.add(tree2);
     publication = publication.add(tree3);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-block-labels.xml");
@@ -472,11 +473,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1002-1-1e-1",null,"Fig 2-A",8,"2.0.0.0.0.0.0.1.");
     assertHasPrefix(prefixes,"1002-1-1f-1",null,"Table 2-3",8,"2.0.0.0.0.0.0.3.");
     assertHasPrefix(prefixes,"1002-1-default",null,"2.",1,"2.");
-    Assert.assertEquals(27, prefixes.size());
+    assertEquals(27, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingRestarts() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingRestarts() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             ref(0, "X", 1000L,
@@ -522,8 +523,8 @@ public final class PublicationTreeTest {
     publication = publication.add(tree1);
     publication = publication.add(tree2);
     publication = publication.add(tree3);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-restarts.xml");
@@ -567,11 +568,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1002-1-default",null,"2.",1,"2.");
     assertHasPrefix(prefixes,"1002-1-2-1",null,"2.1.",2,"2.1.");
     assertHasPrefix(prefixes,"1002-1-3-1",null,"2.1.1.",3,"2.1.1.");
-    Assert.assertEquals(31, prefixes.size());
+    assertEquals(31, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingBlankFormat() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingBlankFormat() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
               ref(0, "X", 1000L),
@@ -593,8 +594,8 @@ public final class PublicationTreeTest {
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(inter);
     publication = publication.add(tree);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-blank-format.xml");
@@ -618,11 +619,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-1-1a-1","1.1.","(a)",4,"2.1.1.1.");
     assertHasPrefix(prefixes,"1001-1-1b-1","1.1.","(a)(i)",5,"2.1.1.1.1.");
     assertHasPrefix(prefixes,"1001-1-default","","",1,"2.");
-    Assert.assertEquals(11, prefixes.size());
+    assertEquals(11, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingSkippedLevels() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingSkippedLevels() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("X", "1", 1, true, "",
             h2("a", "2", 1, true, "x.x.x"),
@@ -643,8 +644,8 @@ public final class PublicationTreeTest {
         .addReverseReference(1L).labels("autonumber1").build().normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(tree);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
     PublicationConfig config = Tests.parseConfig("publication-config-skipped-levels.xml");
@@ -672,11 +673,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-1-4-2",null,"0.1.3.",3,"0.1.3.");
     assertHasPrefix(prefixes,"1000-1-5-1","0.1.3.0.","(a)",5,"0.1.3.0.1.");
     assertHasPrefix(prefixes,"1000-1-default",null,"0.1.",2,"0.1.");
-    Assert.assertEquals(14, prefixes.size());
+    assertEquals(14, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingLabels() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingLabels() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1, true, "",
             phantom(2,
@@ -717,8 +718,8 @@ public final class PublicationTreeTest {
     publication = publication.add(tree);
     publication = publication.add(tree2);
     publication = publication.add(tree3);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
@@ -764,11 +765,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1002-1-default",null,"a.b.",3,"0.1.2.");
     assertHasPrefix(prefixes,"101-1-1-1",null,"1.",3,"0.0.1.");
     assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
-    Assert.assertEquals(32, prefixes.size());
+    assertEquals(32, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingParas() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingParas() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -828,8 +829,8 @@ public final class PublicationTreeTest {
     publication = publication.add(inter3);
     publication = publication.add(tree);
     publication = publication.add(tree2);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
@@ -884,11 +885,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"102-1-1-2",null,"1.1.5.",3,"1.1.5.");
     assertHasPrefix(prefixes,"102-1-1-3",null,"1.1.6.",3,"1.1.6.");
     assertHasPrefix(prefixes,"102-1-default",null,"",2,null);
-    Assert.assertEquals(40, prefixes.size());
+    assertEquals(40, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingParasFixed() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingParasFixed() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -915,8 +916,8 @@ public final class PublicationTreeTest {
         .addReverseReference(1L).build().normalize(TitleCollapse.always);
     PublicationTree publication = new PublicationTree(root);
     publication = publication.add(tree);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(root, publication.root());
     PublicationConfig config = Tests.parseConfig("publication-config-paras-fixed.xml");
     // Generate fragment numbering
@@ -957,10 +958,10 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1000-2-4-2",null,"1.3.2.3.",5,"0.1.3.2.3.");
     assertHasPrefix(prefixes,"1000-2-5-1",null,"1.3.2.3.1.",6,"0.1.3.2.3.1.");
     assertHasPrefix(prefixes,"1000-2-default",null,"1.3.2.",4,"0.1.3.2.");
-    Assert.assertEquals(27, prefixes.size());  }
+    assertEquals(27, prefixes.size());  }
 
   @Test
-  public void testAutoNumberingParasRelative() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingParasRelative() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
           phantom(2,
@@ -1011,8 +1012,8 @@ public final class PublicationTreeTest {
     publication = publication.add(inter2);
     publication = publication.add(tree);
     publication = publication.add(tree2);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
@@ -1064,11 +1065,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-2-default",null,"1.5.3.",4,"0.1.5.3.");
     assertHasPrefix(prefixes,"101-1-1-1",null,"1.5.",3,"0.1.5.");
     assertHasPrefix(prefixes,"101-1-default",null,"",3,null);
-    Assert.assertEquals(37, prefixes.size());
+    assertEquals(37, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingPerformance() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingPerformance() throws SAXException, IOException, XRefLoopException {
     Builder builder = new DocumentTree.Builder(1).title("T");
     for(int i = 0; i < 500; i++) {
       builder = builder.part(ref(2, "A", 1000L + i));
@@ -1123,67 +1124,71 @@ public final class PublicationTreeTest {
     long ptime = pend - pstart;
     System.out.println("Generation time: " + gtime);
     System.out.println("Print time: " + ptime);
-    Assert.assertEquals(10501, prefixes.size());
-    Assert.assertEquals(10000, numbering.getAllTranscludedPrefixes().size());
-    Assert.assertTrue("Generation time: " + gtime, gtime < 400);
-    Assert.assertTrue("Print time: " + ptime, ptime < 100);
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void testLoopDetection() throws SAXException, ProcessException {
-    DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 1,
-            phantom(2,
-            ref(3, "A", 100L))))
-        .addReverseReference(101L).build().normalize(TitleCollapse.auto);
-    DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 1, true, "",
-            ref(2, "B", 101L)))
-        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
-    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 1, true, "",
-              ref(1, "BX", 1L)))
-        .addReverseReference(100L).build().normalize(TitleCollapse.auto);
-    PublicationTree publication = new PublicationTree(root);
-    publication = publication.add(inter);
-    publication = publication.add(inter2);
-    Tests.print(publication, -1, -1, null, null, true);
-  }
-
-  @Test(expected = XRefLoopException.class)
-  public void testLoopDetectionAutonumber() throws SAXException, IOException, XRefLoopException {
-    DocumentTree root = new DocumentTree.Builder(1).title("T")
-        .part(h1("T", "1", 1,
-            phantom(2,
-            ref(3, "A", 100L))))
-        .addReverseReference(101L).build().normalize(TitleCollapse.auto);
-    DocumentTree inter = new DocumentTree.Builder(100).title("A")
-        .part(h1("A", "1", 1, true, "",
-            ref(2, "B", 101L)))
-        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
-    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
-        .part(h1("BA", "1", 1, true, "",
-              ref(1, "BX", 1L)))
-        .addReverseReference(100L).build().normalize(TitleCollapse.auto);
-    PublicationTree publication = new PublicationTree(root);
-    publication = publication.add(inter);
-    publication = publication.add(inter2);
-    // Generate fragment numbering
-    PublicationConfig config = Tests.parseConfig("publication-config.xml");
-    new FragmentNumbering(publication, config);
+    assertEquals(10501, prefixes.size());
+    assertEquals(10000, numbering.getAllTranscludedPrefixes().size());
+    assertTrue(gtime < 400, "Generation time: " + gtime);
+    assertTrue(ptime < 100, "Print time: " + ptime);
   }
 
   @Test
-  public void testParseWACCC() throws SAXException {
+  void testLoopDetection() {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+            phantom(2,
+            ref(3, "A", 100L))))
+        .addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter = new DocumentTree.Builder(100).title("A")
+        .part(h1("A", "1", 1, true, "",
+            ref(2, "B", 101L)))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
+        .part(h1("BA", "1", 1, true, "",
+              ref(1, "BX", 1L)))
+        .addReverseReference(100L).build().normalize(TitleCollapse.auto);
+    assertThrows(IllegalStateException.class, () -> {
+      PublicationTree publication = new PublicationTree(root);
+      publication = publication.add(inter);
+      publication = publication.add(inter2);
+      Tests.print(publication, -1, -1, null, null, true);
+    });
+  }
+
+  @Test
+  void testLoopDetectionAutonumber() {
+    DocumentTree root = new DocumentTree.Builder(1).title("T")
+        .part(h1("T", "1", 1,
+            phantom(2,
+            ref(3, "A", 100L))))
+        .addReverseReference(101L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter = new DocumentTree.Builder(100).title("A")
+        .part(h1("A", "1", 1, true, "",
+            ref(2, "B", 101L)))
+        .addReverseReference(1L).build().normalize(TitleCollapse.auto);
+    DocumentTree inter2 = new DocumentTree.Builder(101).title("B")
+        .part(h1("BA", "1", 1, true, "",
+              ref(1, "BX", 1L)))
+        .addReverseReference(100L).build().normalize(TitleCollapse.auto);
+    assertThrows(XRefLoopException.class, () -> {
+      PublicationTree publication = new PublicationTree(root);
+      publication = publication.add(inter);
+      publication = publication.add(inter2);
+      // Generate fragment numbering
+      PublicationConfig config = Tests.parseConfig("publication-config.xml");
+      new FragmentNumbering(publication, config);
+    });
+  }
+
+  @Test
+  void testParseWACCC() throws SAXException {
     DocumentTree root = Tests.parse(1, "waccc.psml").normalize(TitleCollapse.auto);
-    Assert.assertEquals(OffsetDateTime.parse("2017-03-28T16:41:30+10:00"), root.lastedited());
-    Assert.assertEquals(
+    assertEquals(OffsetDateTime.parse("2017-03-28T16:41:30+10:00"), root.lastedited());
+    assertEquals(
             "/ps/waccc/legislation/documents/legislation/corruption%2C_crime_and_misconduct_act_2003/content.psml",
             root.path());
     PublicationTree publication = new PublicationTree(root);
     DocumentTree tree = Tests.parse(681724, "test_doc_1.psml").normalize(TitleCollapse.auto);
-    Assert.assertEquals(OffsetDateTime.parse("2021-04-16T15:56:51+10:00"), tree.lastedited());
-    Assert.assertEquals(
+    assertEquals(OffsetDateTime.parse("2021-04-16T15:56:51+10:00"), tree.lastedited());
+    assertEquals(
             "/ps/test/local1/documents/word3/test_doc_1/test_doc_1.psml",
              tree.path());
     publication = publication.add(tree);
@@ -1192,7 +1197,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testParseHub() throws SAXException {
+  void testParseHub() throws SAXException {
     DocumentTree tree = Tests.parse(1, "hub.psml").normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(tree);
     assertValidPublication(publication);
@@ -1200,7 +1205,7 @@ public final class PublicationTreeTest {
   }
 
   @Test
-  public void testParseXrefLevel1() throws SAXException, IOException, XRefLoopException {
+  void testParseXrefLevel1() throws SAXException, IOException, XRefLoopException {
     DocumentTree tree = parse(1, "xref-level1.psml");
     Tests.print(tree);
     tree = tree.normalize(TitleCollapse.auto);
@@ -1212,26 +1217,26 @@ public final class PublicationTreeTest {
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("HEADINGS\n" + headings);
-    Assert.assertEquals("Test <inline name=\"test\">doc <sup>1</sup></inline>", fheadings.get("1"));
-    Assert.assertEquals("My &lt; &amp; > link", fheadings.get("3"));
-    Assert.assertEquals("Default d5", fheadings.get("6"));
-    Assert.assertEquals("https://pageseeder.org/", fheadings.get("7"));
-    Assert.assertEquals("Related", fheadings.get("content"));
-    Assert.assertEquals(5, fheadings.size());
+    assertEquals("Test <inline name=\"test\">doc <sup>1</sup></inline>", fheadings.get("1"));
+    assertEquals("My &lt; &amp; > link", fheadings.get("3"));
+    assertEquals("Default d5", fheadings.get("6"));
+    assertEquals("https://pageseeder.org/", fheadings.get("7"));
+    assertEquals("Related", fheadings.get("content"));
+    assertEquals(5, fheadings.size());
     Map<String, Integer> flevels = tree.fragmentlevels();
     String levels = flevels.entrySet()
         .stream().sorted(Map.Entry.comparingByKey())
         .map(entry -> entry.getKey() + " - " + entry.getValue())
         .collect(Collectors.joining("\n"));
     System.out.println("LEVELS\n" + levels);
-    Assert.assertEquals(Integer.valueOf(0), flevels.get("1"));
-    Assert.assertEquals(Integer.valueOf(2), flevels.get("2"));
-    Assert.assertEquals(Integer.valueOf(2), flevels.get("3"));
-    Assert.assertEquals(Integer.valueOf(2), flevels.get("4"));
-    Assert.assertEquals(Integer.valueOf(2), flevels.get("6"));
-    Assert.assertEquals(Integer.valueOf(2), flevels.get("7"));
-    Assert.assertEquals(Integer.valueOf(1), flevels.get("content"));
-    Assert.assertEquals(7, flevels.size());
+    assertEquals(Integer.valueOf(0), flevels.get("1"));
+    assertEquals(Integer.valueOf(2), flevels.get("2"));
+    assertEquals(Integer.valueOf(2), flevels.get("3"));
+    assertEquals(Integer.valueOf(2), flevels.get("4"));
+    assertEquals(Integer.valueOf(2), flevels.get("6"));
+    assertEquals(Integer.valueOf(2), flevels.get("7"));
+    assertEquals(Integer.valueOf(1), flevels.get("content"));
+    assertEquals(7, flevels.size());
     PublicationTree publication = new PublicationTree(tree);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
@@ -1249,11 +1254,11 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1-1-4-3",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-4-4",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
-    Assert.assertEquals(4, prefixes.size());
+    assertEquals(4, prefixes.size());
   }
 
   @Test
-  public void testAutoNumberingXRefsRelative() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingXRefsRelative() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -1291,8 +1296,8 @@ public final class PublicationTreeTest {
     publication = publication.add(inter2);
     publication = publication.add(tree);
     publication = publication.add(tree2);
-    Assert.assertEquals(root.id(), publication.id());
-    Assert.assertTrue(publication.listReverseReferences().isEmpty());
+    assertEquals(root.id(), publication.id());
+    assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree2, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
@@ -1342,7 +1347,7 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1001-2-default",null,"",2,null);
     assertHasPrefix(prefixes,"101-1-1-1",null,"4.3.",2,"4.3.");
     assertHasPrefix(prefixes,"101-1-default",null,"",2,null);
-    Assert.assertEquals(35, prefixes.size());
+    assertEquals(35, prefixes.size());
 //  Map<String,Prefix> prefixes = numbering.getAllPrefixes();
 //  String code = prefixes.entrySet()
 //      .stream().sorted(Map.Entry.comparingByKey())
@@ -1353,11 +1358,11 @@ public final class PublicationTreeTest {
 //          (entry.getValue().canonical == null ? "null" : "\"" + entry.getValue().canonical + "\"") + ");")
 //      .collect(Collectors.joining("\n"));
 //  System.out.println(code);
-//  System.out.println("Assert.assertEquals(" + prefixes.size() + ", prefixes.size());");
+//  System.out.println("assertEquals(" + prefixes.size() + ", prefixes.size());");
   }
 
   @Test
-  public void testParseCompareRef() throws SAXException, IOException, XRefLoopException {
+  void testParseCompareRef() throws SAXException, IOException, XRefLoopException {
     DocumentTree root = parse(69152, "compare_ref.psml").normalize(TitleCollapse.always);
     DocumentTree tree1 = parse(69153, "compare_1.psml").normalize(TitleCollapse.always);
     DocumentTree tree2 = parse(69154, "compare_2.psml").normalize(TitleCollapse.always);
@@ -1386,12 +1391,12 @@ public final class PublicationTreeTest {
     assertHasPrefix(prefixes,"69154-3-1-1",null,"2.",1,"2.");
     assertHasPrefix(prefixes,"69154-3-default",null,"2.",1,"2.");
     assertHasPrefix(prefixes,"69154-5-1-1",null,"3.1.1.",3,"3.1.1.");
-    Assert.assertEquals(11, prefixes.size());
+    assertEquals(11, prefixes.size());
   }
 
   private static void assertValidPublication(PublicationTree publication) {
     try {
-      Assert.assertThat(Tests.toDOMSource(publication), Tests.validates("publication-tree.xsd"));
+      assertThat(Tests.toDOMSource(publication), Tests.validates("publication-tree.xsd"));
     } catch (AssertionError ex) {
       Tests.print(publication);
       throw ex;
@@ -1408,7 +1413,7 @@ public final class PublicationTreeTest {
         // Won't happen
       }
       xml.flush();
-      Assert.assertThat(toDOMSource(new StringReader(xml.toString())), Tests.validates("publication-tree.xsd"));
+      assertThat(toDOMSource(new StringReader(xml.toString())), Tests.validates("publication-tree.xsd"));
     } catch (AssertionError ex) {
       Tests.print(publication);
       throw ex;
@@ -1425,14 +1430,14 @@ public final class PublicationTreeTest {
    * @param lvl        the heading/para level
    * @param canonic    the canonical numbering (optional)
    */
-  public static void assertHasPrefix(Map<String,Prefix> prefixes, String key,
+  static void assertHasPrefix(Map<String,Prefix> prefixes, String key,
       @Nullable String parent, String val, int lvl, @Nullable String canonic) {
     Prefix p = prefixes.get(key);
-    Assert.assertNotNull(p);
-    Assert.assertEquals(parent, p.parentNumber);
-    Assert.assertEquals(val, p.value);
-    Assert.assertEquals(lvl, p.level);
-    Assert.assertEquals(canonic, p.canonical);
+    assertNotNull(p);
+    assertEquals(parent, p.parentNumber);
+    assertEquals(val, p.value);
+    assertEquals(lvl, p.level);
+    assertEquals(canonic, p.canonical);
   }
 
 }

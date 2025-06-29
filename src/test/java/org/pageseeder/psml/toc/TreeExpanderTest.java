@@ -16,7 +16,7 @@ public final class TreeExpanderTest {
   public void testEmpty() {
     TreeExpander expander = new TreeExpander();
     List<Part<?>> top = expander.parts();
-    Assert.assertTrue(top.size() == 0);
+    Assert.assertTrue(top.isEmpty());
   }
 
   @Test
@@ -24,7 +24,7 @@ public final class TreeExpanderTest {
     Heading heading = new Heading(1, "Hello", "title", "title", 0);
     Part<Heading> expected = part(heading);
     List<Part<?>> top = treeify(heading);
-    Assert.assertTrue(top.size() == 1);
+    Assert.assertEquals(1, top.size());
     assertPartEquals(expected, top.get(0));
   }
 
@@ -33,7 +33,7 @@ public final class TreeExpanderTest {
     Heading heading = new Heading(2, "Hello", "title", "title", 1);
     Part<Phantom> expected = phantom(1, part(heading));
     List<Part<?>> top = treeify(heading);
-    Assert.assertTrue(top.size() == 1);
+    Assert.assertEquals(1, top.size());
     assertPartEquals(expected, top.get(0));
   }
 
@@ -42,7 +42,7 @@ public final class TreeExpanderTest {
     Heading heading = new Heading(3, "Hello", "title", "title", 1);
     Part<Phantom> expected = phantom(1, phantom(2, part(heading)));
     List<Part<?>> top = treeify(heading);
-    Assert.assertTrue(top.size() == 1);
+    Assert.assertEquals(1, top.size());
     assertPartEquals(expected, top.get(0));
   }
 
@@ -51,7 +51,7 @@ public final class TreeExpanderTest {
     Heading heading = new Heading(4, "Hello", "title", "title", 1);
     Part<Phantom> expected = phantom(1, phantom(2, phantom(3, part(heading))));
     List<Part<?>> top = treeify(heading);
-    Assert.assertTrue(top.size() == 1);
+    Assert.assertEquals(1, top.size());
     assertPartEquals(expected, top.get(0));
   }
 
@@ -64,7 +64,7 @@ public final class TreeExpanderTest {
     Part<Heading> pb = part(hb);
     Part<Heading> pc = part(hc);
     List<Part<?>> top = treeify(ha, hb, hc);
-    Assert.assertTrue(top.size() == 3);
+    Assert.assertEquals(3, top.size());
     assertPartEquals(pa, top.get(0));
     assertPartEquals(pb, top.get(1));
     assertPartEquals(pc, top.get(2));
@@ -77,7 +77,7 @@ public final class TreeExpanderTest {
     Heading hc = new Heading(2, "C", "content", "content", 1);
     Part<Phantom> expected = phantom(1, part(ha), part(hb), part(hc));
     List<Part<?>> top = treeify(ha, hb, hc);
-    Assert.assertTrue(top.size() == 1);
+    Assert.assertEquals(1, top.size());
     assertPartEquals(expected, top.get(0));
   }
 
@@ -89,7 +89,7 @@ public final class TreeExpanderTest {
     Heading hc = new Heading(2, "C", "content", "content", 1);
     Part<Heading> expected = part(ht, part(ha), part(hb), part(hc));
     List<Part<?>> top = treeify(ht, ha, hb, hc);
-    Assert.assertTrue(top.size() == 1);
+    Assert.assertEquals(1, top.size());
     assertPartEquals(expected, top.get(0));
   }
 
