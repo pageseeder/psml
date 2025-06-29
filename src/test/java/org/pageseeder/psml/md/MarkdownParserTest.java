@@ -15,49 +15,51 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 
-public class MarkdownParserTest {
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class MarkdownParserTest {
 
   private static final String SOURCE_FOLDER = "src/test/data/md";
 
   @Test
-  public void testParseFragment_Headings() {
+  void testParseFragment_Headings() {
     PSMLElement document = parseMarkdown("headings.md", false);
-    Assert.assertNotNull(document);
-    Assert.assertEquals(PSMLElement.Name.DOCUMENT, document.getElement());
+    assertNotNull(document);
+    assertEquals(PSMLElement.Name.DOCUMENT, document.getElement());
     System.out.println(toXML(document));
   }
 
   @Test
-  public void testParseFragment_Metadata() {
+  void testParseFragment_Metadata() {
     PSMLElement document = parseMarkdown("metadata.md", false);
-    Assert.assertNotNull(document);
-    Assert.assertEquals(PSMLElement.Name.DOCUMENT, document.getElement());
+    assertNotNull(document);
+    assertEquals(PSMLElement.Name.DOCUMENT, document.getElement());
     System.out.println(toXML(document));
   }
 
   @Test
-  public void testParseFragment_Table() {
+  void testParseFragment_Table() {
     PSMLElement fragment = parseMarkdown("table.md", true);
-    Assert.assertNotNull(fragment);
-    Assert.assertEquals(PSMLElement.Name.FRAGMENT, fragment.getElement());
+    assertNotNull(fragment);
+    assertEquals(PSMLElement.Name.FRAGMENT, fragment.getElement());
     System.out.println(toXML(fragment));
   }
 
   @Test
-  public void testProcess() throws Exception {
-    File md   = new File(SOURCE_FOLDER, "test.md");
+  void testProcess() throws Exception {
+    File md = new File(SOURCE_FOLDER, "test.md");
     File psml = new File(SOURCE_FOLDER, "test.psml");
     FileInputStream in = new FileInputStream(md);
     Reader r = new InputStreamReader(in);
@@ -73,20 +75,18 @@ public class MarkdownParserTest {
     System.out.println(result);
 
     // load expected
-    String expected = new String (Files.readAllBytes(psml.toPath()), StandardCharsets.UTF_8);
+    String expected = new String(Files.readAllBytes(psml.toPath()), StandardCharsets.UTF_8);
     expected = expected.replaceAll("\r", "");
-    Assert.assertEquals(expected, result);
-    //Assert.assertThat(result, CompareMatcher.isIdenticalTo(expected));
+    assertEquals(expected, result);
   }
 
-
   private static PSMLElement parseMarkdown(String filename, boolean isFragment) {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Tests.class.getResourceAsStream("/org/pageseeder/psml/md/"+filename)))) {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Tests.class.getResourceAsStream("/org/pageseeder/psml/md/" + filename)))) {
       MarkdownParser parser = new MarkdownParser();
       parser.getConfig().setFragmentMode(isFragment);
       return parser.parse(reader);
     } catch (IOException ex) {
-      throw new UncheckedIOException("Unable to load test file '"+filename+"'", ex);
+      throw new UncheckedIOException("Unable to load test file '" + filename + "'", ex);
     }
   }
 

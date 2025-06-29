@@ -15,8 +15,7 @@
  */
 package org.pageseeder.psml.md;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.html.HTMLElement.Name;
 import org.pageseeder.psml.md.HTMLBlockParser.State;
@@ -26,153 +25,159 @@ import org.pageseeder.xmlwriter.XMLStringWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class HTMLBlockParserTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Test class for BlockParser functionality, ensuring accurate parsing of Markdown text
+ * into the corresponding PSML format.
+ */
+class HTMLBlockParserTest {
 
   @Test
-  public void testEscaping() {
+  void testEscaping() {
     List<String> e1 = List.of("This is \\*escaped star\\*");
     List<String> e2 = List.of("This is \\[escaped brackets\\]");
     List<String> e3 = List.of(" \\- Red", " \\- Green", " \\- Blue");
-    Assert.assertEquals("<p>This is *escaped star*</p>", toHTML(e1));
-    Assert.assertEquals("<p>This is [escaped brackets]</p>", toHTML(e2));
-    Assert.assertEquals("<p>- Red<br/>\n- Green<br/>\n- Blue</p>", toHTML(e3));
+    assertEquals("<p>This is *escaped star*</p>", toHTML(e1));
+    assertEquals("<p>This is [escaped brackets]</p>", toHTML(e2));
+    assertEquals("<p>- Red<br/>\n- Green<br/>\n- Blue</p>", toHTML(e3));
   }
 
   @Test
-  public void testHeadingSetext() {
+  void testHeadingSetext() {
     List<String> h1 = List.of("This is an H1", "=============");
     List<String> h2 = List.of("This is an H2", "-------------");
-    Assert.assertEquals("<h1>This is an H1</h1>", toHTML(h1));
-    Assert.assertEquals("<h2>This is an H2</h2>", toHTML(h2));
+    assertEquals("<h1>This is an H1</h1>", toHTML(h1));
+    assertEquals("<h2>This is an H2</h2>", toHTML(h2));
   }
 
   @Test
-  public void testHeadingATX() {
+  void testHeadingATX() {
     List<String> h1 = List.of("# This is an H1");
     List<String> h2 = List.of("## This is an H2");
     List<String> h3 = List.of("### This is an H3");
     List<String> h4 = List.of("#### This is an H4");
     List<String> h5 = List.of("##### This is an H5");
     List<String> h6 = List.of("###### This is an H6");
-    Assert.assertEquals("<h1>This is an H1</h1>", toHTML(h1));
-    Assert.assertEquals("<h2>This is an H2</h2>", toHTML(h2));
-    Assert.assertEquals("<h3>This is an H3</h3>", toHTML(h3));
-    Assert.assertEquals("<h4>This is an H4</h4>", toHTML(h4));
-    Assert.assertEquals("<h5>This is an H5</h5>", toHTML(h5));
-    Assert.assertEquals("<h6>This is an H6</h6>", toHTML(h6));
+    assertEquals("<h1>This is an H1</h1>", toHTML(h1));
+    assertEquals("<h2>This is an H2</h2>", toHTML(h2));
+    assertEquals("<h3>This is an H3</h3>", toHTML(h3));
+    assertEquals("<h4>This is an H4</h4>", toHTML(h4));
+    assertEquals("<h5>This is an H5</h5>", toHTML(h5));
+    assertEquals("<h6>This is an H6</h6>", toHTML(h6));
   }
 
   @Test
-  public void testHeadingATX2() {
+  void testHeadingATX2() {
     List<String> h1 = List.of("# This is an H1 #");
     List<String> h2 = List.of("## This is an H2 ##");
     List<String> h3 = List.of("### This is an H3 ###");
     List<String> h4 = List.of("#### This is an H4 ####");
     List<String> h5 = List.of("##### This is an H5 #####");
     List<String> h6 = List.of("###### This is an H6 ######");
-    Assert.assertEquals("<h1>This is an H1</h1>", toHTML(h1));
-    Assert.assertEquals("<h2>This is an H2</h2>", toHTML(h2));
-    Assert.assertEquals("<h3>This is an H3</h3>", toHTML(h3));
-    Assert.assertEquals("<h4>This is an H4</h4>", toHTML(h4));
-    Assert.assertEquals("<h5>This is an H5</h5>", toHTML(h5));
-    Assert.assertEquals("<h6>This is an H6</h6>", toHTML(h6));
+    assertEquals("<h1>This is an H1</h1>", toHTML(h1));
+    assertEquals("<h2>This is an H2</h2>", toHTML(h2));
+    assertEquals("<h3>This is an H3</h3>", toHTML(h3));
+    assertEquals("<h4>This is an H4</h4>", toHTML(h4));
+    assertEquals("<h5>This is an H5</h5>", toHTML(h5));
+    assertEquals("<h6>This is an H6</h6>", toHTML(h6));
   }
 
   @Test
-  public void testBlockquotes() {
+  void testBlockquotes() {
     List<String> q1 = List.of("> Hello");
-    Assert.assertEquals("<blockquote><p>Hello</p></blockquote>", toHTML(q1));
+    assertEquals("<blockquote><p>Hello</p></blockquote>", toHTML(q1));
   }
 
   @Test
-  public void testUnorderedList() {
+  void testUnorderedList() {
     List<String> list1 = List.of(" * Red", " * Green", " * Blue");
     List<String> list2 = List.of(" + Red", " + Green", " + Blue");
     List<String> list3 = List.of(" - Red", " - Green", " - Blue");
-    Assert.assertEquals("<ul><li>Red</li><li>Green</li><li>Blue</li></ul>", toHTML(list1));
-    Assert.assertEquals("<ul><li>Red</li><li>Green</li><li>Blue</li></ul>", toHTML(list2));
-    Assert.assertEquals("<ul><li>Red</li><li>Green</li><li>Blue</li></ul>", toHTML(list3));
+    assertEquals("<ul><li>Red</li><li>Green</li><li>Blue</li></ul>", toHTML(list1));
+    assertEquals("<ul><li>Red</li><li>Green</li><li>Blue</li></ul>", toHTML(list2));
+    assertEquals("<ul><li>Red</li><li>Green</li><li>Blue</li></ul>", toHTML(list3));
   }
 
   @Test
-  public void testParagraphs() {
+  void testParagraphs() {
     List<String> p1 = List.of("Hi!");
-    List<String> p2 = List.of("Hi!","","Welcome");
-    List<String> p3 = List.of("Hi!","Welcome");
-    List<String> p4 = List.of("Hi!","Welcome","","Test");
-    List<String> p5 = List.of("Hi!","","Welcome","Test");
-    List<String> p6 = List.of("Hi!","","Welcome","","Test");
+    List<String> p2 = List.of("Hi!", "", "Welcome");
+    List<String> p3 = List.of("Hi!", "Welcome");
+    List<String> p4 = List.of("Hi!", "Welcome", "", "Test");
+    List<String> p5 = List.of("Hi!", "", "Welcome", "Test");
+    List<String> p6 = List.of("Hi!", "", "Welcome", "", "Test");
     List<String> p7 = List.of("This line is longer than sixty-six characters and should continue without", "a line break");
-    Assert.assertEquals("<p>Hi!</p>", toHTML(p1));
-    Assert.assertEquals("<p>Hi!</p><p>Welcome</p>", toHTML(p2));
-    Assert.assertEquals("<p>Hi!<br/>\nWelcome</p>", toHTML(p3));
-    Assert.assertEquals("<p>Hi!<br/>\nWelcome</p><p>Test</p>", toHTML(p4));
-    Assert.assertEquals("<p>Hi!</p><p>Welcome<br/>\nTest</p>", toHTML(p5));
-    Assert.assertEquals("<p>Hi!</p><p>Welcome</p><p>Test</p>", toHTML(p6));
-    Assert.assertEquals("<p>This line is longer than sixty-six characters and should continue without\na line break</p>", toHTML(p7));
+    assertEquals("<p>Hi!</p>", toHTML(p1));
+    assertEquals("<p>Hi!</p><p>Welcome</p>", toHTML(p2));
+    assertEquals("<p>Hi!<br/>\nWelcome</p>", toHTML(p3));
+    assertEquals("<p>Hi!<br/>\nWelcome</p><p>Test</p>", toHTML(p4));
+    assertEquals("<p>Hi!</p><p>Welcome<br/>\nTest</p>", toHTML(p5));
+    assertEquals("<p>Hi!</p><p>Welcome</p><p>Test</p>", toHTML(p6));
+    assertEquals("<p>This line is longer than sixty-six characters and should continue without\na line break</p>", toHTML(p7));
   }
 
   @Test
-  public void testOrderedList() {
+  void testOrderedList() {
     List<String> list1 = List.of(" 1. Bird", " 2. McHale", " 3. Parish");
     List<String> list2 = List.of(" 1. Bird", " 1. McHale", " 1. Parish");
     List<String> list3 = List.of(" 7. Bird", " 8. McHale", " 9. Parish");
     List<String> list4 = List.of(" 3. Bird", " 1. McHale", " 8. Parish");
-    Assert.assertEquals("<ol><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list1));
-    Assert.assertEquals("<ol><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list2));
-    Assert.assertEquals("<ol start=\"7\"><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list3));
-    Assert.assertEquals("<ol start=\"3\"><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list4));
+    assertEquals("<ol><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list1));
+    assertEquals("<ol><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list2));
+    assertEquals("<ol start=\"7\"><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list3));
+    assertEquals("<ol start=\"3\"><li>Bird</li><li>McHale</li><li>Parish</li></ol>", toHTML(list4));
   }
 
   @Test
-  public void testOrderedListEscape() {
+  void testOrderedListEscape() {
     List<String> list1 = List.of(" 1986. What a great season.");
     List<String> list2 = List.of(" 1986\\. What a great season.");
-    Assert.assertEquals("<ol start=\"1986\"><li>What a great season.</li></ol>", toHTML(list1));
-    Assert.assertEquals("<p>1986. What a great season.</p>", toHTML(list2));
+    assertEquals("<ol start=\"1986\"><li>What a great season.</li></ol>", toHTML(list1));
+    assertEquals("<p>1986. What a great season.</p>", toHTML(list2));
   }
 
   @Test
-  public void testCodeBlock() {
+  void testCodeBlock() {
     List<String> pre = List.of("    This is a code block.");
-    Assert.assertEquals("<pre>This is a code block.</pre>", toHTML(pre));
+    assertEquals("<pre>This is a code block.</pre>", toHTML(pre));
   }
 
 
   @Test
-  public void testFencedCode() {
+  void testFencedCode() {
     List<String> fencedCode1 = List.of("```", "function() { return 'Hello!';}", "```");
     List<String> fencedCode2 = List.of("```javascript", "function() { return 'Hello!';}", "```");
     List<String> fencedCode3 = List.of("```", "function() {", "  return 'Hello!';", "}", "```");
     List<String> fencedCode4 = List.of("```", "function() {", "  if (a", "  > b) then a = b;", "}", "```");
-    List<String> fencedCode5 = List.of("```", "function() {","","return 'Hello!';}", "```");
-    List<String> fencedCode6 = List.of("```", "<report>","  <errors>","    <error>", "```");
-    Assert.assertEquals("<pre>\nfunction() { return 'Hello!';}\n</pre>", toHTML(fencedCode1));
-    Assert.assertEquals("<pre><code class=\"lang-javascript\">\nfunction() { return 'Hello!';}\n</code></pre>", toHTML(fencedCode2));
-    Assert.assertEquals("<pre>\nfunction() {\n  return 'Hello!';\n}\n</pre>", toHTML(fencedCode3));
-    Assert.assertEquals("<pre>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</pre>", toHTML(fencedCode4));
-    Assert.assertEquals("<pre>\nfunction() {\n\nreturn 'Hello!';}\n</pre>", toHTML(fencedCode5));
-    Assert.assertEquals("<pre>\n&lt;report&gt;\n  &lt;errors&gt;\n    &lt;error&gt;\n</pre>", toHTML(fencedCode6));
+    List<String> fencedCode5 = List.of("```", "function() {", "", "return 'Hello!';}", "```");
+    List<String> fencedCode6 = List.of("```", "<report>", "  <errors>", "    <error>", "```");
+    assertEquals("<pre>\nfunction() { return 'Hello!';}\n</pre>", toHTML(fencedCode1));
+    assertEquals("<pre><code class=\"lang-javascript\">\nfunction() { return 'Hello!';}\n</code></pre>", toHTML(fencedCode2));
+    assertEquals("<pre>\nfunction() {\n  return 'Hello!';\n}\n</pre>", toHTML(fencedCode3));
+    assertEquals("<pre>\nfunction() {\n  if (a\n  &gt; b) then a = b;\n}\n</pre>", toHTML(fencedCode4));
+    assertEquals("<pre>\nfunction() {\n\nreturn 'Hello!';}\n</pre>", toHTML(fencedCode5));
+    assertEquals("<pre>\n&lt;report&gt;\n  &lt;errors&gt;\n    &lt;error&gt;\n</pre>", toHTML(fencedCode6));
   }
 
-//  @Test
-  public void testFencedBlock() {
+  //  @Test
+  void testFencedBlock() {
     List<String> fencedBlock1 = List.of("~~~warning", "A warning!", "~~~");
     List<String> fencedBlock2 = List.of("~~~", "Anonymous block", "~~~");
-    List<String> fencedBlock3 = List.of("~~~empty",  "~~~");
+    List<String> fencedBlock3 = List.of("~~~empty", "~~~");
     List<String> fencedBlock4 = List.of("~~~warning", "A double", "", "warning", "~~~");
     List<String> fencedBlock5 = List.of("~~~note", " - apple", " - pear", "", "~~~");
     List<String> fencedBlock6 = List.of("~~~wrap", "~~~warning", "The warning", "~~~", "~~~");
-    Assert.assertEquals("<div class=\"label-warning\" label=\"warning\"><p>A warning!</p></div>", toHTML(fencedBlock1));
-    Assert.assertEquals("<div><p>Anonymous block</p></div>", toHTML(fencedBlock2));
-    Assert.assertEquals("<div class=\"label-empty\" label=\"empty\"/>", toHTML(fencedBlock3));
-    Assert.assertEquals("<div class=\"label-warning\" label=\"warning\"><p>A double</p><p>warning</p></div>", toHTML(fencedBlock4));
-    Assert.assertEquals("<div class=\"label-note\" label=\"note\"><ul><li>apple</li><li>pear</li></ul></div>", toHTML(fencedBlock5));
-    Assert.assertEquals("<div class=\"label-wrap\" label=\"wrap\"><div class=\"label-warning\"><para>The warning</para></div></div>", toHTML(fencedBlock6));
+    assertEquals("<div class=\"label-warning\" label=\"warning\"><p>A warning!</p></div>", toHTML(fencedBlock1));
+    assertEquals("<div><p>Anonymous block</p></div>", toHTML(fencedBlock2));
+    assertEquals("<div class=\"label-empty\" label=\"empty\"/>", toHTML(fencedBlock3));
+    assertEquals("<div class=\"label-warning\" label=\"warning\"><p>A double</p><p>warning</p></div>", toHTML(fencedBlock4));
+    assertEquals("<div class=\"label-note\" label=\"note\"><ul><li>apple</li><li>pear</li></ul></div>", toHTML(fencedBlock5));
+    assertEquals("<div class=\"label-wrap\" label=\"wrap\"><div class=\"label-warning\"><para>The warning</para></div></div>", toHTML(fencedBlock6));
   }
 
   @Test
-  public void testTable() {
+  void testTable() {
     List<String> table1 = List.of(
         "| TH 1 | TH 2 | TH 3 |",
         "|------|------|------|",
@@ -184,86 +189,83 @@ public class HTMLBlockParserTest {
         "<tr><td>R1C1</td><td>R1C2</td><td>R1C3</td></tr>" +
         "<tr><td>R2C1</td><td>R2C2</td><td>R2C3</td></tr>" +
         "</table>";
-    Assert.assertEquals(expected, toHTML(table1));
+    assertEquals(expected, toHTML(table1));
   }
 
   @Test
-  public void testUC1() {
+  void testUC1() {
     List<String> mixed = List.of("`coconut`");
-    Assert.assertEquals("<p><code>coconut</code></p>", toHTML(mixed));
+    assertEquals("<p><code>coconut</code></p>", toHTML(mixed));
   }
-
 
 
   // Testing the parser state
   // --------------------------------------------------------------------------------------------
 
   @Test
-  public void testStateCommit() {
+  void testStateCommit() {
     State state = new State();
     state.commit();
-    Assert.assertNull(state.current());
+    assertNull(state.current());
     // Empty fragment
     state.push(Name.SECTION);
-    Assert.assertTrue(state.isElement(Name.SECTION));
+    assertTrue(state.isElement(Name.SECTION));
     state.commit();
-    Assert.assertFalse(state.isElement(Name.SECTION));
-    Assert.assertNull(state.current());
+    assertFalse(state.isElement(Name.SECTION));
+    assertNull(state.current());
     // Empty fragment with paragraph
     state.push(Name.SECTION);
     state.push(Name.P, "test");
-    Assert.assertTrue(state.isElement(Name.P));
+    assertTrue(state.isElement(Name.P));
     state.commit();
-    Assert.assertFalse(state.isElement(Name.P));
-    Assert.assertTrue(state.isElement(Name.SECTION));
+    assertFalse(state.isElement(Name.P));
+    assertTrue(state.isElement(Name.SECTION));
   }
 
   @Test
-  public void testStateCurrent() {
+  void testStateCurrent() {
     State state = new State();
-    Assert.assertNull(state.current());
+    assertNull(state.current());
     state.push(Name.SECTION);
-    Assert.assertEquals(Name.SECTION, state.current().getElement());
-    Assert.assertNotEquals(Name.P, state.current().getElement());
+    assertEquals(Name.SECTION, state.current().getElement());
+    assertNotEquals(Name.P, state.current().getElement());
     state.push(Name.P);
-    Assert.assertNotEquals(Name.SECTION, state.current().getElement());
-    Assert.assertEquals(Name.P, state.current().getElement());
+    assertNotEquals(Name.SECTION, state.current().getElement());
+    assertEquals(Name.P, state.current().getElement());
   }
 
   @Test
-  public void testStateIsElement() {
+  void testStateIsElement() {
     State state = new State();
-    Assert.assertFalse(state.isElement(null));
-    Assert.assertFalse(state.isElement(Name.SECTION));
-    Assert.assertFalse(state.isElement(Name.P));
+    assertFalse(state.isElement(null));
+    assertFalse(state.isElement(Name.SECTION));
+    assertFalse(state.isElement(Name.P));
     state.push(Name.SECTION);
-    Assert.assertTrue(state.isElement(Name.SECTION));
-    Assert.assertFalse(state.isElement(Name.P));
+    assertTrue(state.isElement(Name.SECTION));
+    assertFalse(state.isElement(Name.P));
     state.push(Name.P);
-    Assert.assertFalse(state.isElement(Name.SECTION));
-    Assert.assertTrue(state.isElement(Name.P));
+    assertFalse(state.isElement(Name.SECTION));
+    assertTrue(state.isElement(Name.P));
   }
 
   @Test
-  public void testStateIsDescendantOf() {
+  void testStateIsDescendantOf() {
     State state = new State();
-    Assert.assertFalse(state.isDescendantOf(Name.P));
+    assertFalse(state.isDescendantOf(Name.P));
     state.push(Name.SECTION);
-    Assert.assertFalse(state.isDescendantOf(Name.P));
+    assertFalse(state.isDescendantOf(Name.P));
     state.push(Name.P);
-    Assert.assertTrue(state.isDescendantOf(Name.P));
+    assertTrue(state.isDescendantOf(Name.P));
     state.push(Name.STRONG);
-    Assert.assertTrue(state.isDescendantOf(Name.P));
-    Assert.assertTrue(state.isDescendantOf(Name.SECTION));
+    assertTrue(state.isDescendantOf(Name.P));
+    assertTrue(state.isDescendantOf(Name.SECTION));
   }
 
   /**
    * Returns the Markdown text as HTML using the block parser.
    *
    * @param lines The text to parse
-   *
    * @return The corresponding HTML as a string.
-   *
    * @throws IOException If thrown by
    */
   private static String toHTML(List<String> lines) {

@@ -15,147 +15,148 @@
  */
 package org.pageseeder.psml.md;
 
-import java.io.*;
-import java.util.Objects;
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.pageseeder.psml.PSML;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.toc.Tests;
 
-public final class MarkdownSerializerTest {
+import java.io.*;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+final class MarkdownSerializerTest {
 
   @Test
-  public void testDoubleEmphasis() {
-    Assert.assertEquals("__test__", toMarkdown("<bold>test</bold>"));
-    Assert.assertEquals("A __test__!", toMarkdown("<wrapper>A <bold>test</bold>!</wrapper>"));
-    Assert.assertEquals("A __test__!", toMarkdown("<wrapper>A <bold>test</bold>!</wrapper>"));
-    Assert.assertEquals("extra__test__", toMarkdown( "<wrapper>extra<bold>test</bold></wrapper>"));
-    Assert.assertEquals("__extra__test", toMarkdown( "<wrapper><bold>extra</bold>test</wrapper>"));
-    Assert.assertEquals("ex__tra__test", toMarkdown( "<wrapper>ex<bold>tra</bold>test</wrapper>"));
-    Assert.assertEquals("____", toMarkdown( "<bold/>"));
+  void testDoubleEmphasis() {
+    assertEquals("__test__", toMarkdown("<bold>test</bold>"));
+    assertEquals("A __test__!", toMarkdown("<wrapper>A <bold>test</bold>!</wrapper>"));
+    assertEquals("A __test__!", toMarkdown("<wrapper>A <bold>test</bold>!</wrapper>"));
+    assertEquals("extra__test__", toMarkdown("<wrapper>extra<bold>test</bold></wrapper>"));
+    assertEquals("__extra__test", toMarkdown("<wrapper><bold>extra</bold>test</wrapper>"));
+    assertEquals("ex__tra__test", toMarkdown("<wrapper>ex<bold>tra</bold>test</wrapper>"));
+    assertEquals("____", toMarkdown("<bold/>"));
   }
 
   @Test
-  public void testSimpleEmphasis() {
-    Assert.assertEquals("*test*", toMarkdown( "<italic>test</italic>"));
-    Assert.assertEquals("A *test*!", toMarkdown( "<wrapper>A <italic>test</italic>!</wrapper>"));
-    Assert.assertEquals("extra*test*", toMarkdown( "<wrapper>extra<italic>test</italic></wrapper>"));
-    Assert.assertEquals("*extra*test", toMarkdown( "<wrapper><italic>extra</italic>test</wrapper>"));
-    Assert.assertEquals("ex*tra*test", toMarkdown( "<wrapper>ex<italic>tra</italic>test</wrapper>"));
-    Assert.assertEquals("**", toMarkdown( "<italic/>"));
+  void testSimpleEmphasis() {
+    assertEquals("*test*", toMarkdown("<italic>test</italic>"));
+    assertEquals("A *test*!", toMarkdown("<wrapper>A <italic>test</italic>!</wrapper>"));
+    assertEquals("extra*test*", toMarkdown("<wrapper>extra<italic>test</italic></wrapper>"));
+    assertEquals("*extra*test", toMarkdown("<wrapper><italic>extra</italic>test</wrapper>"));
+    assertEquals("ex*tra*test", toMarkdown("<wrapper>ex<italic>tra</italic>test</wrapper>"));
+    assertEquals("**", toMarkdown("<italic/>"));
   }
 
   @Test
-  public void testCode() {
-    Assert.assertEquals("`test`", toMarkdown("<monospace>test</monospace>"));
-    Assert.assertEquals("A `test`!", toMarkdown("<wrapper>A <monospace>test</monospace>!</wrapper>"));
-    Assert.assertEquals("extra`test`", toMarkdown("<wrapper>extra<monospace>test</monospace></wrapper>"));
-    Assert.assertEquals("`extra`test", toMarkdown("<wrapper><monospace>extra</monospace>test</wrapper>"));
-    Assert.assertEquals("ex`tra`test", toMarkdown("<wrapper>ex<monospace>tra</monospace>test</wrapper>"));
-    Assert.assertEquals("``", toMarkdown("<monospace/>"));
+  void testCode() {
+    assertEquals("`test`", toMarkdown("<monospace>test</monospace>"));
+    assertEquals("A `test`!", toMarkdown("<wrapper>A <monospace>test</monospace>!</wrapper>"));
+    assertEquals("extra`test`", toMarkdown("<wrapper>extra<monospace>test</monospace></wrapper>"));
+    assertEquals("`extra`test", toMarkdown("<wrapper><monospace>extra</monospace>test</wrapper>"));
+    assertEquals("ex`tra`test", toMarkdown("<wrapper>ex<monospace>tra</monospace>test</wrapper>"));
+    assertEquals("``", toMarkdown("<monospace/>"));
 
     // From Markdown spec
-    Assert.assertEquals("Use the `printf()` function.", toMarkdown( "<wrapper>Use the <monospace>printf()</monospace> function.</wrapper>"));
-    Assert.assertEquals("Please don't use any `<blink>` tags.", toMarkdown( "<wrapper>Please don't use any <monospace>&lt;blink&gt;</monospace> tags.</wrapper>"));
-    Assert.assertEquals("`&#8212;` is the decimal-encoded equivalent of `&mdash;`.", toMarkdown( "<wrapper><monospace>&amp;#8212;</monospace> is the decimal-encoded equivalent of <monospace>&amp;mdash;</monospace>.</wrapper>"));
+    assertEquals("Use the `printf()` function.", toMarkdown("<wrapper>Use the <monospace>printf()</monospace> function.</wrapper>"));
+    assertEquals("Please don't use any `<blink>` tags.", toMarkdown("<wrapper>Please don't use any <monospace>&lt;blink&gt;</monospace> tags.</wrapper>"));
+    assertEquals("`&#8212;` is the decimal-encoded equivalent of `&mdash;`.", toMarkdown("<wrapper><monospace>&amp;#8212;</monospace> is the decimal-encoded equivalent of <monospace>&amp;mdash;</monospace>.</wrapper>"));
   }
 
   @Test
-  public void testUnderline() {
+  void testUnderline() {
     MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
-    Assert.assertEquals(MarkdownOutputOptions.UnderlineFormat.IGNORE, defaultOptions.underline());
+    assertEquals(MarkdownOutputOptions.UnderlineFormat.IGNORE, defaultOptions.underline());
     MarkdownOutputOptions ignoreOption = defaultOptions.underline(MarkdownOutputOptions.UnderlineFormat.IGNORE);
-    Assert.assertEquals("test", toMarkdown("<underline>test</underline>", ignoreOption));
-    Assert.assertEquals("A test!", toMarkdown("<wrapper>A <underline>test</underline>!</wrapper>", ignoreOption));
-    Assert.assertEquals("", toMarkdown("<underline/>", ignoreOption));
+    assertEquals("test", toMarkdown("<underline>test</underline>", ignoreOption));
+    assertEquals("A test!", toMarkdown("<wrapper>A <underline>test</underline>!</wrapper>", ignoreOption));
+    assertEquals("", toMarkdown("<underline/>", ignoreOption));
     MarkdownOutputOptions htmlOption = defaultOptions.underline(MarkdownOutputOptions.UnderlineFormat.HTML);
-    Assert.assertEquals("<u>test</u>", toMarkdown("<underline>test</underline>", htmlOption));
-    Assert.assertEquals("A <u>test</u>!", toMarkdown("<wrapper>A <underline>test</underline>!</wrapper>", htmlOption));
-    Assert.assertEquals("", toMarkdown("<underline/>", htmlOption));
+    assertEquals("<u>test</u>", toMarkdown("<underline>test</underline>", htmlOption));
+    assertEquals("A <u>test</u>!", toMarkdown("<wrapper>A <underline>test</underline>!</wrapper>", htmlOption));
+    assertEquals("", toMarkdown("<underline/>", htmlOption));
   }
 
   @Test
-  public void testSuperScript() {
+  void testSuperScript() {
     MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
-    Assert.assertEquals(MarkdownOutputOptions.SuperSubFormat.IGNORE, defaultOptions.superSub());
+    assertEquals(MarkdownOutputOptions.SuperSubFormat.IGNORE, defaultOptions.superSub());
     MarkdownOutputOptions ignoreOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.IGNORE);
-    Assert.assertEquals("trademark", toMarkdown("<sup>trademark</sup>", ignoreOption));
-    Assert.assertEquals("1st Ca2+", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", ignoreOption));
-    Assert.assertEquals("", toMarkdown("<sup/>", ignoreOption));
+    assertEquals("trademark", toMarkdown("<sup>trademark</sup>", ignoreOption));
+    assertEquals("1st Ca2+", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", ignoreOption));
+    assertEquals("", toMarkdown("<sup/>", ignoreOption));
     MarkdownOutputOptions extendedOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.CARET_TILDE);
-    Assert.assertEquals("^trademark^", toMarkdown("<sup>trademark</sup>", extendedOption));
-    Assert.assertEquals("1^st^ Ca^2+^", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", extendedOption));
-    Assert.assertEquals("", toMarkdown("<sup/>", extendedOption));
+    assertEquals("^trademark^", toMarkdown("<sup>trademark</sup>", extendedOption));
+    assertEquals("1^st^ Ca^2+^", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", extendedOption));
+    assertEquals("", toMarkdown("<sup/>", extendedOption));
     MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE);
-    Assert.assertEquals("ᵗʳᵃᵈᵉᵐᵃʳᵏ", toMarkdown("<sup>trademark</sup>", unicodeOption));
-    Assert.assertEquals("1ˢᵗ Ca²⁺", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", unicodeOption));
-    Assert.assertEquals("", toMarkdown("<sup/>", unicodeOption));
+    assertEquals("ᵗʳᵃᵈᵉᵐᵃʳᵏ", toMarkdown("<sup>trademark</sup>", unicodeOption));
+    assertEquals("1ˢᵗ Ca²⁺", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", unicodeOption));
+    assertEquals("", toMarkdown("<sup/>", unicodeOption));
     MarkdownOutputOptions htmlOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.HTML);
-    Assert.assertEquals("<sup>trademark</sup>", toMarkdown("<sup>trademark</sup>", htmlOption));
-    Assert.assertEquals("1<sup>st</sup> Ca<sup>2+</sup>", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", htmlOption));
-    Assert.assertEquals("", toMarkdown("<sup/>", htmlOption));
+    assertEquals("<sup>trademark</sup>", toMarkdown("<sup>trademark</sup>", htmlOption));
+    assertEquals("1<sup>st</sup> Ca<sup>2+</sup>", toMarkdown("<wrapper>1<sup>st</sup> Ca<sup>2+</sup></wrapper>", htmlOption));
+    assertEquals("", toMarkdown("<sup/>", htmlOption));
   }
 
   @Test
-  public void testSubScript() {
+  void testSubScript() {
     MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
-    Assert.assertEquals(MarkdownOutputOptions.SuperSubFormat.IGNORE, defaultOptions.superSub());
+    assertEquals(MarkdownOutputOptions.SuperSubFormat.IGNORE, defaultOptions.superSub());
     MarkdownOutputOptions ignoreOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.IGNORE);
-    Assert.assertEquals("2(a)", toMarkdown("<sub>2(a)</sub>", ignoreOption));
-    Assert.assertEquals("H2O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", ignoreOption));
-    Assert.assertEquals("", toMarkdown("<sub/>", ignoreOption));
+    assertEquals("2(a)", toMarkdown("<sub>2(a)</sub>", ignoreOption));
+    assertEquals("H2O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", ignoreOption));
+    assertEquals("", toMarkdown("<sub/>", ignoreOption));
     MarkdownOutputOptions extendedOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.CARET_TILDE);
-    Assert.assertEquals("~2(a)~", toMarkdown("<sub>2(a)</sub>", extendedOption));
-    Assert.assertEquals("H~2~O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", extendedOption));
-    Assert.assertEquals("", toMarkdown("<sub/>", extendedOption));
+    assertEquals("~2(a)~", toMarkdown("<sub>2(a)</sub>", extendedOption));
+    assertEquals("H~2~O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", extendedOption));
+    assertEquals("", toMarkdown("<sub/>", extendedOption));
     MarkdownOutputOptions unicodeOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.UNICODE);
-    Assert.assertEquals("₂₍ₐ₎", toMarkdown("<sub>2(a)</sub>", unicodeOption));
-    Assert.assertEquals("H₂O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", unicodeOption));
-    Assert.assertEquals("", toMarkdown("<sub/>", unicodeOption));
+    assertEquals("₂₍ₐ₎", toMarkdown("<sub>2(a)</sub>", unicodeOption));
+    assertEquals("H₂O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", unicodeOption));
+    assertEquals("", toMarkdown("<sub/>", unicodeOption));
     MarkdownOutputOptions htmlOption = defaultOptions.superSub(MarkdownOutputOptions.SuperSubFormat.HTML);
-    Assert.assertEquals("<sub>2(a)</sub>", toMarkdown("<sub>2(a)</sub>", htmlOption));
-    Assert.assertEquals("H<sub>2</sub>O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", htmlOption));
-    Assert.assertEquals("", toMarkdown("<sub/>", htmlOption));
+    assertEquals("<sub>2(a)</sub>", toMarkdown("<sub>2(a)</sub>", htmlOption));
+    assertEquals("H<sub>2</sub>O!", toMarkdown("<wrapper>H<sub>2</sub>O!</wrapper>", htmlOption));
+    assertEquals("", toMarkdown("<sub/>", htmlOption));
   }
 
   @Test
-  public void testCodeEscape() {
-//    Assert.assertEquals("`` test ``", toMarkdown("<wrapper><monospace>test</monospace></wrapper>"));
-//    Assert.assertEquals("`` `test` ``", toMarkdown("<wrapper><monospace>`test`</monospace></wrapper>"));
-//    Assert.assertEquals("A `` test ``!", toMarkdown("<wrapper>A <monospace>test</monospace>!</wrapper>"));
-//    Assert.assertEquals("A `` `test` ``!", toMarkdown("<wrapper>A <monospace>`test`</monospace>!</wrapper>"));
+  void testCodeEscape() {
+//    assertEquals("`` test ``", toMarkdown("<wrapper><monospace>test</monospace></wrapper>"));
+//    assertEquals("`` `test` ``", toMarkdown("<wrapper><monospace>`test`</monospace></wrapper>"));
+//    assertEquals("A `` test ``!", toMarkdown("<wrapper>A <monospace>test</monospace>!</wrapper>"));
+//    assertEquals("A `` `test` ``!", toMarkdown("<wrapper>A <monospace>`test`</monospace>!</wrapper>"));
 
     // From Markdown spec
-//    Assert.assertEquals("``There is a literal backtick (`) here.``", toMarkdown("<monospace>There is a literal backtick (`) here.</monospace>" ));
-//    Assert.assertEquals("A single backtick in a code span: `` ` ``", toMarkdown("A single backtick in a code span: <monospace>`</monospace>"));
-//    Assert.assertEquals("A backtick-delimited string in a code span: <monospace>`foo`</monospace>", toMarkdown("A backtick-delimited string in a code span: `` `foo` ``"));
+//    assertEquals("``There is a literal backtick (`) here.``", toMarkdown("<monospace>There is a literal backtick (`) here.</monospace>" ));
+//    assertEquals("A single backtick in a code span: `` ` ``", toMarkdown("A single backtick in a code span: <monospace>`</monospace>"));
+//    assertEquals("A backtick-delimited string in a code span: <monospace>`foo`</monospace>", toMarkdown("A backtick-delimited string in a code span: `` `foo` ``"));
   }
 
   @Test
-  public void testImage() {
+  void testImage() {
     MarkdownOutputOptions defaultOptions = MarkdownOutputOptions.defaultOptions();
-    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions));
-    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.LOCAL)));
-    Assert.assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.EXTERNAL)));
-    Assert.assertEquals("<img src=\"/path/to/img.jpg\" alt=\"Alt text\" />", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.IMG_TAG)));
-    Assert.assertEquals("", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.NONE)));
+    assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions));
+    assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.LOCAL)));
+    assertEquals("![Alt text](/path/to/img.jpg)", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.EXTERNAL)));
+    assertEquals("<img src=\"/path/to/img.jpg\" alt=\"Alt text\" />", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.IMG_TAG)));
+    assertEquals("", toMarkdown("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", defaultOptions.image(MarkdownOutputOptions.ImageFormat.NONE)));
   }
 
   @Test
-  public void testRef() {
-    Assert.assertEquals("[test](http://example.net/)", toMarkdown("<link href=\"http://example.net/\">test</link>"));
+  void testRef() {
+    assertEquals("[test](http://example.net/)", toMarkdown("<link href=\"http://example.net/\">test</link>"));
   }
 
   @Test
-  public void testList() {
+  void testList() {
     String psml = "<list><item>Item 1</item><item>Item 2</item></list>";
-    Assert.assertEquals(" * Item 1\n * Item 2\n", toMarkdown(psml));
+    assertEquals(" * Item 1\n * Item 2\n", toMarkdown(psml));
   }
 
   @Test
-  public void testKitchenSink() throws IOException {
+  void testKitchenSink() throws IOException {
     PSMLElement psml = getTestFile("kitchen_sink.psml");
     MarkdownSerializer serializer = new MarkdownSerializer();
     StringWriter out = new StringWriter();
@@ -164,7 +165,7 @@ public final class MarkdownSerializerTest {
   }
 
   @Test
-  public void testProperties() throws IOException {
+  void testProperties() throws IOException {
     PSMLElement psml = getTestFile("clock_synchronisation.psml");
     MarkdownSerializer serializer = new MarkdownSerializer();
     StringWriter out = new StringWriter();
@@ -180,7 +181,6 @@ public final class MarkdownSerializerTest {
    * Returns the Markdown text as PSML using the inline parser.
    *
    * @param text The text to parse
-   *
    * @return The corresponding PSML as a string.
    */
   private static String toMarkdown(String text, MarkdownOutputOptions options) {
@@ -201,7 +201,7 @@ public final class MarkdownSerializerTest {
     try (Reader r = new InputStreamReader(Objects.requireNonNull(Tests.class.getResourceAsStream("/org/pageseeder/psml/md/" + filename)))) {
       return PSML.load(r);
     } catch (IOException ex) {
-      throw new UncheckedIOException("Unable to load test file '"+filename+"'", ex);
+      throw new UncheckedIOException("Unable to load test file '" + filename + "'", ex);
     }
   }
 
