@@ -1,15 +1,13 @@
 [versions]
 junit = "5.13.2"
 junit-platform = "1.13.2"
-hamcrest = "2.0.0.0"
 slf4j = "2.0.17"
 xmlunit = "2.10.0"
 
 [libraries]
 annotations = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version = "2.3.100" }
 commons-io = { module = "commons-io:commons-io", version = "2.19.0" }
-hamcrest-java = { module = "org.hamcrest:java-hamcrest", version.ref = "hamcrest"}
-hamcrest-junit = { module = "org.hamcrest:hamcrest-junit", version.ref = "hamcrest"}
+hamcrest = { module = "org.hamcrest:hamcrest", version = "2.2"}
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
@@ -25,7 +23,7 @@ xmlunit-core = { module = "org.xmlunit:xmlunit-core", version.ref = "xmlunit"}
 xmlunit-matchers = { module = "org.xmlunit:xmlunit-matchers", version.ref = "xmlunit"}
 
 [bundles]
-junit-testing = [
+junit = [
     "junit-jupiter-api",
     "junit-platform-launcher",
     "junit-platform-engine"

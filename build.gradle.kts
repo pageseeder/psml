@@ -34,16 +34,15 @@ dependencies {
   api(libs.pso.diffx)
 
   testImplementation(platform(libs.junit.bom))
-  testImplementation(libs.bundles.junit.testing)
-  testImplementation(libs.slf4j.simple)
-  testImplementation(libs.hamcrest.java)
-  testImplementation(libs.hamcrest.junit)
+  testImplementation(libs.bundles.junit)
+  testImplementation(libs.hamcrest)
   testImplementation(libs.xmlunit.core)
   testImplementation(libs.xmlunit.matchers)
   testImplementation(libs.commons.io)
   testImplementation(libs.annotations)
 
   testRuntimeOnly(libs.junit.jupiter.engine)
+  testRuntimeOnly(libs.slf4j.simple)
   testRuntimeOnly (libs.saxon.he)
   testRuntimeOnly(libs.rhino.engine) {
     because("Required by TeX/AsciiMath conversion in Java 15+")
