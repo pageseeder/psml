@@ -12,7 +12,6 @@ hamcrest-java = { module = "org.hamcrest:java-hamcrest", version.ref = "hamcrest
 hamcrest-junit = { module = "org.hamcrest:hamcrest-junit", version.ref = "hamcrest"}
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 junit-platform-engine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junit-platform" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
@@ -28,7 +27,6 @@ xmlunit-matchers = { module = "org.xmlunit:xmlunit-matchers", version.ref = "xml
 [bundles]
 junit-testing = [
     "junit-jupiter-api",
-    "junit-vintage-engine",
     "junit-platform-launcher",
     "junit-platform-engine"
 ]
