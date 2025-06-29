@@ -1,6 +1,8 @@
 [versions]
-slf4j = "2.0.17"
+junit = "5.13.2"
+junit-platform = "1.13.2"
 hamcrest = "2.0.0.0"
+slf4j = "2.0.17"
 xmlunit = "2.10.0"
 
 [libraries]
@@ -8,7 +10,12 @@ annotations = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version =
 commons-io = { module = "commons-io:commons-io", version = "2.19.0" }
 hamcrest-java = { module = "org.hamcrest:java-hamcrest", version.ref = "hamcrest"}
 hamcrest-junit = { module = "org.hamcrest:hamcrest-junit", version.ref = "hamcrest"}
-junit = { module = "junit:junit", version = "4.13.1" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
+junit-platform-engine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junit-platform" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 pso-diffx = { module = "org.pageseeder.diffx:pso-diffx", version = "1.2.1" }
 pso-xmlwriter = { module = "org.pageseeder.xmlwriter:pso-xmlwriter", version = "1.0.4" }
 rhino-engine = { module = "org.mozilla:rhino-engine", version = "1.7.14" }
@@ -17,6 +24,14 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 xmlunit-core = { module = "org.xmlunit:xmlunit-core", version.ref = "xmlunit"}
 xmlunit-matchers = { module = "org.xmlunit:xmlunit-matchers", version.ref = "xmlunit"}
+
+[bundles]
+junit-testing = [
+    "junit-jupiter-api",
+    "junit-vintage-engine",
+    "junit-platform-launcher",
+    "junit-platform-engine"
+]
 
 [plugins]
 jreleaser = { id = "org.jreleaser", version = "1.18.0" }

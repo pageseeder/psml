@@ -33,7 +33,8 @@ dependencies {
   api(libs.pso.xmlwriter)
   api(libs.pso.diffx)
 
-  testImplementation(libs.junit)
+  testImplementation(platform(libs.junit.bom))
+  testImplementation(libs.bundles.junit.testing)
   testImplementation(libs.slf4j.simple)
   testImplementation(libs.hamcrest.java)
   testImplementation(libs.hamcrest.junit)
@@ -42,6 +43,7 @@ dependencies {
   testImplementation(libs.commons.io)
   testImplementation(libs.annotations)
 
+  testRuntimeOnly(libs.junit.jupiter.engine)
   testRuntimeOnly (libs.saxon.he)
   testRuntimeOnly(libs.rhino.engine) {
     because("Required by TeX/AsciiMath conversion in Java 15+")
@@ -51,6 +53,10 @@ dependencies {
 tasks.wrapper {
   gradleVersion = "8.13"
   distributionType = Wrapper.DistributionType.BIN
+}
+
+tasks.test {
+  useJUnitPlatform()
 }
 
 tasks.withType<Javadoc> {
