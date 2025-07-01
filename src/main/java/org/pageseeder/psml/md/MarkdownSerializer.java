@@ -146,17 +146,22 @@ public class MarkdownSerializer {
       return "Properties " + (++this.propertiesCounter);
     }
 
-    String toRelativeLocalPath(String href) {
+    String toRelativeLocalPath(String href, DiagnosticCollector collector) {
       if (href.startsWith("http://") || href.startsWith("https://")) return href;
       if (this.path.isEmpty()) return href;
       // Compute path relative to state.path
-      Path base = Paths.get(this.path).getParent();
-      Path target = Paths.get(href);
-      if (base == null) {
+      try {
+        Path base = Paths.get(this.path).getParent();
+        Path target = Paths.get(href);
+        if (base == null) {
+          return href;
+        }
+        Path relative = base.relativize(target);
+        return relative.toString().replace('\\', '/');
+      } catch (IllegalArgumentException ex) {
+        collector.warn("Unable to relativize path " + href + " to " + this.path);
         return href;
       }
-      Path relative = base.relativize(target);
-      return relative.toString().replace('\\', '/');
     }
 
     String toExternalUrl(String href) {
@@ -426,8 +431,20 @@ public class MarkdownSerializer {
     }
 
     private void serializeBlockXref(PSMLElement blockXref, Appendable out) throws IOException {
-      if (!blockXref.getChildElements().isEmpty()) {
-        // TODO handle transclusions
+      List<PSMLElement> children = blockXref.getChildElements(Name.DOCUMENT, Name.FRAGMENT, Name.XREF_FRAGMENT, Name.MEDIA_FRAGMENT, Name.XREF_FRAGMENT);
+      if (!children.isEmpty()) {
+        PSMLElement child = children.get(0);
+        if (child.getElement() == Name.DOCUMENT) {
+          List<PSMLElement> sections = child.getChildElements(Name.SECTION);
+          for (PSMLElement section : sections) {
+            List<PSMLElement> fragments = section.getChildElements();
+            for (PSMLElement fragment : fragments) {
+              serialize(fragment, out);
+            }
+          }
+        } else {
+          serialize(child, out);
+        }
       } else {
         serializeXref(blockXref, out);
       }
@@ -540,7 +557,7 @@ public class MarkdownSerializer {
       }
       switch (options.image()) {
         case LOCAL:
-          String href = state.toRelativeLocalPath(src);
+          String href = state.toRelativeLocalPath(src, collector);
           out.append("![").append(alt).append("](").append(href).append(")");
           break;
         case EXTERNAL:
@@ -876,7 +893,7 @@ public class MarkdownSerializer {
           out.append("[").append(text).append("](").append(externalHref).append(")");
           break;
         case LOCAL_LINK:
-          String localHref = state.toRelativeLocalPath(url);
+          String localHref = state.toRelativeLocalPath(url, this.collector);
           out.append("[").append(text).append("](").append(localHref).append(")");
           break;
         case BOLD_TEXT:
