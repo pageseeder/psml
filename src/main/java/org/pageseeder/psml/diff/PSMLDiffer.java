@@ -130,9 +130,10 @@ public final class PSMLDiffer {
     loader.setConfig(this.config);
     ExtendedWhitespaceStripper stripper = new ExtendedWhitespaceStripper();
     stripper.setAlwaysIgnore("fragment", "table", "row", "list", "nlist");
-    stripper.setMaybeIgnore("item", "block", "cell", "hcell");
-    Sequence seqB = stripper.process(loader.load(to));
-    Sequence seqA = stripper.process(loader.load(from));
+    stripper.setMaybeIgnore("item", "block", "cell", "hcell", "para", "blockxref");
+    BlockLabelNormalizer normalizer = BlockLabelNormalizer.forPsml();
+    Sequence seqB = normalizer.process(stripper.process(loader.load(to)));
+    Sequence seqA = normalizer.process(stripper.process(loader.load(from)));
     LOGGER.debug("Sequence A: {} (granularity={})", seqA.size(), this.config.granularity());
     LOGGER.debug("Sequence B: {} (granularity={})", seqB.size(), this.config.granularity());
 
@@ -194,7 +195,7 @@ public final class PSMLDiffer {
    * @return {@code true} if the operation completed successfully, {@code false} if an error occurred.
    */
   private boolean diffGasherbrum(List<? extends XMLToken> from, List<? extends XMLToken> to, org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
-    GasherbrumIVAlgorithm algorithm = new GasherbrumIVAlgorithm(.5f);
+    GasherbrumVAlgorithm algorithm = new GasherbrumVAlgorithm(.5f);
     algorithm.diff(from, to, handler);
     return !algorithm.hasError();
   }

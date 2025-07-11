@@ -1,21 +1,22 @@
 package org.pageseeder.psml.diff;
 
-
+import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.diffx.action.Operation;
 import org.pageseeder.diffx.action.OperationsBuffer;
 import org.pageseeder.diffx.algorithm.MatrixXMLAlgorithm;
-import org.pageseeder.diffx.algorithm.MyersGreedyAlgorithm;
 import org.pageseeder.diffx.api.DiffAlgorithm;
 import org.pageseeder.diffx.api.DiffHandler;
 import org.pageseeder.diffx.api.Operator;
-import org.pageseeder.diffx.handler.PostXMLFixer;
-import org.pageseeder.diffx.similarity.Similarity;
+import org.pageseeder.diffx.handler.XMLBalanceCheckFilter;
+import org.pageseeder.diffx.handler.XMLEventBalancer;
+import org.pageseeder.diffx.similarity.EditSimilarity;
+import org.pageseeder.diffx.similarity.ElementSimilarity;
 import org.pageseeder.diffx.similarity.SimilarityWagnerFischerAlgorithm;
+import org.pageseeder.diffx.token.EndElementToken;
+import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.XMLTokenType;
 import org.pageseeder.diffx.token.impl.XMLElement;
-import org.pageseeder.diffx.token.impl.XMLEndElement;
-import org.pageseeder.diffx.token.impl.XMLStartElement;
 
 import java.util.*;
 
@@ -38,25 +39,26 @@ import java.util.*;
  *
  * @author Christophe Lauret
  *
- * @since 1.5.1
- * @version 1.5.1
+ * @since 1.6.5
+ * @version 1.6.5
  */
-@Deprecated(forRemoval = true)
-public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
+public final class GasherbrumVAlgorithm implements DiffAlgorithm<XMLToken> {
 
-  /**
-   * A predefined immutable set of block names representing specific structural elements
-   * in XML documents. These block names are used in various methods of the
-   * GasherbrumIIIAlgorithm class to identify and process specific blocks
-   * during XML token comparisons and transformations.
-   */
-  private static final Set<String> BLOCKS = Set.of("heading", "item", "para", "preformat", "row");
+  private static final Set<String> DEFAULT_BLOCKS = Set.of(
+      "heading", "item", "para", "preformat", "row"
+  );
 
   /**
    * The default similarity threshold used to determine whether two tokens
    * are considered similar in the context of the diffing algorithm.
    */
   public static final float DEFAULT_SIMILARITY_THRESHOLD = 0.5f;
+
+  /**
+   * The default similarity threshold used to determine whether two tokens
+   * are considered similar in the context of the diffing algorithm.
+   */
+  public static final double DEFAULT_LENGTH_BOOST_FACTOR = 0.1;
 
   /**
    * Defines the similarity threshold used to determine whether two tokens
@@ -68,36 +70,48 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    */
   private final float similarityThreshold;
 
-  private boolean hasError = false;
+  private final Set<String> blocks;
 
-  public GasherbrumIIIAlgorithm() {
+  public GasherbrumVAlgorithm() {
     this.similarityThreshold = DEFAULT_SIMILARITY_THRESHOLD;
+    this.blocks = DEFAULT_BLOCKS;
   }
 
-  public GasherbrumIIIAlgorithm(float similarityThreshold) {
+  public GasherbrumVAlgorithm(float similarityThreshold) {
     this.similarityThreshold = similarityThreshold;
+    this.blocks = DEFAULT_BLOCKS;
   }
+
+  public float getSimilarityThreshold() {
+    return this.similarityThreshold;
+  }
+
+  public Set<String> getBlocks() {
+    return this.blocks;
+  }
+
+  private boolean hasError = false;
 
   @Override
   public void diff(List<? extends XMLToken> from, List<? extends XMLToken> to, DiffHandler<XMLToken> handler) {
     List<XMLToken> gFrom = fold(from);
     List<XMLToken> gTo = fold(to);
+
     OperationsBuffer<XMLToken> buffer = diffBySimilarity(gFrom, gTo);
 
     // Diff within each structural block
-    PostXMLFixer fixer = new PostXMLFixer(handler);
-    fixer.start();
-    diffAndUnfold(gFrom, gTo, buffer, fixer);
-    fixer.end();
-    hasError = fixer.hasError();
+    XMLBalanceCheckFilter checker = new XMLBalanceCheckFilter(handler);
+    XMLEventBalancer balancer = new XMLEventBalancer(checker);
+    ShiftLeftFilter shifter = new ShiftLeftFilter(balancer);
+    shifter.start();
+    diffAndUnfold(gFrom, gTo, buffer, shifter);
+    shifter.end();
+    if (!checker.isBalanced()) {
+      this.hasError = true;
+    }
   }
 
-  /**
-   * Indicates whether an error occurred during the operation or processing.
-   *
-   * @return true if an error has occurred; false otherwise.
-   */
-  boolean hasError() {
+  public boolean hasError() {
     return hasError;
   }
 
@@ -113,7 +127,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    */
   private OperationsBuffer<XMLToken> diffBySimilarity(List<XMLToken> from, List<XMLToken> to) {
     DiffAlgorithm<XMLToken> algorithm = new SimilarityWagnerFischerAlgorithm<>(
-        new XMLTokenSimilarityFunction(),
+        new ElementSimilarity(new EditSimilarity<>(), DEFAULT_LENGTH_BOOST_FACTOR),
         this.similarityThreshold
     );
     OperationsBuffer<XMLToken> buffer = new OperationsBuffer<>();
@@ -171,15 +185,25 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
    * @param handler   The {@link DiffHandler} used to process the computed differences, must not be null.
    */
   void diffElement(XMLElement from, XMLElement to, Operator operator, DiffHandler<XMLToken> handler) {
-    boolean recurse = childHasBlock(from, to);
+    boolean recurse = hasMultipleOrDifferentBlocks(from, to);
     if (recurse) {
       handler.handle(operator, from.getStart());
       diff(from.getContent(), to.getContent(), handler);
       handler.handle(operator, from.getEnd());
     } else {
       MatrixXMLAlgorithm matrix = new MatrixXMLAlgorithm();
-      matrix.diff(from.tokens(), to.tokens(), handler);
+      Operator op = getOp(from.getStart(), to.getStart());
+      if (op != null) handler.handle(op, from.getStart());
+      matrix.diff(from.getContent(), to.getContent(), handler);
+      if (op != null) handler.handle(op, from.getEnd());
     }
+  }
+
+  private @Nullable Operator getOp(StartElementToken from, StartElementToken to) {
+    boolean fromIsPseudo = from instanceof PseudoStartToken;
+    boolean toIsPseudo = to instanceof PseudoStartToken;
+    if (fromIsPseudo) return toIsPseudo ? null : Operator.INS;
+    return toIsPseudo ? Operator.DEL : Operator.MATCH;
   }
 
   /**
@@ -197,10 +221,10 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
     List<XMLToken> children = null;
     for (XMLToken token : in) {
       if (children != null) {
-        if (token.getType() == XMLTokenType.END_ELEMENT && BLOCKS.contains(token.getName())
+        if (token.getType() == XMLTokenType.END_ELEMENT && isBlock(token)
             && stack.size() == 1 && stack.peek().getName().equals(token.getName())) {
-          XMLStartElement start = (XMLStartElement) stack.pop();
-          XMLEndElement end = (XMLEndElement) token;
+          StartElementToken start = (StartElementToken) stack.pop();
+          EndElementToken end = (EndElementToken) token;
           out.add(new XMLElement(start, end, children));
           children = null;
         } else {
@@ -212,7 +236,7 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
           children.add(token);
         }
       } else {
-        if (token.getType() == XMLTokenType.START_ELEMENT && BLOCKS.contains(token.getName())) {
+        if (token.getType() == XMLTokenType.START_ELEMENT && isBlock(token)) {
           children = new ArrayList<>();
           stack.push(token);
         } else {
@@ -223,113 +247,47 @@ public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
     return out;
   }
 
-  /**
-   * Checks if either the source or target {@link XMLElement} contains at least one child element
-   * matching the predefined block start tokens (defined in {@code BLOCK_STARTS})
-   * and if both have more than two child elements.
-   *
-   * @param from The source {@link XMLElement} to evaluate, must not be null.
-   * @param to   The target {@link XMLElement} to evaluate, must not be null.
-   * @return {@code true} if either {@code from} or {@code to} contains a child element
-   *         that matches a block start token from {@code BLOCK_STARTS} and both have
-   *         more than two child elements, {@code false} otherwise.
-   */
-  private static boolean childHasBlock(XMLElement from, XMLElement to) {
-    if (from.getContent().size() > 2 && to.getContent().size() > 2) {
-      return childHasBlock(from) || childHasBlock(to);
-    }
-    return false;
+  private boolean hasMultipleOrDifferentBlocks(XMLElement from, XMLElement to) {
+    // No need to recurse if few tokens
+    if (from.getContent().size() <= 2 || to.getContent().size() <= 2) return false;
+
+    // Check for blocks in the `from`
+    String fromBlock = findFirstBlock(from);
+    if (fromBlock == null) return false;
+    if (fromBlock.isEmpty()) return true;
+
+    // Check for blocks in the `to`
+    String toBlock = findFirstBlock(to);
+    if (toBlock == null) return false;
+    if (toBlock.isEmpty()) return true;
+
+    // Only recurse if the block is different
+    return !fromBlock.equals(toBlock);
   }
 
-  /**
-   * Checks if the specified {@link XMLElement} has any child element that is a
-   * start element and matches one of the predefined block names in {@code BLOCKS}.
-   *
-   * @param element The {@link XMLElement} to be checked, must not be null.
-   * @return {@code true} if a matching child block is found, {@code false} otherwise.
-   */
-  private static boolean childHasBlock(XMLElement element) {
+  private @Nullable String findFirstBlock(XMLElement element) {
+    String firstBlock = null;
     for (XMLToken t : element.getContent()) {
-      if (t.getType() == XMLTokenType.START_ELEMENT && BLOCKS.contains(t.getName())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * A token similarity function implementation for comparing {@link XMLToken} instances
-   * based on their type and content. This similarity function can handle both simple
-   * token comparison and hierarchical structure similarity for XML element tokens.
-   *
-   * <p>This class is primarily used in the context of computing differences between lists
-   * of {@link XMLToken} objects, where similarity between individual tokens influences
-   * the resulting edit operations.
-   */
-  private static class XMLTokenSimilarityFunction implements Similarity<XMLToken> {
-
-    @Override
-    public float score(XMLToken a, XMLToken b) {
-      if (a.getType() == XMLTokenType.ELEMENT && b.getType() == XMLTokenType.ELEMENT) {
-        return scoreForElement((XMLElement) a, (XMLElement) b);
-      }
-      return a.equals(b) ? 1.0f : 0;
-    }
-
-    public float scoreForElement(XMLElement a, XMLElement b) {
-      boolean sameElementName = a.getStart().equals(b.getStart());
-      // Don't bother if the first token is different
-      if (!sameElementName) return 0;
-
-      // Empty it's a match
-      if (a.getContent().isEmpty() && b.getContent().isEmpty())
-        return 1;
-
-      // Multiple tokens
-      MyersGreedyAlgorithm<XMLToken> alg = new MyersGreedyAlgorithm<>();
-      EditCounter counter = new EditCounter();
-      alg.diff(a.getContent(), b.getContent(), counter);
-      return counter.score();
-    }
-  }
-
-  /**
-   * A private helper class that implements the {@link DiffHandler} interface for calculating
-   * and maintaining the number of edits and tokens involved in a diff operation. Specifically,
-   * it provides methods to compute an overall score representing the similarity between two
-   * lists of {@link XMLToken} objects.
-   */
-  private static class EditCounter implements DiffHandler<XMLToken> {
-
-    int edits = 0;
-    int tokens = 0;
-
-    @Override
-    public void handle(Operator operator, XMLToken token) {
-      if (token.getType() == XMLTokenType.TEXT) {
-        if (operator == Operator.MATCH) {
-          tokens += 2;
+      if (t.getType() == XMLTokenType.START_ELEMENT && isBlock(t)) {
+        if (firstBlock == null) {
+          firstBlock = t.getName();
         } else {
-          edits += 1;
-          tokens += 1;
+          return "";
         }
       }
     }
+    return firstBlock;
+  }
 
-    float editScore() {
-      if (tokens == 0) return .5f;
-      if (edits == 0) return 1;
-      return 1 - (edits / (float)tokens);
-    }
-
-    float lengthBonus() {
-      return (float) Math.log(1.0 + tokens - edits) / 10f;
-    }
-
-    float score() {
-      return editScore() + lengthBonus();
-    }
-
+  /**
+   * Determines whether the given {@link XMLToken} represents a block element.
+   *
+   * @param token The {@link XMLToken} to evaluate, must not be null.
+   * @return {@code true} if the token is a block element, {@code false} otherwise.
+   */
+  private boolean isBlock(XMLToken token) {
+    // We assume the default XML namespace URI ""
+    return token.getNamespaceURI().isEmpty() && this.blocks.contains(token.getName());
   }
 
 }
