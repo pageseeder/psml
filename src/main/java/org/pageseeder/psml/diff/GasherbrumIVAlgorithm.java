@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  * @since 1.6.2
  * @version 1.6.2
  */
+@Deprecated
 public class GasherbrumIVAlgorithm implements DiffAlgorithm<XMLToken> {
 
   private static final Set<String> DEFAULT_BLOCKS = Set.of(

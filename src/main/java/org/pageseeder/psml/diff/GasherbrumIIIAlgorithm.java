@@ -41,6 +41,7 @@ import java.util.*;
  * @since 1.5.1
  * @version 1.5.1
  */
+@Deprecated(forRemoval = true)
 public class GasherbrumIIIAlgorithm implements DiffAlgorithm<XMLToken> {
 
   /**
