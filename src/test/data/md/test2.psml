@@ -22,16 +22,16 @@
     </fragment>
     <fragment id="3">
       <heading level="2">First chapter</heading>
-      <para>Let's have a long paragraph that <italic>continues</italic> on the next line and see if see works
-properly</para>
-      <preformat>this is
+      <para>Let's have a long paragraph that <italic>continues</italic> on the next line and see if see works properly</para>
+      <preformat>
+this is
 a code
-block</preformat>
+block
+</preformat>
       <para>This is a list:</para>
       <list>
         <item>First item</item>
-        <item>Second item
-(also part of the second item?)</item>
+        <item>Second item (also part of the second item?)</item>
         <item>Third item</item>
       </list>
     </fragment>
@@ -40,17 +40,16 @@ block</preformat>
       <para>Now we have a numbered list:</para>
       <nlist start="2">
         <item>First item</item>
-        <item>Second item
-(also part of the second item?)</item>
-        <item>Third item</item>
+        <item>Second item (also part of the second item?)</item>
+        <item>Third item
+&gt; <bold>quoted</bold>:
+&gt; We're having a some quoted content now Quoted line #2 Quoted line #3
+&gt;
+&gt; Quoted line #4</item>
       </nlist>
-      <block label="quoted">
-        <para>We're having a some quoted content now Quoted line #2 Quoted line #3</para>
-        <para>Quoted line #4</para>
-      </block>
       <para>break</para>
       <block label="quoted">
-        <para>Quoted line #5</para>
+        <para>**quoted**:  Quoted line #5</para>
       </block>
       <preformat role="lang-javascript">
 function() {
@@ -80,14 +79,15 @@ function() {
     </fragment>
     <fragment id="7">
       <heading level="2">Background</heading>
-      <para>We've used this API for over 15 years and it used to be included in Diff-X.
-We decided to split it off so that we would not have to include Diff-X in all our projects.</para>
+      <para>We've used this API for over 15 years and it used to be included in Diff-X. We decided to split it off so that we would not have to include Diff-X in all our projects.</para>
       <para>Escape ~ ` ! @ # $ % ^ &amp; * ( ) _ - + = { [ } ] | \ : ; " ' &lt; , &gt; . ? / text</para>
-      <para>This is *escaped star*</para>
+      <para>This is <italic>escaped star</italic></para>
       <para>This is [escaped brackets]</para>
-      <para>- Red<br/>
-- Green<br/>
-- Blue</para>
+      <list>
+        <item>Red</item>
+        <item>Green</item>
+        <item>Blue</item>
+      </list>
     </fragment>
   </section>
 </document>

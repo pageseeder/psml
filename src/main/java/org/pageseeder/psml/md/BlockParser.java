@@ -309,10 +309,23 @@ public class BlockParser {
             state.newFragment();
           }
 
+          // In document mode, headings create new fragments
+          if (options.isDocument() && !state.isEmpty() && !"1".equals(level)) {
+            state.newFragment();
+          }
+
           PSMLElement heading = new PSMLElement(Name.HEADING);
           heading.setAttribute("level", level);
           state.push(heading, text);
           state.commit();
+
+          // In document mode, we move to the next section after H1
+          if (options.isDocument()) {
+            PSMLElement section = state.ancestor(Name.SECTION);
+            if (section != null && "title".equals(section.getAttribute("id"))) {
+              state.commitUpto(Name.DOCUMENT);
+            }
+          }
 
         } else {
 

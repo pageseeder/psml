@@ -75,7 +75,30 @@ class MarkdownParserTest {
     System.out.println(result);
 
     // load expected
-    String expected = new String(Files.readAllBytes(psml.toPath()), StandardCharsets.UTF_8);
+    String expected = Files.readString(psml.toPath());
+    expected = expected.replaceAll("\r", "");
+    assertEquals(expected, result);
+  }
+
+  @Test
+  void testProcess2() throws Exception {
+    File md = new File(SOURCE_FOLDER, "test2.md");
+    File psml = new File(SOURCE_FOLDER, "test2.psml");
+    FileInputStream in = new FileInputStream(md);
+    Reader r = new InputStreamReader(in);
+    MarkdownParser parser = new MarkdownParser();
+    parser.getConfig().setFragmentMode(false);
+    PSMLElement document = parser.parse(r);
+
+    XMLWriter xml = new XMLStringWriter(NamespaceAware.No);
+    xml.setIndentChars("  ");
+    document.toXML(xml);
+    xml.flush();
+    String result = xml.toString();
+    System.out.println(result);
+
+    // load expected
+    String expected = Files.readString(psml.toPath());
     expected = expected.replaceAll("\r", "");
     assertEquals(expected, result);
   }
