@@ -268,11 +268,16 @@ public final class GasherbrumVAlgorithm implements DiffAlgorithm<XMLToken> {
   private @Nullable String findFirstBlock(XMLElement element) {
     String firstBlock = null;
     for (XMLToken t : element.getContent()) {
-      if (t.getType() == XMLTokenType.START_ELEMENT && isBlock(t)) {
-        if (firstBlock == null) {
-          firstBlock = t.getName();
-        } else {
-          return "";
+      if (t.getType() == XMLTokenType.START_ELEMENT) {
+        if (isBlock(t)) {
+          if (firstBlock == null) {
+            firstBlock = t.getName();
+          } else {
+            return "";
+          }
+        } else if (isCell(t)) {
+          // Reset when hitting a cell
+          firstBlock = null;
         }
       }
     }
@@ -288,6 +293,17 @@ public final class GasherbrumVAlgorithm implements DiffAlgorithm<XMLToken> {
   private boolean isBlock(XMLToken token) {
     // We assume the default XML namespace URI ""
     return token.getNamespaceURI().isEmpty() && this.blocks.contains(token.getName());
+  }
+
+  /**
+   * Determines whether the given {@link XMLToken} represents a "cell" or "hcell" element.
+   *
+   * @param token The {@link XMLToken} to evaluate, must not be null.
+   * @return {@code true} if the token's name matches "cell" or "hcell", {@code false} otherwise.
+   */
+  private boolean isCell(XMLToken token) {
+    // We assume the default XML namespace URI ""
+    return token.getName().matches("cell|hcell");
   }
 
 }
