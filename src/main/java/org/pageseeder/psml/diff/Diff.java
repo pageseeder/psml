@@ -65,7 +65,7 @@ public final class Diff {
   /**
    * The granularity of the text compare used by Diff-X
    */
-  private TextGranularity textGranularity = TextGranularity.WORD;
+  private TextGranularity textGranularity = TextGranularity.SPACE_WORD;
 
   /**
    * Defines the images to process
