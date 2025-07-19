@@ -211,6 +211,43 @@ class BlockParserTest {
     assertEquals("<para><monospace>coconut</monospace></para>", toPSML(mixed));
   }
 
+  @Test
+  void testTableWithCaption() {
+    List<String> mixed = List.of(
+        "Horizontal Header with Caption",
+        "| Header | Horizontal | ",
+        "|---|---| ",
+        "| Cell1 | Cell2 | ",
+        "| Cell3 | Cell4 | "
+    );
+    assertEquals("<para>Horizontal Header with Caption</para>" +
+        "<table>" +
+        "<col/><col/>" +
+        "<row part=\"header\"><cell>Header</cell><cell>Horizontal</cell></row>" +
+        "<row><cell>Cell1</cell><cell>Cell2</cell></row>" +
+        "<row><cell>Cell3</cell><cell>Cell4</cell></row>" +
+        "</table>", toPSML(mixed));
+  }
+
+  @Test
+  void testTableWithCaption2() {
+    List<String> mixed = List.of(
+        "*Table 1: Horizontal Header with Caption*",
+        "",
+        "| Header | Horizontal | ",
+        "|---|---| ",
+        "| Cell1 | Cell2 | ",
+        "| Cell3 | Cell4 | "
+    );
+    assertEquals("<para><italic>Table 1: Horizontal Header with Caption</italic></para>" +
+        "<table>" +
+        "<col/><col/>" +
+        "<row part=\"header\"><cell>Header</cell><cell>Horizontal</cell></row>" +
+        "<row><cell>Cell1</cell><cell>Cell2</cell></row>" +
+        "<row><cell>Cell3</cell><cell>Cell4</cell></row>" +
+        "</table>", toPSML(mixed));
+  }
+
   // Testing the parser state
   // --------------------------------------------------------------------------------------------
 

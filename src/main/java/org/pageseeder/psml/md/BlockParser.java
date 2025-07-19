@@ -217,7 +217,7 @@ public class BlockParser {
     }
 
     // Separators
-    else if (line.matches("\\s*\\*\\s?\\*\\s?\\*[\\s\\*]*")) {
+    else if (line.matches("\\s*\\*\\s?\\*\\s?\\*[\\s*]*")) {
       if (options.isDocument()) {
         state.ensureFragment();
         state.newFragment();
@@ -274,7 +274,7 @@ public class BlockParser {
 
     // Tables starting with `|`
     else if (line.startsWith("|") && !state.isElement(Name.PREFORMAT)) {
-      processTableRow(line, next, state);
+      processTableRow(line, next, state, options);
     }
 
     // Metadata (document mode only)
@@ -342,7 +342,7 @@ public class BlockParser {
               element = new PSMLElement(Name.HEADING);
               element.setAttribute("level", "1");
 
-              // Special case for title section
+              // Special case for the 'title' section
               if (options.isDocument()) {
                 PSMLElement section = state.ancestor(Name.SECTION);
                 if (section != null && "title".equals(section.getAttribute("id"))) {
@@ -417,6 +417,7 @@ public class BlockParser {
     }
   }
 
+  @SuppressWarnings("java:S3776")
   private static void processQuotedContent(String line, State state, MarkdownInputOptions options) {
     if (options.isDocument()) {
       state.ensureFragment();
@@ -450,14 +451,19 @@ public class BlockParser {
     }
   }
 
-  private static void processTableRow(String line, @Nullable String next, State state) {
+  @SuppressWarnings("java:S3776")
+  private static void processTableRow(String line, @Nullable String next, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
     assert line.startsWith("|");
-    String[] columns = line.substring(1).split("\\|");
+    String[] columns = line.trim().substring(1).split("\\|");
     boolean inTable = state.isDescendantOf(Name.TABLE);
     boolean isHeaderRow = false;
-    if (!inTable && next != null && next.startsWith("|") && next.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
+    if (!inTable && next != null && next.startsWith("|") && next.trim().matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
+      state.commitUpToBlockOrFragment();
       PSMLElement table = new PSMLElement(Name.TABLE);
-      String[] cols = next.substring(1).split("\\|");
+      String[] cols = next.trim().substring(1).split("\\|");
       for (String col : cols) {
         String align = toColAlign(col);
         PSMLElement colElement = new PSMLElement(Name.COL);
@@ -470,7 +476,7 @@ public class BlockParser {
     }
 
     if (inTable) {
-      if (!line.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
+      if (!line.trim().matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
         PSMLElement row = new PSMLElement(Name.ROW);
         if (isHeaderRow) row.setAttribute("part", "header");
         state.push(row);
@@ -492,6 +498,7 @@ public class BlockParser {
     }
   }
 
+  @SuppressWarnings("java:S3776")
   private static void processMetadataProperty(String line, State state, MarkdownInputOptions options) {
     int colon = line.indexOf(':');
     String title = line.substring(0, colon).trim();
@@ -507,7 +514,7 @@ public class BlockParser {
       PSMLElement uri = state.current();
       if (uri != null && uri.isElement(Name.URI)) {
         if ("type".equals(name)) {
-          uri.setAttribute("documenttype", value.replaceAll("[^A-Za-z0-9_]", "_"));
+          uri.setAttribute("documenttype", value.replaceAll("\\W", "_"));
         } else if ("docid".equals(name)) {
           uri.setAttribute(name, value.replaceAll("[^A-Za-z0-9_-]", "_"));
         } else if ("title".equals(name)) {
