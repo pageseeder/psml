@@ -971,7 +971,7 @@ public class PSMLElement implements PSMLNode {
   }
 
   /**
-   * Retrieves all child elements of this PSMLElement instance that match the specified name.
+   * Retrieves the first child element of this PSMLElement instance that match the specified name.
    *
    * <p>This method filters the list of nodes associated with the element, extracting only those
    * that are of type {@code PSMLElement} and whose name matches the specified {@code Name}.
