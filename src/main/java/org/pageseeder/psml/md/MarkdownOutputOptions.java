@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.7
  * @since 1.6.0
  */
 public final class MarkdownOutputOptions {
@@ -29,7 +29,7 @@ public final class MarkdownOutputOptions {
     LOCAL,
 
     /**
-     * As an link to PageSeeder
+     * As a link to PageSeeder
      */
     EXTERNAL,
 
@@ -67,13 +67,13 @@ public final class MarkdownOutputOptions {
     LOCAL_LINK,
 
     /**
-     * Represents bold text format in Markdown output, used for rendering text in a bold style
+     * Represents the bold text format in Markdown output, used for rendering text in a bold style
      * within cross-references (Xref).
      */
     BOLD_TEXT,
 
     /**
-     * Represents plain text format in Markdown output, used for cross-references (Xref)
+     * Represents the plain text format in Markdown output, used for cross-references (Xref)
      * where no hyperlink is applied, and only the text is rendered as-is.
      */
     TEXT
@@ -166,6 +166,27 @@ public final class MarkdownOutputOptions {
 
   }
 
+  public enum TableFormat {
+
+    /**
+     * Formats the table with the minimum number of characters to be valid Markdown
+     */
+    COMPACT,
+
+    /**
+     * Formats the table so that the cell borders line up are easier to read, making the table
+     * more visually appealing.
+     */
+    PRETTY,
+
+    /**
+     * Formats the table as an HTML table, suitable for including in web pages or other
+     * environments that support HTML markup.
+     */
+    HTML
+
+  }
+
   private final boolean metadata;
 
   private final boolean captions;
@@ -182,6 +203,9 @@ public final class MarkdownOutputOptions {
 
   private final PropertiesFormat properties;
 
+  private final TableFormat table;
+
+  @SuppressWarnings("java:S107")
   private MarkdownOutputOptions(
       boolean metadata,
       boolean captions,
@@ -190,7 +214,8 @@ public final class MarkdownOutputOptions {
       BlockFormat block,
       SuperSubFormat superSub,
       UnderlineFormat underline,
-      PropertiesFormat properties) {
+      PropertiesFormat properties,
+      TableFormat table) {
     this.metadata = metadata;
     this.captions = captions;
     this.image = Objects.requireNonNull(image);
@@ -199,6 +224,7 @@ public final class MarkdownOutputOptions {
     this.superSub = Objects.requireNonNull(superSub);
     this.underline = Objects.requireNonNull(underline);
     this.properties = Objects.requireNonNull(properties);
+    this.table = Objects.requireNonNull(table);
   }
 
   /**
@@ -220,7 +246,8 @@ public final class MarkdownOutputOptions {
         BlockFormat.QUOTED,
         SuperSubFormat.IGNORE,
         UnderlineFormat.IGNORE,
-        PropertiesFormat.TABLE
+        PropertiesFormat.TABLE,
+        TableFormat.PRETTY
     );
   }
 
@@ -236,7 +263,7 @@ public final class MarkdownOutputOptions {
   /**
    * Determines whether captions should be included as text in the Markdown output.
    *
-   * @return true if captions is included in the output, false otherwise.
+   * @return true if captions are included in the output, false otherwise.
    */
   public boolean captions() {
     return captions;
@@ -293,7 +320,7 @@ public final class MarkdownOutputOptions {
   }
 
   /**
-   * Retrieves the properties formatting option for the Markdown output.
+   * Retrieves the formatting option for properties in the Markdown output.
    *
    * @return the properties formatting option (PropertiesFormat),
    *         which determines how properties are represented in the Markdown output.
@@ -303,13 +330,23 @@ public final class MarkdownOutputOptions {
   }
 
   /**
+   * Retrieves the table formatting option for the Markdown output.
+   *
+   * @return the table formatting option (TableFormat), which specifies how table elements
+   *         are formatted in the Markdown output, such as compact or visually aligned styles.
+   */
+  public TableFormat table() {
+    return this.table;
+  }
+
+  /**
    * Sets whether metadata should be included in the Markdown output.
    *
    * @param include true to include metadata in the output, false to exclude it.
    * @return a new instance of {@code MarkdownOutputOptions} with the updated metadata formatting setting.
    */
   public MarkdownOutputOptions metadata(boolean include) {
-    return new MarkdownOutputOptions(include, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(include, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -322,7 +359,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated caption formatting setting.
    */
   public MarkdownOutputOptions captions(boolean include) {
-    return new MarkdownOutputOptions(this.metadata, include, this.image, this.xref, this.block, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, include, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -332,7 +369,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated image formatting setting.
    */
   public MarkdownOutputOptions image(ImageFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, format, this.xref, this.block, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, format, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -345,7 +382,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated cross-reference format.
    */
   public MarkdownOutputOptions xref(XrefFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, format, this.block, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, format, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -357,7 +394,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated block format.
    */
   public MarkdownOutputOptions block(BlockFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, format, this.superSub, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, format, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -371,7 +408,7 @@ public final class MarkdownOutputOptions {
    *         and subscript formatting setting.
    */
   public MarkdownOutputOptions superSub(SuperSubFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, format, this.underline, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, format, this.underline, this.properties, this.table);
   }
 
   /**
@@ -383,7 +420,7 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated underline formatting setting.
    */
   public MarkdownOutputOptions underline(UnderlineFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, format, this.properties);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, format, this.properties, this.table);
   }
 
   /**
@@ -395,7 +432,47 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated properties formatting setting.
    */
   public MarkdownOutputOptions properties(PropertiesFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, format);
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, format, this.table);
+  }
+
+  /**
+   * Configures the table formatting option for the Markdown output.
+   *
+   * @param format the table formatting option to be applied.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated table formatting setting.
+   */
+  public MarkdownOutputOptions table(TableFormat format) {
+    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, format);
+  }
+
+  /**
+   * Creates a new {@code Builder} instance based on the current {@code MarkdownOutputOptions}.
+   *
+   * @return a {@code Builder} instance initialized with the settings of the current {@code MarkdownOutputOptions}.
+   */
+  public Builder builder() {
+    return Builder.from(this);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    MarkdownOutputOptions that = (MarkdownOutputOptions) o;
+    return metadata == that.metadata &&
+        captions == that.captions &&
+        image == that.image &&
+        xref == that.xref &&
+        block == that.block &&
+        superSub == that.superSub &&
+        underline == that.underline &&
+        properties == that.properties &&
+        table == that.table;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(metadata, captions, image, xref, block, superSub, underline, properties, table);
   }
 
   @Override
@@ -409,6 +486,175 @@ public final class MarkdownOutputOptions {
         ", superSub=" + superSub +
         ", underline=" + underline +
         ", properties=" + properties +
+        ", table=" + table +
         '}';
   }
+
+  /**
+   * Builder class for configuring and creating instances of {@code MarkdownOutputOptions}.
+   *
+   * <p>This class provides methods to customize various formatting options for Markdown output.
+   *
+   * <p>All customization methods return the builder instance itself to support method chaining.
+   */
+  public static class Builder {
+    private boolean metadata = true;
+    private boolean captions = false;
+    private ImageFormat image = ImageFormat.LOCAL;
+    private XrefFormat xref = XrefFormat.BOLD_TEXT;
+    private BlockFormat block = BlockFormat.QUOTED;
+    private SuperSubFormat superSub = SuperSubFormat.IGNORE;
+    private UnderlineFormat underline = UnderlineFormat.IGNORE;
+    private PropertiesFormat properties = PropertiesFormat.TABLE;
+    private TableFormat table = TableFormat.PRETTY;
+
+    /**
+     * Creates a new Builder with default options.
+     */
+    public Builder() {
+      // Default values already set in field initialization
+    }
+
+    /**
+     * Creates a new Builder with values copied from an existing options object.
+     *
+     * @param options The options to copy values from
+     * @return A new builder initialized with the values from the provided options
+     */
+    public static Builder from(MarkdownOutputOptions options) {
+      Builder builder = new Builder();
+      builder.metadata = options.metadata();
+      builder.captions = options.captions();
+      builder.image = options.image();
+      builder.xref = options.xref();
+      builder.block = options.block();
+      builder.superSub = options.superSub();
+      builder.underline = options.underline();
+      builder.properties = options.properties();
+      builder.table = options.table();
+      return builder;
+    }
+
+    /**
+     * Sets whether metadata should be included in the Markdown output.
+     *
+     * @param include true to include metadata in the output, false to exclude it.
+     * @return this builder instance
+     */
+    public Builder metadata(boolean include) {
+      this.metadata = include;
+      return this;
+    }
+
+    /**
+     * Sets whether table captions, properties, and images alt text should be included as a paragraph
+     * before the table, properties, or images in the content.
+     *
+     * <p>For example, {@code **Image 2**: Network diagram}
+     *
+     * @param include true to include captions as text in the output, false to exclude it.
+     * @return this builder instance
+     */
+    public Builder captions(boolean include) {
+      this.captions = include;
+      return this;
+    }
+
+    /**
+     * Sets the image formatting option for the Markdown output.
+     *
+     * @param format the image formatting option to be applied.
+     * @return this builder instance
+     */
+    public Builder image(ImageFormat format) {
+      this.image = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Sets the format for cross-references (Xref) in the Markdown output.
+     *
+     * @param format the cross-reference formatting to be applied.
+     * @return this builder instance
+     */
+    public Builder xref(XrefFormat format) {
+      this.xref = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Sets the block formatting option for the Markdown output.
+     *
+     * @param format the block formatting option to be applied.
+     * @return this builder instance
+     */
+    public Builder block(BlockFormat format) {
+      this.block = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Sets the superscript and subscript formatting option for the Markdown output.
+     *
+     * @param format the superscript and subscript formatting to be applied.
+     * @return this builder instance
+     */
+    public Builder superSub(SuperSubFormat format) {
+      this.superSub = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Sets the underline formatting option for the Markdown output.
+     *
+     * @param format the underline formatting to be applied.
+     * @return this builder instance
+     */
+    public Builder underline(UnderlineFormat format) {
+      this.underline = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Sets the properties formatting option for the Markdown output.
+     *
+     * @param format the properties formatting option to be applied.
+     * @return this builder instance
+     */
+    public Builder properties(PropertiesFormat format) {
+      this.properties = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Configures the table formatting option for the Markdown output.
+     *
+     * @param format the table formatting option to be applied.
+     * @return this builder instance
+     */
+    public Builder table(TableFormat format) {
+      this.table = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Builds a new {@code MarkdownOutputOptions} instance with the current builder configuration.
+     *
+     * @return a new immutable {@code MarkdownOutputOptions} instance
+     */
+    public MarkdownOutputOptions build() {
+      return new MarkdownOutputOptions(
+          metadata,
+          captions,
+          image,
+          xref,
+          block,
+          superSub,
+          underline,
+          properties,
+          table
+      );
+    }
+  }
+
 }
