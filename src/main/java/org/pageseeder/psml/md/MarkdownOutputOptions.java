@@ -180,6 +180,12 @@ public final class MarkdownOutputOptions {
     PRETTY,
 
     /**
+     * Formats and normalize the table for AI systems, where cells spanning multiple rows
+     * or columns are repeated to ensure maximum compatibility with AI systems.
+     */
+    NORMALIZED,
+
+    /**
      * Formats the table as an HTML table, suitable for including in web pages or other
      * environments that support HTML markup.
      */

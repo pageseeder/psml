@@ -156,6 +156,32 @@ final class MarkdownSerializerTest {
   }
 
   @Test
+  void testTable1() throws IOException {
+    testTableFormat("table1", MarkdownOutputOptions.TableFormat.COMPACT);
+    testTableFormat("table1", MarkdownOutputOptions.TableFormat.PRETTY);
+    testTableFormat("table1", MarkdownOutputOptions.TableFormat.NORMALIZED);
+    testTableFormat("table1", MarkdownOutputOptions.TableFormat.HTML);
+  }
+
+  @Test
+  void testTable2() throws IOException {
+    testTableFormat("table2", MarkdownOutputOptions.TableFormat.COMPACT);
+    testTableFormat("table2", MarkdownOutputOptions.TableFormat.PRETTY);
+    testTableFormat("table2", MarkdownOutputOptions.TableFormat.NORMALIZED);
+    testTableFormat("table2", MarkdownOutputOptions.TableFormat.HTML);
+  }
+
+  private void testTableFormat(String name, MarkdownOutputOptions.TableFormat format) throws IOException {
+    PSMLElement psml = getTestFile(name+".psml");
+    String expected = getResultFile(name+"_"+format.name().toLowerCase()+".md");
+    MarkdownSerializer serializer = new MarkdownSerializer();
+    serializer.setOptions(MarkdownOutputOptions.defaultOptions().table(format));
+    StringWriter out = new StringWriter();
+    serializer.serialize(psml, out);
+    assertEquals(expected.trim(), out.toString().trim());
+  }
+
+  @Test
   void testKitchenSink() throws IOException {
     PSMLElement psml = getTestFile("kitchen_sink.psml");
     MarkdownSerializer serializer = new MarkdownSerializer();
@@ -204,5 +230,20 @@ final class MarkdownSerializerTest {
       throw new UncheckedIOException("Unable to load test file '" + filename + "'", ex);
     }
   }
+
+  public static String getResultFile(String filename) {
+    try (Reader r = new InputStreamReader(Objects.requireNonNull(Tests.class.getResourceAsStream("/org/pageseeder/psml/md/out/" + filename)))) {
+      StringBuilder sb = new StringBuilder();
+      char[] buffer = new char[4096];
+      int len;
+      while ((len = r.read(buffer)) != -1) {
+        sb.append(buffer, 0, len);
+      }
+      return sb.toString();
+    } catch (IOException ex) {
+      throw new UncheckedIOException("Unable to load test file '" + filename + "'", ex);
+    }
+  }
+
 
 }

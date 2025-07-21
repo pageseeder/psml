@@ -1,0 +1,29 @@
+<table>
+  <row>
+    <cell>A</cell>
+    <cell></cell>
+  </row>
+  <row>
+    <cell>
+      <para>A list of items</para>
+      <list>
+        <item>Item 1</item>
+        <item>Item 2</item>
+      </list>
+    </cell>
+    <cell>
+      <para>Another list</para>
+      <nlist>
+        <item>Item A</item>
+        <item>Item B</item>
+      </nlist>
+    </cell>
+  </row>
+  <row>
+    <cell align="center" colspan="2">
+      <para>
+        <italic>Merged cell</italic>
+      </para>
+    </cell>
+  </row>
+</table>

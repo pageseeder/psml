@@ -1,0 +1,31 @@
+<table>
+  <caption>Countries with their capitals and estimated populations in 2025.</caption>
+  <col part="header"/>
+  <col/>
+  <col part="body" align="right"/>
+  <row part="header">
+    <cell>Country</cell>
+    <cell>Capital City</cell>
+    <cell align="right">Population (2025 est.)</cell>
+  </row>
+  <row>
+    <hcell>United States</hcell>
+    <cell>Washington, D.C.</cell>
+    <cell align="right">339 million</cell>
+  </row>
+  <row>
+    <hcell>India</hcell>
+    <cell>New Delhi</cell>
+    <cell align="right">1.43 billion</cell>
+  </row>
+  <row>
+    <hcell>Brazil</hcell>
+    <cell>Brasília</cell>
+    <cell align="right">217 million</cell>
+  </row>
+  <row>
+    <hcell>Germany</hcell>
+    <cell>Berlin</cell>
+    <cell align="right">84 million</cell>
+  </row>
+</table>

@@ -33,18 +33,10 @@ import java.util.*;
 /**
  * This class is responsible for serializing PSML content into Markdown format.
  *
- * @version 1.6.0
+ * @version 1.6.7
  * @since 1.0
  */
 public class MarkdownSerializer {
-
-  private enum CellAlignment {
-    NONE, LEFT, CENTER, RIGHT
-  }
-
-  private enum CellStyle {
-    NONE, BOLD, ITALIC
-  }
 
   /**
    * The default configuration for generating Markdown content.
@@ -105,7 +97,7 @@ public class MarkdownSerializer {
   /**
    * Normalizes the input text by collapsing consecutive whitespace characters into a single space.
    */
-  private static String normalizeText(String text) {
+  static String normalizeText(String text) {
     return text.replaceAll("\\s+", " ");
   }
 
@@ -802,67 +794,8 @@ public class MarkdownSerializer {
     }
 
     private void serializeTable(PSMLElement table, Appendable out) throws IOException {
-      PSMLElement caption = table.getFirstChildElement(Name.CAPTION);
-      if (options.captions()) {
-        out.append("\n**").append(state.nextTable()).append("**");
-        if (caption != null) {
-          out.append(": ").append(caption.getText());
-        }
-        out.append("\n");
-      }
-      List<PSMLElement> columns = table.getChildElements(Name.COL);
-      List<CellAlignment> align = toCellAlignments(columns);
-      List<CellStyle> styles = toCellStyles(columns);
-
-      boolean firstRow = true;
-      for (PSMLElement row : table.getChildElements(Name.ROW)) {
-        List<PSMLElement> cells = row.getChildElements(Name.CELL, Name.HCELL);
-        String attribute = row.getAttribute("part");
-        CellStyle rowStyle = toCellStyle(attribute);
-        out.append("| ");
-        for (int i=0; i < cells.size(); i++) {
-          PSMLElement cell = cells.get(i);
-          CellStyle style = rowStyle;
-          if (styles.size() > i) {
-            style = styles.get(i);
-          }
-          String text = normalizeText(cell.getText().trim().replace("\n", "<br>"));
-          if (style == CellStyle.BOLD) {
-            out.append("**").append(text.replace("*", "\\*")).append("**");
-          } else if (style == CellStyle.ITALIC) {
-            out.append("*").append(text.replace("*", "\\*")).append("*");
-          } else {
-            out.append(text);
-          }
-          out.append(" | ");
-        }
-        out.append('\n');
-        if (firstRow) {
-          out.append("|");
-          for (int i = 0; i < cells.size(); i++) {
-            CellAlignment a = CellAlignment.NONE;
-            if (align.size() > i) {
-              a = align.get(i);
-            }
-            switch (a) {
-              case LEFT:
-                out.append(":---|");
-                break;
-              case CENTER:
-                out.append(":---:|");
-                break;
-              case RIGHT:
-                out.append("---:|");
-                break;
-              default:
-                out.append("---|");
-                break;
-            }
-          }
-          out.append('\n');
-          firstRow = false;
-        }
-      }
+      MarkdownTable tableOut = new MarkdownTable(table, state.nextTable(), this.collector);
+      tableOut.format(out, options);
     }
 
     private void serializeTitle(PSMLElement title, Appendable out) throws IOException {
@@ -971,51 +904,11 @@ public class MarkdownSerializer {
       }
     }
 
-    private static List<CellAlignment> toCellAlignments(List<PSMLElement> columns) {
-      List<CellAlignment> alignments = new ArrayList<>();
-      for (PSMLElement col : columns) {
-        String attribute = col.getAttribute("align");
-        CellAlignment alignment = CellAlignment.NONE;
-        if (attribute != null) {
-          switch (attribute) {
-            case "left":
-              alignment = CellAlignment.LEFT;
-              break;
-            case "center":
-              alignment = CellAlignment.CENTER;
-              break;
-            case "right":
-              alignment = CellAlignment.RIGHT;
-              break;
-            default:
-          }
-        }
-        alignments.add(alignment);
-      }
-      return alignments;
-    }
-
-    private static List<CellStyle> toCellStyles(List<PSMLElement> columns) {
-      List<CellStyle> styles = new ArrayList<>();
-      for (PSMLElement col : columns) {
-        String attribute = col.getAttribute("part");
-        CellStyle style = toCellStyle(attribute);
-        styles.add(style);
-      }
-      return styles;
-    }
-
-    private static CellStyle toCellStyle(@Nullable String attribute) {
-      if (attribute == null) return CellStyle.NONE;
-      if ("header".equals(attribute)) return CellStyle.BOLD;
-      if ("footer".equals(attribute)) return CellStyle.ITALIC;
-      return CellStyle.NONE;
-    }
-
     private static String textOf(@Nullable PSMLElement element) {
       return element == null ? "" : normalizeText(element.getText());
     }
 
   }
+
 }
 
