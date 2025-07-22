@@ -30,7 +30,7 @@ import java.util.List;
  */
 public final class ElementDenormalizer extends DiffFilter<XMLToken> implements org.pageseeder.diffx.api.DiffHandler<XMLToken> {
 
-  ElementDenormalizer(org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
+  public ElementDenormalizer(org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
     super(handler);
   }
 
@@ -74,7 +74,6 @@ public final class ElementDenormalizer extends DiffFilter<XMLToken> implements o
 
     // Forward the current token to the target handler
     this.target.handle(operator, token);
-
   }
 
   @Override
@@ -82,7 +81,6 @@ public final class ElementDenormalizer extends DiffFilter<XMLToken> implements o
     flushBuffer();
     this.target.end();
   }
-
 
   /**
    * Handles the modification of attributes based on the operator and the type of elements

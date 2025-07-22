@@ -27,7 +27,7 @@ import org.pageseeder.psml.util.Beta;
  * @since 1.6.7
  */
 @Beta
-final class ListNormalizer extends ElementNormalizer implements SequenceProcessor {
+public final class ListNormalizer extends ElementNormalizer implements SequenceProcessor {
 
   public static final StartElementToken NLIST_START = new XMLStartElement("nlist");
 
