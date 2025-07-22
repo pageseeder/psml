@@ -5,7 +5,6 @@ package org.pageseeder.psml.diff;
 
 import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
-import org.pageseeder.diffx.token.impl.XMLStartElement;
 import org.pageseeder.psml.util.Beta;
 
 import javax.xml.namespace.QName;
@@ -87,7 +86,7 @@ public final class PseudoStartToken implements StartElementToken {
    * The returned string includes the name of the encapsulated token,
    * surrounded by angle brackets and followed by an asterisk.
    *
-   * @return A string in the format "<name*>" where "name" is the name of the encapsulated token.
+   * @return A string in the format "{@code <name*> }" where "name" is the name of the encapsulated token.
    */
   @Override
   public String toString() {
