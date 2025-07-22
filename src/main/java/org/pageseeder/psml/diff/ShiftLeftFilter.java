@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.pageseeder.diffx.action.Operation;
@@ -6,6 +9,7 @@ import org.pageseeder.diffx.api.Operator;
 import org.pageseeder.diffx.handler.DiffFilter;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.XMLTokenType;
+import org.pageseeder.psml.util.Beta;
 
 import java.io.UncheckedIOException;
 import java.util.ArrayDeque;
@@ -13,7 +17,8 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-final class ShiftLeftFilter extends DiffFilter<XMLToken> {
+@Beta
+public final class ShiftLeftFilter extends DiffFilter<XMLToken> {
 
   private final List<Operation<XMLToken>> operations = new ArrayList<>();
 

@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.impl.XMLStartElement;
+import org.pageseeder.psml.util.Beta;
 
 /**
  * A normalizer to replace the "hcell" elements by "cell" elements and including attribute
@@ -21,7 +25,8 @@ import org.pageseeder.diffx.token.impl.XMLStartElement;
  * @version 1.6.7
  * @since 1.6.7
  */
-final class CellNormalizer extends ElementNormalizer {
+@Beta
+public final class CellNormalizer extends ElementNormalizer {
 
   public static final StartElementToken HCELL_START = new XMLStartElement("hcell");
   public static final StartElementToken CELL_START = new XMLStartElement("cell");

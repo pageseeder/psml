@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.pageseeder.diffx.token.AttributeToken;
@@ -7,6 +10,7 @@ import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.impl.XMLAttribute;
 import org.pageseeder.diffx.token.impl.XMLEndElement;
 import org.pageseeder.diffx.xml.SequenceProcessor;
+import org.pageseeder.psml.util.Beta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +27,8 @@ import java.util.Objects;
  * @version 1.6.7
  * @since 1.6.7
  */
-class ElementNormalizer implements SequenceProcessor {
+@Beta
+public class ElementNormalizer implements SequenceProcessor {
 
   /**
    * The start element token to be replaced.

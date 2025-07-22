@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.impl.XMLStartElement;
 import org.pageseeder.diffx.xml.SequenceProcessor;
+import org.pageseeder.psml.util.Beta;
 
 /**
  * A normalizer to replace the "nlist" elements by "list" elements and including attribute
@@ -22,6 +26,7 @@ import org.pageseeder.diffx.xml.SequenceProcessor;
  * @version 1.6.7
  * @since 1.6.7
  */
+@Beta
 final class ListNormalizer extends ElementNormalizer implements SequenceProcessor {
 
   public static final StartElementToken NLIST_START = new XMLStartElement("nlist");

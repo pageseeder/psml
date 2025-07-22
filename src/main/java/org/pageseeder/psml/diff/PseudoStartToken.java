@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.impl.XMLStartElement;
+import org.pageseeder.psml.util.Beta;
 
 import javax.xml.namespace.QName;
 
@@ -17,7 +21,8 @@ import javax.xml.namespace.QName;
  *
  * @author Christophe Lauret
  */
-final class PseudoStartToken implements StartElementToken {
+@Beta
+public final class PseudoStartToken implements StartElementToken {
 
   private final StartElementToken token;
 

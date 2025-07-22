@@ -1,6 +1,8 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.pageseeder.diffx.action.Operation;
 import org.pageseeder.diffx.api.Operator;
 import org.pageseeder.diffx.handler.DiffFilter;
@@ -26,7 +28,7 @@ import java.util.List;
  * @version 1.6.7
  * @since 1.6.7
  */
-final class ElementDenormalizer extends DiffFilter<XMLToken> implements org.pageseeder.diffx.api.DiffHandler<XMLToken> {
+public final class ElementDenormalizer extends DiffFilter<XMLToken> implements org.pageseeder.diffx.api.DiffHandler<XMLToken> {
 
   ElementDenormalizer(org.pageseeder.diffx.api.DiffHandler<XMLToken> handler) {
     super(handler);

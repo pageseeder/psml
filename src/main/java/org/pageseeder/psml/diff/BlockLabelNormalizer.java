@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.eclipse.jdt.annotation.Nullable;

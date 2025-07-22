@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.pageseeder.diffx.token.EndElementToken;
 import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.impl.XMLEndElement;
+import org.pageseeder.psml.util.Beta;
 
 import javax.xml.namespace.QName;
 
@@ -18,7 +22,8 @@ import javax.xml.namespace.QName;
  *
  * @author Christophe Lauret
  */
-final class PseudoEndToken implements EndElementToken {
+@Beta
+public final class PseudoEndToken implements EndElementToken {
 
   private final EndElementToken token;
 
