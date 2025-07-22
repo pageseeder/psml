@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 1999-2025 weborganic systems pty. ltd.
+ */
 package org.pageseeder.psml.diff;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -17,6 +20,7 @@ import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.diffx.token.XMLTokenType;
 import org.pageseeder.diffx.token.impl.XMLElement;
+import org.pageseeder.psml.util.Beta;
 
 import java.util.*;
 
@@ -42,6 +46,7 @@ import java.util.*;
  * @since 1.6.5
  * @version 1.6.5
  */
+@Beta
 public final class GasherbrumVAlgorithm implements DiffAlgorithm<XMLToken> {
 
   private static final Set<String> DEFAULT_BLOCKS = Set.of(
