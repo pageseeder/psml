@@ -128,12 +128,8 @@ public final class PSMLDiffer {
     // Load tokens from XML
     SAXLoader loader = new SAXLoader();
     loader.setConfig(this.config);
-    ExtendedWhitespaceStripper stripper = new ExtendedWhitespaceStripper();
-    stripper.setAlwaysIgnore("fragment", "table", "row", "list", "nlist");
-    stripper.setMaybeIgnore("item", "block", "cell", "hcell", "para", "blockxref");
-    BlockLabelNormalizer normalizer = BlockLabelNormalizer.forPsml();
-    Sequence seqB = normalizer.process(stripper.process(loader.load(to)));
-    Sequence seqA = normalizer.process(stripper.process(loader.load(from)));
+    Sequence seqB = normalize(loader.load(to));
+    Sequence seqA = normalize(loader.load(from));
     LOGGER.debug("Sequence A: {} (granularity={})", seqA.size(), this.config.granularity());
     LOGGER.debug("Sequence B: {} (granularity={})", seqB.size(), this.config.granularity());
 
@@ -145,6 +141,16 @@ public final class PSMLDiffer {
     } catch (UndeclaredNamespaceException ex) {
       throw new DiffException(ex.getMessage(), ex);
     }
+  }
+
+  private Sequence normalize(Sequence seq) {
+    ExtendedWhitespaceStripper stripper = new ExtendedWhitespaceStripper();
+    stripper.setAlwaysIgnore("fragment", "table", "row", "list", "nlist");
+    stripper.setMaybeIgnore("item", "block", "cell", "hcell", "para", "blockxref");
+    BlockLabelNormalizer blocks = BlockLabelNormalizer.forPsml();
+    CellNormalizer cells = new CellNormalizer();
+    ListNormalizer lists = new ListNormalizer();
+    return lists.process(cells.process(blocks.process(stripper.process(seq))));
   }
 
   /**
@@ -181,7 +187,7 @@ public final class PSMLDiffer {
       diffMatrixXML(from, to, buffer, false);
     }
     // Apply the results from to the buffer
-    buffer.applyTo(new CoalescingFilter(output));
+    buffer.applyTo(new ElementDenormalizer(new CoalescingFilter(output)));
   }
 
   /**
