@@ -14,10 +14,10 @@ import java.util.List;
  * potentially ignoring certain PSML element types during whitespace processing.
  *
  * <p>Whitespaces directly under the following elements are systematically stripped:
- * "fragment", "table", "row", "list", "nlist".
+ * "row", "list", "nlist", "table", "fragment".
  *
  * <p>Whitespaces directly under the following elements are stripped if possible:
- * "item", "block", "cell", "hcell"
+ * "cell", "item", "para", "block", "blockxref", "hcell"
  *
  * @author Christophe Lauret
  *
