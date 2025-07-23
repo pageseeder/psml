@@ -21,7 +21,6 @@ import org.pageseeder.diffx.format.XMLDiffOutput;
 import org.pageseeder.diffx.handler.CoalescingFilter;
 import org.pageseeder.diffx.load.SAXLoader;
 import org.pageseeder.diffx.token.XMLToken;
-import org.pageseeder.diffx.util.ExtendedWhitespaceStripper;
 import org.pageseeder.diffx.xml.NamespaceSet;
 import org.pageseeder.diffx.xml.Sequence;
 import org.pageseeder.xmlwriter.UndeclaredNamespaceException;
@@ -144,9 +143,7 @@ public final class PSMLDiffer {
   }
 
   private Sequence normalize(Sequence seq) {
-    ExtendedWhitespaceStripper stripper = new ExtendedWhitespaceStripper();
-    stripper.setAlwaysIgnore("fragment", "table", "row", "list", "nlist");
-    stripper.setMaybeIgnore("item", "block", "cell", "hcell", "para", "blockxref");
+    PSMLWhiteSpaceStripper stripper = new PSMLWhiteSpaceStripper();
     BlockLabelNormalizer blocks = BlockLabelNormalizer.forPsml();
     CellNormalizer cells = new CellNormalizer();
     ListNormalizer lists = new ListNormalizer();
