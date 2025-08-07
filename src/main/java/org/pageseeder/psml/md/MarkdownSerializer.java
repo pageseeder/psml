@@ -220,6 +220,14 @@ public class MarkdownSerializer {
       return false;
     }
 
+    int listLevel() {
+      int level = -1;
+      for (Name n : this.context) {
+        if (n == Name.LIST || n == Name.NLIST) level++;
+      }
+      return level;
+    }
+
   }
 
   private static class Instance {
@@ -594,10 +602,15 @@ public class MarkdownSerializer {
 
     private void serializeList(PSMLElement list, Appendable out) throws IOException {
       List<PSMLElement> items = list.getChildElements(Name.ITEM);
+      int level = state.listLevel();
+      out.append('\n');
       for (PSMLElement item : items) {
         state.push(Name.ITEM);
-        out.append(" * ");
-        // TODO multiple paragraph, blocks and sublists
+        for (int i = 0; i < level; i++) {
+          out.append("    ");
+        }
+        out.append("* ");
+        // TODO multiple paragraph, blocks
         processChildren(item, out);
         out.append('\n');
         state.pop();
@@ -623,10 +636,15 @@ public class MarkdownSerializer {
 
     private void serializeNlist(PSMLElement nlist, Appendable out) throws IOException {
       List<PSMLElement> items = nlist.getChildElements(Name.ITEM);
+      int level = state.listLevel();
+      out.append('\n');
       int start = nlist.getAttributeOrElse("start", 1);
       for (PSMLElement item : items) {
         state.push(Name.ITEM);
-        out.append(" ").append(Integer.toString(start++)).append(". ");
+        for (int i = 0; i < level; i++) {
+          out.append("    ");
+        }
+        out.append(Integer.toString(start++)).append(". ");
         processChildren(item, out);
         out.append('\n');
         state.pop();

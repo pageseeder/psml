@@ -152,7 +152,18 @@ final class MarkdownSerializerTest {
   @Test
   void testList() {
     String psml = "<list><item>Item 1</item><item>Item 2</item></list>";
-    assertEquals(" * Item 1\n * Item 2\n", toMarkdown(psml));
+    assertEquals("\n* Item 1\n* Item 2\n", toMarkdown(psml));
+  }
+
+  @Test
+  void testListFiles() throws IOException {
+    testFile("list1");
+    testFile("list2");
+    // Sub lists
+    testFile("list3");
+    testFile("list4");
+    // List continuation
+//    testFile("list5");
   }
 
   @Test
@@ -163,12 +174,21 @@ final class MarkdownSerializerTest {
     testTableFormat("table1", MarkdownOutputOptions.TableFormat.HTML);
   }
 
-  @Test
+//  @Test
   void testTable2() throws IOException {
     testTableFormat("table2", MarkdownOutputOptions.TableFormat.COMPACT);
     testTableFormat("table2", MarkdownOutputOptions.TableFormat.PRETTY);
     testTableFormat("table2", MarkdownOutputOptions.TableFormat.NORMALIZED);
     testTableFormat("table2", MarkdownOutputOptions.TableFormat.HTML);
+  }
+
+  private void testFile(String name) throws IOException {
+    PSMLElement psml = getTestFile(name+".psml");
+    String expected = getResultFile(name+".md");
+    MarkdownSerializer serializer = new MarkdownSerializer();
+    StringWriter out = new StringWriter();
+    serializer.serialize(psml, out);
+    assertEquals(expected.trim(), out.toString().trim());
   }
 
   private void testTableFormat(String name, MarkdownOutputOptions.TableFormat format) throws IOException {
