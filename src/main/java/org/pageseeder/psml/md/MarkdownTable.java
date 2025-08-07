@@ -38,7 +38,6 @@ class MarkdownTable {
 
   private static final int MAX_ROWS_PRETTY_SCAN = 20;
 
-
   private final PSMLElement table;
 
   /**
@@ -70,20 +69,42 @@ class MarkdownTable {
     this.table = Objects.requireNonNull(table);
     this.name = name;
     this.collector = collector;
-    this.columnCount = countColumns(table.getFirstChildElement(PSMLElement.Name.ROW));
+    this.columnCount = countColumnsForTable(table);
     this.columnAlignments = toColumnAlignments(this.table.getChildElements(PSMLElement.Name.COL), this.columnCount);
     this.columnStyles = toColumnStyles(this.table.getChildElements(PSMLElement.Name.COL), this.columnCount);
-    if (isValidTable(table)) {
-      this.collector.error("This table is invalid");
+    if (PSMLElement.Name.TABLE != table.getElement()) {
+      this.collector.error(name+" is not a table!");
+    }
+    if (table.getFirstChildElement(PSMLElement.Name.ROW) == null) {
+      this.collector.error("No rows found in "+name);
     }
   }
 
-  private boolean isValidTable(PSMLElement table) {
-    if (!PSMLElement.Name.TABLE.equals(table.getElement())) return false;
-    if (table.getFirstChildElement(PSMLElement.Name.ROW) == null) return false;
-    return true;
+  /**
+   * Counts the number of columns in a table by analyzing its rows.
+   *
+   * <p>This method iterates through the rows of the table and calculates
+   * the maximum column count among the first few rows. The check is limited
+   * to a specified number of rows for performance reasons.
+   *
+   * @param table the table represented as a {@code PSMLElement}
+   * @return the maximum number of columns found among the rows of the table
+   */
+  private static int countColumnsForTable(PSMLElement table) {
+    final int maxRowsChecked = 10;
+    int count = 0;
+    int rowsChecked = 0;
+    // Check the col elements first
+    for (PSMLElement col : table.getChildElements(PSMLElement.Name.COL)) {
+      count += col.getAttributeOrElse("colspan", 1);
+    }
+    // Go through the rows
+    for (PSMLElement row : table.getChildElements(PSMLElement.Name.ROW)) {
+      count = Math.max(count, countColumnsInRow(row));
+      if (++rowsChecked >= maxRowsChecked) break;
+    }
+    return count;
   }
-
 
   /**
    * Counts the number of columns in a specified table row by iterating over all
@@ -93,8 +114,7 @@ class MarkdownTable {
    * @param row the table row represented as a {@code PSMLElement}, or null
    * @return the total number of columns in the row; 0 if {@code row} is null
    */
-  private static int countColumns(@Nullable PSMLElement row) {
-    if (row == null) return 0;
+  private static int countColumnsInRow(PSMLElement row) {
     int count = 0;
     for (PSMLElement cell : row.getChildElements(PSMLElement.Name.CELL, PSMLElement.Name.HCELL)) {
       count += cell.getAttributeOrElse("colspan", 1);
@@ -398,6 +418,10 @@ class MarkdownTable {
 
       i += colspan;
       if (i >= cells.length) break;
+    }
+    // Ensure that all cells have a value
+    for (;i < cells.length; i++) {
+      cells[i] = "";
     }
     return cells;
   }
