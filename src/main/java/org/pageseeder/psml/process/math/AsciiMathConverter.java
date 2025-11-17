@@ -51,10 +51,10 @@ public final class AsciiMathConverter {
     // disable 'id' and 'class' as they are not handled properly in MathJax
     if (am.contains("class"))
       throw new IllegalArgumentException(
-              "The AsciiMath \""+am+"\" could not be converted to MathML because \"class\" is not supported.");
+              "The AsciiMath \""+am+"\" could not be converted to MathML because \"class\" is not supported, use \"cla ss\" instead.");
     if (am.contains("id"))
       throw new IllegalArgumentException(
-              "The AsciiMath \""+am+"\" could not be converted to MathML because \"id\" is not supported.");
+              "The AsciiMath \""+am+"\" could not be converted to MathML because \"id\" is not supported, use \"i d\" instead.");
 
     // check cache
     String result = cache.get(am);
