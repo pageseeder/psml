@@ -3,7 +3,7 @@
  */
 package org.pageseeder.psml.toc;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

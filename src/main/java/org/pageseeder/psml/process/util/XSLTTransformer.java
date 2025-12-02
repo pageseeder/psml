@@ -14,7 +14,7 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.process.config.XSLTTransformation;
 import org.slf4j.Logger;

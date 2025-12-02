@@ -3,7 +3,7 @@
  */
 package org.pageseeder.psml.process.util;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Reader;

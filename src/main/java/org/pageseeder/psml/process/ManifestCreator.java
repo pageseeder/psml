@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.config.ManifestDocument;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.slf4j.Logger;

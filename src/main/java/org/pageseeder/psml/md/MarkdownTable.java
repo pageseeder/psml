@@ -1,6 +1,6 @@
 package org.pageseeder.psml.md;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.util.DiagnosticCollector;
 import org.pageseeder.xmlwriter.XML;

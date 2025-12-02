@@ -3,7 +3,7 @@
  */
 package org.pageseeder.psml.process;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.math.AsciiMathConverter;

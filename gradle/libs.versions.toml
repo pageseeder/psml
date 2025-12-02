@@ -5,7 +5,7 @@ slf4j = "2.0.17"
 xmlunit = "2.10.0"
 
 [libraries]
-annotations = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version = "2.3.100" }
+jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 commons-io = { module = "commons-io:commons-io", version = "2.19.0" }
 hamcrest = { module = "org.hamcrest:hamcrest", version = "2.2"}
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }

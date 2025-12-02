@@ -8,7 +8,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

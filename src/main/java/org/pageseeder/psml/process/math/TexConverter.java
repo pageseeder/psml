@@ -1,6 +1,6 @@
 package org.pageseeder.psml.process.math;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.util.WrappingReader;
 import org.pageseeder.psml.util.PSCache;
 

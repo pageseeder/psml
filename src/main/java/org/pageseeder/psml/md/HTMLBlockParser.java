@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.html.HTMLElement.Name;
 import org.pageseeder.psml.html.HTMLNode;

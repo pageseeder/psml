@@ -15,7 +15,7 @@
  */
 package org.pageseeder.psml.xml;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Exception thrown when an attribute is invalid.
