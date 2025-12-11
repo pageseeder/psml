@@ -48,6 +48,7 @@ import org.pageseeder.psml.util.NilDiagnosticCollector;
  * @version 1.6.0
  * @since 1.0
  */
+@SuppressWarnings("java:S1192")
 public class BlockParser {
 
   /**
