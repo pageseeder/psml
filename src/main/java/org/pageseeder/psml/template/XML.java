@@ -15,8 +15,6 @@
  */
 package org.pageseeder.psml.template;
 
-import org.jspecify.annotations.Nullable;
-
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +24,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author  Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.9
  * @since 1.0
  */
 public final class XML {
