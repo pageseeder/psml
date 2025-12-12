@@ -22,6 +22,7 @@ import java.util.Objects;
  * @version 1.6.7
  * @since 1.0
  */
+@SuppressWarnings("java:S1192") // No value in creating constants for each element/attribute name
 class MarkdownTable {
 
   private enum CellAlignment {
