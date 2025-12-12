@@ -223,7 +223,7 @@ public final class XMLUtils {
           reader.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
           XMLParserErrorHandler errorHandler = new XMLParserErrorHandler();
           reader.setErrorHandler(errorHandler);
-          String path = schema.toString().replaceAll(" ", "%20");
+          String path = schema.toString().replace(" ", "%20");
           reader.setProperty("http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", path);
           reader.parse(new InputSource(fis));
           if (errors != null)
