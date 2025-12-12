@@ -4,10 +4,10 @@
 package org.pageseeder.psml.process.util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 import javax.xml.transform.ErrorListener;
@@ -29,16 +29,12 @@ import org.slf4j.Logger;
  * of source files.
  *
  * @author Jean-Baptiste Reure
+ * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.9
  * @since 1.0
  */
 public final class XSLTTransformer {
-
-  /**
-   * The size of the byte buffer used to copy files.
-   */
-  private static final int BUFFER_SIZE = 12 * 1024;
 
   /**
    * The XSLT details
@@ -169,10 +165,8 @@ public final class XSLTTransformer {
         output = new File(destinationFolder, relPath);
         // just in case
         output.getParentFile().mkdirs();
-        if (transform) {
-          if (!output.exists() && !output.createNewFile())
-            throw new ProcessException("Failed to create output file "+output.getAbsolutePath());
-        }
+        if (transform && !output.exists() && !output.createNewFile())
+          throw new ProcessException("Failed to create output file "+output.getAbsolutePath());
       } catch (IOException e) {
         throw new ProcessException("XRefs error: Failed to create temp file: "+e.getMessage(), e);
       }
@@ -207,30 +201,15 @@ public final class XSLTTransformer {
    */
   private void moveFile(File from, File to) throws ProcessException {
     to.getParentFile().mkdirs();
-    if (this.preserveSrc) {
-      // copy file
-      try {
-        FileInputStream fis = new FileInputStream(from);
-        FileOutputStream fos = new FileOutputStream(to);
-        try {
-          int read;
-          byte[] buffer = new byte[BUFFER_SIZE];
-          while ((read = fis.read(buffer)) != -1) {
-            fos.write(buffer, 0, read);
-          }
-        } finally {
-          fis.close();
-          fos.close();
-        }
-      } catch (IOException ex) {
-        throw new ProcessException("Failed to copy file "+from.getAbsolutePath()+" to "+to.getAbsolutePath(), ex);
+    try {
+      if (this.preserveSrc) {
+        Files.copy(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+      } else {
+        Files.move(from.toPath(), to.toPath(), StandardCopyOption.REPLACE_EXISTING);
       }
-    } else {
-      try {
-        java.nio.file.Files.move(from.toPath(), to.toPath());
-      } catch (IOException ex) {
-        throw new ProcessException("Failed to move file "+from.getAbsolutePath()+" to "+to.getAbsolutePath(), ex);
-      }
+    } catch (IOException ex) {
+      String action = this.preserveSrc ? "copy" : "move";
+      throw new ProcessException("Failed to " + action + " file " + from.getAbsolutePath() + " to " + to.getAbsolutePath(), ex);
     }
   }
 
