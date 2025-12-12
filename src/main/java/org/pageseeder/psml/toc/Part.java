@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -25,6 +24,11 @@ import org.pageseeder.xmlwriter.XMLWriter;
  *
  * <p>When a level is missing, a phantom part may be created to bridge the gap between parts of
  * different levels.
+ *
+ * @author Christophe Lauret
+ *
+ * @version 1.6.9
+ * @since 1.0.0
  */
 public final class Part<T extends Element> implements Serializable, XMLWritable {
 
@@ -39,7 +43,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   /**
    * List of sub-parts in this part
    */
-  private final List<Part<?>> parts;
+  private final List<Part<? extends Element>> parts;
 
   /**
    * Create an empty part starting with the specified element.
@@ -56,7 +60,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @param element The element starting this part
    * @param parts   The sub-parts
    */
-  public Part(T element, @NonNull Part<?>... parts) {
+  public Part(T element, Part<?>... parts) {
     this.element = element;
     this.parts = Arrays.asList(parts);
   }
@@ -67,7 +71,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
    * @param element The element starting this part
    * @param parts   The sub-parts
    */
-  public Part(T element, List<Part<?>> parts) {
+  public Part(T element, List<Part<? extends Element>> parts) {
     this.element = element;
     this.parts = parts;
   }
@@ -86,7 +90,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   /**
    * @return The element at the origin of this part.
    */
-  public @NonNull T element() {
+  public T element() {
     return this.element;
   }
 
@@ -122,17 +126,18 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
   }
 
   /**
-   * Returns the list of sub-parts in the part.
+   * Returns the list of subparts in the part.
    *
-   * @return the list of sub-parts in the part.
+   * @return the list of subparts in the part.
    */
-  public List<Part<?>> parts() {
+  @SuppressWarnings("java:S1452")
+  public List<Part<? extends Element>> parts() {
     return this.parts;
   }
 
   /**
    * Indicates whether the level of this part is consistent with the level of
-   * its defining element and each sub-part.
+   * its defining element and each subpart.
    *
    * @return <code>true</code> if the levels are consistent;
    *         <code>false</code> otherwise.
@@ -143,7 +148,7 @@ public final class Part<T extends Element> implements Serializable, XMLWritable 
 
   /**
    * Indicates whether the level of this part is consistent with the level of
-   * its defining element and each sub-part.
+   * its defining element and each subpart.
    *
    * @param level The expected level
    *
