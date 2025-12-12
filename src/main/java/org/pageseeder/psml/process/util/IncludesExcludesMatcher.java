@@ -10,7 +10,10 @@ import java.util.List;
 
 /**
  * @author Jean-Baptiste Reure
- * @version 12 September 2010
+ * @author Christophe Lauret
+ *
+ * @version 1.6.9
+ * @since 1.0.0
  */
 public final class IncludesExcludesMatcher {
 
@@ -34,7 +37,7 @@ public final class IncludesExcludesMatcher {
   public void addIncludePatterns(@Nullable List<String> patterns) {
     if (patterns == null) return;
     for (String inc : patterns) {
-      if (inc.length() > 0) this.includePatterns.add(createRegex(inc));
+      if (!inc.isEmpty()) this.includePatterns.add(createRegex(inc));
     }
   }
 
@@ -45,10 +48,10 @@ public final class IncludesExcludesMatcher {
    *
    * @param patterns the list of patterns to include.
    */
-  public void addIncludePatterns(@Nullable String[] patterns) {
+  public void addIncludePatterns(String @Nullable [] patterns) {
     if (patterns == null) return;
     for (String inc : patterns) {
-      if (inc.length() > 0) this.includePatterns.add(createRegex(inc));
+      if (!inc.isEmpty()) this.includePatterns.add(createRegex(inc));
     }
   }
 
@@ -74,7 +77,7 @@ public final class IncludesExcludesMatcher {
   public void addExcludePatterns(@Nullable List<String> patterns) {
     if (patterns == null) return;
     for (String exc : patterns) {
-      if (exc.length() > 0) this.excludePatterns.add(createRegex(exc));
+      if (!exc.isEmpty()) this.excludePatterns.add(createRegex(exc));
     }
   }
 
@@ -85,10 +88,10 @@ public final class IncludesExcludesMatcher {
    *
    * @param patterns the list of patterns to exclude.
    */
-  public void addExcludePatterns(@Nullable String[] patterns) {
+  public void addExcludePatterns(String @Nullable [] patterns) {
     if (patterns == null) return;
     for (String exc : patterns) {
-      if (exc.length() > 0) this.excludePatterns.add(createRegex(exc));
+      if (!exc.isEmpty()) this.excludePatterns.add(createRegex(exc));
     }
   }
 
@@ -145,7 +148,7 @@ public final class IncludesExcludesMatcher {
   }
 
   /**
-   * Checks if the path sepcified is valid according to this matcher.
+   * Checks if the path specified is valid according to this matcher.
    * This is the same as calling {@code isIncluded(path) && !isExcluded(path)}
    *
    * @param path the path to test
@@ -172,11 +175,11 @@ public final class IncludesExcludesMatcher {
    * @param pattern the pattern
    * @return the corresponding regular expression.
    */
-  private static String createRegex(String pattern) {
+  static String createRegex(String pattern) {
     return "^"+pattern.replaceAll("[\\.\\(\\)\\[\\]\\^\\$\\+]", "\\\\$0")
-                      .replaceAll("\\*\\*", "[psdoublestar]")
-                      .replaceAll("\\*", "([^/]*?)")
-                      .replaceAll("\\[psdoublestar\\]", "(.*?)")+"$";
+                      .replace("**", "\\u0000DS\\u0000")
+                      .replace("*", "([^/]*?)")
+                      .replace("\\u0000DS\\u0000", "(.*?)")+"$";
   }
 
 }
