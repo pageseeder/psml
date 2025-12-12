@@ -18,7 +18,6 @@ package org.pageseeder.psml.md;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -3,7 +3,7 @@
  */
 package org.pageseeder.psml.toc;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.xmlwriter.XML;
 import org.pageseeder.xmlwriter.XMLStringWriter;

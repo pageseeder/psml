@@ -152,7 +152,7 @@ final class MarkdownSerializerTest {
   @Test
   void testList() {
     String psml = "<list><item>Item 1</item><item>Item 2</item></list>";
-    assertEquals("\n* Item 1\n* Item 2\n", toMarkdown(psml));
+    assertEquals("\n- Item 1\n- Item 2\n", toMarkdown(psml));
   }
 
   @Test

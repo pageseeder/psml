@@ -5,7 +5,7 @@ slf4j = "2.0.17"
 xmlunit = "2.10.0"
 
 [libraries]
-annotations = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version = "2.3.100" }
+jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 commons-io = { module = "commons-io:commons-io", version = "2.19.0" }
 hamcrest = { module = "org.hamcrest:hamcrest", version = "2.2"}
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
@@ -13,7 +13,7 @@ junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.re
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 junit-platform-engine = { module = "org.junit.platform:junit-platform-engine", version.ref = "junit-platform" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-pso-diffx = { module = "org.pageseeder.diffx:pso-diffx", version = "1.2.2" }
+pso-diffx = { module = "org.pageseeder.diffx:pso-diffx", version = "1.2.4" }
 pso-xmlwriter = { module = "org.pageseeder.xmlwriter:pso-xmlwriter", version = "1.0.4" }
 rhino-engine = { module = "org.mozilla:rhino-engine", version = "1.7.14" }
 saxon-he = { module ="net.sf.saxon:Saxon-HE", version = "9.9.1-5" }

@@ -3,7 +3,7 @@ package org.pageseeder.psml.toc;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.xmlwriter.XMLWriter;
 

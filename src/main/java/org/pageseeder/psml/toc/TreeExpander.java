@@ -5,25 +5,32 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
-
+/**
+ *
+ *
+ * @author Phlilip Rutherford
+ * @author Christophe Lauret
+ *
+ * @version 1.6.9
+ * @since 1.0.0
+ */
 public final class TreeExpander {
 
   /**
    * Stack of structural elements so that we can return to the previous level when a branch has been processed.
    */
-  private final Deque<MutablePart> _parts = new ArrayDeque<>();
+  private final Deque<MutablePart> parts = new ArrayDeque<>();
 
   public TreeExpander(String title) {
-    this._parts.push(new MutablePart(new DocumentTitle(title)));
+    this.parts.push(new MutablePart(new DocumentTitle(title)));
   }
 
   public TreeExpander() {
-    this._parts.push(new MutablePart(DocumentTitle.UNTITLED));
+    this.parts.push(new MutablePart(DocumentTitle.UNTITLED));
   }
 
   /**
-   * Add a new leaf to the list (it should not affect heading structure).
+   * Add a new leaf to the list (it should not affect the heading structure).
    * Used for paragraphs end transclusion start/end.
    *
    * @param element The new element to add
@@ -31,7 +38,7 @@ public final class TreeExpander {
    * @return This tree expander instance for method chaining
    */
   public TreeExpander addLeaf(Element element) {
-    MutablePart current = this._parts.peek();
+    MutablePart current = this.parts.peek();
     // Add the element to the current part
     MutablePart mutable = new MutablePart(element);
     if (current != null) {
@@ -55,32 +62,32 @@ public final class TreeExpander {
    * Add a new element to the list.
    *
    * @param element      The new element to add
-   * @param elementlevel The level for the element
+   * @param elementLevel The level for the element
    *
    * @return This tree expander instance for method chaining
    */
-  public TreeExpander add(Element element, int elementlevel) {
-    // level = size(parts) = level(current) + 1;
-    int level = this._parts.size();
-    MutablePart current = this._parts.peek();
+  public TreeExpander add(Element element, int elementLevel) {
+    // level = size of parts = level of current + 1
+    int level = this.parts.size();
+    MutablePart current = this.parts.peek();
     if (current == null) {
       current = new MutablePart(DocumentTitle.UNTITLED);
-      this._parts.push(current);
+      this.parts.push(current);
     }
 
     // Insert phantom parts when we jumps levels (e.g. h1 -> h4)
-    while (elementlevel > level) {
-      Element phantom= new Phantom(level++, element.fragment(), element.originalFragment());
+    while (elementLevel > level) {
+      Element phantom = new Phantom(level++, element.fragment(), element.originalFragment());
       MutablePart mutable = new MutablePart(phantom);
       current.add(mutable);
-      this._parts.push(mutable);
+      this.parts.push(mutable);
       current = mutable;
     }
 
     // Remove other parts of deeper levels (e.g. h4 -> h1)
-    while (elementlevel < level) {
-      this._parts.pop();
-      current = this._parts.peek();
+    while (elementLevel < level) {
+      this.parts.pop();
+      current = this.parts.peek();
       level--;
     }
 
@@ -89,12 +96,13 @@ public final class TreeExpander {
     if (current != null) {
       current.add(mutable);
     }
-    this._parts.push(mutable);
+    this.parts.push(mutable);
     return this;
   }
 
-  public List<Part<?>> parts() {
-    MutablePart root = this._parts.peekLast();
+  @SuppressWarnings("java:S1452")
+  public List<Part<? extends Element>> parts() {
+    MutablePart root = this.parts.peekLast();
     if (root == null) throw new IllegalStateException("No root!");
     Part<?> document = root.build();
     return document.parts();
@@ -105,21 +113,21 @@ public final class TreeExpander {
    */
   private static class MutablePart {
 
-    private final Element _element;
+    private final Element element;
 
-    private final List<MutablePart> _parts = new ArrayList<>();
+    private final List<MutablePart> parts = new ArrayList<>();
 
     public MutablePart(Element element) {
-      this._element = element;
+      this.element = element;
     }
 
     public void add(MutablePart part) {
-      this._parts.add(part);
+      this.parts.add(part);
     }
 
-    public Part<?> build() {
-      @NonNull Part<?>[] parts = this._parts.stream().map(p -> p.build()).toArray(Part<?>[]::new);
-      return new Part<>(this._element, parts);
+    public Part<Element> build() {
+      Part<?>[] buildParts = this.parts.stream().map(MutablePart::build).toArray(Part<?>[]::new);
+      return new Part<>(this.element, buildParts);
     }
 
   }

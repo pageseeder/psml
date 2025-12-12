@@ -11,7 +11,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

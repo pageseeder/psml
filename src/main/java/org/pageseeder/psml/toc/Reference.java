@@ -3,8 +3,8 @@
  */
 package org.pageseeder.psml.toc;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.xmlwriter.XMLWriter;
 

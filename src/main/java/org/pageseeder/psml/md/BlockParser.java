@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
@@ -48,6 +48,7 @@ import org.pageseeder.psml.util.NilDiagnosticCollector;
  * @version 1.6.0
  * @since 1.0
  */
+@SuppressWarnings("java:S1192")
 public class BlockParser {
 
   /**

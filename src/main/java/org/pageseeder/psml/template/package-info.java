@@ -16,7 +16,7 @@
 /**
  * Package providing classes to process PSML templates.
  */
-@NonNullByDefault
+@NullMarked
 package org.pageseeder.psml.template;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.jspecify.annotations.NullMarked;

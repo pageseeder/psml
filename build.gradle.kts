@@ -27,11 +27,10 @@ java {
 }
 
 dependencies {
-  compileOnly(libs.annotations)
-
   api(libs.slf4j.api)
   api(libs.pso.xmlwriter)
   api(libs.pso.diffx)
+  api(libs.jspecify)
 
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.bundles.junit)
@@ -39,7 +38,7 @@ dependencies {
   testImplementation(libs.xmlunit.core)
   testImplementation(libs.xmlunit.matchers)
   testImplementation(libs.commons.io)
-  testImplementation(libs.annotations)
+  testImplementation(libs.jspecify)
 
   testRuntimeOnly(libs.junit.jupiter.engine)
   testRuntimeOnly(libs.slf4j.simple)

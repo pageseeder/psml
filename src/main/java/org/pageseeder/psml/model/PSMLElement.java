@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -34,9 +34,10 @@ import org.pageseeder.xmlwriter.XMLWriter;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.9
  * @since 1.0
  */
+@SuppressWarnings("java:S1192")
 public class PSMLElement implements PSMLNode {
 
   /**
@@ -202,13 +203,12 @@ public class PSMLElement implements PSMLNode {
     FULLNAME("fullname"),
 
     /**
-     * &lt;hcell&lt; element
+     * &lt;hcell&lt; element.
+     *
+     * <p>The cell element is usually preferable.
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-hcell.html">hcell element</a>
-     *
-     * @deprecated Use cell instead
      */
-    @Deprecated
     HCELL("hcell", "align", "alignment", "colspan", "role", "rowspan", "valign", "width"),
 
     /**

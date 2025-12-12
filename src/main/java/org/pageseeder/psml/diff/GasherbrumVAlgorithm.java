@@ -3,7 +3,7 @@
  */
 package org.pageseeder.psml.diff;
 
-import org.eclipse.jdt.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.diffx.action.Operation;
 import org.pageseeder.diffx.action.OperationsBuffer;
 import org.pageseeder.diffx.algorithm.MatrixXMLAlgorithm;

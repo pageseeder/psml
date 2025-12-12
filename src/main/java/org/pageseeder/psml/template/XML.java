@@ -15,9 +15,10 @@
  */
 package org.pageseeder.psml.template;
 
-import org.eclipse.jdt.annotation.Nullable;
-
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -26,7 +27,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author  Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.9
  * @since 1.0
  */
 public final class XML {
@@ -37,6 +38,40 @@ public final class XML {
   private static final int ASCII_LAST_CHAR = 0x80;
 
   private XML() {}
+
+  /**
+   * Checks if the specified string is valid XML.
+   *
+   * @param xml The xml to check.
+   * @return true if well-formed XML; false otherwise.
+   */
+  public static boolean isWellFormed(String xml) {
+    XMLInputFactory f = XMLInputFactory.newFactory();
+
+    // Security: disable DTDs/external entities to prevent XXE.
+    try { f.setProperty(XMLInputFactory.SUPPORT_DTD, false); } catch (IllegalArgumentException ignored) { /* ignored */ }
+    try { f.setProperty("javax.xml.stream.isSupportingExternalEntities", false); } catch (IllegalArgumentException ignored) { /* ignored */ }
+
+    try (StringReader sr = new StringReader(xml)) {
+      XMLStreamReader r = f.createXMLStreamReader(sr);
+      while (r.hasNext()) r.next();
+      r.close();
+      return true;
+    } catch (Exception ex) {
+      return false;
+    }
+  }
+
+  /**
+   * Checks if the the specified string is a valid XML fragment.
+   *
+   * @param fragment The fragment to check.
+   * @return true if well-formed XML; false otherwise.
+   */
+  public static boolean isWellFormedFragment(String fragment) {
+    // Wrap fragment so it can be parsed as a single document.
+    return isWellFormed("<r>" + fragment + "</r>");
+  }
 
   /**
    * @param cs the charset to use for the target XML output.

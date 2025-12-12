@@ -10,26 +10,117 @@ import java.util.Objects;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.7
+ * @version 1.6.9
  * @since 1.6.0
  */
 public final class MarkdownOutputOptions {
+
+  /**
+   * Specifies the format used for PSML content marked as bold with the
+   * {@code <bold>} element in the Markdown output.
+   *
+   * <p>For example:</p>
+   * <pre>{@code This is <bold>bold text</bold>.}</pre>
+   */
+  public enum BoldFormat {
+
+    /**
+     * Format the content using a double asterisk.
+     *
+     * <p>For example:</p>
+     * <pre>{@code This is **bold text**.}</pre>
+     */
+    DOUBLE_ASTERISK("**"),
+
+    /**
+     * Format the content using a double underscore.
+     *
+     * <p>For example:</p>
+     * <pre>{@code This is __bold text__.}</pre>
+     */
+    DOUBLE_UNDERSCORE("__"),
+
+    /**
+     * Ignore the bold formatting and just output the content as-is.
+     *
+     * <p>For example:</p>
+     * <pre>{@code This is bold text.}</pre>
+     */
+    IGNORE("");
+
+    private final String format;
+
+    BoldFormat(String format) {
+      this.format = format;
+    }
+
+    String format() {
+      return format;
+    }
+  }
+
+  /**
+   * Specifies the format used for PSML content marked as italic with the
+   * {@code <italic>} element in the Markdown output.
+   *
+   * <p>For example:</p>
+   * <pre>{@code This is an <bold>emphasis</bold>.}</pre>
+   */
+  public enum ItalicFormat {
+
+    /**
+     * Format the content using a single asterisk.
+     *
+     * <p>For example:</p>
+     * <pre>{@code This is an *emphasis*.}</pre>
+     */
+    ASTERISK,
+
+    /**
+     * Format the content using a single underscore.
+     *
+     * <p>For example:</p>
+     * <pre>{@code This is an _emphasis_.}</pre>
+     */
+    UNDERSCORE,
+
+    /**
+     * Ignore the bold formatting and just output the content as-is.
+     *
+     * <p>For example:</p>
+     * <pre>{@code This is an emphasis.}</pre>
+     */
+    IGNORE;
+
+  }
 
   /**
    * Specifies the format used for exporting images in the Markdown output.
    *
    * <p>This enumeration defines the various options for handling image references or embedding within
    * the generated Markdown content. Each format controls how the image is represented in the output.
+   *
+   * <p>for example:</p>
+   * <pre>{@code
+   * <image src="/common/images/sample.png" alt="My sample image" uriid="1234"
+   *        height="150" width="300" labels="border,shadow,photo"/>
+   * }</pre>
    */
   public enum ImageFormat {
 
     /**
      * As a local link
+     *
+     * <p>for example:</p>
+     * <pre>{@code ![My sample image](images/sample.png) }</pre>
      */
     LOCAL,
 
     /**
-     * As a link to PageSeeder
+     * As a link to PageSeeder.
+     *
+     * <p>for example:</p>
+     * <pre>{@code ![My sample image](https://ps.example.org/ps/uri/1234.png) }</pre>
      */
     EXTERNAL,
 
@@ -39,7 +130,13 @@ public final class MarkdownOutputOptions {
     DATA_URI,
 
     /**
-     * As an image tag
+     * As an HTML image tag.
+     *
+     * <p>for example:</p>
+     * <pre>{@code
+     * <img src="/common/images/sample.png" alt="My sample image"
+     *      height="150" width="300" />
+     * }</pre>
      */
     IMG_TAG,
 
@@ -82,85 +179,168 @@ public final class MarkdownOutputOptions {
   /**
    * Enumeration representing the formats for rendering block label elements
    * in Markdown output.
+   *
+   * <p>For example:</p>
+   * <pre>{@code
+   * <block label="warning">Do not attempt to read this document while eating.
+   * Your focus may be compromised.</block>
+   * }</pre>
    */
   public enum BlockFormat {
 
     /**
-     * Represents a block label element rendered in a quoted format using
+     * Formats a block label element using the quoted format and prefixed with
      * {@code '> **[label]**:'} in the Markdown output.
+     *
+     * <p>For example:</p>
+     * <pre>{@code
+     * > **Warning**: Do not attempt to read this document while eating.
+     * > Your focus may be compromised.
+     * }</pre>
      */
     QUOTED,
 
     /**
-     * Represents a block label element rendered in a fenced format using
-     * {@code '~~~[label]'} in the Markdown output.
+     * Formates a block label element using the fenced format using
+     * {@code '~~~[label]'} around block content in the Markdown output.
+     *
+     * <p>For example:</p>
+     * <pre>{@code
+     * ~~~warning
+     * Do not attempt to read this document while eating.
+     * Your focus may be compromised.
+     * ~~~
+     * }</pre>
      */
     FENCED,
 
     /**
-     * Represents a block label element rendered in a prefixed format in the Markdown output.
-     * The specific rendering details for this format are not defined in the provided documentation.
+     * Formats a block label element using a prefixed format starting with
+     * {@code '**[label]**:'} in the Markdown output.
+     *
+     * <p>For example:</p>
+     * <pre>{@code
+     * **Warning**: Do not attempt to read this document while eating.
+     * Your focus may be compromised.
+     * }</pre>
      */
-    LABELED
 
   }
 
   /**
    * Defines options for formatting superscript and subscript text in Markdown output.
+   *
+   * <p>For example</p>
+   * <pre>{@code x<sup>2</sup> or note<sup>2</sup>}</pre>
    */
   public enum SuperSubFormat {
 
     /**
      * Superscripts and subscripts are represented using HTML tags (e.g.,
      * {@code <sup>}, {@code <sub>}).
+     *
+     * <p>For example</p>
+     * <pre>{@code x<sup>2</sup> or note<sup>2</sup>}</pre>
      */
     HTML,
 
     /**
      * Superscripts and subscripts are represented using caret (^) and tilde (~) notation.
+     *
+     * <p>For example</p>
+     * <pre>{@code x^2^ or note~2~}</pre>
      */
     CARET_TILDE,
 
     /**
      * Superscripts and subscripts are represented using their Unicode equivalent
      * characters to render formatted text.
+     *
+     * <p>For example</p>
+     * <pre>{@code x² or note₂}</pre>
      */
     UNICODE,
 
     /**
      * Superscript and subscript formatting is ignored and not rendered.
+     *
+     * <p>For example</p>
+     * <pre>{@code x2 or note2}</pre>
      */
     IGNORE
   }
 
   /**
    * Specifies the underline formatting style for Markdown output generation.
+   *
+   * <p>For example</p>
+   * <pre>{@code The <underline>formula</underline> is crucial.}</pre>
    */
   public enum UnderlineFormat {
 
     /**
      * Underlines are represented using the HTML tag {@code <u>}).
+     *
+     * <p>For example</p>
+     * <pre>{@code The <u>formula</u> is crucial.}</pre>
      */
     HTML,
 
     /**
      * Underline formatting is ignored and not rendered.
+     *
+     * <p>For example</p>
+     * <pre>{@code The formula is crucial.}</pre>
      */
     IGNORE
   }
 
   /**
    * Defines the possible formats for rendering properties in the Markdown output.
+   *
+   * <p>For example.</p>
+   * <pre>{@code
+   *   <properties-fragment id="bookinfo"
+   *     <property title="Title"  name="title"  value="Echoes of the Forgotten Sky"/>
+   *     <property title="Author" name="author" value="Dr. Elara Voss"/>
+   *     <property title="Publication date" name="pubdate" datatype="date value="2023-04-05"/>
+   *     <property title="Genre" name="gener" multiple="true">
+   *       <value>Science Fiction</value>
+   *       <value>Mystery</value>
+   *     </property>
+   *   </properties-fragment>
+   * }</pre>
+   *
+   * <p>If metadata are enabled, the properties fragment will start with</p>
+   * <pre>{@code **Properties 1**: bookinfo }</pre>
    */
   public enum PropertiesFormat {
 
     /**
      * Renders properties as value-pairs {e.g. {@code Title: Value}.
+     *
+     * <p>For example.</p>
+     * <pre>{@code
+     * Title: Echoes of the Forgotten Sky
+     * Author: Dr. Elara Voss
+     * Publication date: 2023-04-05
+     * Genre: [Science Fiction, Mystery]
+     * }</pre>
      */
     VALUE_PAIRS,
 
     /**
      * Renders properties as a table with the "Title" and "Value" headers.
+     *
+     * <p>For example.</p>
+     * <pre>{@code
+     * | Name | Value |
+     * | ----- | ----- |
+     * | Title | Echoes of the Forgotten Sky |
+     * | Author |  Dr. Elara Voss |
+     * | Publication date | 2023-04-05 |
+     * | Genre | [Science Fiction, Mystery] |
+     * }</pre>
      */
     TABLE
 
@@ -193,9 +373,84 @@ public final class MarkdownOutputOptions {
 
   }
 
+  /**
+   * Specifies the style to use for designators for table captions, images, properties and block labels.
+   *
+   * <p>The designator can be: "Table", "Image", "Properties" or the label name.</p>
+   */
+  public enum DesignatorStyle {
+
+    /**
+     * Use a double asterisk.
+     *
+     * <p>For example:</p>
+     * <pre>{@code **Table 1**: Sample table**}</pre>
+     * or
+     * <pre>{@code **Note:** this just an example}</pre>
+     */
+    DOUBLE_ASTERISK,
+
+    /**
+     * Use a single asterisk.
+     *
+     * <p>For example:</p>
+     * <pre>{@code *Table 1*: Sample table}</pre>
+     * or
+     * <pre>{@code *Note:* this just an example}</pre>
+     */
+    ASTERISK,
+
+    /**
+     * Convert all characters of the designator to the upper case.
+     *
+     * <p>For example:</p>
+     * <pre>{@code TABLE 1: Sample table}</pre>
+     * or
+     * <pre>{@code NOTE: this just an example}</pre>
+     */
+    UPPER_CASE,
+
+    /**
+     * Just use a capitalized word.
+     *
+     * <p>For example:</p>
+     * <pre>{@code Table 1: Sample table}</pre>
+     * or
+     * <pre>{@code Note: this just an example}</pre>
+     */
+    PLAIN,
+
+    /**
+     * Don't output designators at all.
+     */
+    NONE;
+
+    /**
+     * Formats the designator using the specified style.
+     *
+     * @param designator The designator to format.
+     * @return the formatted designator.
+     */
+    public String format(String designator) {
+      switch (this) {
+        case DOUBLE_ASTERISK: return "**" + designator + "**";
+        case ASTERISK: return "*" + designator + "*";
+        case UPPER_CASE: return designator.toUpperCase();
+        case PLAIN: return designator.substring(0, 1).toUpperCase() + designator.substring(1);
+        case NONE: return "";
+      }
+      return designator;
+    }
+
+  }
+
   private final boolean metadata;
 
-  private final boolean captions;
+  private final DesignatorStyle designator;
+
+  private final BoldFormat bold;
+
+  private final ItalicFormat italic;
 
   private final ImageFormat image;
 
@@ -214,7 +469,9 @@ public final class MarkdownOutputOptions {
   @SuppressWarnings("java:S107")
   private MarkdownOutputOptions(
       boolean metadata,
-      boolean captions,
+      DesignatorStyle designator,
+      BoldFormat bold,
+      ItalicFormat italic,
       ImageFormat image,
       XrefFormat xref,
       BlockFormat block,
@@ -223,7 +480,9 @@ public final class MarkdownOutputOptions {
       PropertiesFormat properties,
       TableFormat table) {
     this.metadata = metadata;
-    this.captions = captions;
+    this.designator = designator;
+    this.bold = Objects.requireNonNull(bold);
+    this.italic = Objects.requireNonNull(italic);
     this.image = Objects.requireNonNull(image);
     this.xref = Objects.requireNonNull(xref);
     this.block = Objects.requireNonNull(block);
@@ -246,7 +505,9 @@ public final class MarkdownOutputOptions {
    */
   public static MarkdownOutputOptions defaultOptions() {
     return new MarkdownOutputOptions(true,
-        false,
+        DesignatorStyle.NONE,
+        BoldFormat.DOUBLE_UNDERSCORE,
+        ItalicFormat.ASTERISK,
         ImageFormat.LOCAL,
         XrefFormat.BOLD_TEXT,
         BlockFormat.QUOTED,
@@ -270,9 +531,39 @@ public final class MarkdownOutputOptions {
    * Determines whether captions should be included as text in the Markdown output.
    *
    * @return true if captions are included in the output, false otherwise.
+   *
+   * @deprecated since 1.6.9, use designator() instead.
    */
+  @Deprecated(forRemoval = true, since = "1.6.9")
   public boolean captions() {
-    return captions;
+    return DesignatorStyle.NONE != this.designator;
+  }
+
+  /**
+   * Returns the style for designators
+   *
+   * @return The designator style.
+   */
+  public DesignatorStyle designator() {
+    return designator;
+  }
+
+  /**
+   * Returns the bold format option for the Markdown output.
+   *
+   * @return the bold format option used for processing bold text.
+   */
+  public BoldFormat bold() {
+    return bold;
+  }
+
+  /**
+   * Returns the italic format option for the Markdown output.
+   *
+   * @return the italic format option used for processing italic text.
+   */
+  public ItalicFormat italic() {
+    return italic;
   }
 
   /**
@@ -352,7 +643,8 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated metadata formatting setting.
    */
   public MarkdownOutputOptions metadata(boolean include) {
-    return new MarkdownOutputOptions(include, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    if (this.metadata == include) return this;
+    return new MarkdownOutputOptions(include, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -365,7 +657,49 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated caption formatting setting.
    */
   public MarkdownOutputOptions captions(boolean include) {
-    return new MarkdownOutputOptions(this.metadata, include, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    if (include) {
+      if (this.designator != DesignatorStyle.NONE) return this;
+      return new MarkdownOutputOptions(this.metadata, DesignatorStyle.DOUBLE_ASTERISK, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    } else {
+      if (this.designator == DesignatorStyle.NONE) return this;
+      return new MarkdownOutputOptions(this.metadata, DesignatorStyle.NONE, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    }
+  }
+
+  /**
+   * Sets the style of table captions, properties, images alt text should be included as a paragraph
+   * before the table, properties, or images in the content.
+   *
+   * <p>For example, {@code **Image 2**: Network diagram}
+   *
+   * @param style true to include captions as text in the output, false to exclude it.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated caption formatting setting.
+   */
+  public MarkdownOutputOptions designator(DesignatorStyle style) {
+    if (this.designator == style) return this;
+    return new MarkdownOutputOptions(this.metadata, style, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+  }
+
+  /**
+   * Sets the bold formatting option for the Markdown output.
+   *
+   * @param format the bold formatting to be applied.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated bold formatting setting.
+   */
+  public MarkdownOutputOptions bold(BoldFormat format) {
+    if (this.bold == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, format, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+  }
+
+  /**
+   * Sets the italic formatting option for the Markdown output.
+   *
+   * @param format the italic formatting to be applied.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated italic formatting setting.
+   */
+  public MarkdownOutputOptions italic(ItalicFormat format) {
+    if (this.italic == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, format, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -375,7 +709,8 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated image formatting setting.
    */
   public MarkdownOutputOptions image(ImageFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, format, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    if (this.image == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, format, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -388,7 +723,8 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated cross-reference format.
    */
   public MarkdownOutputOptions xref(XrefFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, format, this.block, this.superSub, this.underline, this.properties, this.table);
+    if (this.xref == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, format, this.block, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
@@ -400,45 +736,42 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated block format.
    */
   public MarkdownOutputOptions block(BlockFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, format, this.superSub, this.underline, this.properties, this.table);
+    if (this.block == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, format, this.superSub, this.underline, this.properties, this.table);
   }
 
   /**
    * Sets the superscript and subscript formatting option for the Markdown output.
    *
-   * @param format the superscript and subscript formatting to be applied. Possible values include:
-   *               HTML for HTML tag-based formatting,
-   *               CARET_TILDE for caret/tilde-based formatting, and
-   *               IGNORE to skip rendering superscripts and subscripts.
+   * @param format the superscript and subscript formatting to be applied.
    * @return a new instance of {@code MarkdownOutputOptions} with the updated superscript
    *         and subscript formatting setting.
    */
   public MarkdownOutputOptions superSub(SuperSubFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, format, this.underline, this.properties, this.table);
+    if (this.superSub == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, format, this.underline, this.properties, this.table);
   }
 
   /**
    * Sets the underline formatting option for the Markdown output.
    *
-   * @param format the underline formatting to be applied. Possible values include:
-   *               HTML for HTML tag-based formatting, and
-   *               IGNORE to skip rendering underlined elements.
+   * @param format the underline formatting to be applied.
    * @return a new instance of {@code MarkdownOutputOptions} with the updated underline formatting setting.
    */
   public MarkdownOutputOptions underline(UnderlineFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, format, this.properties, this.table);
+    if (this.underline == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, format, this.properties, this.table);
   }
 
   /**
    * Sets the properties formatting option for the Markdown output.
    *
-   * @param format the properties formatting option to be applied. Possible values include:
-   *               VALUE_PAIRS for rendering properties as value pairs (e.g., Title: Value), and
-   *               TABLE for rendering properties as a table with "Title" and "Value" headers.
+   * @param format the properties formatting option to be applied.
    * @return a new instance of {@code MarkdownOutputOptions} with the updated properties formatting setting.
    */
   public MarkdownOutputOptions properties(PropertiesFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, format, this.table);
+    if (this.properties == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, format, this.table);
   }
 
   /**
@@ -448,7 +781,8 @@ public final class MarkdownOutputOptions {
    * @return a new instance of {@code MarkdownOutputOptions} with the updated table formatting setting.
    */
   public MarkdownOutputOptions table(TableFormat format) {
-    return new MarkdownOutputOptions(this.metadata, this.captions, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, format);
+    if (this.table == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, format);
   }
 
   /**
@@ -466,7 +800,9 @@ public final class MarkdownOutputOptions {
     if (o == null || getClass() != o.getClass()) return false;
     MarkdownOutputOptions that = (MarkdownOutputOptions) o;
     return metadata == that.metadata &&
-        captions == that.captions &&
+        bold == that.bold &&
+        italic == that.italic &&
+        designator == that.designator &&
         image == that.image &&
         xref == that.xref &&
         block == that.block &&
@@ -478,14 +814,16 @@ public final class MarkdownOutputOptions {
 
   @Override
   public int hashCode() {
-    return Objects.hash(metadata, captions, image, xref, block, superSub, underline, properties, table);
+    return Objects.hash(metadata, designator, bold, italic, image, xref, block, superSub, underline, properties, table);
   }
 
   @Override
   public String toString() {
     return "MarkdownOutputOptions{" +
         "metadata=" + metadata +
-        ", captions=" + captions +
+        ", designator=" + designator +
+        ", bold=" + bold +
+        ", italic=" + italic +
         ", image=" + image +
         ", xref=" + xref +
         ", block=" + block +
@@ -505,7 +843,9 @@ public final class MarkdownOutputOptions {
    */
   public static class Builder {
     private boolean metadata = true;
-    private boolean captions = false;
+    private DesignatorStyle designator = DesignatorStyle.NONE;
+    private BoldFormat bold = BoldFormat.DOUBLE_UNDERSCORE;
+    private ItalicFormat italic = ItalicFormat.ASTERISK;
     private ImageFormat image = ImageFormat.LOCAL;
     private XrefFormat xref = XrefFormat.BOLD_TEXT;
     private BlockFormat block = BlockFormat.QUOTED;
@@ -530,7 +870,9 @@ public final class MarkdownOutputOptions {
     public static Builder from(MarkdownOutputOptions options) {
       Builder builder = new Builder();
       builder.metadata = options.metadata();
-      builder.captions = options.captions();
+      builder.designator = options.designator();
+      builder.bold = options.bold();
+      builder.italic = options.italic();
       builder.image = options.image();
       builder.xref = options.xref();
       builder.block = options.block();
@@ -562,7 +904,21 @@ public final class MarkdownOutputOptions {
      * @return this builder instance
      */
     public Builder captions(boolean include) {
-      this.captions = include;
+      this.designator = DesignatorStyle.DOUBLE_ASTERISK;
+      return this;
+    }
+
+    /**
+     * Sets whether table captions, properties, images alt text should be included as a paragraph
+     * before the table, properties, or images in the content.
+     *
+     * <p>For example, {@code **Image 2**: Network diagram}
+     *
+     * @param style the style to use for designators.
+     * @return this builder instance
+     */
+    public Builder designator(DesignatorStyle style) {
+      this.designator = style;
       return this;
     }
 
@@ -651,7 +1007,9 @@ public final class MarkdownOutputOptions {
     public MarkdownOutputOptions build() {
       return new MarkdownOutputOptions(
           metadata,
-          captions,
+          designator,
+          bold,
+          italic,
           image,
           xref,
           block,
