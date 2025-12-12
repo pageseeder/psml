@@ -204,7 +204,8 @@ public final class XRefTranscluder {
       if (this.parentFiles.size() > MAX_DEPTH)
         throw new TooDeepException();
       if (this.parentFiles.size() > WARNING_DEPTH) {
-        String src, tgt;
+        String src;
+        String tgt;
         try {
           src = this.parentHandler.getSourceFile().getCanonicalPath().substring(this.parentHandler.getPSMLRoot().getCanonicalPath().length()+1).replace(File.separatorChar, '/');
           tgt = target.getCanonicalPath().substring(this.parentHandler.getPSMLRoot().getCanonicalPath().length()+1).replace(File.separatorChar, '/');
