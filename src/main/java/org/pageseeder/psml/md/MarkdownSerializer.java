@@ -157,6 +157,7 @@ public class MarkdownSerializer {
       }
     }
 
+    @SuppressWarnings("java:S1075") // We want to use the path separator used on Web so '/' only
     String toExternalUrl(String href) {
       if (href.startsWith("http://") || href.startsWith("https://")) return href;
       if (this.host.isEmpty()) return href;
