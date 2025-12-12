@@ -19,6 +19,9 @@ import java.util.Objects;
  * Split a PSML document into multiple documents.
  *
  * @author Philip Rutherford
+ *
+ * @version 1.6.9
+ * @since 0.4.7
  */
 public final class PSMLSplitter {
 
