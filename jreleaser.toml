@@ -45,7 +45,7 @@ groupId = "org.pageseeder"
 owner = "pageseeder"
 name = "psml"
 username = "pageseeder"
-branch = "master"
+branch = "main"
 
 # Signing configuration
 [signing]
