@@ -3,13 +3,10 @@
  */
 package org.pageseeder.psml.process.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,8 +27,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * A utility class for XML data.
  *
- * @version 29 August 2002
  * @author  Christophe Lauret
+ *
+ * @version 1.6.9
+ * @since 0.9.0
  */
 public final class XMLUtils {
 
@@ -201,22 +200,22 @@ public final class XMLUtils {
       @Nullable List<String> errors,
       @Nullable List<String> warnings
   ) throws ProcessException {
+    final Path inPath = in.toPath();
+    final Path outPath = out.toPath();
+
     try {
-      FileInputStream fis = new FileInputStream(in);
-      FileOutputStream fos = new FileOutputStream(out);
-      try {
-        // run transform
+
+      // Transform
+      try (InputStream fis = Files.newInputStream(inPath);
+           OutputStream fos = Files.newOutputStream(outPath)) {
         Source source = new SAXSource(XMLReaderFactory.createXMLReader(), new InputSource(fis));
         source.setSystemId(in.toURI().toString());
-        t.transform(source,  new StreamResult(fos));
-      } finally {
-        fis.close();
-        fos.close();
+        t.transform(source, new StreamResult(fos));
       }
+
       // validate now if needed
       if (schema != null) {
-        fis = new FileInputStream(out);
-        try {
+        try (InputStream fis = Files.newInputStream(outPath)) {
           XMLReader reader = XMLReaderFactory.createXMLReader();
           reader.setFeature("http://xml.org/sax/features/validation", true);
           reader.setFeature("http://apache.org/xml/features/validation/schema", true);
@@ -237,14 +236,6 @@ public final class XMLUtils {
             warnings.addAll(errorHandler.getWarnings());
         } catch (SAXException ex) {
           throw new ProcessException("Error when validating XSLT output: " + ex.getMessage(), ex);
-        } catch (IOException ex) {
-          throw new ProcessException("Failed to read/write XML", ex);
-        } finally {
-          try {
-            fis.close();
-          } catch (IOException ex) {
-            throw new ProcessException("Failed to close XSLT output stream", ex);
-          }
         }
       }
     } catch (SAXException ex) {
@@ -316,14 +307,10 @@ public final class XMLUtils {
                            @Nullable List<String> errors,
                            @Nullable List<String> warnings) throws ProcessException {
 
-    try {
+    try (in) {
       parse(new InputSource(in), handler, errors, warnings);
-    } finally {
-      try {
-        in.close();
-      } catch (IOException ex) {
-        throw new ProcessException("Failed to close PSML: " + ex.getMessage(), ex);
-      }
+    } catch (IOException ex) {
+      throw new ProcessException("Failed to close PSML: " + ex.getMessage(), ex);
     }
 }
 
@@ -365,9 +352,7 @@ public final class XMLUtils {
         warnings.addAll(errorHandler.getWarnings());
     } catch (IOException ex) {
       throw new ProcessException("Failed to read/write PSML: " + ex.getMessage(), ex);
-    } catch (SAXException ex) {
-      throw new ProcessException(ex.getMessage(), ex);
-    } catch (ParserConfigurationException ex) {
+    } catch (SAXException | ParserConfigurationException ex) {
       throw new ProcessException(ex.getMessage(), ex);
     }
   }
