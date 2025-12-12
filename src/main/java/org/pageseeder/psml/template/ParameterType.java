@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Allette Systems (Australia)
+ * Copyright 2025 Allette Systems (Australia)
  * http://www.allette.com.au
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,16 @@
  */
 package org.pageseeder.psml.template;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 /**
  * The possible types of parameters that can be used to generate a template.
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.6.9
  * @since 1.0
  */
 public enum ParameterType {
@@ -61,7 +65,13 @@ public enum ParameterType {
 
     @Override
     public boolean matches(String value) {
-      return value.matches("^([0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])$");
+      if (value.length() != 10 || value.charAt(4) != '-' || value.charAt(7) != '-') return false;
+      try {
+        LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE);
+        return true;
+      } catch (DateTimeParseException ex) {
+        return false;
+      }
     }
 
   },
@@ -73,8 +83,17 @@ public enum ParameterType {
 
     @Override
     public boolean matches(String value) {
-      // TODO
-      return true;
+      if (value.length() < 19 || value.charAt(10) != 'T') return false;
+      try {
+        if (hasOffsetOrZulu(value)) {
+          OffsetDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        } else {
+          LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        }
+        return true;
+      } catch (DateTimeParseException ex) {
+        return false;
+      }
     }
 
   },
@@ -86,7 +105,18 @@ public enum ParameterType {
 
     @Override
     public boolean matches(String value) {
-      return value.matches("^(2[0-3]|[0-1][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)??(Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$");
+      if (value.length() < 8) return false;
+      if (value.charAt(2) != ':' || value.charAt(5) != ':') return false;
+      try {
+        if (hasOffsetOrZulu(value)) {
+          OffsetTime.parse(value, DateTimeFormatter.ISO_OFFSET_TIME);
+        } else {
+          LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME);
+        }
+        return true;
+      } catch (DateTimeParseException ex) {
+        return false;
+      }
     }
 
   },
@@ -98,8 +128,7 @@ public enum ParameterType {
 
     @Override
     public boolean matches(String value) {
-      // TODO
-      return true;
+      return org.pageseeder.psml.template.XML.isWellFormedFragment(value);
     }
 
   };
@@ -125,5 +154,21 @@ public enum ParameterType {
       if (type.name().equalsIgnoreCase(name)) return type;
     }
     return TEXT;
+  }
+
+  private static boolean hasOffsetOrZulu(String value) {
+    // ISO offset time examples:
+    // 10:15:30Z
+    // 10:15:30+10:00
+    // 10:15:30.123-05:00
+    int z = value.indexOf('Z');
+    if (z != -1) return true;
+
+    // Look for + or - after the basic "HH:mm:ss" part.
+    for (int i = 8; i < value.length(); i++) {
+      char c = value.charAt(i);
+      if (c == '+' || c == '-') return true;
+    }
+    return false;
   }
 }
