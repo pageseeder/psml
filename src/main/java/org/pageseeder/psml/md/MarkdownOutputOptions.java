@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.9
+ * @version 1.6.10
  * @since 1.6.0
  */
 public final class MarkdownOutputOptions {
@@ -224,6 +224,7 @@ public final class MarkdownOutputOptions {
      * Your focus may be compromised.
      * }</pre>
      */
+    LABELED
 
   }
 
