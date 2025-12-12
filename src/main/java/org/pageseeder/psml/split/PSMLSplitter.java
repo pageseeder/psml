@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Split a PSML document into multiple documents.
@@ -24,19 +25,30 @@ public final class PSMLSplitter {
   /**
    * The builder
    */
-  private final Builder _builder;
+  private final Builder builder;
 
   /**
    * A writer to store the log
    */
-  private final Logger _logger;
+  private final Logger logger;
 
+  /**
+   * Constructs a new instance of PSMLSplitter.
+   *
+   * <p>The source, destination, and config files must not be null.</p>
+   *
+   * @param producer The builder instance containing necessary configuration.
+   * @param log      The logger used for logging messages during the operation of PSMLSplitter.
+   *                 If not explicitly provided, a default logger will be used.
+   * @throws NullPointerException If any of the required fields from the builder (source, destination,
+   *                              or config) are null.
+   */
   private PSMLSplitter(Builder producer, Logger log) {
-    if (producer.source() == null) { throw new NullPointerException("source is null"); }
-    if (producer.destination() == null) { throw new NullPointerException("destination is null"); }
-    if (producer.config() == null) { throw new NullPointerException("config is null"); }
-    this._builder = producer;
-    this._logger = log;
+    Objects.requireNonNull(producer.source(), "source is null");
+    Objects.requireNonNull(producer.destination(), "destination is null");
+    Objects.requireNonNull(producer.config(), "config is null");
+    this.builder = producer;
+    this.logger = Objects.requireNonNull(log);
   }
 
   /**
@@ -47,13 +59,13 @@ public final class PSMLSplitter {
   public void process() throws IOException {
 
     // Find destination folder and filename
-    File source = this._builder.source();
+    File source = this.builder.source();
     File destination;
-    String name = this._builder.destination().getName();
+    String name = this.builder.destination().getName();
     if (name.endsWith(".psml")) {
-      destination = this._builder.destination().getParentFile();
+      destination = this.builder.destination().getParentFile();
     } else {
-      destination = this._builder.destination();
+      destination = this.builder.destination();
       name = source.getName();
     }
 
@@ -69,8 +81,8 @@ public final class PSMLSplitter {
     String outuri = destination.toURI().toString();
 
     // Move the media files
-    this._logger.info("PSML Splitter: Moving media files");
-    String mediaFolderName = this._builder.media() == null ? "images" : this._builder.media();
+    this.logger.info("PSML Splitter: Moving media files");
+    String mediaFolderName = this.builder.media() == null ? "images" : this.builder.media();
     File mediaFolder = new File(source.getParentFile(), mediaFolderName);
     if (mediaFolder.exists()) {
       java.nio.file.Files.move(mediaFolder.toPath(), new File(destination, mediaFolderName).toPath());
@@ -81,24 +93,24 @@ public final class PSMLSplitter {
     parameters.put("_outputfolder", outuri);
     parameters.put("_outputfilename", name);
     parameters.put("_mediafoldername", mediaFolderName);
-    parameters.put("_configfileurl", this._builder.config().toURI().toString());
+    parameters.put("_configfileurl", this.builder.config().toURI().toString());
 
     // Add custom parameters
-    parameters.putAll(this._builder.params());
+    parameters.putAll(this.builder.params());
 
     // Pre-split 1
-    this._logger.info("PSML Splitter: First pre-process");
-    File pre_split1 = new File(this._builder.working(), "pre-split1.xml");
-    XSLT.transform(source, pre_split1, pre1, parameters);
+    this.logger.info("PSML Splitter: First pre-process");
+    File preSplit1 = new File(this.builder.working(), "pre-split1.xml");
+    XSLT.transform(source, preSplit1, pre1, parameters);
 
     // Pre-split 2
-    this._logger.info("PSML Splitter: Second pre-process");
-    File pre_split2 = new File(this._builder.working(), "pre-split2.xml");
-    XSLT.transform(pre_split1, pre_split2, pre2, parameters);
+    this.logger.info("PSML Splitter: Second pre-process");
+    File preSplit2 = new File(this.builder.working(), "pre-split2.xml");
+    XSLT.transform(preSplit1, preSplit2, pre2, parameters);
 
     // Split files
-    this._logger.info("PSML Splitter: Splitting PSML");
-    XSLT.transform(pre_split2, new File(destination, name), split, parameters);
+    this.logger.info("PSML Splitter: Splitting PSML");
+    XSLT.transform(preSplit2, new File(destination, name), split, parameters);
 
   }
 
