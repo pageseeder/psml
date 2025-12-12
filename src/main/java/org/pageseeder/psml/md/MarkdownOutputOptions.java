@@ -1001,6 +1001,28 @@ public final class MarkdownOutputOptions {
     }
 
     /**
+     * Sets the bold formatting option for the Markdown output.
+     *
+     * @param format the bold formatting option to be applied
+     * @return this builder instance
+     */
+    public Builder bold(BoldFormat format) {
+      this.bold = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
+     * Sets the italic formatting option for the Markdown output.
+     *
+     * @param format the italic formatting option to be applied
+     * @return this builder instance
+     */
+    public Builder italic(ItalicFormat format) {
+      this.italic = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
      * Builds a new {@code MarkdownOutputOptions} instance with the current builder configuration.
      *
      * @return a new immutable {@code MarkdownOutputOptions} instance
