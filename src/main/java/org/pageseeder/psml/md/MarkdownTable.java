@@ -41,7 +41,7 @@ class MarkdownTable {
   private final PSMLElement table;
 
   /**
-   * The of the table "Table 1", "Table 2", etc... used for the caption.
+   * The name of the table "Table 1", "Table 2", etc... used for the caption.
    */
   private final String name;
 
@@ -170,9 +170,7 @@ class MarkdownTable {
   }
 
   public void format(Appendable out, MarkdownOutputOptions options) throws IOException {
-    if (options.captions() && options.table() != MarkdownOutputOptions.TableFormat.HTML) {
-      formatCaption(out);
-    }
+    formatCaption(out, options);
     if (options.table() == MarkdownOutputOptions.TableFormat.COMPACT) {
       formatCompact(out);
     } else if (options.table() == MarkdownOutputOptions.TableFormat.PRETTY) {
@@ -193,13 +191,16 @@ class MarkdownTable {
    * @param out the {@code Appendable} object to which the formatted caption is written
    * @throws IOException if an I/O error occurs while appending to the {@code Appendable}
    */
-  public void formatCaption(Appendable out) throws IOException {
-    out.append("\n*").append(name);
+  public void formatCaption(Appendable out, MarkdownOutputOptions options) throws IOException {
+    if (options.designator() == MarkdownOutputOptions.DesignatorStyle.NONE
+     || options.table() != MarkdownOutputOptions.TableFormat.HTML) return;
+
+    out.append("\n").append(options.designator().format(name));
     PSMLElement captionElement = table.getFirstChildElement(PSMLElement.Name.CAPTION);
     if (captionElement != null) {
       out.append(": ").append(captionElement.getText());
     }
-    out.append("*\n\n");
+    out.append("\n\n");
   }
 
   /**

@@ -33,9 +33,10 @@ import java.util.*;
 /**
  * This class is responsible for serializing PSML content into Markdown format.
  *
- * @version 1.6.7
+ * @version 1.6.9
  * @since 1.0
  */
+@SuppressWarnings("java:S1192")
 public class MarkdownSerializer {
 
   /**
@@ -406,7 +407,7 @@ public class MarkdownSerializer {
       String label = block.getAttribute("label");
       out.append("> ");
       if (label != null) {
-        out.append("**").append(block.getAttribute("label")).append("**: ");
+        out.append(this.options.designator().format(label)).append(": ");
       }
       StringBuilder buffer = new StringBuilder();
       processChildren(block, buffer);
@@ -424,7 +425,7 @@ public class MarkdownSerializer {
     private void serializeBlockAsLabelText(PSMLElement block, Appendable out) throws IOException {
       String label = block.getAttribute("label");
       if (label != null) {
-        out.append("**").append(block.getAttribute("label")).append("**: ");
+        out.append(this.options.designator().format(label)).append(": ");
       }
       processChildren(block, out);
       out.append('\n');
@@ -451,9 +452,15 @@ public class MarkdownSerializer {
     }
 
     private void serializeBold(PSMLElement bold, Appendable out) throws IOException {
-      out.append("__");
-      processChildren(bold, out);
-      out.append("__");
+      MarkdownOutputOptions.BoldFormat format = this.options.bold();
+      if (format == MarkdownOutputOptions.BoldFormat.IGNORE) {
+        processChildren(bold, out);
+      } else {
+        String wrapper = format.format();
+        out.append(wrapper);
+        processChildren(bold, out);
+        out.append(wrapper);
+      }
     }
 
     private void serializeBreak(Appendable out) throws IOException {
@@ -464,6 +471,7 @@ public class MarkdownSerializer {
       }
     }
 
+    @SuppressWarnings("java:S3776")
     private void serializeDocument(PSMLElement document, Appendable out) throws IOException {
       // Include metadata as Yaml section at start of document
       if (this.options.metadata()) {
@@ -545,8 +553,8 @@ public class MarkdownSerializer {
     private void serializeImage(PSMLElement image, Appendable out) throws IOException {
       String src = image.getAttributeOrElse("src", "");
       String alt = image.getAttribute("alt");
-      if (options.captions()) {
-        out.append("**").append(state.nextImage()).append("**");
+      if (options.designator() != MarkdownOutputOptions.DesignatorStyle.NONE) {
+        out.append(options.designator().format(state.nextImage()));
         if (alt != null) {
           out.append(": ").append(alt);
         }
@@ -572,14 +580,14 @@ public class MarkdownSerializer {
           collector.warn("Data URI images are not currently supported");
           break;
         case IMG_TAG:
-          String width = image.getAttribute("width");
-          String height = image.getAttribute("height");
+          String width = image.getAttributeOrElse("width", "");
+          String height = image.getAttributeOrElse("height", "");
           out.append("<img src=\"").append(src).append('"');
           out.append(" alt=\"").append(alt).append('"');
-          if (width != null && !width.isEmpty()) {
+          if (!width.isEmpty()) {
             out.append(" width=\"").append(width).append('"');
           }
-          if (height != null && !height.isEmpty()) {
+          if (!height.isEmpty()) {
             out.append(" height=\"").append(height).append('"');
           }
           out.append(" />");
@@ -589,9 +597,15 @@ public class MarkdownSerializer {
     }
 
     private void serializeItalic(PSMLElement italic, Appendable out) throws IOException {
-      out.append("*");
-      processChildren(italic, out);
-      out.append("*");
+      MarkdownOutputOptions.ItalicFormat format = this.options.italic();
+      if (format == MarkdownOutputOptions.ItalicFormat.IGNORE) {
+        processChildren(italic, out);
+      } else {
+        char wrapper = format == MarkdownOutputOptions.ItalicFormat.UNDERSCORE ? '_' : '*';
+        out.append(wrapper);
+        processChildren(italic, out);
+        out.append(wrapper);
+      }
     }
 
     private void serializeLink(PSMLElement link, Appendable out) throws IOException {
@@ -609,7 +623,7 @@ public class MarkdownSerializer {
         for (int i = 0; i < level; i++) {
           out.append("    ");
         }
-        out.append("* ");
+        out.append("- ");
         // TODO multiple paragraph, blocks
         processChildren(item, out);
         out.append('\n');
@@ -744,8 +758,8 @@ public class MarkdownSerializer {
     private void serializePropertiesFragment(PSMLElement fragment, Appendable out) throws IOException {
       out.append('\n');
       if (options.properties() == MarkdownOutputOptions.PropertiesFormat.TABLE) {
-        if (options.captions()) {
-          out.append("**").append(state.nextProperties()).append("**: ").append(fragment.getAttribute("id")).append('\n');
+        if (options.designator() != MarkdownOutputOptions.DesignatorStyle.NONE) {
+          out.append(options.designator().format(state.nextProperties())).append(": ").append(fragment.getAttribute("id")).append('\n');
         }
         out.append("| Name | Value |\n");
         out.append("|---|---|\n");
@@ -856,14 +870,17 @@ public class MarkdownSerializer {
       }
     }
 
+    @SuppressWarnings("java:S3776")
     private void processChildren(PSMLElement element, Appendable out) throws IOException {
       for (PSMLNode node : element.getNodes()) {
         if (node instanceof PSMLText) {
           String text = normalizeText(node.getText());
-          if (state.isDescendantOf(Name.ITALIC)) {
+          if (state.isDescendantOf(Name.ITALIC) && this.options.italic() == MarkdownOutputOptions.ItalicFormat.ASTERISK
+           || state.isDescendantOf(Name.BOLD) && this.options.bold() == MarkdownOutputOptions.BoldFormat.DOUBLE_ASTERISK) {
             text = text.replace("*", "\\*");
           }
-          if (state.isDescendantOf(Name.BOLD)) {
+          if (state.isDescendantOf(Name.BOLD) && this.options.bold() == MarkdownOutputOptions.BoldFormat.DOUBLE_UNDERSCORE
+           || state.isDescendantOf(Name.ITALIC) && this.options.italic() == MarkdownOutputOptions.ItalicFormat.UNDERSCORE) {
             text = text.replace("_", "\\_");
           }
           if (state.isDescendantOf(Name.MONOSPACE)) {
