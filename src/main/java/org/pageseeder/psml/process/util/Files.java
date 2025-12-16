@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.process.util;
 
+import org.pageseeder.psml.util.RelativePaths;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -14,6 +16,7 @@ import java.io.IOException;
  * @version 1.0
  * @since 1.0
  */
+@Deprecated(since = "1.7.0", forRemoval = true)
 public final class Files {
 
   /** utility class. */
@@ -30,7 +33,10 @@ public final class Files {
    * @return the relative path between file and root
    *
    * @throws IllegalArgumentException if file is not a descendant of root
+   *
+   * @deprecated Use {@link RelativePaths#computeCanonical(File, File)} instead
    */
+  @Deprecated(since = "1.7.0", forRemoval = true)
   public static String computeRelativePath(File file, File root) throws IllegalArgumentException {
     String fpath;
     try {
