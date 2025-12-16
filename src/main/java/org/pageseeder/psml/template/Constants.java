@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.7.0
  * @since 1.0
  */
 public final class Constants {
@@ -31,22 +31,6 @@ public final class Constants {
   /** Utility */
   private Constants() {
   }
-
-  /**
-   * Constant for US-ASCII charset.
-   *
-   * @deprecated Use {@link StandardCharsets#US_ASCII} instead
-   */
-  @Deprecated(forRemoval = true, since = "1.2.0")
-  public static final Charset ASCII = StandardCharsets.US_ASCII;
-
-  /**
-   * Constant for UTF-8 charset.
-   *
-   * @deprecated Use {@link StandardCharsets#UTF_8} instead
-   */
-  @Deprecated(forRemoval = true, since = "1.2.0")
-  public static final Charset UTF8 = StandardCharsets.UTF_8;
 
   /**
    * The namespace URI.
