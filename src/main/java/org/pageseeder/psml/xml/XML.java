@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pageseeder.psml.template;
+package org.pageseeder.psml.xml;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -63,7 +63,7 @@ public final class XML {
   }
 
   /**
-   * Checks if the the specified string is a valid XML fragment.
+   * Checks if the specified string is a valid XML fragment.
    *
    * @param fragment The fragment to check.
    * @return true if well-formed XML; false otherwise.
@@ -83,7 +83,7 @@ public final class XML {
   }
 
   /**
-   * Indicates whether the has a non ASCII character.
+   * Indicates whether the has a non-ASCII character.
    *
    * @param xml The XML to test.
    * @return <code>true</code> if this XML contains a non-ASCII character;
@@ -100,7 +100,7 @@ public final class XML {
   /**
    * Make the specified XML ASCII safe.
    *
-   * @param unicode The XML as a unicode string.
+   * @param unicode The XML as a Unicode string.
    * @param ascii   The same XML with all non-ASCII characters converted to ASCII.
    */
   public static void toASCII(String unicode, PrintWriter ascii) {
@@ -158,6 +158,9 @@ public final class XML {
         break;
       case '"' :
         xml.append("&quot;");
+        break;
+      case '\'' :
+        xml.append("&apos;");
         break;
         // output by default
       default:

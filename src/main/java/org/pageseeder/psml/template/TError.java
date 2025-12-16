@@ -15,6 +15,8 @@
  */
 package org.pageseeder.psml.template;
 
+import org.pageseeder.psml.xml.XML;
+
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
