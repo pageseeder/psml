@@ -126,7 +126,7 @@ public final class NumberingGenerator {
                 break;
               }
             }
-          };
+          }
           while (levels.size() < level) {
             // if skipped levels set to one and not a block stack push 1
             levels.push(this.numberConfig.getSkippedLevels() == PublicationNumbering.SkippedLevels.ONE &&
