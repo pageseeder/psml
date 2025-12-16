@@ -62,6 +62,41 @@ class XMLStringsTest {
   }
 
   @Test
+  void testText_withOnlySpecialCharacters() {
+    // Test with a string containing only special characters
+    String input = "<<&&<<";
+    String expected = "&lt;&lt;&amp;&amp;&lt;&lt;";
+    String actual = XMLStrings.text(input);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  void testText_withMixedCharacters() {
+    // Test with a string containing a mix of special and non-special characters
+    String input = "Mix & Match < Everything";
+    String expected = "Mix &amp; Match &lt; Everything";
+    String actual = XMLStrings.text(input);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  void testText_withLongString() {
+    // Test with a long string containing multiple special characters
+    String input = "This is a very long string with special characters like & and < scattered throughout. Another & here and < there.";
+    String expected = "This is a very long string with special characters like &amp; and &lt; scattered throughout. Another &amp; here and &lt; there.";
+    String actual = XMLStrings.text(input);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  void testNullableText_withNullInput() {
+    // Test with null input for nullableText
+    String input = null;
+    String actual = XMLStrings.nullableText(input);
+    assertEquals(null, actual);
+  }
+
+  @Test
   void testText_withConsecutiveSpecialCharacters() {
     // Test with a string that contains consecutive '&' and '<'
     String input = "A&& B<<";
@@ -133,4 +168,43 @@ class XMLStringsTest {
     assertEquals(expected, actual);
   }
 
+  @Test
+  void testTextWithCharArray_noSpecialCharacters() {
+    // Test with char array containing no special characters
+    char[] input = "HelloWorld".toCharArray();
+    String actual = XMLStrings.text(input, 0, input.length);
+    String expected = "HelloWorld";
+    assertEquals(expected, actual);
+    assertEquals(XMLStrings.text(new String(input)), actual);
+  }
+
+  @Test
+  void testTextWithCharArray_withSpecialCharacters() {
+    // Test with char array containing special characters
+    char[] input = "A & B < C".toCharArray();
+    String actual = XMLStrings.text(input, 0, input.length);
+    String expected = "A &amp; B &lt; C";
+    assertEquals(expected, actual);
+    assertEquals(XMLStrings.text(new String(input)), actual);
+  }
+
+  @Test
+  void testTextWithCharArray_onlySpecialCharacters() {
+    // Test with char array containing only special characters
+    char[] input = "<&&<".toCharArray();
+    String actual = XMLStrings.text(input, 0, input.length);
+    String expected = "&lt;&amp;&amp;&lt;";
+    assertEquals(expected, actual);
+    assertEquals(XMLStrings.text(new String(input)), actual);
+  }
+
+  @Test
+  void testTextWithCharArray_partialInput() {
+    // Test with a partial range of characters
+    char[] input = "Some <random> text & values".toCharArray();
+    String actual = XMLStrings.text(input, 5, 15); // Substring: "<random> text &"
+    String expected = "&lt;random> text &amp;";
+    assertEquals(expected, actual);
+    assertEquals(XMLStrings.text(new String(input, 5, 15)), actual);
+  }
 }

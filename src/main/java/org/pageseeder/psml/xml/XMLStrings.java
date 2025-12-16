@@ -98,6 +98,41 @@ public final class XMLStrings {
     return valid.toString();
   }
 
+  /**
+   * Replaces characters in the specified portion of a character array with their corresponding
+   * XML entities so they can be safely used as character data in XML elements.
+   *
+   * <p>The following characters are replaced:
+   * <ul>
+   *   <li>'&' is replaced with "&amp;"</li>
+   *   <li>'<' is replaced with "&lt;"</li>
+   * </ul>
+   *
+   * <p>Characters that do not need escaping are appended as-is.
+   *
+   * @param ch The character array to process.
+   * @param start The starting index in the array to begin processing.
+   * @param length The ending index in the array to stop processing.
+   * @return A string with the appropriate characters replaced by XML entities.
+   */
+  public static String text(char[] ch, int start, int length) {
+    StringBuilder out = new StringBuilder(ch.length);
+    final int upto = start+length;
+    for (int i = start; i < upto; i++) {
+      char c = ch[i];
+      switch (c) {
+        case '&' :
+          out.append("&amp;");
+          break;
+        case '<' :
+          out.append("&lt;");
+          break;
+        default :
+          out.append(c);
+      }
+    }
+    return out.toString();
+  }
 
   /**
    * Replace characters which are invalid in attribute values,
@@ -105,10 +140,10 @@ public final class XMLStrings {
    *
    * <p>These characters are:</p>
    * <ul>
-   *  <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
-   *  <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
-   *  <li>{@code '"'} by the entity {@code "&amp;quot;"}</li>
-   *  <li>{@code '''} by the entity {@code "&amp;apos;"}</li>
+   *   <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
+   *   <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
+   *   <li>{@code '"'} by the entity {@code "&amp;quot;"}</li>
+   *   <li>{@code '''} by the entity {@code "&amp;apos;"}</li>
    * </ul>
    *
    * <p>Note: this function makes the following assumptions:
@@ -159,6 +194,50 @@ public final class XMLStrings {
       }
     }
     return valid.toString();
+  }
+
+  /**
+   * Replaces characters in the specified portion of a character array with their corresponding
+   * XML entity so that they can be safely used in XML attribute values.
+   *
+   * <p>The following characters are replaced:
+   * <ul>
+   *   <li>'&' is replaced with "&amp;"</li>
+   *   <li>'"' is replaced with "&quot;"</li>
+   *   <li>'<' is replaced with "&lt;"</li>
+   *   <li>'\'' is replaced with "&apos;"</li>
+   * </ul>
+   *
+   * <p>Characters that do not need escaping are appended as-is.
+   *
+   * @param ch The character array to process.
+   * @param start The starting index in the array to begin processing.
+   * @param length The ending index in the array to stop processing.
+   * @return A string with the appropriate characters replaced by XML entities.
+   */
+  public static String attribute(char[] ch, int start, int length) {
+    StringBuilder out = new StringBuilder(ch.length);
+    final int upto = start+length;
+    for (int i = start; i < upto; i++) {
+      char c = ch[i];
+      switch (c) {
+        case '&' :
+          out.append("&amp;");
+          break;
+        case '"' :
+          out.append("&quot;");
+          break;
+        case '<' :
+          out.append("&lt;");
+          break;
+        case '\'' :
+          out.append("&apos;");
+          break;
+        default :
+          out.append(c);
+      }
+    }
+    return out.toString();
   }
 
 }
