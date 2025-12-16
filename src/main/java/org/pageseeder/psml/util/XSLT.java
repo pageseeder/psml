@@ -9,22 +9,32 @@ import javax.xml.transform.stream.StreamSource;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Hashtable;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 
 /**
  * A utility class for common XSLT functions.
  *
  * @author Christophe Lauret
+ *
+ * @version 1.7.0
+ * @since 1.0
  */
 public final class XSLT {
 
   /**
    * Maps XSLT templates to their URL as a string for easy retrieval.
+   * Only keep the last 10 entries.
    */
-  private static final Map<String, Templates> CACHE = new Hashtable<>();
+  private static final Map<String, Templates> CACHE =
+      Collections.synchronizedMap(new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Templates> eldest) {
+          return size() > 10;
+        }
+      });
 
   /** Utility class. */
   private XSLT() {
@@ -42,12 +52,15 @@ public final class XSLT {
    * @throws XSLTException If XSLT templates could not be loaded from the specified URL.
    */
   public static Templates getTemplates(URL url) {
-    Templates templates = CACHE.get(url.toString());
-    if (templates == null) {
-      templates = toTemplates(url);
-      CACHE.put(url.toString(), templates);
+    final String key = url.toString();
+    synchronized (CACHE) {
+      Templates templates = CACHE.get(key);
+      if (templates == null) {
+        templates = toTemplates(url);
+        CACHE.put(key, templates);
+      }
+      return templates;
     }
-    return templates;
   }
 
   /**
@@ -73,9 +86,9 @@ public final class XSLT {
   }
 
   /**
-   * Utility function to transforms the specified XML source and returns the results as XML.
+   * Utility function to transform the specified XML source and returns the results as XML.
    *
-   * Problems will be reported in the logs, the output will simply produce results as a comment.
+   * <p>Problems will be reported in the logs, the output will simply produce results as a comment.
    *
    * @param source     The Source XML data.
    * @param result     The Result XHTML data.
@@ -100,9 +113,9 @@ public final class XSLT {
   }
 
   /**
-   * Utility function to transforms the specified XML source and returns the results as XML.
+   * Utility function to transform the specified XML source and returns the results as XML.
    *
-   * Problems will be reported in the logs, the output will simply produce results as a comment.
+   * <p>Problems will be reported in the logs, the output will simply produce results as a comment.
    *
    * @param source     The Source XML data.
    * @param result     The Result data.
@@ -152,9 +165,9 @@ public final class XSLT {
       TransformerFactory factory = TransformerFactory.newInstance();
       templates = factory.newTemplates(source);
     } catch (TransformerConfigurationException ex) {
-      throw new XSLTException("Transformer exception while trying to load XSLT templates"+ url.toString(), ex);
+      throw new XSLTException("Transformer exception while trying to load XSLT templates"+ url, ex);
     } catch (IOException ex) {
-      throw new XSLTException("IO error while trying to load XSLT templates"+ url.toString(), ex);
+      throw new XSLTException("IO error while trying to load XSLT templates"+ url, ex);
     }
     return templates;
   }
