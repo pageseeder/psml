@@ -3,13 +3,10 @@
  */
 package org.pageseeder.psml.process;
 
-import org.pageseeder.psml.process.util.XMLUtils;
-import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 import org.pageseeder.psml.toc.PublicationConfig;
-import org.pageseeder.xmlwriter.XML;
-import org.pageseeder.xmlwriter.XMLStringWriter;
+import org.pageseeder.psml.xml.XMLStrings;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.pageseeder.xmlwriter.XMLWriterImpl;
 import org.slf4j.Logger;
@@ -26,7 +23,10 @@ import java.util.*;
  *
  * @author Jean-Baptiste Reure
  * @author Philip Rutherford
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 1.0
  */
 public final class PSMLProcessHandler2 extends DefaultHandler {
 
@@ -379,7 +379,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
       }
       if (prefix != null) {
         try {
-          this.xml.write(" prefix=\""+XMLUtils.escapeForAttribute(prefix)+"\"");
+          this.xml.write(" prefix=\""+XMLStrings.attribute(prefix)+"\"");
         } catch (IOException ex) {
           throw new SAXException("Failed to add id attribute: " + ex.getMessage(), ex);
         }
@@ -508,7 +508,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         value = atts.getValue(i);
       }
       try {
-        this.xml.write(" "+name+"=\""+XMLUtils.escapeForAttribute(value)+"\"");
+        this.xml.write(" "+name+"=\""+XMLStrings.nullableAttribute(value)+"\"");
       } catch (IOException ex) {
         throw new SAXException("Failed to add attribute \""+atts.getQName(i)+"\" to element "+qName, ex);
       }
@@ -516,7 +516,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     // write toc ids if needed
     if (isHeading && this.generateTOC && !this.elements.contains("compare") && this.alternateXRefs == 0) {
       try {
-        this.xml.write(" id=\""+XMLUtils.escapeForAttribute(
+        this.xml.write(" id=\""+XMLStrings.attribute(
             location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index)+"\"");
       } catch (IOException ex) {
         throw new SAXException("Failed to add id attribute: " + ex.getMessage(), ex);
@@ -573,9 +573,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           String newParentNumber = prefix == null ? null : prefix.parentNumber;
 
           // set content and title attribute
-          this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : XMLUtils.escape(newPrefix))
+          this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : XMLStrings.text(newPrefix))
                                          .replaceAll("\\{heading}",      newHeading      == null ? "?" : newHeading)
-                                         .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : XMLUtils.escape(newParentNumber));
+                                         .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : XMLStrings.text(newParentNumber));
         }
       }
     }
@@ -653,7 +653,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           (this.xrefElementChange == DiffType.DELETE && this.insideDiffElement == DiffElement.DEL))) return;
     try {
       if (this.resolvedXRefTemplate == null) {
-        this.xml.write(XMLUtils.escape(new String(ch, start, length)));
+        this.xml.write(XMLStrings.text(ch, start, length));
       }
     } catch (IOException ex) {
       throw new SAXException("Failed to write text", ex);

@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.ProcessException;
+import org.pageseeder.psml.xml.XMLStrings;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -59,7 +60,10 @@ public final class XMLUtils {
    * @param  s The String to be parsed
    *
    * @return a valid string or empty if s is <code>null</code> or empty.
+   *
+   * @deprecated Use {@link XMLStrings#text(String)} instead.
    */
+  @Deprecated(since = "1.7.0", forRemoval = true)
   public static String escape(@Nullable String s) {
     // bypass null and empty strings
     if (s == null || s.isEmpty()) return s;
@@ -107,7 +111,10 @@ public final class XMLUtils {
    * @param  s The String to be parsed
    *
    * @return a valid string or empty if s is <code>null</code> or empty.
+   *
+   * @deprecated Use {@link XMLStrings#attribute(String)} instead.
    */
+  @Deprecated(since = "1.7.0", forRemoval = true)
   public static String escapeForAttribute(@Nullable String s) {
     // bypass null and empty strings
     if (s == null || s.isEmpty()) return s;

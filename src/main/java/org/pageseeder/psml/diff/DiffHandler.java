@@ -12,7 +12,7 @@ import java.util.Deque;
 import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
-import org.pageseeder.psml.process.util.XMLUtils;
+import org.pageseeder.psml.xml.XMLStrings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -23,6 +23,10 @@ import org.xml.sax.helpers.DefaultHandler;
  * Adds {@code <diff>} elements to compare fragments in portable PSML.
  *
  * @author Philip Rutherford
+ * @author Christophe Lauret
+ *
+ * @version 1.7.0
+ * @since 1.0.0
  */
 public final class DiffHandler extends DefaultHandler {
 
@@ -95,8 +99,8 @@ public final class DiffHandler extends DefaultHandler {
       String name = atts.getQName(i);
       String value = atts.getValue(i);
       try {
-        this.xml.write(" "+name+"=\""+XMLUtils.escapeForAttribute(value)+"\"");
-        if (this.fragmentContent != null) this.fragmentContent.write(" "+name+"=\""+XMLUtils.escapeForAttribute(value)+"\"");
+        this.xml.write(" "+name+"=\""+XMLStrings.nullableAttribute(value)+"\"");
+        if (this.fragmentContent != null) this.fragmentContent.write(" "+name+"=\""+XMLStrings.nullableAttribute(value)+"\"");
       } catch (IOException ex) {
         throw new SAXException("Failed to add attribute \""+atts.getQName(i)+"\" to element "+qName, ex);
       }
@@ -148,8 +152,8 @@ public final class DiffHandler extends DefaultHandler {
   @Override
   public void characters(char[] ch, int start, int length) throws SAXException {
     try {
-      this.xml.write(XMLUtils.escape(new String(ch, start, length)));
-      if (this.fragmentContent != null) this.fragmentContent.write(XMLUtils.escape(new String(ch, start, length)));
+      this.xml.write(XMLStrings.text(ch, start, length));
+      if (this.fragmentContent != null) this.fragmentContent.write(XMLStrings.text(ch, start, length));
     } catch (IOException ex) {
       throw new SAXException("Failed to write text", ex);
     }

@@ -4,28 +4,31 @@
 package org.pageseeder.psml.toc;
 
 import org.jspecify.annotations.Nullable;
-import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.xml.BasicHandler;
-import org.pageseeder.xmlwriter.XML;
-import org.pageseeder.xmlwriter.XMLStringWriter;
+import org.pageseeder.psml.xml.XMLStrings;
 import org.xml.sax.Attributes;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayDeque;
-import java.util.Date;
 import java.util.Deque;
 import java.util.Objects;
 
 /**
- * Parse the document content to generate the document tree.
+ * <p>Parse the document content to generate the document tree.
  *
- * The parser only considers the following elements as structural elements:
+ * <p>The parser only considers the following elements as structural elements:
  * - headings
  * - section titles
  * - embed block references
  *
- * Markup within headings is ignored.
+ * <p>Markup within headings is ignored.
+ *
+ * @author Philip Rutherford
+ * @author Christophe Lauret
+ *
+ * @version 1.7.0
+ * @since 1.0.0
  */
 public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
 
@@ -396,7 +399,7 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     if (value != null && !value.isEmpty()) {
       if (this.firstHeading) {
         // set first property value (escaped for XML) as heading
-        this._tree.putFragmentHeading(this.fragment, XMLUtils.escape(value));
+        this._tree.putFragmentHeading(this.fragment, XMLStrings.text(value));
         this.firstHeading = false;
       }
     }

@@ -13,13 +13,13 @@ import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.config.Strip;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
 import org.pageseeder.psml.process.math.TexConverter;
-import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.DocumentTreeHandler;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.PublicationTree;
 import org.pageseeder.psml.util.RelativePaths;
+import org.pageseeder.psml.xml.XMLStrings;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -40,8 +40,9 @@ import java.util.*;
  *
  * @author Jean-Baptiste Reure
  * @author Philip Rutherford
+ * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.7.0
  * @since 1.0
  */
 public final class PSMLProcessHandler extends DefaultHandler {
@@ -745,7 +746,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
       if (!"default".equals(this.preFragment)) {
         addUriFragID(this.uriID, this.preFragment, false);
         addKeyUriFragID(this.preUriCount + "_" + this.preUriID, this.uriID, this.preFragment, false);
-        write("<document-fragment uriid=\"" + XMLUtils.escapeForAttribute(this.uriID) + "\">");
+        write("<document-fragment uriid=\"" + XMLStrings.nullableAttribute(this.uriID) + "\">");
       } else {
         addUriFragID(this.uriID, null, false);
         addKeyUriFragID(this.preUriCount + "_" + this.preUriID, this.uriID, null, false);
@@ -753,7 +754,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
     // if fragment loading add temporary document element (stripped out later)
     if (this.fragmentToLoad != null && "document".equals(qName)) {
-      write("<document-fragment uriid=\"" + XMLUtils.escapeForAttribute(this.uriID) + "\">");
+      write("<document-fragment uriid=\"" + XMLStrings.nullableAttribute(this.uriID) + "\">");
     }
     // fragment loading?
     boolean isFragment = noNamespace && isFragment(qName);
@@ -796,7 +797,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.convertTex && noNamespace && "media-fragment".equals(qName) && "application/x-tex".equals(atts.getValue("mediatype"))) {
       String id = (this.uriID == null || !this.transcluder.isTranscluding()) ?
           atts.getValue("id") : (this.uriID + "-" + atts.getValue("id"));
-      write("<media-fragment id=\""+XMLUtils.escapeForAttribute(id)+"\" mediatype=\"application/mathml+xml\">");
+      write("<media-fragment id=\""+XMLStrings.nullableAttribute(id)+"\" mediatype=\"application/mathml+xml\">");
       this.convertContent = new StringBuilder();
       this.convertingAsciimath = "text/asciimath".equals(atts.getValue("mediatype"));
       return;
@@ -895,18 +896,18 @@ public final class PSMLProcessHandler extends DefaultHandler {
         } else {
           value = atts.getValue(i);
         }
-        write(" " + name + "=\"" + XMLUtils.escapeForAttribute(value) + '"');
+        write(" " + name + "=\"" + XMLStrings.nullableAttribute(value) + '"');
       }
     }
     // change document level to processed
     if (this.uriID != null && "document".equals(qName) && atts.getValue("id") == null) {
-      write(" id=\"" + XMLUtils.escapeForAttribute(this.uriID) + '"');
+      write(" id=\"" + XMLStrings.attribute(this.uriID) + '"');
     }
     // add a full href path for xrefs, it will be stripped on second pass
     if ((isXRef || isReverseXRef) && !"true".equals(atts.getValue("external")) && !"true".equals(atts.getValue("unresolved"))) {
       String relpath = this.transcluder.findXRefRelativePath(atts.getValue("href"));
       if (relpath != null)
-        write(" relpath=\"" + XMLUtils.escapeForAttribute(relpath) + "\"");
+        write(" relpath=\"" + XMLStrings.attribute(relpath) + "\"");
     }
     // unresolved placeholder
     if (this.placeholders && "placeholder".equals(qName) && this.placeholderContent == null) {
@@ -931,7 +932,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     // placeholder content
     if (this.placeholderContent != null) {
       if ("placeholder".equals(qName)) {
-        write(XMLUtils.escape(this.placeholderContent));
+        write(XMLStrings.text(this.placeholderContent));
         this.placeholderContent = null;
       } else {
         return;
@@ -1028,7 +1029,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     if ((this.convertAsciiMath || this.convertMarkdown || this.convertTex) && this.convertContent != null)
       this.convertContent.append(ch, start, length);
     else
-      write(XMLUtils.escape(new String(ch, start, length)));
+      write(XMLStrings.text(ch, start, length));
   }
 
   /**
@@ -1445,13 +1446,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
         if (this.imageCache != null) this.imageCache.cacheImagePath(relativePath);
         // add an href att to rewrite the path later
         write(" " + (alternateXRef ? "xhref" : "href") + "=\""
-            + XMLUtils.escapeForAttribute(relativePath) + "\"");
+            + XMLStrings.attribute(relativePath) + "\"");
       }
     }
     if (!this.processed && this.imageSrc != ImageSrc.FILENAMEENCODE) {
       finalSrc = URLEncodeFilepath(finalSrc);
     }
-    write(" " + (alternateXRef ? "href" : "src") + "=\"" + XMLUtils.escapeForAttribute(finalSrc) + "\"");
+    write(" " + (alternateXRef ? "href" : "src") + "=\"" + XMLStrings.nullableAttribute(finalSrc) + "\"");
   }
 
   /**
