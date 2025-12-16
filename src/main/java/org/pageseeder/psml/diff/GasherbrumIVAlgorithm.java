@@ -41,12 +41,14 @@ import java.util.stream.Collectors;
  * <p>The class also includes mechanisms for comparing tokens based on similarity
  * thresholds and ensuring efficient handling of XML structures.
  *
+ * @deprecated Use {@link GasherbrumVAlgorithm} instead.
+ *
  * @author Christophe Lauret
  *
  * @since 1.6.2
  * @version 1.6.2
  */
-@Deprecated
+@Deprecated(since = "1.6.0", forRemoval = true)
 public class GasherbrumIVAlgorithm implements DiffAlgorithm<XMLToken> {
 
   private static final Set<String> DEFAULT_BLOCKS = Set.of(
