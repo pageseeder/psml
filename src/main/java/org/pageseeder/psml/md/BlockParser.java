@@ -119,54 +119,6 @@ public class BlockParser {
   }
 
   /**
-   * @param configuration The configuration to use as Markdown options
-   * @deprecated Use {@link #setOptions(MarkdownInputOptions)} instead
-   */
-  @Deprecated(forRemoval = true, since = "1.6.0")
-  public void setConfiguration(Configuration configuration) {
-    this.options = configuration.toMarkdownInputOptions();
-  }
-
-  /**
-   * @return The configuration corresponding the Markdown options used in this class
-   * @deprecated Use {@link #getOptions()} instead
-   */
-  @Deprecated(forRemoval = true, since = "1.6.0")
-  public Configuration getConfiguration() {
-    return Configuration.fromMarkdownInputOptions(this.options);
-  }
-
-  /**
-   * Iterate over the lines and return corresponding PSML elements.
-   *
-   * @param lines The lines to parse
-   * @param config The configuration to use
-   *
-   * @return The corresponding list of PSML elements
-   *
-   * @deprecated Use {@link #parse(List, MarkdownInputOptions)} instead.
-   */
-  @Deprecated(forRemoval = true, since = "1.6.0")
-  public List<PSMLElement> parse(List<String> lines, Configuration config) {
-    return parse(lines, config.toMarkdownInputOptions());
-  }
-
-  /**
-   * Process a single line
-   *
-   * @param line  The current line
-   * @param next  The next line
-   * @param state The state of the parser
-   * @param config The configuration to use
-   *
-   * @deprecated Use {@link #processLine(String, String, State, MarkdownInputOptions)} instead.
-   */
-  @Deprecated(forRemoval = true, since = "1.6.0")
-  public void processLine(String line, @Nullable String next, State state, Configuration config) {
-    processLine(line, next, state, config.toMarkdownInputOptions());
-  }
-
-  /**
    * Iterate over the lines and return corresponding PSML elements.
    *
    * @param lines The lines to parse
