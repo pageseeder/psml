@@ -15,9 +15,6 @@
  */
 package org.pageseeder.psml.template;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
 /**
  * Some useful constants
  *
