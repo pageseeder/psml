@@ -7,7 +7,6 @@ import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.config.*;
 import org.pageseeder.psml.process.config.Images.ImageSrc;
 import org.pageseeder.psml.process.math.AsciiMathConverter;
-import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.process.util.XSLTTransformer;
