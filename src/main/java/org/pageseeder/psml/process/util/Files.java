@@ -15,6 +15,8 @@ import java.io.IOException;
  *
  * @version 1.0
  * @since 1.0
+ *
+ * @deprecated Use {@link RelativePaths} instead.
  */
 @Deprecated(since = "1.7.0", forRemoval = true)
 public final class Files {
