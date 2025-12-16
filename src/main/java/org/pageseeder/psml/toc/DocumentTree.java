@@ -700,7 +700,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
       return this;
     }
 
-    public Builder parts(List<Part<?>> parts) {
+    public Builder parts(List<Part<? extends Element>> parts) {
       // XXX Should only be Level 1
       this.parts.addAll(parts);
       return this;
