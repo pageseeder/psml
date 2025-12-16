@@ -28,8 +28,10 @@ package org.pageseeder.psml.process.config;
  * </ul>
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 0.5.0
  */
 public class Strip {
 

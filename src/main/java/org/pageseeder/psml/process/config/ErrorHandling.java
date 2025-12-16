@@ -20,66 +20,74 @@ package org.pageseeder.psml.process.config;
  * </ul>
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 0.5.0
  */
 public final class ErrorHandling {
 
   /**
-   * Whether or not to throw an error for an XRef not found
+   * Whether to throw an error for an XRef not found
    */
-  private boolean xrefnotfound = false;
+  private boolean xrefNotFound = false;
 
   /**
-   * Whether or not to throw an error when an XRef target is ambiguous
+   * Whether to throw an error when an XRef target is ambiguous
    */
-  private boolean xrefambiguous = false;
+  private boolean xrefAmbiguous = false;
 
   /**
-   * Whether or not to throw an error for an image not found
+   * Whether to throw an error for an image not found
    */
-  private boolean imagenotfound = false;
+  private boolean imageNotFound = false;
 
   /**
-   * @param imagenf the imagenotfound to set
+   * Sets whether an error should be logged when a referenced image is not found.
+   *
+   * @param notFound true to log an error for a missing image, false otherwise
    */
-  public void setImageNotFound(boolean imagenf) {
-    this.imagenotfound = imagenf;
+  public void setImageNotFound(boolean notFound) {
+    this.imageNotFound = notFound;
   }
 
   /**
-   * @param xrefnf the xrefnotfound to set
+   * Sets whether an error should be logged when an xref is not found.
+   *
+   * @param notFound true to log an error for a missing xref, false otherwise
    */
-  public void setXrefNotFound(boolean xrefnf) {
-    this.xrefnotfound = xrefnf;
+  public void setXrefNotFound(boolean notFound) {
+    this.xrefNotFound = notFound;
   }
 
   /**
-   * @param xrefa the xrefambiguous to set
+   * Sets whether an error should be logged when an xref is ambiguous.
+   *
+   * @param notFound true to log an error for an ambiguous xref, false otherwise
    */
-  public void setXrefAmbiguous(boolean xrefa) {
-    this.xrefambiguous = xrefa;
+  public void setXrefAmbiguous(boolean notFound) {
+    this.xrefAmbiguous = notFound;
   }
 
   /**
-   * @return the imagenotfound
+   * @return true if an error should be logged when a referenced image is not found.
    */
   public boolean getImageNotFound() {
-    return this.imagenotfound;
+    return this.imageNotFound;
   }
 
   /**
-   * @return the xrefnotfound
+   * @return true if an error should be logged when an xref is not found.
    */
   public boolean getXrefNotFound() {
-    return this.xrefnotfound;
+    return this.xrefNotFound;
   }
 
   /**
-   * @return the xrefambiguous
+   * @return true if an error should be logged when an ambiguous xref is found.
    */
   public boolean getXrefAmbiguous() {
-    return this.xrefambiguous;
+    return this.xrefAmbiguous;
   }
 
 }

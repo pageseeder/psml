@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.process.config;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Creates a PSML document of type "manifest" from the manifest.xml containing an {@code <xref>}
  * of type "embed" for each PSML file, in alphabetical order.
@@ -31,28 +33,30 @@ package org.pageseeder.psml.process.config;
  * </ul>
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 0.5.0
  */
 public final class ManifestDocument extends IncludeExcludeConfig {
 
   /**
    * Name of manifest file
    */
-  private String filename = null;
+  private @Nullable String filename = null;
 
   /**
-   * @return the name of the manidest.
+   * @return the name of the manifest.
    */
-  public String getFilename() {
+  public @Nullable String getFilename() {
     return this.filename;
   }
 
   /**
-   * @param fname the name of the manifest file to create.
+   * @param filename the name of the manifest file to create.
    */
-  public void setFilename(String fname) {
-    this.filename = fname;
+  public void setFilename(String filename) {
+    this.filename = filename;
   }
 
 }

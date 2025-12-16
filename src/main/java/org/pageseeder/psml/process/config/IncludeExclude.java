@@ -4,12 +4,15 @@
 package org.pageseeder.psml.process.config;
 
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represent an ANT include or exclude.
  *
  * <p>Only attribute <code>name</code> is supported.
  *
  * @author Jean-Baptiste Reure
+ *
  * @version 1.6.0
  * @since 1.0
  */
@@ -18,7 +21,7 @@ public final class IncludeExclude {
   /**
    * include name.
    */
-  private String name;
+  private @Nullable String name;
 
   /**
    * if this is to include or exclude documents
@@ -58,7 +61,7 @@ public final class IncludeExclude {
   /**
    * @param include true if it's an include; false for an exclude.
    */
-  private IncludeExclude(String name, boolean include) {
+  private IncludeExclude(@Nullable String name, boolean include) {
     this.name = name;
     this.isInclude = include;
   }
@@ -73,7 +76,7 @@ public final class IncludeExclude {
   /**
    * @return the include name.
    */
-  public String getName() {
+  public @Nullable String getName() {
     return name;
   }
 

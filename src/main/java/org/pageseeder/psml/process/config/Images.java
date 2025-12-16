@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.process.config;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This element provides options to control how images are managed and will
  * rewrite the path accordingly.
@@ -33,8 +35,10 @@ package org.pageseeder.psml.process.config;
  * </ul>
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 0.5.0
  */
 public class Images extends IncludeExcludeConfig {
 
@@ -77,6 +81,8 @@ public class Images extends IncludeExcludeConfig {
      * @param name The name of image src (uriid, uriidfolders, permalink or location).
      *
      * @return The corresponding image src.
+     *
+     * @throws IllegalArgumentException If the specified name does not match any of the predefined values.
      */
     public static ImageSrc forName(String name) {
       for (ImageSrc n : values()) {
@@ -95,12 +101,12 @@ public class Images extends IncludeExcludeConfig {
   /**
    * List of exclude patterns
    */
-  private String location = null;
+  private @Nullable String location = null;
 
   /**
    * Site prefix, used for permalinks
    */
-  private String sitePrefix = null;
+  private @Nullable String sitePrefix = null;
 
   /**
    * Whether or not to embed image metadata
@@ -110,7 +116,7 @@ public class Images extends IncludeExcludeConfig {
   /**
    * @return the location
    */
-  public String getLocation() {
+  public @Nullable String getLocation() {
     return this.location;
   }
 
@@ -124,7 +130,7 @@ public class Images extends IncludeExcludeConfig {
   /**
    * @return the site prefix
    */
-  public String getSitePrefix() {
+  public @Nullable String getSitePrefix() {
     return this.sitePrefix;
   }
 
