@@ -15,6 +15,10 @@ import java.util.Map.Entry;
  * Generates fragment numbering for a publication.
  *
  * @author Philip Rutherford
+ * @author Christophe Lauret
+ *
+ * @version 1.7.1
+ * @since 1.0
  */
 public final class FragmentNumbering implements Serializable {
 
@@ -45,7 +49,7 @@ public final class FragmentNumbering implements Serializable {
     /**
      * Current fragment
      */
-    private String fragment = Element.NO_FRAGMENT;;
+    private String fragment = Element.NO_FRAGMENT;
 
     /**
      * Index (instance number) of heading/para in fragment
@@ -92,8 +96,8 @@ public final class FragmentNumbering implements Serializable {
   /**
    * Constructor
    *
-   * @param pub              The publication tree
-   * @param config           The publication config
+   * @param pub     The publication tree
+   * @param config  The publication config
    *
    * @throws XRefLoopException if an XRef loop is detected
    */
@@ -122,7 +126,7 @@ public final class FragmentNumbering implements Serializable {
       // mark root as embedded
       addTransclusionParents(root.id(), -1, transclusions);
       processTree(pub, root.id(), 1, 1, config, getNumberingGenerators(config),
-          doccount, 1, new ArrayList<String>(), Reference.DEFAULT_FRAGMENT, transclusions);
+          doccount, 1, new ArrayList<>(), Reference.DEFAULT_FRAGMENT, transclusions);
     }
     List<Long> allIds = new ArrayList<>(pub.ids());
     // remove IDs that are not transcluded from transclusions map
@@ -169,10 +173,11 @@ public final class FragmentNumbering implements Serializable {
    */
   private @Nullable NumberingGenerator getNumberingGenerator(@Nullable PublicationConfig config,
       Map<String, NumberingGenerator> numbers, DocumentTree tree) {
+    if (config == null) return null;
     // Use config to get the first numbering that matches in config order
-    PublicationNumbering numbering = config == null ? null : config.getPublicationNumbering(tree.labels());
-    if (numbering == null) return null;
-    return numbers.get(numbering.getLabel());
+    PublicationNumbering pubNumbering = config.getPublicationNumbering(tree.labels());
+    if (pubNumbering == null) return null;
+    return numbers.get(pubNumbering.getLabel());
   }
 
   /**
@@ -320,11 +325,7 @@ public final class FragmentNumbering implements Serializable {
    * @param transclusions  the map of transclusion parents
    */
   private static void addTransclusionParents(long id, long parentid, Map<Long,List<Long>> transclusions) {
-    List<Long> parents = transclusions.get(id);
-    if (parents == null) {
-      parents = new ArrayList<>();
-      transclusions.put(id, parents);
-    }
+    List<Long> parents = transclusions.computeIfAbsent(id, k -> new ArrayList<>());
     // if not already in list add it
     if (!parents.contains(parentid)) {
       parents.add(parentid);
@@ -340,7 +341,7 @@ public final class FragmentNumbering implements Serializable {
    * @param number    The numbering generator
    * @param count     No. of times target has been used.
    */
-  public void processReference(Reference ref, int level, DocumentTree target, NumberingGenerator number, int count) {
+  public void processReference(Reference ref, int level, DocumentTree target, @Nullable NumberingGenerator number, int count) {
     String p = target.prefix();
     Prefix pref = null;
     if (number != null && Reference.DEFAULT_FRAGMENT.equals(ref.targetfragment())) {
@@ -356,9 +357,10 @@ public final class FragmentNumbering implements Serializable {
     this.numbering.put(target.id() + "-" + count + "-default",
         new Prefix(pref.value, pref.canonical, level + 2 - target.level(), pref.parentNumber));
     if (NO_PREFIX.equals(pref.value)) return;
-    // store prefix on first heading fragment (must have index=1 for reference to have a prefix)
-    this.numbering.put(target.id() + "-" + count + "-" + target.titlefragment()+ "-1", pref);
-    this.transcludedNumbering.put(target.id() + "-" + count + "-" + target.titlefragment()+ "-1", pref);
+    // store prefix on the first heading fragment (must have index=1 for reference to have a prefix)
+    String key = target.id() + "-" + count + "-" + target.titlefragment() + "-1";
+    this.numbering.put(key, pref);
+    this.transcludedNumbering.put(key, pref);
   }
 
   /**
@@ -371,7 +373,7 @@ public final class FragmentNumbering implements Serializable {
    * @param count     No. of times tree ID has been used.
    * @param location  The current original location for transcluded content
    */
-  public void processHeading(Heading h, int level, long id, NumberingGenerator number, int count, Location location) {
+  public void processHeading(Heading h, int level, long id, @Nullable NumberingGenerator number, int count, Location location) {
     String p = h.prefix();
     Prefix pref = null;
     if (h.numbered() && number != null) {
@@ -422,28 +424,28 @@ public final class FragmentNumbering implements Serializable {
    * @param count     No. of times tree ID has been used.
    * @param location  The current original location for transcluded content
    */
-  public void processParagraph(Paragraph para, int level, long id, NumberingGenerator number, int count, Location location) {
+  public void processParagraph(Paragraph para, int level, long id, @Nullable NumberingGenerator number, int count, Location location) {
     String p = para.prefix();
     Prefix pref = null;
     // adjust level minus 1 as level is already incremented (can't be less than 0)
-    int adjusted_level = (level + para.level() < 1) ? 0 : level + para.level() - 1;
+    int adjustedLevel = (level + para.level() < 1) ? 0 : level + para.level() - 1;
     if (para.numbered() && number != null) {
-      pref = number.generateNumbering(adjusted_level, "para", para.blocklabel());
+      pref = number.generateNumbering(adjustedLevel, "para", para.blocklabel());
       // if numbering undefined create empty prefix so adjusted level can be output for checking
       if (pref == null) {
-        pref = new Prefix("", null, adjusted_level, null);
+        pref = new Prefix("", null, adjustedLevel, null);
       }
     } else if (p != null && !NO_PREFIX.equals(p)) {
-      pref = new Prefix(p, null, adjusted_level, null);
+      pref = new Prefix(p, null, adjustedLevel, null);
     }
     if (number != null) {
-      number.restartNumbering(adjusted_level);
+      number.restartNumbering(adjustedLevel);
     }
     updateLocation(para, location);
     if (pref == null) return;
     // store prefix on fragment
     this.transcludedNumbering.put(id + "-" + count + "-" + para.fragment() + "-" + para.index(), pref);
-    // if not a nested transclusion then store it on orginal fragment
+    // if not a nested transclusion then store it on original fragment
     if (location.transclusions <= 1) {
       this.numbering.put(location.uriid + "-" + location.position + "-" + location.fragment + "-" + location.index, pref);
     }
@@ -476,7 +478,7 @@ public final class FragmentNumbering implements Serializable {
    *
    * @return the prefix
    */
-  public Prefix getPrefix(long uriid, int position, String fragment, int index) {
+  public @Nullable Prefix getPrefix(long uriid, int position, String fragment, int index) {
     if ("default".equals(fragment)) {
       return getPrefix(uriid, position);
     }

@@ -12,6 +12,10 @@ import java.util.*;
  * Generates numbering for a publication.
  *
  * @author Philip Rutherford
+ * @author Christophe Lauret
+ *
+ * @version 1.7.1
+ * @since 1.0
  */
 public final class NumberingGenerator {
 
@@ -79,7 +83,7 @@ public final class NumberingGenerator {
     for (String label : labels) {
       // if default restart or restart for this label defined
       if (this.numberConfig.hasRestart(level, "") ||
-          (!"".equals(label) && this.numberConfig.hasRestart(level, label))) {
+          (!label.isEmpty() && this.numberConfig.hasRestart(level, label))) {
         Deque<Integer> levels = this.numberingLevels.get(label);
         while (levels.size() > level) {
           levels.pop();
@@ -105,9 +109,9 @@ public final class NumberingGenerator {
     Set<String> labels = this.numberingLevels.keySet();
     // for each stack of levels
     for (String label : labels) {
-      boolean blockdefined = this.numberConfig.getNumberFormat(level, label) != null;
+      boolean isBlockDefined = this.numberConfig.getNumberFormat(level, label) != null;
       // if block defined add to it's stack or if default block add to all stacks undefined for that level
-      if ((blockdefined && label.equals(blockLabel)) || (!blockdefined && "".equals(blockLabel))) {
+      if ((isBlockDefined && label.equals(blockLabel)) || (!isBlockDefined && "".equals(blockLabel))) {
         Deque<Integer> levels = this.numberingLevels.get(label);
         if (levels.size() == level) {
           levels.push(levels.pop() + 1);
