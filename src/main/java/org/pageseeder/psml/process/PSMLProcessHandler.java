@@ -19,6 +19,7 @@ import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.DocumentTreeHandler;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.PublicationTree;
+import org.pageseeder.psml.util.RelativePaths;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
@@ -321,7 +322,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     this.sourceFile = file;
     this.psmlRoot = root;
     this.binaryRepository = binariesFolder;
-    this.parentFolderRelativePath = Files.computeRelativePath(file.getParentFile(), root);
+    this.parentFolderRelativePath = RelativePaths.computeCanonical(file.getParentFile(), root);
     this.transcluder = new XRefTranscluder(this);
     this.transcluder.addParentFile(file, "default");
   }
@@ -1424,7 +1425,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
 
     // get canonical relative path
-    relativePath = Files.computeRelativePath(imageFile, this.binaryRepository);
+    relativePath = RelativePaths.computeCanonical(imageFile, this.binaryRepository);
     if (relativePath == null) {
       this.logger.debug("Could not compute relative path for image src {} ({})", finalSrc, uriid);
     } else {

@@ -14,6 +14,7 @@ import org.pageseeder.psml.process.util.XSLTTransformer;
 import org.pageseeder.psml.toc.FragmentNumbering;
 import org.pageseeder.psml.toc.PublicationConfig;
 import org.pageseeder.psml.toc.XRefLoopException;
+import org.pageseeder.psml.util.RelativePaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -389,7 +390,7 @@ public final class Process {
       manifestFile = this.manifestCreator.createManifest(psml, this.src);
       // add it to the list of PSML source
       if (manifestFile != null) {
-        psml.put(Files.computeRelativePath(manifestFile, this.src), manifestFile);
+        psml.put(RelativePaths.computeCanonical(manifestFile, this.src), manifestFile);
       }
     }
 
@@ -779,9 +780,9 @@ public final class Process {
         }
       }
     } else if (file.isFile() && file.getName().toLowerCase().endsWith(".psml")) {
-      psml.put(Files.computeRelativePath(file, root), file);
+      psml.put(RelativePaths.computeCanonical(file, root), file);
     } else if (others != null) {
-      others.put(Files.computeRelativePath(file, root), file);
+      others.put(RelativePaths.computeCanonical(file, root), file);
     }
   }
 

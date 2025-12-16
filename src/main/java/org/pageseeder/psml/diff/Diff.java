@@ -21,8 +21,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.diffx.config.TextGranularity;
 import org.pageseeder.diffx.config.WhiteSpaceProcessing;
-import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
+import org.pageseeder.psml.util.RelativePaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -280,7 +280,7 @@ public final class Diff {
         }
       }
     } else if (file.isFile() && file.getName().toLowerCase().endsWith(".psml")) {
-      psml.put(Files.computeRelativePath(file, root), file);
+      psml.put(RelativePaths.computeCanonical(file, root), file);
     }
   }
 
