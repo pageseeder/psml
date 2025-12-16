@@ -16,9 +16,9 @@ import org.jspecify.annotations.Nullable;
  * @version 1.7.0
  * @since 1.7.0
  */
-public final class XmlStrings {
+public final class XMLStrings {
 
-  private XmlStrings() {}
+  private XMLStrings() {}
 
   /**
    * Replace characters in the specified string by the corresponding XML entity
