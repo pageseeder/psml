@@ -46,7 +46,10 @@ import org.xml.sax.SAXParseException;
  *
  * @author Christophe Lauret
  *
- * @param <T> The type of object to retrieve form the SAX events
+ * @version 1.7.1
+ * @since 1.0
+ *
+ * @param <T> The type of object to retrieve from the SAX events
  */
 public abstract class BasicHandler<T> extends Handler<T> {
 
@@ -105,6 +108,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
   // ---------------------------------------------------------------------------
 
   @Override
+  @SuppressWarnings("java:S1075") // XPath uses '/'
   public final void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
     String element = localName.isEmpty() ? qName : localName;
     this.ancestorOrSelf.add(element);
