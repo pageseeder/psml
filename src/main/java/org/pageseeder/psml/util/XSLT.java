@@ -42,7 +42,6 @@ public final class XSLT {
    * @throws XSLTException If XSLT templates could not be loaded from the specified URL.
    */
   public static Templates getTemplates(URL url) {
-    if (url == null) return null;
     Templates templates = CACHE.get(url.toString());
     if (templates == null) {
       templates = toTemplates(url);
@@ -145,7 +144,6 @@ public final class XSLT {
    * @throws XSLTException If XSLT templates could not be loaded from the specified URL.
    */
   private static Templates toTemplates(URL url) {
-    if (url == null) return null;
     // load the templates from the source URL
     Templates templates;
     try (InputStream in = url.openStream()) {
