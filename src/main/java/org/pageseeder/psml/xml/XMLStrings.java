@@ -54,8 +54,8 @@ public final class XMLStrings {
    *
    * <p>These characters are:</p>
    * <ul>
-   *  <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
-   *  <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
+   *  <li>{@code '&'} by the entity {@code "&amp"}</li>
+   *  <li>{@code '<'} by the entity {@code "&lt;"}</li>
    * </ul>
    *
    * <p>Note: this function makes the following assumptions:
@@ -104,8 +104,8 @@ public final class XMLStrings {
    *
    * <p>The following characters are replaced:
    * <ul>
-   *   <li>'&' is replaced with "&amp;"</li>
-   *   <li>'<' is replaced with "&lt;"</li>
+   *   <li>{@code '&'} is replaced with {@code "&amp;"}</li>
+   *   <li>{@code '<'} is replaced with {@code "&lt;"}</li>
    * </ul>
    *
    * <p>Characters that do not need escaping are appended as-is.
@@ -140,10 +140,10 @@ public final class XMLStrings {
    *
    * <p>These characters are:</p>
    * <ul>
-   *   <li>{@code '&amp'} by the ampersand entity {@code "&amp;amp"}</li>
-   *   <li>{@code '&lt;'} by the entity {@code "&amp;lt;"}</li>
-   *   <li>{@code '"'} by the entity {@code "&amp;quot;"}</li>
-   *   <li>{@code '''} by the entity {@code "&amp;apos;"}</li>
+   *   <li>{@code '&'} by the entity {@code "&amp"}</li>
+   *   <li>{@code '<'} by the entity {@code "&lt;"}</li>
+   *   <li>{@code '"'} by the entity {@code "&quot;"}</li>
+   *   <li>{@code '''} by the entity {@code "&apos;"}</li>
    * </ul>
    *
    * <p>Note: this function makes the following assumptions:
@@ -202,10 +202,10 @@ public final class XMLStrings {
    *
    * <p>The following characters are replaced:
    * <ul>
-   *   <li>'&' is replaced with "&amp;"</li>
-   *   <li>'"' is replaced with "&quot;"</li>
-   *   <li>'<' is replaced with "&lt;"</li>
-   *   <li>'\'' is replaced with "&apos;"</li>
+   *   <li>{@code '&'} is replaced with {@code "&amp;"}</li>
+   *   <li>{@code '<'} is replaced with {@code "&lt;"}</li>
+   *   <li>{@code '"'} is replaced with {@code "&quot;"}</li>
+   *   <li>{@code '\''} is replaced with {@code "&apos;"}</li>
    * </ul>
    *
    * <p>Characters that do not need escaping are appended as-is.

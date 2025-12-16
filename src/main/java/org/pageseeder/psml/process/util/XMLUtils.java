@@ -64,29 +64,8 @@ public final class XMLUtils {
    * @deprecated Use {@link XMLStrings#text(String)} instead.
    */
   @Deprecated(since = "1.7.0", forRemoval = true)
-  public static String escape(@Nullable String s) {
-    // bypass null and empty strings
-    if (s == null || s.isEmpty()) return s;
-    // do not process valid strings.
-    if (s.indexOf('&') == -1 && s.indexOf('<') == -1) return s;
-    // process the rest
-    StringBuilder valid = new StringBuilder(s);
-    int shift = 0;
-    for (int i = 0; i < s.length(); i++) {
-      switch (s.charAt(i)) {
-        case '&' :
-          valid.insert(i + shift + 1, "amp;");
-          shift += 4;
-          break;
-        case '<' :
-          valid.deleteCharAt(i + shift);
-          valid.insert(i + shift, "&lt;");
-          shift += 3;
-          break;
-        default :
-      }
-    }
-    return valid.toString();
+  public static @Nullable String escape(@Nullable String s) {
+    return XMLStrings.nullableText(s);
   }
 
   /**
@@ -115,39 +94,8 @@ public final class XMLUtils {
    * @deprecated Use {@link XMLStrings#attribute(String)} instead.
    */
   @Deprecated(since = "1.7.0", forRemoval = true)
-  public static String escapeForAttribute(@Nullable String s) {
-    // bypass null and empty strings
-    if (s == null || s.isEmpty()) return s;
-    // do not process valid strings.
-    if (s.indexOf('&') == -1 && s.indexOf('<') == -1 && s.indexOf('"') == -1) return s;
-    // process the rest
-    StringBuilder valid = new StringBuilder(s);
-    int shift = 0;
-    for (int i = 0; i < s.length(); i++) {
-      switch (s.charAt(i)) {
-        case '&' :
-          valid.insert(i + shift + 1, "amp;");
-          shift += 4;
-          break;
-        case '"' :
-          valid.deleteCharAt(i + shift);
-          valid.insert(i + shift, "&quot;");
-          shift += 5;
-          break;
-        case '\'' :
-          valid.deleteCharAt(i + shift);
-          valid.insert(i + shift, "&apos;");
-          shift += 5;
-          break;
-        case '<' :
-          valid.deleteCharAt(i + shift);
-          valid.insert(i + shift, "&lt;");
-          shift += 3;
-          break;
-        default :
-      }
-    }
-    return valid.toString();
+  public static @Nullable String escapeForAttribute(@Nullable String s) {
+    return XMLStrings.nullableAttribute(s);
   }
 
   /**
