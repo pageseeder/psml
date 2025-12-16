@@ -128,7 +128,7 @@ public enum ParameterType {
 
     @Override
     public boolean matches(String value) {
-      return org.pageseeder.psml.template.XML.isWellFormedFragment(value);
+      return org.pageseeder.psml.xml.XML.isWellFormedFragment(value);
     }
 
   };

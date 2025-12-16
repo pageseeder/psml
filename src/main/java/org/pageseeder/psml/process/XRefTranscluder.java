@@ -5,10 +5,10 @@ package org.pageseeder.psml.process;
 
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.math.TexConverter;
-import org.pageseeder.psml.process.util.Files;
 import org.pageseeder.psml.process.util.XMLUtils;
 import org.pageseeder.psml.toc.DocumentTree;
 import org.pageseeder.psml.toc.DocumentTreeHandler;
+import org.pageseeder.psml.util.RelativePaths;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.xml.sax.Attributes;
@@ -337,10 +337,10 @@ public final class XRefTranscluder {
     if (path.endsWith(".psml")) {
       // try psml
       File target = new File(this.parentHandler.getPSMLRoot(), dadPath + '/' + path);
-      if (!path.startsWith("/")) return Files.computeRelativePath(target, this.parentHandler.getPSMLRoot());
+      if (!path.startsWith("/")) return RelativePaths.computeCanonical(target, this.parentHandler.getPSMLRoot());
     } else {
       File target = new File(this.parentHandler.getBinaryRepository(), dadPath + '/' + path);
-      if (!path.startsWith("/")) return Files.computeRelativePath(target, this.parentHandler.getBinaryRepository());
+      if (!path.startsWith("/")) return RelativePaths.computeCanonical(target, this.parentHandler.getBinaryRepository());
     }
     return null;
   }

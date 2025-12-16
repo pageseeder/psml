@@ -78,7 +78,7 @@ public abstract class BasicHandler<T> extends Handler<T> {
    */
   private @Nullable Locator locator = null;
 
-  public BasicHandler() {
+  protected BasicHandler() {
   }
 
   // Methods to implement

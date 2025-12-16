@@ -66,8 +66,12 @@ public final class PseudoEndToken implements EndElementToken {
     return this.token.hashCode();
   }
 
-  @Override
   public StartElementToken getOpenElement() {
+    return new PseudoStartToken(this.token.getStartElement());
+  }
+
+  @Override
+  public StartElementToken getStartElement() {
     return new PseudoStartToken(this.token.getStartElement());
   }
 

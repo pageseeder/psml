@@ -32,7 +32,7 @@ import org.pageseeder.psml.html.HTMLNode;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.1
+ * @version 1.7.0
  * @since 1.0
  */
 public class HTMLBlockParser {
@@ -74,21 +74,6 @@ public class HTMLBlockParser {
   }
 
   /**
-   * Iterate over the lines and return corresponding PSML elements.
-   *
-   * @param lines The lines to parse
-   * @param config The configuration to use
-   *
-   * @return The corresponding list of PSML elements
-   *
-   * @deprecated Use {@link #parse(List, MarkdownInputOptions)} instead.
-   */
-  @Deprecated(forRemoval = true, since = "1.6.1")
-  public List<HTMLElement> parse(List<String> lines, Configuration config) {
-    return parse(lines, config.toMarkdownInputOptions());
-  }
-
-  /**
    * Iterate over the lines and return corresponding HTML elements.
    *
    * @param lines The lines to parse
@@ -123,29 +108,6 @@ public class HTMLBlockParser {
    */
   public void setOptions(MarkdownInputOptions options) {
     this.options = options;
-  }
-
-  @Deprecated(forRemoval = true, since = "1.6.1")
-  public void setConfiguration(Configuration configuration) {
-    this.options = configuration.toMarkdownInputOptions();
-  }
-
-  @Deprecated(forRemoval = true, since = "1.6.1")
-  public Configuration getConfiguration() {
-    return Configuration.fromMarkdownInputOptions(this.options);
-  }
-
-  /**
-   * Process a single line
-   *
-   * @param line  The current line
-   * @param next  The next line
-   * @param state The state of the parser
-   * @param config The configuration to use
-   */
-  @Deprecated(forRemoval = true, since = "1.6.1")
-  public void processLine(String line, @Nullable String next, State state, Configuration config) {
-    processLine(line, next, state, config.toMarkdownInputOptions());
   }
 
   /**

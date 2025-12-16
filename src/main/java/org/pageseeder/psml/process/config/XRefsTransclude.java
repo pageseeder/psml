@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.process.config;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Defines how to traverse XRefs, including the XRefs types and some patterns to include/exclude.
  *
@@ -37,12 +39,14 @@ package org.pageseeder.psml.process.config;
  * </ul>
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 0.5.0
  */
 public final class XRefsTransclude extends IncludeExcludeConfig {
 
-  public enum XREF_IN_XREF_FRAGMENT {
+  public enum XrefInXRefFragment {
     
     /** Process xrefs inside {@code <xref-fragment>} */
     INCLUDE,
@@ -54,14 +58,14 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
     ONLY;
     
     /**
-     * Returns the XREF_IN_XREF_FRAGMENT corresponding to the given name.
+     * Returns the XrefInXRefFragment corresponding to the given name.
      *
-     * @param name The name of XREF_IN_XREF_FRAGMENT (include, exclude or only).
+     * @param name The name of XrefInXRefFragment (include, exclude, or only).
      * 
-     * @return The corresponding XREF_IN_XREF_FRAGMENT.
+     * @return The corresponding XrefInXRefFragment.
      */
-    public static XREF_IN_XREF_FRAGMENT forName(String name) {
-      for (XREF_IN_XREF_FRAGMENT n : values()) {
+    public static XrefInXRefFragment forName(String name) {
+      for (XrefInXRefFragment n : values()) {
         if (n.name().equalsIgnoreCase(name)) return n;
       }
       throw new IllegalArgumentException("Invalid xreffragment attribute value: " + name);
@@ -71,12 +75,12 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
   /**
    * List of XRefs types to match.
    */
-  private String types = null;
+  private @Nullable String types = null;
 
   /**
    * How to handle xrefs in an xref-fragment.
    */
-  private XREF_IN_XREF_FRAGMENT xRefFragment = XREF_IN_XREF_FRAGMENT.INCLUDE;
+  private XrefInXRefFragment xRefFragment = XrefInXRefFragment.INCLUDE;
 
   /**
    * Whether to process xref levels
@@ -93,7 +97,7 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
   /**
    * @param xf the xRefFragment to set
    */
-  public void setXRefsInXRefFragment(XREF_IN_XREF_FRAGMENT xf) {
+  public void setXRefsInXRefFragment(XrefInXRefFragment xf) {
     this.xRefFragment = xf;
   }
 
@@ -101,7 +105,7 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
    * @param s the name of xRefFragment to set  (include, exclude or only)
    */
   public void setXRefFragment(String s) {
-    this.xRefFragment = XREF_IN_XREF_FRAGMENT.forName(s);
+    this.xRefFragment = XrefInXRefFragment.forName(s);
   }
 
   /**
@@ -115,27 +119,27 @@ public final class XRefsTransclude extends IncludeExcludeConfig {
    * @return <code>true</code> if the XRefs in an xref-fragment are included
    */
   public boolean includeXRefsInXRefFragment() {
-    return this.xRefFragment == XREF_IN_XREF_FRAGMENT.INCLUDE;
+    return this.xRefFragment == XrefInXRefFragment.INCLUDE;
   }
 
   /**
    * @return <code>true</code> if the XRefs in an xref-fragment are excluded
    */
   public boolean excludeXRefsInXRefFragment() {
-    return this.xRefFragment == XREF_IN_XREF_FRAGMENT.EXCLUDE;
+    return this.xRefFragment == XrefInXRefFragment.EXCLUDE;
   }
 
   /**
    * @return <code>true</code> if only the XRefs in an xref-fragment are included
    */
   public boolean onlyXRefsInXRefFragment() {
-    return this.xRefFragment == XREF_IN_XREF_FRAGMENT.ONLY;
+    return this.xRefFragment == XrefInXRefFragment.ONLY;
   }
 
   /**
    * @return the types
    */
-  public String getTypes() {
+  public @Nullable String getTypes() {
     return this.types;
   }
 

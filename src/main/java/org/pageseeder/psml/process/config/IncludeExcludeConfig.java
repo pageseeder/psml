@@ -8,14 +8,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 
 /**
  * Include exclude config details.
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 0.5.0
  */
 public abstract class IncludeExcludeConfig {
 
@@ -76,7 +79,7 @@ public abstract class IncludeExcludeConfig {
   /**
    * @param exc the excludes to set
    */
-  public void setExcludes(String exc) {
+  public void setExcludes(@Nullable String exc) {
     if (exc != null)
       this.excludes.addAll(Arrays.asList(exc.split(",")));
   }
@@ -84,7 +87,7 @@ public abstract class IncludeExcludeConfig {
   /**
    * @param inc the includes to set
    */
-  public void setIncludes(String inc) {
+  public void setIncludes(@Nullable String inc) {
     if (inc != null)
       this.includes.addAll(Arrays.asList(inc.split(",")));
   }
@@ -129,7 +132,7 @@ public abstract class IncludeExcludeConfig {
    *
    * @return the matcher if there are any patterns, <code>null</code> otherwise.
    */
-  public IncludesExcludesMatcher buildMatcher() {
+  public @Nullable IncludesExcludesMatcher buildMatcher() {
     IncludesExcludesMatcher matcher = new IncludesExcludesMatcher();
     matcher.addIncludePatterns(this.includes);
     matcher.addExcludePatterns(this.excludes);

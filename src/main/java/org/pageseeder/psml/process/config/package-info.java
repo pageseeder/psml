@@ -13,25 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pageseeder.psml.template;
-
-/**
- * Some useful constants
- *
- * @author Christophe Lauret
- *
- * @version 1.7.0
- * @since 1.0
- */
-public final class Constants {
-
-  /** Utility */
-  private Constants() {
-  }
-
-  /**
-   * The namespace URI.
-   */
-  public static final String NS_URI = "http://pageseeder.com/psml/template";
-
-}
+@org.jspecify.annotations.NullMarked
+package org.pageseeder.psml.process.config;

@@ -3,6 +3,8 @@
  */
 package org.pageseeder.psml.process.config;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,15 +39,17 @@ import java.util.Map;
  * </ul>
  *
  * @author Jean-Baptiste Reure
- * @version 1.7.9
+ * @author Christophe Lauret
  *
+ * @version 1.7.0
+ * @since 0.5.0
  */
 public final class XSLTTransformation extends IncludeExcludeConfig {
 
   /**
    * Path to XSLT script
    */
-  private String xslt = null;
+  private @Nullable String xslt = null;
 
   /**
    * List of facets to filter the documents
@@ -62,7 +66,7 @@ public final class XSLTTransformation extends IncludeExcludeConfig {
   /**
    * @return the path to the xslt script
    */
-  public String getXSLT() {
+  public @Nullable String getXSLT() {
     return this.xslt;
   }
 

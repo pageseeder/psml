@@ -4,9 +4,7 @@
 package org.pageseeder.psml.toc;
 
 import org.jspecify.annotations.Nullable;
-import org.pageseeder.psml.process.util.XMLUtils;
-import org.pageseeder.xmlwriter.XML;
-import org.pageseeder.xmlwriter.XMLStringWriter;
+import org.pageseeder.psml.xml.XMLStrings;
 import org.pageseeder.xmlwriter.XMLWritable;
 import org.pageseeder.xmlwriter.XMLWriter;
 import org.slf4j.Logger;
@@ -18,11 +16,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * An immutable tree aggregating multiple trees together in order to generate a
- * deep table of contents.
+ * An immutable tree aggregating multiple trees together to generate a deep table of contents.
  *
  * @author Christophe Lauret
  * @author Philip Rutherford
+ *
+ * @version 1.7.0
+ * @since 1.0
  */
 public final class PublicationTree implements Tree, Serializable, XMLWritable {
 
@@ -280,7 +280,7 @@ public final class PublicationTree implements Tree, Serializable, XMLWritable {
     if (t.xmlheadings()) {
       return h;
     } else {
-      return XMLUtils.escape(h);
+      return XMLStrings.text(h);
     }
   }
 

@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Processes a new document template to generate new document instances.
