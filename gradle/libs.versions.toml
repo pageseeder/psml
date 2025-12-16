@@ -1,12 +1,12 @@
 [versions]
-junit = "5.13.2"
-junit-platform = "1.13.2"
+junit = "5.14.1"
+junit-platform = "1.14.1"
 slf4j = "2.0.17"
-xmlunit = "2.10.0"
+xmlunit = "2.11.0"
 
 [libraries]
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
-commons-io = { module = "commons-io:commons-io", version = "2.19.0" }
+commons-io = { module = "commons-io:commons-io", version = "2.21.0" }
 hamcrest = { module = "org.hamcrest:hamcrest", version = "2.2"}
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
@@ -30,4 +30,4 @@ junit = [
 ]
 
 [plugins]
-jreleaser = { id = "org.jreleaser", version = "1.18.0" }
+jreleaser = { id = "org.jreleaser", version = "1.21.0" }
