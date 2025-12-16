@@ -188,7 +188,7 @@ final class MarkdownSerializerTest {
     MarkdownSerializer serializer = new MarkdownSerializer();
     StringWriter out = new StringWriter();
     serializer.serialize(psml, out);
-    assertEquals(expected.trim(), out.toString().trim());
+    assertEquals(normalizeLineEndings(expected).trim(), normalizeLineEndings(out.toString()).trim());
   }
 
   private void testTableFormat(String name, MarkdownOutputOptions.TableFormat format) throws IOException {
@@ -198,7 +198,7 @@ final class MarkdownSerializerTest {
     serializer.setOptions(MarkdownOutputOptions.defaultOptions().table(format));
     StringWriter out = new StringWriter();
     serializer.serialize(psml, out);
-    assertEquals(expected.trim(), out.toString().trim());
+    assertEquals(normalizeLineEndings(expected).trim(), normalizeLineEndings(out.toString()).trim());
   }
 
   @Test
@@ -265,5 +265,9 @@ final class MarkdownSerializerTest {
     }
   }
 
-
+  private static String normalizeLineEndings(String s) {
+    if (s == null) return null;
+    // Normalize Windows and old-Mac line endings to Unix \n
+    return s.replace("\r\n", "\n").replace("\r", "\n");
+  }
 }
