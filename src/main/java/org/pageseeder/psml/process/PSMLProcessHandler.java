@@ -759,7 +759,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
     // fragment loading?
     boolean isFragment = noNamespace && isFragment(qName);
     if (!this.inRequiredFragment) {
-      if ((isFragment && this.fragmentToLoad != null
+      if ((isFragment && this.fragmentToLoad != null && !this.inPreTranscluded
           && this.fragmentToLoad.equals(atts.getValue("id")) && !this.elements.contains("compare"))
           || (noNamespace && this.fragmentToLoad != null && "locator".equals(qName)
           && this.fragmentToLoad.equals(atts.getValue("fragment")))) {
@@ -987,7 +987,7 @@ public final class PSMLProcessHandler extends DefaultHandler {
         write(this.convertingAsciimath ? AsciiMathConverter.convert(this.convertContent.toString()) : TexConverter.convert(this.convertContent.toString()));
         write("</media-fragment>");
         this.convertContent = null;
-        if (this.fragmentToLoad != null) {
+        if (this.fragmentToLoad != null && !this.inPreTranscluded) {
           this.inRequiredFragment = false;
         }
         return;
@@ -1010,9 +1010,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
       // reset current fragment
       this.currentFragment = null;
       // load a specific fragment?
-      if (this.fragmentToLoad != null)
+      if (this.fragmentToLoad != null && !this.inPreTranscluded)
         this.inRequiredFragment = false;
-    } else if ("locator".equals(qName) && this.fragmentToLoad != null) {
+    } else if ("locator".equals(qName) && this.fragmentToLoad != null && !this.inPreTranscluded) {
       this.inRequiredFragment = false;
     }
   }

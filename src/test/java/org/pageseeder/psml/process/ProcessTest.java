@@ -1568,6 +1568,7 @@ public class ProcessTest {
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();
     xrefs.setTypes("embed");
+    xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
     p.setConvertAsciiMath(true);
     p.process();
@@ -1586,6 +1587,9 @@ public class ProcessTest {
     assertThat(xml, hasXPath("(//fragment)[9]/@id", equalTo("2_921771-3")));
     assertThat(xml, hasXPath("(//fragment)[10]/@id", equalTo("2_988297-1")));
     assertThat(xml, hasXPath("(//fragment)[11]/@id", equalTo("2_988297-2")));
+    assertThat(xml, hasXPath("(//fragment)[12]/@id", equalTo("988295-6")));
+    assertThat(xml, hasXPath("(//fragment)[13]/@id", equalTo("3_921771-3")));
+    assertThat(xml, hasXPath("(//fragment)[14]/@id", equalTo("3_988297-2")));
     assertThat(xml, hasXPath("(//media-fragment)[1]/@id", equalTo("media")));
     assertThat(xml, hasXPath("(//media-fragment)[2]/@id", equalTo("227-1")));
     assertThat(xml, hasXPath("(//media-fragment)[3]/@id", equalTo("208-1")));
@@ -1593,7 +1597,7 @@ public class ProcessTest {
     assertThat(xml, hasXPath("(//heading)[3]/@level", equalTo("1")));
     assertThat(xml, hasXPath("(//heading)[4]/@level", equalTo("3")));
     assertThat(xml, hasXPath("(//heading)[5]/@level", equalTo("1")));
-    assertThat(xml, hasXPath("(//xref[@type='none'])[1]/@href", equalTo("#921771-3")));
+    assertThat(xml, hasXPath("(//xref[@type='none'])[1]/@href", equalTo("#3_921771-3")));
     assertThat(xml, hasXPath("(//xref[@type='none'])[2]/@href", equalTo("#988297-1")));
     assertThat(xml, hasXPath("(//xref[@type='none'])[3]/@href", equalTo("#2_988297-1")));
   }

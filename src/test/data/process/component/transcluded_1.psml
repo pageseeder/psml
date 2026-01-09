@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document id="921771" schemaversion="1.4" date="2024-02-06T12:06:15+11:00" version="current" level="portable">
+  <documentinfo>
+    <uri id="921771" external="false" mediatype="application/vnd.pageseeder.psml+xml"
+         created="2024-02-06T12:05:37+11:00" modified="2024-02-06T12:06:15+11:00" scheme="http" host="localhost"
+         port="80" path="/ps/report2/local1/documents/component/transclude_1.psml"
+         decodedpath="/ps/report2/local1/documents/component/transclude_1.psml" title="Transclude 1">
+      <displaytitle>Transclude 1</displaytitle>
+    </uri>
+  </documentinfo>
+  <fragmentinfo>
+    <locator id="2301857" fragment="3" modified="2024-02-09T10:58:54+11:00">
+      <reversexrefs>
+        <reversexref uriid="921771" href="/ps/report2/local1/documents/component/transcluded_1.psml" frag="3"
+                     urititle="Transcluded 1" mediatype="application/vnd.pageseeder.psml+xml" id="5346716"
+                     title="Trans heading" type="none" forwardtype="none" forwarddisplay="document"
+                     forwardfrag="default"/>
+      </reversexrefs>
+    </locator>
+  </fragmentinfo>
+  <metadata/>
+  <section id="title">
+    <fragment id="1">
+      <heading level="1">Transclude 1</heading>
+    </fragment>
+  </section>
+  <section id="content">
+    <fragment id="3">
+      <heading level="2" numbered="true" prefix="1">Trans heading</heading>
+      <para>
+        <xref id="5346763" frag="1" reversefrag="3" reversetitle="Trans heading" reverselink="true" reversetype="none" display="document" type="none" uriid="988297" href="embeded_1.psml" urititle="Embeded 1" mediatype="application/vnd.pageseeder.psml+xml">Embeded 1</xref>
+      </para>
+      <para>Trans content</para>
+      <blockxref id="5346725" frag="2" reversefrag="3" reversetitle="Trans heading" reverselink="true" reversetype="none" display="document" type="transclude" uriid="988297" href="embeded_1.psml" urititle="Embeded 1" mediatype="application/vnd.pageseeder.psml+xml">
+        <locator id="80766" fragment="2" modified="2025-11-27T15:13:26+11:00"/>
+        <fragment id="2">
+          <para>
+          </para>
+        </fragment>
+      </blockxref>
+      <para/>
+    </fragment>
+  </section>
+</document>
