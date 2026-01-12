@@ -167,7 +167,7 @@ public class ProcessTest {
     // check result
     File result = new File(DEST_FOLDER + "/" + filename + ".psml");
     String xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref)", equalTo("27")));
+    assertThat(xml, hasXPath("count(/document/section/xref-fragment/blockxref)", equalTo("28")));
   }
 
   @Test
@@ -1648,6 +1648,7 @@ public class ProcessTest {
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();
     xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
     p.setPlaceholders(true);
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
@@ -1716,6 +1717,7 @@ public class ProcessTest {
     XRefsTransclude xrefs = new XRefsTransclude();
     xrefs.setTypes("embed,transclude");
     p.setXrefs(xrefs);
+    xrefs.setIncludes(filename);
     p.setPlaceholders(true);
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
     p.setPublicationConfig(config, filename, true);
@@ -1783,6 +1785,7 @@ public class ProcessTest {
     p.setDest(dest);
     XRefsTransclude xrefs = new XRefsTransclude();
     xrefs.setTypes("embed,transclude");
+    xrefs.setIncludes(filename);
     p.setXrefs(xrefs);
     PublicationConfig config = Tests.parseConfig("publication-config-process.xml");
     p.setPublicationConfig(config, filename, true);

@@ -733,6 +733,11 @@ public final class PSMLProcessHandler extends DefaultHandler {
     }
     // if pre-transcluded content update URI counts
     if (this.preXrefLevel == 1 && !this.inPreTranscluded) {
+      if (this.inTranscludedContent) {
+        handleError("You cannot process transclude xrefs on content exported with processpublication=\"true\" URIID: "
+                        + this.preUriID, this.failOnError, this.logger, true, false);
+      }
+      this.inTranscludedContent = true;
       this.inPreTranscluded = true;
       // update uri count
       Integer count = this.allUriIDs.get(this.uriID);
@@ -1198,7 +1203,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
   private void transcludeXRef(Attributes atts, boolean image, boolean link) throws SAXException {
     // ignore nested transclude
     String type = atts.getValue("type");
-    if ("transclude".equals(type) && this.inTranscludedContent) return;
     String href = atts.getValue(image ? "src" : "href");
     try {
       // find out if the fragment we're in is an xref-fragment
@@ -1214,7 +1218,8 @@ public final class PSMLProcessHandler extends DefaultHandler {
       }
       // retrieve target document
       String uriid = atts.getValue("uriid");
-      if (this.transcluder.transcludeXRef(atts, isInXRefFragment, image, link, this.inEmbedHierarchy, this.convertTex)) {
+      if (!("transclude".equals(type) && this.inTranscludedContent) &&
+          this.transcluder.transcludeXRef(atts, isInXRefFragment, image, link, this.inEmbedHierarchy, this.convertTex)) {
         // then ignore content of XRef
         this.inTranscludedXRef = !link;
       // else if pre-transcluded xref (ignoring generated media fragment without a uriid)
@@ -1228,7 +1233,6 @@ public final class PSMLProcessHandler extends DefaultHandler {
         this.preEmbedHierarchy = this.inEmbedHierarchy;
         this.uriID = uriid;
         this.inEmbedHierarchy = false;
-        this.inTranscludedContent = true;
       }
     } catch (InfiniteLoopException ex) {
       File root_src = this.sourceFile;
