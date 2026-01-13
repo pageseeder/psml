@@ -731,10 +731,15 @@ public final class PSMLProcessHandler extends DefaultHandler {
             "true".equals(atts.getValue("external"))) {
       this.parentFolderRelativePath = "";
     }
+    // check for transcluding already pre-transcluded content
+    if (this.inTranscludedXRef) {
+      handleError("You cannot process transclude xrefs on content exported with processpublication=\"true\" URIID: "
+              + this.uriID, this.failOnError, this.logger, true, false);
+    }
     // if pre-transcluded content update URI counts
     if (this.preXrefLevel == 1 && !this.inPreTranscluded) {
       if (this.inTranscludedContent) {
-        handleError("You cannot process transclude xrefs on content exported with processpublication=\"true\" URIID: "
+        handleError("You can not process transclude xrefs on content exported with processpublication=\"true\" URIID: "
                         + this.preUriID, this.failOnError, this.logger, true, false);
       }
       this.inTranscludedContent = true;
