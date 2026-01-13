@@ -74,5 +74,9 @@
         </fragment>
       </blockxref>
     </fragment>
+    <fragment id="6">
+      <heading level="1">Embed</heading>
+      <blockxref id="6346739" frag="3" reversefrag="1" reversetitle="Equations using inline labels should be …" reverselink="true" reversetype="none" display="document" type="embed" uriid="921771" href="component/transcluded_1.psml" urititle="Transcluded 1" mediatype="application/vnd.pageseeder.psml+xml">Transcluded 1</blockxref>
+    </fragment>
   </section>
 </document>

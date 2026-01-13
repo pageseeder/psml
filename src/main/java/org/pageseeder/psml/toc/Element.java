@@ -45,7 +45,7 @@ public abstract class Element implements Serializable, XMLWritable {
    *
    * @param level The level.
    */
-  public Element(int level) {
+  protected Element(int level) {
     this.level = level;
     this.title = NO_TITLE;
     this.fragment = NO_FRAGMENT;
@@ -62,7 +62,7 @@ public abstract class Element implements Serializable, XMLWritable {
    *
    * @throws IllegalArgumentException If the level is less than zero.
    */
-  public Element(int level, String title, String fragment, String originalFragment) {
+  protected Element(int level, String title, String fragment, String originalFragment) {
     if (level < 0) throw new IllegalArgumentException("Level must be > 0 but was "+level);
     this.level = level;
     this.title = title;

@@ -43,15 +43,15 @@ public final class Heading extends Element implements Serializable {
    * @param index         The index of the heading in the current document.
    * @param numbered      Whether the heading is auto-numbered
    * @param prefix        Any prefix given to this heading.
-   * @param blocklabel    Parent block label.
+   * @param blockLabel    Parent block label.
    */
   private Heading(int level, String title, String fragment, String originalfrag,
-      int index, boolean numbered, String prefix, String blocklabel) {
+      int index, boolean numbered, String prefix, String blockLabel) {
     super(level, title, fragment, originalfrag);
     this.index = index;
     this.numbered = numbered;
     this.prefix = prefix;
-    this.blocklabel = blocklabel;
+    this.blocklabel = blockLabel;
   }
 
   /**
@@ -60,11 +60,11 @@ public final class Heading extends Element implements Serializable {
    * @param level         The level of this heading.
    * @param title         The title (or text) for the heading.
    * @param fragment      The Fragment identifier where the heading was found.
-   * @param originalfrag  The original (untranscluded) fragment.
+   * @param originalFrag  The original (untranscluded) fragment.
    * @param index         The index of the heading in the current document.
    */
-  public Heading(int level, String title, String fragment, String originalfrag, int index) {
-    this(level, title,  fragment, originalfrag, index, false, NO_PREFIX, NO_BLOCK_LABEL);
+  public Heading(int level, String title, String fragment, String originalFrag, int index) {
+    this(level, title,  fragment, originalFrag, index, false, NO_PREFIX, NO_BLOCK_LABEL);
   }
 
   /**
@@ -72,13 +72,13 @@ public final class Heading extends Element implements Serializable {
    *
    * @param level         The level of this heading.
    * @param fragment      The Fragment identifier where the heading was found.
-   * @param originalfrag  The original (untranscluded) fragment.
+   * @param originalFrag  The original (untranscluded) fragment.
    * @param index         The index of the heading in the current document.
    *
    * @return A new heading instance.
    */
-  public static Heading untitled(int level, String fragment, String originalfrag, int index) {
-    return new Heading(level, NO_TITLE, fragment, originalfrag, index, false, NO_PREFIX, NO_BLOCK_LABEL);
+  public static Heading untitled(int level, String fragment, String originalFrag, int index) {
+    return new Heading(level, NO_TITLE, fragment, originalFrag, index, false, NO_PREFIX, NO_BLOCK_LABEL);
   }
 
   /**

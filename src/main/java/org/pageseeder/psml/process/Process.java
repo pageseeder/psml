@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -635,6 +636,12 @@ public final class Process {
 //            this.logger.info("  Found ID {} globally {}, locally {} and embedded {} times", key2, counts[0], counts[1], counts[2]);
 //          }
 //        }
+//      }
+//      try {
+//        if (fileEntry.getValue().getName().equals("transclude.psml"))
+//          System.out.println(Files.readString(tempOutput.toPath()));
+//      } catch (IOException e) {
+//        throw new RuntimeException(e);
 //      }
       // ok second pass now
       this.logger.debug("Second pass file {}", relPath);

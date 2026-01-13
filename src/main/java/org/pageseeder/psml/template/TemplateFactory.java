@@ -48,7 +48,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.7.1
  * @since 1.0
  */
 public final class TemplateFactory {
@@ -149,8 +149,7 @@ public final class TemplateFactory {
   public Template parse(InputSource template) throws IOException, TemplateException {
     Handler handler = new Handler(this.charset, this.fragment);
     try {
-      SAXParser parser = getParser();
-      parser.parse(template, handler);
+      getParser().parse(template, handler);
       return handler.getTemplate();
     } catch (SAXException ex) {
       throw new TemplateException(ex);
@@ -161,7 +160,7 @@ public final class TemplateFactory {
   // ==============================================================================================
 
   /**
-   * Indicates what encoding are supported for output.
+   * Indicates what character encodings are supported for output.
    *
    * @param cs the charset to use for the target XML output.
    * @return <code>true</code> is that charset is supported;
@@ -175,7 +174,7 @@ public final class TemplateFactory {
   }
 
   /**
-   * @return a namespace aware, non validating parser.
+   * @return a namespace-aware, non-validating parser.
    */
   private SAXParser getParser() {
     if (this.parser == null) {
@@ -184,9 +183,7 @@ public final class TemplateFactory {
       factory.setValidating(false);
       try {
         this.parser = factory.newSAXParser();
-      } catch (ParserConfigurationException ex) {
-        throw new UnsupportedOperationException(ex);
-      } catch (SAXException ex) {
+      } catch (ParserConfigurationException | SAXException ex) {
         throw new UnsupportedOperationException(ex);
       }
     }
@@ -194,14 +191,14 @@ public final class TemplateFactory {
   }
 
   /**
-   * A namespace aware handler to process to generate a Template instance from a PSML template SAX stream.
+   * A namespace-aware handler to process to generate a Template instance from a PSML template SAX stream.
    *
    * <p>The Template instance can be retrieved after a parse with the {@link #getTemplate()} method.
    *
    * @author Christophe Lauret
    * @version 26 June 2013
    */
-  public class Handler extends DefaultHandler {
+  public static class Handler extends DefaultHandler {
 
     // Class attributes
     // ==============================================================================================
@@ -214,17 +211,17 @@ public final class TemplateFactory {
     /**
      * Encodes the XML text and attribute values when needed.
      */
-    private final Charset _charset;
+    private final Charset charset;
 
     /**
      * Encodes the XML text and attribute values when needed.
      */
-    private final XML.Encoder _encoder;
+    private final XML.Encoder encoder;
 
     /**
      * The current template builder
      */
-    private final TemplateBuilder<? extends Template> _builder;
+    private final TemplateBuilder<? extends Template> builder;
 
     /**
      * Holds PSML data to be written out.
@@ -234,7 +231,7 @@ public final class TemplateFactory {
     /**
      * The builder for fragments (may be <code>null</code>).
      */
-    private TFragment.Builder _fragment;
+    private TFragment.@Nullable Builder fragment;
 
     /**
      * Set to true when an element has been left unclosed.
@@ -254,12 +251,12 @@ public final class TemplateFactory {
     /**
      * The stack of parent elements.
      */
-    private Deque<NSElement> parents = new ArrayDeque<>();
+    private final Deque<NSElement> parents = new ArrayDeque<>();
 
     /**
      * We use this to determine whether to output white spaces.
      */
-    private NSElement previous = null;
+    private @Nullable NSElement previous = null;
 
     // Constructors and attributes
     // ==============================================================================================
@@ -275,13 +272,13 @@ public final class TemplateFactory {
         charset = StandardCharsets.UTF_8;
       }
       if (!isSupported(charset)) throw new IllegalArgumentException("Only supports ASCII and UTF-8");
-      this._charset = charset;
+      this.charset = charset;
       if (fragment != null) {
-        this._builder = new FragmentTemplate.Builder(charset, fragment);
+        this.builder = new FragmentTemplate.Builder(charset, fragment);
       } else {
-        this._builder = new DocumentTemplate.Builder(charset);
+        this.builder = new DocumentTemplate.Builder(charset);
       }
-      this._encoder = XML.getEncoder(charset);
+      this.encoder = XML.getEncoder(charset);
     }
 
     /**
@@ -295,13 +292,13 @@ public final class TemplateFactory {
      * @return the Template instance after a parse.
      */
     public Template getTemplate() {
-      return this._builder.build();
+      return this.builder.build();
     }
 
     @Override
     public void startDocument() throws SAXException {
       if (this.includeXMLDeclaration) {
-        this.buffer.append("<?xml version=\"1.0\" encoding=\""+this._charset.name()+"\"?>");
+        this.buffer.append("<?xml version=\"1.0\" encoding=\"").append(this.charset.name()).append("\"?>");
       }
     }
 
@@ -316,11 +313,11 @@ public final class TemplateFactory {
       if (Constants.NS_URI.equals(uri)) {
         startTemplateElement(localName, attributes);
 
-      } else if (localName.endsWith("fragment") && this._fragment != null) {
-        this._fragment.setKind(localName);
+      } else if (localName.endsWith("fragment") && this.fragment != null) {
+        this.fragment.setKind(localName);
         String mediatype = attributes.getValue("mediatype");
         if (mediatype != null) {
-          this._fragment.setMediatype(mediatype);
+          this.fragment.setMediatype(mediatype);
         }
         this.ignore = false;
       } else {
@@ -337,7 +334,7 @@ public final class TemplateFactory {
       this.parents.pop();
       if (Constants.NS_URI.equals(uri)) {
         endTemplateElement(localName);
-      } else if (localName.endsWith("fragment") && this._fragment != null) {
+      } else if (localName.endsWith("fragment") && this.fragment != null) {
         this.ignore = true;
       } else {
         endPSMLElement(qName);
@@ -352,9 +349,9 @@ public final class TemplateFactory {
       if (this.depth <= 1 && element != null && element.isTemplateElement("param")) {
         String characters = new String(ch, start, length);
         characters = characters.trim();
-        this._encoder.text(characters.toCharArray(), 0, characters.length(), this.buffer);
+        this.encoder.text(characters.toCharArray(), 0, characters.length(), this.buffer);
       } else {
-        this._encoder.text(ch, start, length, this.buffer);
+        this.encoder.text(ch, start, length, this.buffer);
       }
     }
 
@@ -371,28 +368,28 @@ public final class TemplateFactory {
      * @param localName  The local name of the element.
      * @param attributes Attributes attached to the element
      */
-    private void startTemplateElement(String localName, Attributes attributes) throws SAXException {
+    private void startTemplateElement(String localName, Attributes attributes) {
       // Don't output XML from the template namespace.
       if ("param".equals(localName)) {
         String name  = attributes.getValue("name");
         String value = attributes.getValue("default");
         String type  = attributes.getValue("type");
-        if (this._fragment != null) {
-          this._fragment.addParameter(name, value, ParameterType.forName(type));
+        if (this.fragment != null) {
+          this.fragment.addParameter(name, value, ParameterType.forName(type));
         } else {
-          this._builder.addParameter(name, value, ParameterType.forName(type));
+          this.builder.addParameter(name, value, ParameterType.forName(type));
         }
 
       } else if ("value".equals(localName)) {
         checkPushData();
         String name  = attributes.getValue("name");
         if (name == null) {
-          this._builder.pushError("a value without a name is pointless");
+          this.builder.pushError("a value without a name is pointless");
         } else {
-          if (this._fragment != null) {
-            this._fragment.pushValue(name, false);
+          if (this.fragment != null) {
+            this.fragment.pushValue(name, false);
           } else {
-            this._builder.pushValue(name, false);
+            this.builder.pushValue(name, false);
           }
         }
 
@@ -400,9 +397,9 @@ public final class TemplateFactory {
         checkPushData();
         String type = attributes.getValue("type");
         if (type == null) {
-          this._builder.pushError("type is required for fragment templates");
+          this.builder.pushError("type is required for fragment templates");
         } else {
-          this._fragment = new TFragment.Builder(type);
+          this.fragment = new TFragment.Builder(type);
         }
         this.ignore = true;
 
@@ -410,7 +407,7 @@ public final class TemplateFactory {
         checkPushData();
         String id  = attributes.getValue("id");
         String type = attributes.getValue("type");
-        this._builder.pushFragmentRef(id, type);
+        this.builder.pushFragmentRef(id, type);
 
       } else if ("description".equals(localName)) {
         // Nothing to do
@@ -425,13 +422,13 @@ public final class TemplateFactory {
      *
      * @param localName  The local name of the element.
      */
-    private void endTemplateElement(String localName) throws SAXException {
+    private void endTemplateElement(String localName) {
       // End of a fragment definition
-      if ("fragment".equals(localName) && this._fragment != null) {
+      if ("fragment".equals(localName) && this.fragment != null) {
         checkPushData();
-        TFragment fragment = this._fragment.build();
-        this._builder.addFragment(fragment);
-        this._fragment = null;
+        TFragment f = this.fragment.build();
+        this.builder.addFragment(f);
+        this.fragment = null;
         this.ignore = false; // just in case this wasn't reset
       }
     }
@@ -442,14 +439,14 @@ public final class TemplateFactory {
      * @param qName      the qualified name of the element.
      * @param attributes attributes attached to the element.
      */
-    private void startPSMLElement(String qName, Attributes attributes) throws SAXException {
+    private void startPSMLElement(String qName, Attributes attributes) {
       // Copy the output verbatim
       StringBuilder psml = this.buffer;
       this.depth++;
       psml.append('<').append(qName);
       int length = attributes.getLength();
       for (int i=0; i < length; i++) {
-        // ingnore template NS attributes
+        // Ignore template NS attributes
         if (Constants.NS_URI.equals(attributes.getURI(i))) continue;
         String name = attributes.getQName(i);
         String value = attributes.getValue(i);
@@ -461,23 +458,23 @@ public final class TemplateFactory {
           // Check for any data for each match
           if (m.start() != from) {
             String data = value.substring(from, m.start());
-            this._encoder.attribute(data, psml);
+            this.encoder.attribute(data, psml);
           }
           checkPushData();
           // Get the placeholder
           String placeholder = value.substring(m.start()+2, m.end()-1);
-          if (this._fragment != null) {
-            this._fragment.pushValue(placeholder, true);
+          if (this.fragment != null) {
+            this.fragment.pushValue(placeholder, true);
           } else {
-            this._builder.pushValue(placeholder, true);
+            this.builder.pushValue(placeholder, true);
           }
           from = m.end();
         }
 
         // Check the tail
         if (from != value.length()) {
-          String data = value.substring(from, value.length());
-          this._encoder.attribute(data, psml);
+          String data = value.substring(from);
+          this.encoder.attribute(data, psml);
         }
 
         psml.append('"');
@@ -489,7 +486,7 @@ public final class TemplateFactory {
      *
      * @param qName the qualified name of the element.
      */
-    private void endPSMLElement(String qName) throws SAXException {
+    private void endPSMLElement(String qName) {
       this.depth--;
       if (this.unclosed) {
         this.buffer.append('/').append('>');
@@ -514,10 +511,10 @@ public final class TemplateFactory {
      */
     private void checkPushData() {
       if (this.buffer.length() > 0) {
-        if (this._fragment != null) {
-          this._fragment.pushData(this.buffer.toString());
+        if (this.fragment != null) {
+          this.fragment.pushData(this.buffer.toString());
         } else {
-          this._builder.pushData(this.buffer.toString());
+          this.builder.pushData(this.buffer.toString());
         }
         this.buffer.setLength(0);
       }

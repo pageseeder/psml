@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.toc;
 
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
 
 import java.util.*;
@@ -11,6 +12,10 @@ import java.util.*;
  * Generates numbering for a publication.
  *
  * @author Philip Rutherford
+ * @author Christophe Lauret
+ *
+ * @version 1.7.1
+ * @since 1.0
  */
 public final class NumberingGenerator {
 
@@ -22,7 +27,7 @@ public final class NumberingGenerator {
   /**
    * Map of current numbering levels keyed on blocklabel
    */
-  private Map<String,ArrayDeque<Integer>> numberingLevels = new HashMap<>();
+  private final Map<String,ArrayDeque<Integer>> numberingLevels = new HashMap<>();
 
   /**
    * Constructor
@@ -48,14 +53,14 @@ public final class NumberingGenerator {
    *
    * @param level         the level of the object
    * @param element       the name of the element being numbered (e.g. heading, para)
-   * @param blocklabel    the parent block label name
+   * @param blockLabel    the parent block label name
    *
    * @return the numbering prefix
    */
-  public Prefix generateNumbering(int level, String element, String blocklabel) {
-    if (this.numberConfig != null && this.numberConfig.hasScheme(level, blocklabel, element)) {
+  public @Nullable Prefix generateNumbering(int level, String element, String blockLabel) {
+    if (this.numberConfig != null && this.numberConfig.hasScheme(level, blockLabel, element)) {
       // if blocklabel not defined, use empty
-      String label = this.numberConfig.getNumberFormat(level, blocklabel) == null ? "" : blocklabel;
+      String label = this.numberConfig.getNumberFormat(level, blockLabel) == null ? "" : blockLabel;
       // add it to current levels
       this.addNewLevel(level, label);
       // compute canonical numbering
@@ -78,7 +83,7 @@ public final class NumberingGenerator {
     for (String label : labels) {
       // if default restart or restart for this label defined
       if (this.numberConfig.hasRestart(level, "") ||
-          (!"".equals(label) && this.numberConfig.hasRestart(level, label))) {
+          (!label.isEmpty() && this.numberConfig.hasRestart(level, label))) {
         Deque<Integer> levels = this.numberingLevels.get(label);
         while (levels.size() > level) {
           levels.pop();
@@ -91,22 +96,22 @@ public final class NumberingGenerator {
    * Increment current numbering levels.
    *
    * @param level         the level to add to the list
-   * @param blocklabel    the parent block label name
+   * @param blockLabel    the parent block label name
    */
-  private void addNewLevel(int level, String blocklabel) {
+  private void addNewLevel(int level, String blockLabel) {
     // if block defined and has no levels, then create a separate levels stack
-    if (this.numberConfig.getNumberFormat(level, blocklabel) != null &&
-        !this.numberingLevels.containsKey(blocklabel)) {
-      ArrayDeque<Integer> blocklevels = this.numberingLevels.get("").clone();
-      while (blocklevels.size() >= level) blocklevels.pop();
-      this.numberingLevels.put(blocklabel, blocklevels);
+    if (this.numberConfig.getNumberFormat(level, blockLabel) != null &&
+        !this.numberingLevels.containsKey(blockLabel)) {
+      ArrayDeque<Integer> blockLevels = this.numberingLevels.get("").clone();
+      while (blockLevels.size() >= level) blockLevels.pop();
+      this.numberingLevels.put(blockLabel, blockLevels);
     }
     Set<String> labels = this.numberingLevels.keySet();
     // for each stack of levels
     for (String label : labels) {
-      boolean blockdefined = this.numberConfig.getNumberFormat(level, label) != null;
+      boolean isBlockDefined = this.numberConfig.getNumberFormat(level, label) != null;
       // if block defined add to it's stack or if default block add to all stacks undefined for that level
-      if ((blockdefined && label.equals(blocklabel)) || (!blockdefined && "".equals(blocklabel))) {
+      if ((isBlockDefined && label.equals(blockLabel)) || (!isBlockDefined && "".equals(blockLabel))) {
         Deque<Integer> levels = this.numberingLevels.get(label);
         if (levels.size() == level) {
           levels.push(levels.pop() + 1);
