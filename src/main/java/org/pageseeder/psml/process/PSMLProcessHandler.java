@@ -718,6 +718,13 @@ public final class PSMLProcessHandler extends DefaultHandler {
   @Override
   public void startElement(@Nullable String uri, String localName, String qName, Attributes atts) throws SAXException {
     boolean noNamespace = uri == null || uri.isEmpty();
+    // if converting asciimath or tex, abort conversion due to nested element
+    if (this.convertContent != null) {
+      this.elements.push("inline");
+      write("<inline label=\"" + (this.convertingAsciimath ? "asciimath" : "tex") + "\">");
+      write(XMLStrings.text(this.convertContent.toString()));
+      this.convertContent = null;
+    }
     // load URI ID of root document
     if (this.uriID == null && noNamespace && "document".equals(qName)) {
       this.uriID = atts.getValue("id");

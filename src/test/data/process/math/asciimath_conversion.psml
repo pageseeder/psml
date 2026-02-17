@@ -2,6 +2,7 @@
 <document id="1" level="portable">
   <section id="1">
     <fragment id="1">
+      <para>Nested inline: <inline label="asciimath">xyz<inline label="asciimath">y=x^2</inline>.</inline></para>
       <para>You can use the following ASCIIMathML constructs: <inline label="asciimath">`(x+1)/(x-1) x^(i+j) x_(ij) sqrt(x) root(n)(x) stackrel(+)(->) text(any) "any"`</inline></para>
       <para>Operation symbols <inline label="asciimath">+ - * ** *** // \\ xx -: @ o+ ox sum prod ^^ ^^^ vv vvv nn nnn uu uuu</inline></para>
       <para>Relation symbols <inline label="asciimath">`= != &lt; &lt;= > >= -&lt; >- in !in sub sup sube supe -= ~= ~~ prop`</inline></para>
