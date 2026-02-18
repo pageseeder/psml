@@ -15,6 +15,9 @@ import java.util.function.IntPredicate;
  * <p>By default, the tokenizer uses Unicode spaces for tokenization.</p>
  *
  * @author Christophe Lauret
+ *
+ * @since 1.7.2
+ * @version 1.7.2
  */
 public final class LexicalTokenizer implements TextTokenizer {
 

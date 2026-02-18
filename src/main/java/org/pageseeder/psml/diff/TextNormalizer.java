@@ -2,6 +2,9 @@ package org.pageseeder.psml.diff;
 
 /**
  * Interface for text normalization operations.
+ *
+ * @since 1.7.2
+ * @version 1.7.2
  */
 @FunctionalInterface
 public interface TextNormalizer {

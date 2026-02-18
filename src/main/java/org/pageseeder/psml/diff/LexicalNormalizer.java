@@ -8,6 +8,9 @@ import java.util.Set;
  * Normalizes text for lexical comparison, including accent, bracket, case, dash, quote, and space folding.
  *
  * @author Christophe Lauret
+ *
+ * @since 1.7.2
+ * @version 1.7.2
  */
 public final class LexicalNormalizer implements TextNormalizer {
 

@@ -8,6 +8,9 @@ import org.pageseeder.diffx.token.XMLToken;
  * A text token with a normalized text version used for comparison.
  *
  * @author Christophe Lauret
+ *
+ * @since 1.7.2
+ * @version 1.7.2
  */
 public final class LexicalToken implements TextToken {
 
