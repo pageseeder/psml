@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Philip Rutherford
  *
  * @since 0.3.7
- * @version 1.6.2
+ * @version 1.7.2
  */
 public final class PSMLDiffer {
 
@@ -52,6 +52,11 @@ public final class PSMLDiffer {
    * Threshold to change the granularity of Diff-X.
    */
   private final int maxEvents;
+
+  /**
+   * Text normalizer to apply to text tokens.
+   */
+  private TextNormalizer textNormalizer = t -> t;
 
   /**
    * Constructor.
@@ -87,6 +92,15 @@ public final class PSMLDiffer {
    */
   public void setGranularity(TextGranularity granularity) {
     this.config = this.config.granularity(granularity);
+  }
+
+  /**
+   * Defines the normalizer to apply to text tokens.
+   *
+   * @param normalizer the normalizer to apply to text tokens.
+   */
+  public void setTextNormalizer(TextNormalizer normalizer) {
+    this.textNormalizer = normalizer;
   }
 
   /**
@@ -127,8 +141,12 @@ public final class PSMLDiffer {
     // Load tokens from XML
     SAXLoader loader = new SAXLoader();
     loader.setConfig(this.config);
-    Sequence seqB = normalize(loader.load(to));
-    Sequence seqA = normalize(loader.load(from));
+    if (this.textNormalizer instanceof LexicalNormalizer) {
+      LexicalTokenizer tokenizer = new LexicalTokenizer(this.textNormalizer);
+      loader.setTextTokenizer(tokenizer);
+    }
+    Sequence seqB = normalizeElements(loader.load(to));
+    Sequence seqA = normalizeElements(loader.load(from));
     LOGGER.debug("Sequence A: {} (granularity={})", seqA.size(), this.config.granularity());
     LOGGER.debug("Sequence B: {} (granularity={})", seqB.size(), this.config.granularity());
 
@@ -142,7 +160,7 @@ public final class PSMLDiffer {
     }
   }
 
-  private Sequence normalize(Sequence seq) {
+  private Sequence normalizeElements(Sequence seq) {
     PSMLWhiteSpaceStripper stripper = new PSMLWhiteSpaceStripper();
     BlockLabelNormalizer blocks = BlockLabelNormalizer.forPsml();
     CellNormalizer cells = new CellNormalizer();
