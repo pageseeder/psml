@@ -1,6 +1,8 @@
 package org.pageseeder.psml.diff;
 
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -14,94 +16,31 @@ import java.util.Set;
  */
 public final class LexicalNormalizer implements TextNormalizer {
 
-  /**
-   * Applicable normalization features.
-   */
-  public enum Feature {
+  private static final LexicalNormalizer NONE_INSTANCE = new LexicalNormalizer(Set.of());
+  private static final LexicalNormalizer ALL_INSTANCE  = new LexicalNormalizer(NormalizationFeature.all());
 
-    /**
-     * Accent folding removes diacritical marks (such as accents) from characters, for example,
-     * replacing 'é' with 'e' to ignore diacritical marks.
-     */
-    ACCENT,
+  private final EnumSet<NormalizationFeature> features;
 
-    /**
-     * Bracket folding: replace any bracket (Ps and Pe Unicode categories) with either '(' or ')'
-     * to ignore differences between brackets.
-     */
-    BRACKET,
-
-    /**
-     * Case folding: replace uppercase letters with lowercase to ignore differences in case.
-     */
-    CASE,
-
-    /**
-     * Dash folding: replace any dash (Pd Unicode category) with a soft hyphen (U+00AD) to
-     * ignore differences in dashes.
-     */
-    DASH,
-
-    /**
-     * Punctuation folding: replace punctuation marks with a single dot to ignore differences in punctuation.
-     */
-    PUNCTUATION,
-
-    /**
-     * Quote folding: replace any quotation mark (Pi and Pf Unicode categories) with an apostrophe
-     * to ignore differences between quotation marks.
-     */
-    QUOTE,
-
-    /**
-     * Space folding: replace multiple consecutive XML spaces with a single space (U+0020)
-     * to ignore differences in spaces.
-     */
-    SPACE,
-
-    /**
-     * Space folding: replace multiple consecutive Unicode spaces (Zs, Zl, and Zp Unicode categories)
-     * or XML space with a single space (U+0020) to ignore differences in any type of spaces.
-     */
-    UNICODE_SPACE
-
-  }
-
-  private static final int ACCENT_BIT  = 1;
-  private static final int BRACKET_BIT = 1 << 1;
-  private static final int CASE_BIT    = 1 << 2;
-  private static final int DASH_BIT    = 1 << 3;
-  private static final int PUNCTUATION_BIT = 1 << 4;
-  private static final int QUOTE_BIT   = 1 << 5;
-  private static final int SPACE_BIT   = 1 << 6;
-  private static final int UNICODE_SPACE_BIT = 1 << 7;
-
-  private static final int ALL_FLAGS = ACCENT_BIT | BRACKET_BIT | CASE_BIT | DASH_BIT | PUNCTUATION_BIT | QUOTE_BIT | SPACE_BIT | UNICODE_SPACE_BIT;
-
-  private static final LexicalNormalizer NONE_INSTANCE = new LexicalNormalizer(0);
-  private static final LexicalNormalizer ALL_INSTANCE  = new LexicalNormalizer(ALL_FLAGS);
-
-  private final int flags;
-
-  private final boolean accentFolding;
   private final boolean bracketFolding;
   private final boolean caseFolding;
   private final boolean dashFolding;
+  private final boolean diacriticFolding;
   private final boolean punctuationFolding;
   private final boolean quoteFolding;
-  private final boolean spaceFolding;
+  private final boolean xmlSpaceFolding;
   private final boolean unicodeSpaceFolding;
 
-  private LexicalNormalizer(int flags) {
-    this.flags = flags;
-    this.caseFolding = (this.flags & CASE_BIT) != 0;
-    this.accentFolding = (this.flags & ACCENT_BIT) != 0;
-    this.bracketFolding = (this.flags & BRACKET_BIT) != 0;
-    this.dashFolding = (this.flags & DASH_BIT) != 0;
-    this.punctuationFolding = (this.flags & PUNCTUATION_BIT) != 0;
-    this.quoteFolding = (this.flags & QUOTE_BIT) != 0;
-    this.spaceFolding = (this.flags & SPACE_BIT) != 0;
-    this.unicodeSpaceFolding = (this.flags & UNICODE_SPACE_BIT) != 0;
+  private LexicalNormalizer(Set<NormalizationFeature> features) {
+    // defensive copy to preserve immutability even if the caller mutates its EnumSet later
+    this.features = features.isEmpty() ? EnumSet.noneOf(NormalizationFeature.class) : EnumSet.copyOf(features);
+    this.bracketFolding = this.features.contains(NormalizationFeature.BRACKET_FOLDING);
+    this.caseFolding = this.features.contains(NormalizationFeature.CASE_FOLDING);
+    this.dashFolding = this.features.contains(NormalizationFeature.DASH_FOLDING);
+    this.diacriticFolding = this.features.contains(NormalizationFeature.DIACRITIC_FOLDING);
+    this.punctuationFolding = this.features.contains(NormalizationFeature.PUNCTUATION_FOLDING);
+    this.quoteFolding = this.features.contains(NormalizationFeature.QUOTE_FOLDING);
+    this.xmlSpaceFolding = this.features.contains(NormalizationFeature.XML_SPACE_FOLDING);
+    this.unicodeSpaceFolding = this.features.contains(NormalizationFeature.UNICODE_WHITESPACE_FOLDING);
   }
 
   /**
@@ -129,17 +68,89 @@ public final class LexicalNormalizer implements TextNormalizer {
    *
    * @return A LexicalNormalizer instance with the specified features.
    */
-  public static LexicalNormalizer of(Set<Feature> features) {
-    int flags = 0;
-    if (features.contains(Feature.ACCENT))  flags |= ACCENT_BIT;
-    if (features.contains(Feature.BRACKET)) flags |= BRACKET_BIT;
-    if (features.contains(Feature.CASE))    flags |= CASE_BIT;
-    if (features.contains(Feature.DASH))    flags |= DASH_BIT;
-    if (features.contains(Feature.PUNCTUATION)) flags |= PUNCTUATION_BIT;
-    if (features.contains(Feature.QUOTE))   flags |= QUOTE_BIT;
-    if (features.contains(Feature.SPACE))   flags |= SPACE_BIT;
-    if (features.contains(Feature.UNICODE_SPACE)) flags |= UNICODE_SPACE_BIT;
-    return new LexicalNormalizer(flags);
+  public static LexicalNormalizer of(Set<NormalizationFeature> features) {
+    if (features.isEmpty()) return NONE_INSTANCE;
+    if (features.containsAll(NormalizationFeature.all())) return ALL_INSTANCE;
+    return new LexicalNormalizer(features);
+  }
+
+  /**
+   * Returns true if this normalizer has the given feature enabled.
+   */
+  public boolean hasFeature(NormalizationFeature feature) {
+    return this.features.contains(feature);
+  }
+
+  /**
+   * Returns a defensive copy of the enabled features.
+   *
+   * <p>Note: the returned set is mutable, but mutating it will not affect this instance.</p>
+   */
+  public Set<NormalizationFeature> features() {
+    if (this.features.isEmpty()) return Set.of();
+    return Collections.unmodifiableSet(EnumSet.copyOf(this.features));
+  }
+
+  /**
+   * Returns a new normalizer with the given feature enabled (or this instance if already enabled).
+   *
+   * @param feature The normalization feature to enable.
+   *
+   * @return A new normalizer with the specified feature enabled, or this instance if already enabled.
+   */
+  public LexicalNormalizer withFeature(NormalizationFeature feature) {
+    if (this.features.contains(feature)) return this;
+    if (this.features.isEmpty()) return of(Set.of(feature));
+    EnumSet<NormalizationFeature> set = EnumSet.copyOf(this.features);
+    set.add(feature);
+    return of(set);
+  }
+
+  /**
+   * Returns a new normalizer with the given feature disabled (or this instance if already disabled).
+   *
+   * @param feature The normalization feature to disable.
+   *
+   * @return A new normalizer with the specified feature disabled, or this instance if already disabled.
+   */
+  public LexicalNormalizer withoutFeature(NormalizationFeature feature) {
+    if (!this.features.contains(feature)) return this;
+    EnumSet<NormalizationFeature> set = EnumSet.copyOf(this.features);
+    set.remove(feature);
+    return of(set);
+  }
+
+  /**
+   * Returns a new normalizer with all the given features enabled.
+   * If all are already enabled, returns {@code this}.
+   *
+   * @param features The normalization features to enable.
+   *
+   * @return A new normalizer with the specified features enabled, or this instance if already enabled.
+   */
+  public LexicalNormalizer withFeatures(Set<NormalizationFeature> features) {
+    if (features.isEmpty()) return this;
+    if (this.features.containsAll(features)) return this;
+    if (this.features.isEmpty()) return of(features);
+    EnumSet<NormalizationFeature> set = EnumSet.copyOf(this.features);
+    set.addAll(features);
+    return of(set);
+  }
+
+  /**
+   * Returns a new normalizer with all the given features disabled.
+   * If none are enabled, returns {@code this}.
+   *
+   * @param features The normalization features to disable.
+   *
+   * @return A new normalizer with the specified features disabled, or this instance if already disabled.
+   */
+  public LexicalNormalizer withoutFeatures(Set<NormalizationFeature> features) {
+    if (features.isEmpty() || this.features.isEmpty()) return this;
+    if (Collections.disjoint(this.features, features)) return this;
+    EnumSet<NormalizationFeature> set = EnumSet.copyOf(this.features);
+    set.removeAll(features);
+    return of(set);
   }
 
   /**
@@ -151,7 +162,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified accent folding setting.
    */
   public LexicalNormalizer withAccentFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | ACCENT_BIT) : (this.flags & ~ACCENT_BIT));
+    return enabled ? withFeature(NormalizationFeature.DIACRITIC_FOLDING) : withoutFeature(NormalizationFeature.DIACRITIC_FOLDING);
   }
 
   /**
@@ -161,7 +172,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified bracket folding setting.
    */
   public LexicalNormalizer withBracketFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | BRACKET_BIT) : (this.flags & ~BRACKET_BIT));
+    return enabled ? withFeature(NormalizationFeature.BRACKET_FOLDING) : withoutFeature(NormalizationFeature.BRACKET_FOLDING);
   }
 
   /**
@@ -171,7 +182,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified case folding setting.
    */
   public LexicalNormalizer withCaseFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | CASE_BIT) : (this.flags & ~CASE_BIT));
+    return enabled ? withFeature(NormalizationFeature.CASE_FOLDING) : withoutFeature(NormalizationFeature.CASE_FOLDING);
   }
 
   /**
@@ -181,7 +192,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified dash folding setting.
    */
   public LexicalNormalizer withDashFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | DASH_BIT) : (this.flags & ~DASH_BIT));
+    return enabled ? withFeature(NormalizationFeature.DASH_FOLDING) : withoutFeature(NormalizationFeature.DASH_FOLDING);
   }
 
   /**
@@ -191,7 +202,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified quote folding setting.
    */
   public LexicalNormalizer withQuoteFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | QUOTE_BIT) : (this.flags & ~QUOTE_BIT));
+    return enabled ? withFeature(NormalizationFeature.QUOTE_FOLDING) : withoutFeature(NormalizationFeature.QUOTE_FOLDING);
   }
 
   /**
@@ -201,7 +212,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified space folding setting.
    */
   public LexicalNormalizer withSpaceFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | SPACE_BIT) : (this.flags & ~SPACE_BIT));
+    return enabled ? withFeature(NormalizationFeature.XML_SPACE_FOLDING) : withoutFeature(NormalizationFeature.XML_SPACE_FOLDING);
   }
 
   /**
@@ -211,7 +222,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified space folding setting.
    */
   public LexicalNormalizer withUnicodeSpaceFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | UNICODE_SPACE_BIT) : (this.flags & ~UNICODE_SPACE_BIT));
+    return enabled ? withFeature(NormalizationFeature.UNICODE_WHITESPACE_FOLDING) : withoutFeature(NormalizationFeature.UNICODE_WHITESPACE_FOLDING);
   }
 
   /**
@@ -222,7 +233,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return A new LexicalNormalizer instance configured with the specified punctuation folding setting.
    */
   public LexicalNormalizer withPunctuationFolding(boolean enabled) {
-    return new LexicalNormalizer(enabled ? (this.flags | PUNCTUATION_BIT) : (this.flags & ~PUNCTUATION_BIT));
+    return enabled ? withFeature(NormalizationFeature.PUNCTUATION_FOLDING) : withoutFeature(NormalizationFeature.PUNCTUATION_FOLDING);
   }
 
   /**
@@ -230,7 +241,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    *
    * @return True if accent folding is enabled, false otherwise.
    */
-  public boolean isAccentFolding()  { return this.accentFolding; }
+  public boolean isDiacriticFolding()  { return this.diacriticFolding; }
 
   /**
    * Indicates whether bracket folding is enabled.
@@ -265,7 +276,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    *
    * @return True if space folding is enabled, false otherwise.
    */
-  public boolean isSpaceFolding()   { return this.spaceFolding; }
+  public boolean isXmlSpaceFolding()   { return this.xmlSpaceFolding; }
 
   /**
    * Indicates whether punctuation folding is enabled.
@@ -279,7 +290,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    *
    * @return True if Unicode space folding is enabled, false otherwise.
    */
-  public boolean isUnicodeSpaceFolding()   { return this.unicodeSpaceFolding; }
+  public boolean isUnicodeWhitespaceFolding()   { return this.unicodeSpaceFolding; }
 
   /**
    * Normalizes the specified text based on the current configuration.
@@ -292,7 +303,7 @@ public final class LexicalNormalizer implements TextNormalizer {
   public String normalize(String text) {
     if (caseFolding)
       text = text.toLowerCase(Locale.ROOT);
-    if (accentFolding)
+    if (diacriticFolding)
       text = Normalizer.normalize(text, Normalizer.Form.NFD);
 
     StringBuilder out = new StringBuilder(text.length());
@@ -303,13 +314,13 @@ public final class LexicalNormalizer implements TextNormalizer {
       i += Character.charCount(cp);
 
       // Remove Zero-width spaces
-      if (spaceFolding && cp == 0x200B)
+      if (xmlSpaceFolding && cp == 0x200B)
         continue;
 
       int type = Character.getType(cp);
 
       // Remove combining marks after NFD
-      if (accentFolding && type == Character.NON_SPACING_MARK)
+      if (diacriticFolding && type == Character.NON_SPACING_MARK)
         continue;
 
       // dash folding
@@ -341,7 +352,7 @@ public final class LexicalNormalizer implements TextNormalizer {
       }
 
       // space folding
-      if (spaceFolding && LexicalTokenizer.isXMLSpace(cp) || unicodeSpaceFolding && isUnicodeSpace(cp, type)) {
+      if (xmlSpaceFolding && LexicalTokenizer.isXMLSpace(cp) || unicodeSpaceFolding && isUnicodeSpace(cp, type)) {
         if (!lastWasSpace) {
           out.append(' ');
           lastWasSpace = true;
@@ -366,7 +377,7 @@ public final class LexicalNormalizer implements TextNormalizer {
       lastWasSpace = false;
     }
 
-    return spaceFolding && out.length() > 1 ? out.toString().trim() : out.toString();
+    return (xmlSpaceFolding || unicodeSpaceFolding) && out.length() > 1 ? out.toString().trim() : out.toString();
   }
 
   private static boolean isPunctuation(int cp, int type) {

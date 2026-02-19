@@ -45,10 +45,13 @@ public final class LexicalToken implements TextToken {
     return this.characters;
   }
 
+  /**
+   * Returns the normalized text.
+   *
+   * @return the normalized text
+   */
   @Override
-  public String getValue() {
-    return this.normalized;
-  }
+  public String getValue() { return this.normalized; }
 
   @Override
   public boolean equals(Object obj) {

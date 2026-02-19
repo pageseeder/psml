@@ -143,7 +143,7 @@ public final class PSMLDiffer {
     loader.setConfig(this.config);
     if (this.textNormalizer instanceof LexicalNormalizer) {
       LexicalTokenizer tokenizer = new LexicalTokenizer(this.textNormalizer);
-      tokenizer.setUseUnicodeSpace(((LexicalNormalizer) this.textNormalizer).isUnicodeSpaceFolding());
+      tokenizer.setUseUnicodeSpace(((LexicalNormalizer) this.textNormalizer).isUnicodeWhitespaceFolding());
       loader.setTextTokenizer(tokenizer);
     }
     Sequence seqB = normalizeElements(loader.load(to));
