@@ -13,8 +13,8 @@ import java.util.Set;
 public enum NormalizationFeature {
 
   /**
-   * Accent folding removes diacritical marks (such as accents) from characters, for example,
-   * replacing 'é' with 'e' to ignore diacritical marks.
+   * Diacritic folding: remove diacritical marks (such as accents) from characters, for example,
+   * replacing 'é' with 'e' to ignore differences caused by diacritical marks.
    */
   DIACRITIC_FOLDING,
 
@@ -47,13 +47,13 @@ public enum NormalizationFeature {
   QUOTE_FOLDING,
 
   /**
-   * Space folding: replace multiple consecutive XML spaces with a single space (U+0020)
+   * XML space folding: replace multiple consecutive XML spaces with a single space (U+0020)
    * to ignore differences in spaces.
    */
   XML_SPACE_FOLDING,
 
   /**
-   * Space folding: replace multiple consecutive Unicode spaces (Zs, Zl, and Zp Unicode categories)
+   * Unicode whitespace folding: replace multiple consecutive Unicode spaces (Zs, Zl, and Zp Unicode categories)
    * or XML space with a single space (U+0020) to ignore differences in any type of spaces.
    */
   UNICODE_WHITESPACE_FOLDING;
