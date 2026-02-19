@@ -2,6 +2,25 @@
 <document id="1" level="processed">
   <section id="1">
     <fragment id="1">
+      <para>Nested inline:
+        <inline label="asciimath">xyz
+          <xref frag="media" type="math" config="mathml">
+            <media-fragment id="media" mediatype="application/mathml+xml">
+              <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                  <mi>y</mi>
+                  <mo>=</mo>
+                  <msup>
+                    <mi>x</mi>
+                    <mn>2</mn>
+                  </msup>
+                </mstyle>
+              </math>
+            </media-fragment>
+          </xref>
+          .
+        </inline>
+      </para>
       <para>You can use the following ASCIIMathML constructs: <xref frag="media" type="math" config="mathml">
         <media-fragment id="media" mediatype="application/mathml+xml">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
