@@ -43,6 +43,11 @@ public final class LexicalNormalizer implements TextNormalizer {
     DASH,
 
     /**
+     * Punctuation folding: replace punctuation marks with a single dot to ignore differences in punctuation.
+     */
+    PUNCTUATION,
+
+    /**
      * Quote folding: replace any quotation mark (Pi and Pf Unicode categories) with an apostrophe
      * to ignore differences between quotation marks.
      */
@@ -58,12 +63,7 @@ public final class LexicalNormalizer implements TextNormalizer {
      * Space folding: replace multiple consecutive Unicode spaces (Zs, Zl, and Zp Unicode categories)
      * or XML space with a single space (U+0020) to ignore differences in any type of spaces.
      */
-    UNICODE_SPACE,
-
-    /**
-     * Punctuation folding: replace punctuation marks with a single dot to ignore differences in punctuation.
-     */
-    PUNCTUATION
+    UNICODE_SPACE
 
   }
 
@@ -71,26 +71,26 @@ public final class LexicalNormalizer implements TextNormalizer {
   private static final int BRACKET_BIT = 1 << 1;
   private static final int CASE_BIT    = 1 << 2;
   private static final int DASH_BIT    = 1 << 3;
-  private static final int QUOTE_BIT   = 1 << 4;
-  private static final int SPACE_BIT   = 1 << 5;
-  private static final int UNICODE_SPACE_BIT = 1 << 6;
-  private static final int PUNCTUATION_BIT = 1 << 7;
+  private static final int PUNCTUATION_BIT = 1 << 4;
+  private static final int QUOTE_BIT   = 1 << 5;
+  private static final int SPACE_BIT   = 1 << 6;
+  private static final int UNICODE_SPACE_BIT = 1 << 7;
 
-  private static final int ALL_FLAGS = ACCENT_BIT | BRACKET_BIT | CASE_BIT | DASH_BIT | QUOTE_BIT | SPACE_BIT | UNICODE_SPACE_BIT | PUNCTUATION_BIT;
+  private static final int ALL_FLAGS = ACCENT_BIT | BRACKET_BIT | CASE_BIT | DASH_BIT | PUNCTUATION_BIT | QUOTE_BIT | SPACE_BIT | UNICODE_SPACE_BIT;
 
   private static final LexicalNormalizer NONE_INSTANCE = new LexicalNormalizer(0);
   private static final LexicalNormalizer ALL_INSTANCE  = new LexicalNormalizer(ALL_FLAGS);
 
   private final int flags;
 
-  private final boolean caseFolding;
   private final boolean accentFolding;
   private final boolean bracketFolding;
+  private final boolean caseFolding;
   private final boolean dashFolding;
+  private final boolean punctuationFolding;
   private final boolean quoteFolding;
   private final boolean spaceFolding;
   private final boolean unicodeSpaceFolding;
-  private final boolean punctuationFolding;
 
   private LexicalNormalizer(int flags) {
     this.flags = flags;
@@ -98,10 +98,10 @@ public final class LexicalNormalizer implements TextNormalizer {
     this.accentFolding = (this.flags & ACCENT_BIT) != 0;
     this.bracketFolding = (this.flags & BRACKET_BIT) != 0;
     this.dashFolding = (this.flags & DASH_BIT) != 0;
+    this.punctuationFolding = (this.flags & PUNCTUATION_BIT) != 0;
     this.quoteFolding = (this.flags & QUOTE_BIT) != 0;
     this.spaceFolding = (this.flags & SPACE_BIT) != 0;
     this.unicodeSpaceFolding = (this.flags & UNICODE_SPACE_BIT) != 0;
-    this.punctuationFolding = (this.flags & PUNCTUATION_BIT) != 0;
   }
 
   /**
@@ -131,10 +131,10 @@ public final class LexicalNormalizer implements TextNormalizer {
     if (features.contains(Feature.BRACKET)) flags |= BRACKET_BIT;
     if (features.contains(Feature.CASE))    flags |= CASE_BIT;
     if (features.contains(Feature.DASH))    flags |= DASH_BIT;
+    if (features.contains(Feature.PUNCTUATION)) flags |= PUNCTUATION_BIT;
     if (features.contains(Feature.QUOTE))   flags |= QUOTE_BIT;
     if (features.contains(Feature.SPACE))   flags |= SPACE_BIT;
     if (features.contains(Feature.UNICODE_SPACE)) flags |= UNICODE_SPACE_BIT;
-    if (features.contains(Feature.PUNCTUATION)) flags |= PUNCTUATION_BIT;
     return new LexicalNormalizer(flags);
   }
 
@@ -221,14 +221,61 @@ public final class LexicalNormalizer implements TextNormalizer {
     return new LexicalNormalizer(enabled ? (this.flags | PUNCTUATION_BIT) : (this.flags & ~PUNCTUATION_BIT));
   }
 
+  /**
+   * Indicate whether accent folding is enabled.
+   *
+   * @return True if accent folding is enabled, false otherwise.
+   */
   public boolean isAccentFolding()  { return this.accentFolding; }
+
+  /**
+   * Indicates whether bracket folding is enabled.
+   *
+   * @return True if bracket folding is enabled, false otherwise.
+   */
   public boolean isBracketFolding() { return this.bracketFolding; }
+
+  /**
+   * Indicates whether case folding is enabled.
+   *
+   * @return True if case folding is enabled, false otherwise.
+   */
   public boolean isCaseFolding()    { return this.caseFolding; }
+
+  /**
+   * Indicates whether dash folding is enabled.
+   *
+   * @return True if dash folding is enabled, false otherwise.
+   */
   public boolean isDashFolding()    { return this.dashFolding; }
+
+  /**
+   * Indicates whether punctuation folding is enabled.
+   *
+   * @return True if punctuation folding is enabled, false otherwise.
+   */
   public boolean isQuoteFolding()   { return this.quoteFolding; }
+
+  /**
+   * Indicates whether space folding is enabled.
+   *
+   * @return True if space folding is enabled, false otherwise.
+   */
   public boolean isSpaceFolding()   { return this.spaceFolding; }
-  public boolean isUnicodeSpaceFolding()   { return this.unicodeSpaceFolding; }
+
+  /**
+   * Indicates whether punctuation folding is enabled.
+   *
+   * @return True if punctuation folding is enabled, false otherwise.
+   */
   public boolean isPunctuationFolding() { return this.punctuationFolding; }
+
+  /**
+   * Indicates whether Unicode space folding is enabled.
+   *
+   * @return True if Unicode space folding is enabled, false otherwise.
+   */
+  public boolean isUnicodeSpaceFolding()   { return this.unicodeSpaceFolding; }
 
   /**
    * Normalizes the specified text based on the current configuration.
@@ -251,14 +298,14 @@ public final class LexicalNormalizer implements TextNormalizer {
       int cp = text.codePointAt(i);
       i += Character.charCount(cp);
 
+      // Remove Zero-width spaces
+      if (spaceFolding && cp == 0x200B)
+        continue;
+
       int type = Character.getType(cp);
 
       // Remove combining marks after NFD
       if (accentFolding && type == Character.NON_SPACING_MARK)
-        continue;
-
-      // Remove Zero-width spaces
-      if (spaceFolding && cp == 0x200B)
         continue;
 
       // dash folding
