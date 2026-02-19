@@ -46,6 +46,11 @@ public final class LexicalToken implements TextToken {
   }
 
   @Override
+  public String getValue() {
+    return this.normalized;
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (obj instanceof LexicalToken) return equals((TextToken)obj);
     if (obj instanceof XMLToken) return equals((XMLToken)obj);
