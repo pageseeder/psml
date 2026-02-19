@@ -106,6 +106,8 @@ public final class LexicalNormalizer implements TextNormalizer {
 
   /**
    * Returns a normalizer that does nothing.
+   *
+   * @return A LexicalNormalizer instance that applies no normalization features.
    */
   public static LexicalNormalizer none() {
     return NONE_INSTANCE;
@@ -113,6 +115,8 @@ public final class LexicalNormalizer implements TextNormalizer {
 
   /**
    * Returns a normalizer that applies all the available normalization features.
+   *
+   * @return A LexicalNormalizer instance that applies all available normalization features.
    */
   public static LexicalNormalizer all() {
     return ALL_INSTANCE;

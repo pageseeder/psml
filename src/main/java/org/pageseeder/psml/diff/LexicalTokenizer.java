@@ -50,6 +50,8 @@ public final class LexicalTokenizer implements TextTokenizer {
 
   /**
    * Creates a new tokenizer with a custom normalizer.
+   *
+   * @param normalizer The custom normalizer to apply to the text when generating lexical tokens.
    */
   public LexicalTokenizer(TextNormalizer normalizer) {
     this.normalizer = Objects.requireNonNull(normalizer, "normalizer");
