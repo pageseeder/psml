@@ -20,37 +20,48 @@ public final class LexicalNormalizer implements TextNormalizer {
   public enum Feature {
 
     /**
-     * Accent folding removes diacritical marks (such as accents) from characters, for example, replacing é with e.
+     * Accent folding removes diacritical marks (such as accents) from characters, for example,
+     * replacing 'é' with 'e' to ignore diacritical marks.
      */
     ACCENT,
 
     /**
-     * Bracket folding: replace any bracket (Ps and Pe Unicode categories) with either '(' or ')'.
+     * Bracket folding: replace any bracket (Ps and Pe Unicode categories) with either '(' or ')'
+     * to ignore differences between brackets.
      */
     BRACKET,
 
     /**
-     * Case folding: replace uppercase letters with lowercase.
+     * Case folding: replace uppercase letters with lowercase to ignore differences in case.
      */
     CASE,
 
     /**
-     * Dash folding: replace any dash (Pd Unicode category) with a soft hyphen (U+00AD).
+     * Dash folding: replace any dash (Pd Unicode category) with a soft hyphen (U+00AD) to
+     * ignore differences in dashes.
      */
     DASH,
 
     /**
-     * Quote folding: replace any quotation mark (Pi and Pf Unicode categories) with an apostrophe.
+     * Quote folding: replace any quotation mark (Pi and Pf Unicode categories) with an apostrophe
+     * to ignore differences between quotation marks.
      */
     QUOTE,
 
     /**
-     * Space folding: replace multiple space (Zs Unicode category) or XML space with a single space (U+0020).
+     * Space folding: replace multiple consecutive XML spaces with a single space (U+0020)
+     * to ignore differences in spaces.
      */
     SPACE,
 
     /**
-     * Punctuation folding: replace punctuation marks with a single dot.
+     * Space folding: replace multiple consecutive Unicode spaces (Zs, Zl, and Zp Unicode categories)
+     * or XML space with a single space (U+0020) to ignore differences in any type of spaces.
+     */
+    UNICODE_SPACE,
+
+    /**
+     * Punctuation folding: replace punctuation marks with a single dot to ignore differences in punctuation.
      */
     PUNCTUATION
 
@@ -62,9 +73,10 @@ public final class LexicalNormalizer implements TextNormalizer {
   private static final int DASH_BIT    = 1 << 3;
   private static final int QUOTE_BIT   = 1 << 4;
   private static final int SPACE_BIT   = 1 << 5;
-  private static final int PUNCTUATION_BIT = 1 << 6;
+  private static final int UNICODE_SPACE_BIT = 1 << 6;
+  private static final int PUNCTUATION_BIT = 1 << 7;
 
-  private static final int ALL_FLAGS = ACCENT_BIT | BRACKET_BIT | CASE_BIT | DASH_BIT | QUOTE_BIT | SPACE_BIT | PUNCTUATION_BIT;
+  private static final int ALL_FLAGS = ACCENT_BIT | BRACKET_BIT | CASE_BIT | DASH_BIT | QUOTE_BIT | SPACE_BIT | UNICODE_SPACE_BIT | PUNCTUATION_BIT;
 
   private static final LexicalNormalizer NONE_INSTANCE = new LexicalNormalizer(0);
   private static final LexicalNormalizer ALL_INSTANCE  = new LexicalNormalizer(ALL_FLAGS);
@@ -77,6 +89,7 @@ public final class LexicalNormalizer implements TextNormalizer {
   private final boolean dashFolding;
   private final boolean quoteFolding;
   private final boolean spaceFolding;
+  private final boolean unicodeSpaceFolding;
   private final boolean punctuationFolding;
 
   private LexicalNormalizer(int flags) {
@@ -87,6 +100,7 @@ public final class LexicalNormalizer implements TextNormalizer {
     this.dashFolding = (this.flags & DASH_BIT) != 0;
     this.quoteFolding = (this.flags & QUOTE_BIT) != 0;
     this.spaceFolding = (this.flags & SPACE_BIT) != 0;
+    this.unicodeSpaceFolding = (this.flags & UNICODE_SPACE_BIT) != 0;
     this.punctuationFolding = (this.flags & PUNCTUATION_BIT) != 0;
   }
 
@@ -119,6 +133,7 @@ public final class LexicalNormalizer implements TextNormalizer {
     if (features.contains(Feature.DASH))    flags |= DASH_BIT;
     if (features.contains(Feature.QUOTE))   flags |= QUOTE_BIT;
     if (features.contains(Feature.SPACE))   flags |= SPACE_BIT;
+    if (features.contains(Feature.UNICODE_SPACE)) flags |= UNICODE_SPACE_BIT;
     if (features.contains(Feature.PUNCTUATION)) flags |= PUNCTUATION_BIT;
     return new LexicalNormalizer(flags);
   }
@@ -186,6 +201,16 @@ public final class LexicalNormalizer implements TextNormalizer {
   }
 
   /**
+   * Returns a new LexicalNormalizer instance with Unicode space folding enabled or disabled based on the input parameter.
+   *
+   * @param enabled A boolean flag indicating whether space folding should be enabled.
+   * @return A new LexicalNormalizer instance configured with the specified space folding setting.
+   */
+  public LexicalNormalizer withUnicodeSpaceFolding(boolean enabled) {
+    return new LexicalNormalizer(enabled ? (this.flags | UNICODE_SPACE_BIT) : (this.flags & ~UNICODE_SPACE_BIT));
+  }
+
+  /**
    * Returns a new LexicalNormalizer instance with punctuation folding enabled or disabled based on the input parameter.
    *
    * @param enabled A boolean flag indicating whether punctuation folding should be enabled.
@@ -202,6 +227,7 @@ public final class LexicalNormalizer implements TextNormalizer {
   public boolean isDashFolding()    { return this.dashFolding; }
   public boolean isQuoteFolding()   { return this.quoteFolding; }
   public boolean isSpaceFolding()   { return this.spaceFolding; }
+  public boolean isUnicodeSpaceFolding()   { return this.unicodeSpaceFolding; }
   public boolean isPunctuationFolding() { return this.punctuationFolding; }
 
   /**
@@ -264,7 +290,7 @@ public final class LexicalNormalizer implements TextNormalizer {
       }
 
       // space folding
-      if (spaceFolding && (type == Character.SPACE_SEPARATOR || cp == 0xA || cp == 0xD ||cp == 0x9)) {
+      if (spaceFolding && LexicalTokenizer.isXMLSpace(cp) || unicodeSpaceFolding && isUnicodeSpace(cp, type)) {
         if (!lastWasSpace) {
           out.append(' ');
           lastWasSpace = true;
@@ -296,4 +322,15 @@ public final class LexicalNormalizer implements TextNormalizer {
     return type == Character.OTHER_PUNCTUATION
         && (cp != '"' && cp != '#' && cp != '%' && cp != '&' && cp != '\'' && cp != '*' && cp != '@');
   }
+
+  private static boolean isUnicodeSpace(int cp, int type) {
+    return type == Character.SPACE_SEPARATOR
+        || cp == 0xA  // NEWLINE
+        || cp == 0xD  // CARRIAGE RETURN
+        || cp == 0x9  // TAB
+        || type == Character.LINE_SEPARATOR
+        || type == Character.PARAGRAPH_SEPARATOR;
+
+  }
+
 }

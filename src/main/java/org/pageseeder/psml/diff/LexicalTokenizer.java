@@ -34,12 +34,12 @@ public final class LexicalTokenizer implements TextTokenizer {
   /**
    * Whether to use Unicode spaces for tokenization or XML spaces.
    */
-  private boolean useUnicodeSpace = true;
+  private boolean useUnicodeSpace = false;
 
   /**
    * Predicate to determine if a character is a space character.
    */
-  private IntPredicate isSpace = LexicalTokenizer::isUnicodeSpace;
+  private IntPredicate isSpace = LexicalTokenizer::isXMLSpace;
 
   /**
    * Creates a new tokenizer with no normalization.
@@ -171,8 +171,8 @@ public final class LexicalTokenizer implements TextTokenizer {
    * @return {@code true} if the code point is recognized as an XML space character,
    *         {@code false} otherwise
    */
-  private static boolean isXMLSpace(int cp) {
-    return cp == 0x20 || cp == 0x9 || cp == 0xD || cp == 0xA;
+  static boolean isXMLSpace(int cp) {
+    return cp == 0x20 || cp == 0xA || cp == 0x9 || cp == 0xD;
   }
 
   /**
@@ -185,14 +185,12 @@ public final class LexicalTokenizer implements TextTokenizer {
    * @return {@code true} if the code point is recognized as a Unicode space character,
    *         {@code false} otherwise
    */
-  private static boolean isUnicodeSpace(int cp) {
+  static boolean isUnicodeSpace(int cp) {
+    if (isXMLSpace(cp)) return true;
     int t = Character.getType(cp);
     return t == Character.SPACE_SEPARATOR
         || t == Character.LINE_SEPARATOR
-        || t == Character.PARAGRAPH_SEPARATOR
-        || cp == 0x9  // TAB
-        || cp == 0xA  // NEWLINE
-        || cp == 0xD; // CARRIAGE RETURN
+        || t == Character.PARAGRAPH_SEPARATOR;
   }
 
   /**
@@ -315,7 +313,7 @@ public final class LexicalTokenizer implements TextTokenizer {
       int c = codePointAt(s, j);
 
       boolean allowed = Character.isLetter(c) || Character.isDigit(c)
-          || c == '\'' || c == '-' || c == '&' || c == '.' || c == '/' || c == '_' || c == '@';
+          || c == '\'' || c == '-' || c == '&' || c == '.' || c == '/' || c == '_' || c == '@' || c == '\u200B';
       if (!allowed) break;
 
       j += Character.charCount(c);
