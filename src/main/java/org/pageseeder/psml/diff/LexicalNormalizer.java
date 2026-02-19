@@ -76,6 +76,9 @@ public final class LexicalNormalizer implements TextNormalizer {
 
   /**
    * Returns true if this normalizer has the given feature enabled.
+   *
+   * @param feature The normalization feature to check.
+   * @return true if the feature is enabled, false otherwise.
    */
   public boolean hasFeature(NormalizationFeature feature) {
     return this.features.contains(feature);
@@ -84,7 +87,7 @@ public final class LexicalNormalizer implements TextNormalizer {
   /**
    * Returns a defensive copy of the enabled features.
    *
-   * <p>Note: the returned set is mutable, but mutating it will not affect this instance.</p>
+   * @return An immutable copy of the enabled features.
    */
   public Set<NormalizationFeature> features() {
     if (this.features.isEmpty()) return Set.of();
