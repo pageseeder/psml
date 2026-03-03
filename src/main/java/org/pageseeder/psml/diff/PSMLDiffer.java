@@ -10,9 +10,11 @@ import java.io.Writer;
 import java.util.List;
 
 import org.pageseeder.diffx.DiffException;
+import org.pageseeder.diffx.action.Operation;
 import org.pageseeder.diffx.action.OperationsBuffer;
 import org.pageseeder.diffx.algorithm.*;
 import org.pageseeder.diffx.api.DiffHandler;
+import org.pageseeder.diffx.api.Operator;
 import org.pageseeder.diffx.config.DiffConfig;
 import org.pageseeder.diffx.config.TextGranularity;
 import org.pageseeder.diffx.config.WhiteSpaceProcessing;
@@ -34,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author Philip Rutherford
  *
  * @since 0.3.7
- * @version 1.7.2
+ * @version 1.7.3
  */
 public final class PSMLDiffer {
 
@@ -114,30 +116,44 @@ public final class PSMLDiffer {
    * @throws IOException   If an I/O exception occurs.
    */
   public void diff(Reader xml1, Reader xml2, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
+    diffWithReport(xml1, xml2, out);
+  }
+
+  /**
+   * Performs the diff and also returns a report describing the operation.
+   *
+   * @param xml1 The first XML reader to compare.
+   * @param xml2 The second XML reader to compare.
+   * @param out  Where the output goes
+   *
+   * @return a report (changed?, timing, fallback used, etc.)
+   *
+   * @throws org.pageseeder.diffx.DiffException If a Diff-X exception occurs or if maxEvents is reached.
+   * @throws IOException   If an I/O exception occurs.
+   */
+  public DiffReport diffWithReport(Reader xml1, Reader xml2, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
     LOGGER.debug("Diff-X config: {} {}", this.config.granularity(), this.config.whitespace());
+    long start = System.nanoTime();
+
     if (LOGGER.isDebugEnabled()) {
       String source1 = toString(xml1);
       String source2 = toString(xml2);
       LOGGER.debug("XML Source B:\n{}", source1);
       LOGGER.debug("XML Source A:\n{}", source2);
-      loadAndDiff(new StringReader(source2), new StringReader(source1), out);
+      DiffReport report = loadAndDiffWithReport(new StringReader(source2), new StringReader(source1), out);
+      long end = System.nanoTime();
+      return report.withDuration(end - start);
     } else {
-      loadAndDiff(xml2, xml1, out);
+      DiffReport report = loadAndDiffWithReport(xml2, xml1, out);
+      long end = System.nanoTime();
+      return report.withDuration(end - start);
     }
   }
 
   /**
-   * Loads two XML sequences from the provided readers, computes the differences between them,
-   * and writes the output to the specified writer.
-   *
-   * @param from The reader for the original XML content.
-   * @param to   The reader for the modified XML content.
-   * @param out  The writer where the computed differences will be written.
-   * @throws DiffException If an error occurs during the diff,
-   *                       or if a data length or undeclared namespace issue arises.
-   * @throws IOException If an input/output error occurs while reading or writing.
+   * Loads, normalizes, diffs, and returns a minimal report about the operation.
    */
-  private void loadAndDiff(Reader from, Reader to, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
+  private DiffReport loadAndDiffWithReport(Reader from, Reader to, Writer out) throws org.pageseeder.diffx.DiffException, IOException {
     // Load tokens from XML
     SAXLoader loader = new SAXLoader();
     loader.setConfig(this.config);
@@ -153,20 +169,14 @@ public final class PSMLDiffer {
 
     // Diff sequences
     try {
-      diff(seqA, seqB, out);
+      return diff(seqA, seqB, out);
     } catch (DataLengthException ex) {
-      throw new org.pageseeder.diffx.DiffException("There are over "+ex.getThreshold()+" points of comparison ("+ex.getSize()+") reducing the fragment size will allow the comparison to be calculated.");
+      throw new org.pageseeder.diffx.DiffException(
+          "There are over " + ex.getThreshold() + " points of comparison (" + ex.getSize() + ") reducing the fragment size will allow the comparison to be calculated."
+      );
     } catch (UndeclaredNamespaceException ex) {
       throw new DiffException(ex.getMessage(), ex);
     }
-  }
-
-  private Sequence normalizeElements(Sequence seq) {
-    PSMLWhiteSpaceStripper stripper = new PSMLWhiteSpaceStripper();
-    BlockLabelNormalizer blocks = BlockLabelNormalizer.forPsml();
-    CellNormalizer cells = new CellNormalizer();
-    ListNormalizer lists = new ListNormalizer();
-    return lists.process(cells.process(blocks.process(stripper.process(seq))));
   }
 
   /**
@@ -176,12 +186,12 @@ public final class PSMLDiffer {
    * @param to   The modified XML sequence.
    * @param out  Where the output goes.
    */
-  private void diff(Sequence from, Sequence to, Writer out) throws DataLengthException {
+  private DiffReport diff(Sequence from, Sequence to, Writer out) throws DataLengthException {
     DefaultXMLDiffOutput output = new DefaultXMLDiffOutput(out);
     output.setWriteXMLDeclaration(false);
     NamespaceSet namespaces = NamespaceSet.merge(to.getNamespaces(), from.getNamespaces());
     output.setNamespaces(namespaces);
-    diffWithFallback(from, to, output);
+    return diffWithFallback(from, to, output);
   }
 
   /**
@@ -194,7 +204,7 @@ public final class PSMLDiffer {
    * @param to     The modified XML sequence.
    * @param output The output where the computed differences will be written.
    */
-  private void diffWithFallback(Sequence from, Sequence to, XMLDiffOutput output) {
+  private DiffReport diffWithFallback(Sequence from, Sequence to, XMLDiffOutput output) {
     OperationsBuffer<XMLToken> buffer = new OperationsBuffer<>();
     boolean successful = diffGasherbrum(from, to, buffer);
     if (!successful) {
@@ -204,6 +214,7 @@ public final class PSMLDiffer {
     }
     // Apply the results from to the buffer
     buffer.applyTo(new ElementDenormalizer(new CoalescingFilter(output)));
+    return new DiffReport(hasChanges(buffer), !successful);
   }
 
   /**
@@ -251,6 +262,21 @@ public final class PSMLDiffer {
   }
 
   /**
+   * Normalizes the provided sequence by applying a series of processing steps, including
+   * whitespace stripping, block label normalization, cell normalization, and list normalization.
+   *
+   * @param seq The input sequence of XML tokens to be normalized.
+   * @return A new {@code Sequence} instance representing the normalized version of the input sequence.
+   */
+  private Sequence normalizeElements(Sequence seq) {
+    PSMLWhiteSpaceStripper stripper = new PSMLWhiteSpaceStripper();
+    BlockLabelNormalizer blocks = BlockLabelNormalizer.forPsml();
+    CellNormalizer cells = new CellNormalizer();
+    ListNormalizer lists = new ListNormalizer();
+    return lists.process(cells.process(blocks.process(stripper.process(seq))));
+  }
+
+  /**
    * Converts the content of the given Reader into a String.
    *
    * @param input The Reader from which the content is to be read.
@@ -265,6 +291,23 @@ public final class PSMLDiffer {
       out.append(buffer, 0, n);
     }
     return out.toString();
+  }
+
+  /**
+   * Determines whether the provided operations buffer contains any changes.
+   *
+   * <p>The method iterates through operations in the buffer and return true if any
+   * operation has an operator other than {@link Operator#MATCH}.
+   *
+   * @param buffer The operations buffer to evaluate for changes.
+   * @return {@code true} if the buffer contains any operations with an operator
+   *         other than {@code Operator.MATCH}, {@code false} otherwise.
+   */
+  private static boolean hasChanges(OperationsBuffer<?> buffer) {
+    for (Operation<?> op : buffer.getOperations()) {
+      if (op.operator() != Operator.MATCH) return true;
+    }
+    return false;
   }
 
 }
