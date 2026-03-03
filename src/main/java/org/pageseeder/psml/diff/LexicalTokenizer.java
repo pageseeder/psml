@@ -105,7 +105,7 @@ public final class LexicalTokenizer implements TextTokenizer {
       if (i >= n) {
         // Trailing whitespace
         emit(out, leading, s, i, i, normalizer);
-        break;
+        return out;
       }
 
       int tokenStart = i;
@@ -114,28 +114,21 @@ public final class LexicalTokenizer implements TextTokenizer {
       // URL
       if (startsWithUrl(s, i)) {
         i = readUntilSpace(s, i);
-        emit(out, leading, s, tokenStart, i, normalizer);
-        continue;
-      }
 
       // Numbers
-      if (isNumberStart(s, i)) {
+      } else if (isNumberStart(s, i)) {
         i = readNumberWithUnit(s, i);
-        emit(out, leading, s, tokenStart, i, normalizer);
-        continue;
-      }
 
       // Words
-      if (Character.isLetter(cp)) {
+      } else if (Character.isLetter(cp)) {
         i = readWord(s, i);
-        emit(out, leading, s, tokenStart, i, normalizer);
-        continue;
-      }
 
       // single codepoint token
-      i += Character.charCount(cp);
-      emit(out, leading, s, tokenStart, i, normalizer);
+      } else {
+        i = i + Character.charCount(cp);
+      }
 
+      emit(out, leading, s, tokenStart, i, normalizer);
     }
 
     return out;
