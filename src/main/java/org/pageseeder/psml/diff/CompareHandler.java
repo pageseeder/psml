@@ -20,8 +20,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Philip Rutherford
  * @author Christophe Lauret
  *
- * @version 1.7.0
  * @since 1.0.0
+ * @version 1.7.3
  */
 public final class CompareHandler extends DefaultHandler {
 
@@ -72,21 +72,12 @@ public final class CompareHandler extends DefaultHandler {
     if (this.xml != null) {
       try {
         this.xml.write('<'+qName);
-      } catch (IOException ex) {
-        throw new SAXException("Failed to open element "+qName, ex);
-      }
-      // attributes
-      for (int i = 0; i < atts.getLength(); i++) {
-        String name = atts.getQName(i);
-        String value = atts.getValue(i);
-        try {
+        for (int i = 0; i < atts.getLength(); i++) {
+          String name = atts.getQName(i);
+          String value = atts.getValue(i);
           this.xml.write(" "+name+"=\""+XMLStrings.nullableAttribute(value)+"\"");
-        } catch (IOException ex) {
-          throw new SAXException("Failed to add attribute \""+atts.getQName(i)+"\" to element "+qName, ex);
         }
-      }
-      try {
-        this.xml.write(">");
+        this.xml.write('>');
       } catch (IOException ex) {
         throw new SAXException("Failed to open element "+qName, ex);
       }
