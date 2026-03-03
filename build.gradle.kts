@@ -1,6 +1,7 @@
 plugins {
   id("java-library")
   id("maven-publish")
+  jacoco
   alias(libs.plugins.jreleaser)
   alias(libs.plugins.sonar)
 }
@@ -53,6 +54,11 @@ sonar {
   properties {
     property("sonar.projectKey", "pageseeder_psml")
     property("sonar.organization", "pageseeder")
+    // Tell SonarCloud where the JaCoCo XML report is
+    property(
+      "sonar.coverage.jacoco.xmlReportPaths",
+      layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml").get().asFile.absolutePath
+    )
   }
 }
 
@@ -63,6 +69,17 @@ tasks.wrapper {
 
 tasks.test {
   useJUnitPlatform()
+  // optional: make sure report generation happens after tests when requested
+  finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+  dependsOn(tasks.test)
+  reports {
+    xml.required.set(true)   // Sonar reads this
+    html.required.set(true)  // nice to have for CI artifacts/debugging
+    csv.required.set(false)
+  }
 }
 
 tasks.withType<Javadoc> {
