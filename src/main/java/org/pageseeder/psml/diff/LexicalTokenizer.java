@@ -17,7 +17,7 @@ import java.util.function.IntPredicate;
  * @author Christophe Lauret
  *
  * @since 1.7.2
- * @version 1.7.2
+ * @version 1.7.3
  */
 public final class LexicalTokenizer implements TextTokenizer {
 

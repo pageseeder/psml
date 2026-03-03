@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.diff;
 
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
 import org.pageseeder.psml.util.Beta;
@@ -19,6 +20,9 @@ import javax.xml.namespace.QName;
  * remains encapsulated.
  *
  * @author Christophe Lauret
+ *
+ * @since 1.6.5
+ * @version 1.7.3
  */
 @Beta
 public final class PseudoStartToken implements StartElementToken {
@@ -72,7 +76,7 @@ public final class PseudoStartToken implements StartElementToken {
    * @return {@code true} if the specified token is equal to this token; {@code false} otherwise.
    */
   @Override
-  public boolean equals(XMLToken token) {
+  public boolean equals(@Nullable XMLToken token) {
     return this.token.equals(token);
   }
 
