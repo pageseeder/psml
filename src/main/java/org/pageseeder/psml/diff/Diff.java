@@ -184,27 +184,19 @@ public final class Diff {
 
       this.logger.debug("Diffing file {}", relPath);
 
-      FileOutputStream fos = null;
       try (InputStream input = new FileInputStream(psmlEntry.getValue())) {
         File output = new File(this.dest, relPath);
         // just in case
         output.getParentFile().mkdirs();
         if (!output.exists() && !output.createNewFile())
           throw new DiffException("Failed to create output file "+output.getAbsolutePath());
-        fos = new FileOutputStream(output);
-        diffPSML(input, new OutputStreamWriter(fos, StandardCharsets.UTF_8), compareFragments);
+        try (FileOutputStream fos = new FileOutputStream(output)) {
+          diffPSML(input, new OutputStreamWriter(fos, StandardCharsets.UTF_8), compareFragments);
+        }
       } catch (ParserConfigurationException | SAXException | IOException ex) {
         this.logger.error("Failed to create output file: {}", ex.getMessage(), ex);
         throw new DiffException("Failed to create output file: "+ex.getMessage(), ex);
-      } finally {
-        // close streams
-        try {
-          if (fos != null) fos.close();
-        } catch (IOException ex) {
-          throw new DiffException("Failed to close output stream: "+ex.getMessage(), ex);
-        }
       }
-
     }
   }
 

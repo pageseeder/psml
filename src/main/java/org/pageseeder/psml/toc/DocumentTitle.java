@@ -23,7 +23,7 @@ import org.pageseeder.xmlwriter.XMLWriter;
  */
 public final class DocumentTitle extends Element {
 
-  /** As er requirement for Serialization*/
+  /** As per requirement for Serialization*/
   private static final long serialVersionUID = 2L;
 
   /**

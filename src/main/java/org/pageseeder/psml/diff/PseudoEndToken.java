@@ -3,6 +3,7 @@
  */
 package org.pageseeder.psml.diff;
 
+import org.jspecify.annotations.Nullable;
 import org.pageseeder.diffx.token.EndElementToken;
 import org.pageseeder.diffx.token.StartElementToken;
 import org.pageseeder.diffx.token.XMLToken;
@@ -21,6 +22,9 @@ import javax.xml.namespace.QName;
  * remains encapsulated.
  *
  * @author Christophe Lauret
+ *
+ * @since 1.6.5
+ * @version 1.7.3
  */
 @Beta
 public final class PseudoEndToken implements EndElementToken {
@@ -57,8 +61,8 @@ public final class PseudoEndToken implements EndElementToken {
   }
 
   @Override
-  public boolean equals(XMLToken token) {
-    return token.equals(this.token);
+  public boolean equals(@Nullable XMLToken token) {
+    return this.token.equals(token);
   }
 
   @Override

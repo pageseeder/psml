@@ -12,7 +12,7 @@ import java.util.Set;
  * @author Christophe Lauret
  *
  * @since 1.7.2
- * @version 1.7.2
+ * @version 1.7.3
  */
 public final class LexicalNormalizer implements TextNormalizer {
 
@@ -303,6 +303,7 @@ public final class LexicalNormalizer implements TextNormalizer {
    * @return The normalized text.
    */
   @Override
+  @SuppressWarnings({"java:S3776", "java:S127","java:S135"}) // hot path; multiple early-continue branches are deliberate
   public String normalize(String text) {
     if (caseFolding)
       text = text.toLowerCase(Locale.ROOT);
@@ -312,7 +313,8 @@ public final class LexicalNormalizer implements TextNormalizer {
     StringBuilder out = new StringBuilder(text.length());
     boolean lastWasSpace = false;
 
-    for (int i = 0; i < text.length();) {
+    final int length = text.length();
+    for (int i = 0; i < length;) {
       int cp = text.codePointAt(i);
       i += Character.charCount(cp);
 

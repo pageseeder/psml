@@ -153,6 +153,7 @@ public final class GasherbrumVAlgorithm implements DiffAlgorithm<XMLToken> {
    * @param handler The {@link DiffHandler} responsible for processing the differences,
    *                must not be null.
    */
+  @SuppressWarnings("java:S3776") // Algorithmic control flow; refactoring would reduce clarity more than risk.
   private void diffAndUnfold(List<XMLToken> from, List<XMLToken> to, OperationsBuffer<XMLToken> path, DiffHandler<XMLToken> handler) {
     int i = 0;
     int j = 0;
@@ -220,6 +221,7 @@ public final class GasherbrumVAlgorithm implements DiffAlgorithm<XMLToken> {
    * @return A list of folded {@link XMLToken} objects where specific start and end blocks
    *         defined in BLOCKS are collapsed into single {@link XMLElement} instances.
    */
+  @SuppressWarnings("java:S3776") // Algorithmic control flow; refactoring would reduce clarity more than risk.
   private List<XMLToken> fold(List<? extends XMLToken> in) {
     Deque<XMLToken> stack = new ArrayDeque<>();
     List<XMLToken> out = new ArrayList<>();
