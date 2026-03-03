@@ -25,7 +25,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Philip Rutherford
  * @author Christophe Lauret
  *
- * @version 1.7.0
+ * @version 1.7.3
  * @since 1.0.0
  */
 public final class DiffHandler extends DefaultHandler {
@@ -120,25 +120,10 @@ public final class DiffHandler extends DefaultHandler {
     try {
       this.xml.write("</"+qName+">");
       if ("content".equals(qName) && this.fragmentId != null) {
-        assert this.fragmentContent != null; // Set at the same time as this.fragmentId
         String current = this.compareFragments.get(this.fragmentId);
         if (current != null) {
-          try {
-            StringWriter diff = new StringWriter();
-            this.differ.diff(new StringReader(current), new StringReader(this.fragmentContent.toString()), diff);
-            String diffx = diff.toString();
-            // remove XML declaration
-            if (diffx.startsWith("<?")) {
-              diffx = diffx.substring(diffx.indexOf('>')+1);
-            }
-            this.xml.write("\n<diff>");
-            this.xml.write(diffx);
-            this.xml.write("</diff>\n");
-          } catch (org.pageseeder.diffx.DiffException ex) {
-            LOGGER.error("Failed to diff content: {}", ex.getMessage());
-          } catch (IOException ex) {
-            throw new SAXException("Failed to write <diff> element: "+ex.getMessage(), ex);
-          }
+          assert this.fragmentContent != null; // Set at the same time as this.fragmentId
+          writeDiff(current, this.fragmentContent.toString());
         }
         this.fragmentId = null;
         this.fragmentContent = null;
@@ -146,6 +131,25 @@ public final class DiffHandler extends DefaultHandler {
       if (this.fragmentContent != null) this.fragmentContent.write("</"+qName+">");
     } catch (IOException ex) {
       throw new SAXException("Failed to close element "+qName, ex);
+    }
+  }
+
+  private void writeDiff(String current, String fragContent) throws SAXException {
+    try {
+      StringWriter diff = new StringWriter();
+      this.differ.diff(new StringReader(current), new StringReader(fragContent), diff);
+      String diffx = diff.toString();
+      // remove XML declaration
+      if (diffx.startsWith("<?")) {
+        diffx = diffx.substring(diffx.indexOf('>')+1);
+      }
+      this.xml.write("\n<diff>");
+      this.xml.write(diffx);
+      this.xml.write("</diff>\n");
+    } catch (org.pageseeder.diffx.DiffException ex) {
+      LOGGER.error("Failed to diff content: {}", ex.getMessage());
+    } catch (IOException ex) {
+      throw new SAXException("Failed to write <diff> element: "+ex.getMessage(), ex);
     }
   }
 
