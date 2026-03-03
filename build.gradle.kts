@@ -2,6 +2,7 @@ plugins {
   id("java-library")
   id("maven-publish")
   alias(libs.plugins.jreleaser)
+  alias(libs.plugins.sonar)
 }
 
 val title: String by project
@@ -45,6 +46,13 @@ dependencies {
   testRuntimeOnly (libs.saxon.he)
   testRuntimeOnly(libs.rhino.engine) {
     because("Required by TeX/AsciiMath conversion in Java 15+")
+  }
+}
+
+sonar {
+  properties {
+    property("sonar.projectKey", "pageseeder_psml")
+    property("sonar.organization", "pageseeder")
   }
 }
 
