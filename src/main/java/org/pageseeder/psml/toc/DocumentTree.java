@@ -458,7 +458,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
   @Override
   public void toXML(XMLWriter xml) throws IOException {
     String reverse = toReverseReferencesString(",");
-    xml.openElement("document-tree", this._parts.size() > 0);
+    xml.openElement("document-tree", !this._parts.isEmpty());
     xml.attribute("id", Long.toString(this._id));
     xml.attribute("level", this._level);
     xml.attribute("title", this._title);
@@ -468,7 +468,7 @@ public final class DocumentTree implements Tree, Serializable, XMLWritable {
     if (!DocumentTree.NO_PREFIX.equals(this.prefix())) {
       xml.attribute("prefix", this.prefix());
     }
-    if (reverse.length() > 0) {
+    if (!reverse.isEmpty()) {
       xml.attribute("reverse-references", reverse);
     }
     for (Part<?> p : this._parts) {
