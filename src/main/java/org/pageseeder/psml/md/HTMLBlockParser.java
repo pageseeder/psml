@@ -32,10 +32,14 @@ import org.pageseeder.psml.html.HTMLNode;
  *
  * @author Christophe Lauret
  *
- * @version 1.7.0
+ * @version 1.7.4
  * @since 1.0
  */
 public class HTMLBlockParser {
+
+  private static final Pattern ATX_HEADING_PATTERN = Pattern.compile("^\\s*+(#{1,6})\\s++(.*)");
+
+  private static final Pattern LIST_ITEM_PATTERN = Pattern.compile("^\\s*+(-|\\+|\\*|\\d++\\.)\\s++(.+)$");
 
   /**
    * Represents the configuration options used for parsing Markdown input.
@@ -176,7 +180,7 @@ public class HTMLBlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.PRE)) {
+    else if (line.matches("\\s*+>++\\s*+.*") && !state.isElement(Name.PRE)) {
       processQuoteBlock(line, state, options);
     }
 
@@ -205,12 +209,11 @@ public class HTMLBlockParser {
       } else {
 
         // Heading using ATX style
-        Pattern headingPattern = Pattern.compile("^\\s*(#{1,6})\\s+(.*?)(#{1,6})?$");
-        Matcher m = headingPattern.matcher(line);
+        Matcher m = ATX_HEADING_PATTERN.matcher(line);
         if (m.matches()) {
           state.commitUpto(Name.SECTION);
           int level = m.group(1).length();
-          String text = m.group(2).trim();
+          String text = stripHeadingCloser(m.group(2));
           HTMLElement heading = newHeadingElement(level);
           state.push(heading, text);
           state.commit();
@@ -293,8 +296,7 @@ public class HTMLBlockParser {
     }
 
     // Create a new item
-    Pattern x  = Pattern.compile("^\\s*(-|\\+|\\*|\\d+\\.)\\s+(.+)$");
-    Matcher m = x.matcher(line);
+    Matcher m = LIST_ITEM_PATTERN.matcher(line);
     if (m.matches()) {
       String no = m.group(1);
       if (state.isInList()) {
@@ -449,6 +451,12 @@ public class HTMLBlockParser {
       // Not a table
       state.push(Name.P, line.trim());
     }
+  }
+
+  private static String stripHeadingCloser(String text) {
+    int end = text.length();
+    while (end > 0 && text.charAt(end - 1) == '#') end--;
+    return (end < text.length() ? text.substring(0, end) : text).trim();
   }
 
   /**
