@@ -45,11 +45,15 @@ import org.pageseeder.psml.util.NilDiagnosticCollector;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.7.4
  * @since 1.0
  */
 @SuppressWarnings("java:S1192")
 public class BlockParser {
+
+  private static final Pattern ATX_HEADING_PATTERN = Pattern.compile("^\\s*+(#{1,6})\\s++(.*)");
+
+  private static final Pattern LIST_ITEM_PATTERN = Pattern.compile("^\\s*+(-|\\+|\\*|\\d++\\.)\\s++(.+)$");
 
   /**
    * Represents the configuration options used by the {@code BlockParser} for parsing Markdown input.
@@ -221,7 +225,7 @@ public class BlockParser {
     }
 
     // Lines starting with '>': quoted content
-    else if (line.matches("\\s*>+\\s*.*") && !state.isElement(Name.PREFORMAT)) {
+    else if (line.matches("\\s*+>++\\s*+.*") && !state.isElement(Name.PREFORMAT)) {
       processQuotedContent(line, state, options);
     }
 
@@ -250,12 +254,11 @@ public class BlockParser {
       } else {
 
         // Heading using ATX style
-        Pattern headingPattern = Pattern.compile("^\\s*(#{1,6})\\s+(.*?)(#{1,6})?$");
-        Matcher m = headingPattern.matcher(line);
+        Matcher m = ATX_HEADING_PATTERN.matcher(line);
         if (m.matches()) {
           state.commitUpToBlockOrFragment();
           String level = Integer.toString(m.group(1).length());
-          String text = m.group(2).trim();
+          String text = stripHeadingCloser(m.group(2));
 
           if (options.isNewFragmentPerHeading()) {
             state.ensureFragment();
@@ -342,8 +345,7 @@ public class BlockParser {
     }
 
     // Create a new item
-    Pattern x  = Pattern.compile("^\\s*(-|\\+|\\*|\\d+\\.)\\s+(.+)$");
-    Matcher m = x.matcher(line);
+    Matcher m = LIST_ITEM_PATTERN.matcher(line);
     if (m.matches()) {
       String no = m.group(1);
       if (state.isInList()) {
@@ -495,7 +497,7 @@ public class BlockParser {
       property.setAttribute("name", name);
       if (value.startsWith("[") && value.endsWith("]")) {
         property.setAttribute("multiple", "true");
-        String[] values = value.substring(1, value.length()-1).split("\\s*,\\s*");
+        String[] values = value.substring(1, value.length()-1).split(",");
         for (String v : values) {
           property.addNode(new PSMLElement(Name.VALUE).setText(v.trim()));
         }
@@ -555,6 +557,12 @@ public class BlockParser {
       }
       state.push(block);
     }
+  }
+
+  private static String stripHeadingCloser(String text) {
+    int end = text.length();
+    while (end > 0 && text.charAt(end - 1) == '#') end--;
+    return (end < text.length() ? text.substring(0, end) : text).trim();
   }
 
   /**
