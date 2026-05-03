@@ -48,7 +48,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Christophe Lauret
  *
- * @version 1.7.1
+ * @version 1.7.4
  * @since 1.0
  */
 public final class TemplateFactory {
@@ -178,10 +178,9 @@ public final class TemplateFactory {
    */
   private SAXParser getParser() {
     if (this.parser == null) {
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      factory.setNamespaceAware(true);
-      factory.setValidating(false);
       try {
+        SAXParserFactory factory = XML.newSAXParserFactory();
+        factory.setNamespaceAware(true);
         this.parser = factory.newSAXParser();
       } catch (ParserConfigurationException | SAXException ex) {
         throw new UnsupportedOperationException(ex);

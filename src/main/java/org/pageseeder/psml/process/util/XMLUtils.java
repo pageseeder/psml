@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.ProcessException;
+import org.pageseeder.psml.xml.XML;
 import org.pageseeder.psml.xml.XMLStrings;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -30,7 +31,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *
  * @author  Christophe Lauret
  *
- * @version 1.6.9
+ * @version 1.7.4
  * @since 0.9.0
  */
 public final class XMLUtils {
@@ -284,10 +285,7 @@ public final class XMLUtils {
                            @Nullable List<String> warnings) throws ProcessException {
     try {
       // use the SAX parser factory to set features
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      factory.setValidating(false);
-      // set not namespace aware
-      factory.setNamespaceAware(false);
+      SAXParserFactory factory = XML.newSAXParserFactory();
       // get reader
       XMLReader reader = factory.newSAXParser().getXMLReader();
       // set handlers

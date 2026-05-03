@@ -15,19 +15,22 @@
  */
 package org.pageseeder.psml.xml;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import org.xml.sax.SAXException;
 
 /**
  * A collection of utility classes for XML.
  *
  * @author  Christophe Lauret
  *
- * @version 1.6.9
+ * @version 1.7.4
  * @since 1.0
  */
 public final class XML {
@@ -38,6 +41,21 @@ public final class XML {
   private static final int ASCII_LAST_CHAR = 0x80;
 
   private XML() {}
+
+  /**
+   * Creates a new {@link SAXParserFactory} with external entity resolution disabled to prevent XXE.
+   *
+   * @return a secure SAXParserFactory
+   * @throws ParserConfigurationException if the factory cannot be configured
+   * @throws SAXException if a required feature is not supported
+   */
+  public static SAXParserFactory newSAXParserFactory() throws ParserConfigurationException, SAXException {
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    return factory;
+  }
 
   /**
    * Checks if the specified string is valid XML.

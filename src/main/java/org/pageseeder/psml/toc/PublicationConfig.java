@@ -9,6 +9,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+import org.pageseeder.psml.xml.XML;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -52,6 +53,9 @@ import java.util.List;
  * The same level can only be repeated if it has a different block-label defined.
  *
  * @author Philip Rutherford
+ *
+ * @version 1.7.4
+ * @since 1.0
  */
 public final class PublicationConfig implements Cloneable {
 
@@ -328,10 +332,7 @@ public final class PublicationConfig implements Cloneable {
   public static void parse(InputStream in, ContentHandler handler) throws IOException {
     try {
       // use the SAX parser factory to set features
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      factory.setValidating(false);
-      // set not namespace aware
-      factory.setNamespaceAware(false);
+      SAXParserFactory factory = XML.newSAXParserFactory();
       // get reader
       XMLReader reader = factory.newSAXParser().getXMLReader();
       // set handlers

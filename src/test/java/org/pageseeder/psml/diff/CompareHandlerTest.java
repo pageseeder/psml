@@ -1,11 +1,11 @@
 package org.pageseeder.psml.diff;
 
 import org.junit.jupiter.api.Test;
+import org.pageseeder.psml.xml.XML;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,8 +22,7 @@ final class CompareHandlerTest {
     File src = new File(SOURCE_FOLDER, "compare_3.psml");
     try {
       CompareHandler handler = new CompareHandler();
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser parser = factory.newSAXParser();
+      SAXParser parser = XML.newSAXParserFactory().newSAXParser();
       parser.parse(new FileInputStream(src), handler);
       Map<String, String> fragments = handler.getCompareFragments();
       //System.out.println(fragments);

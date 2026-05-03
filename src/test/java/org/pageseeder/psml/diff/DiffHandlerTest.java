@@ -4,6 +4,7 @@ import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.psml.toc.Tests.Validates;
+import org.pageseeder.psml.xml.XML;
 import org.xml.sax.SAXException;
 import org.xmlunit.matchers.EvaluateXPathMatcher;
 
@@ -30,7 +31,7 @@ public final class DiffHandlerTest {
     try {
       // get compare fragments
       CompareHandler handler = new CompareHandler();
-      SAXParserFactory factory = SAXParserFactory.newInstance();
+      SAXParserFactory factory = XML.newSAXParserFactory();
       SAXParser parser = factory.newSAXParser();
       parser.parse(new FileInputStream(src), handler);
       Map<String, String> fragments = handler.getCompareFragments();
@@ -39,7 +40,7 @@ public final class DiffHandlerTest {
       // add diff elements
       StringWriter out = new StringWriter();
       DiffHandler handler2 = new DiffHandler(out, fragments, new PSMLDiffer(4000000));
-      SAXParser parser2 = factory.newSAXParser();
+      SAXParser parser2 = XML.newSAXParserFactory().newSAXParser();
       parser2.parse(new FileInputStream(src), handler2);
       String xml = out.toString();
       //System.out.println(xml);

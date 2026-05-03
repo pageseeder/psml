@@ -23,6 +23,7 @@ import org.pageseeder.diffx.config.TextGranularity;
 import org.pageseeder.diffx.config.WhiteSpaceProcessing;
 import org.pageseeder.psml.process.util.IncludesExcludesMatcher;
 import org.pageseeder.psml.util.RelativePaths;
+import org.pageseeder.psml.xml.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -34,6 +35,9 @@ import org.xml.sax.SAXException;
  *
  * @author Philip Rutherford
  * @author Christophe Lauret
+ *
+ * @version 1.7.4
+ * @since 1.0
  */
 public final class Diff {
 
@@ -214,7 +218,7 @@ public final class Diff {
   public Map<String,String> comparePSML(InputStream in)
       throws ParserConfigurationException, SAXException, IOException {
     CompareHandler handler = new CompareHandler();
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParserFactory factory = XML.newSAXParserFactory();
     SAXParser parser = factory.newSAXParser();
     parser.parse(in, handler);
     return handler.getCompareFragments();
@@ -237,7 +241,7 @@ public final class Diff {
     differ.setWhiteSpaceProcessing(this.whiteSpaceProcessing);
     differ.setGranularity(this.textGranularity);
     DiffHandler handler = new DiffHandler(out, compareFragments, differ);
-    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParserFactory factory = XML.newSAXParserFactory();
     SAXParser parser = factory.newSAXParser();
     parser.parse(in, handler);
     out.flush();

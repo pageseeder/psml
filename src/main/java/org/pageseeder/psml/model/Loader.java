@@ -25,6 +25,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.jspecify.annotations.Nullable;
+import org.pageseeder.psml.xml.XML;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -39,7 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.0
+ * @version 1.7.4
  * @since 1.0
  */
 public final class Loader {
@@ -109,10 +110,13 @@ public final class Loader {
 
     // Initialize the factory if needed
     if (this.factory == null) {
-      SAXParserFactory f = SAXParserFactory.newInstance();
-      f.setNamespaceAware(true);
-      f.setValidating(false);
-      this.factory = f;
+      try {
+        SAXParserFactory f = XML.newSAXParserFactory();
+        f.setNamespaceAware(true);
+        this.factory = f;
+      } catch (SAXException | ParserConfigurationException ex) {
+        throw new IOException(ex);
+      }
     }
 
     // Run parser

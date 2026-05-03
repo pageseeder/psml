@@ -4,6 +4,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.pageseeder.psml.xml.XML;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
 import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWritable;
@@ -343,8 +344,7 @@ public class Tests {
     DocumentTree tree = null;
     try {
       DocumentTreeHandler handler = new DocumentTreeHandler(id);
-      SAXParserFactory factory = SAXParserFactory.newInstance();
-      SAXParser parser = factory.newSAXParser();
+      SAXParser parser = XML.newSAXParserFactory().newSAXParser();
       parser.parse(in, handler);
       tree = handler.get();
     } catch (ParserConfigurationException | IOException ex) {
