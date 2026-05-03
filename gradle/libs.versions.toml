@@ -6,7 +6,7 @@ xmlunit = "2.11.0"
 
 [libraries]
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
-commons-io = { module = "commons-io:commons-io", version = "2.21.0" }
+commons-io = { module = "commons-io:commons-io", version = "2.22.0" }
 hamcrest = { module = "org.hamcrest:hamcrest", version = "2.2"}
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
@@ -30,5 +30,5 @@ junit = [
 ]
 
 [plugins]
-jreleaser = { id = "org.jreleaser", version = "1.21.0" }
-sonar = { id = "org.sonarqube", version = "7.1.0.6387" }
+jreleaser = { id = "org.jreleaser", version = "1.24.0" }
+sonar = { id = "org.sonarqube", version = "7.3.0.8198" }
