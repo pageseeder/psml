@@ -42,13 +42,14 @@ groupId = "org.pageseeder"
 
 # Git configuration
 [release.github]
+active = "NEVER"
 owner = "pageseeder"
 name = "psml"
 username = "pageseeder"
 branch = "main"
 
 # Signing configuration
-[signing]
+[signing.pgp]
 active = "ALWAYS"
 armored = true
 mode = "FILE"
