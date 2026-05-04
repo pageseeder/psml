@@ -12,6 +12,8 @@ import static org.pageseeder.psml.toc.Tests.*;
 
 final class DocumentTreeHandlerTest {
 
+  boolean debug = false;
+
   @Test
   void testParseContent1() throws SAXException {
     DocumentTree tree = parse(1, "content1.psml");
@@ -228,7 +230,9 @@ final class DocumentTreeHandlerTest {
                         p(0, "", "2", 6, false, "", ""),
                         tend("2")))),
             h2("Part B", "2", 7)));
-    tree.print(System.out);
+    if (debug) {
+      tree.print(System.out);
+    }
     DocumentTree expected = new DocumentTree(5, "Assembly", "", null, null, Collections.emptyList(), p,
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
@@ -252,16 +256,22 @@ final class DocumentTreeHandlerTest {
                     p(0, "", "2", 6, false, "", ""),
                     tend("2")))),
         h2("Part B", "2", 7));
-    Tests.print(tree);
-    tree.print(System.out);
+    if (debug) {
+      Tests.print(tree);
+      tree.print(System.out);
+    }
     DocumentTree expected = new DocumentTree(6, 2, "Assembly", "", Collections.emptyList(),
         DocumentTree.NO_FRAGMENT, false, DocumentTree.NO_PREFIX, DocumentTree.NO_BLOCK_LABEL,
         null, null, p, Collections.emptyMap(), Collections.emptyMap());
-    Tests.print(tree.normalize(TitleCollapse.auto));
+    if (debug) {
+      Tests.print(tree.normalize(TitleCollapse.auto));
+    }
     DocumentTree normalized = tree.normalize(TitleCollapse.auto);
     Tests.assertDocumentTreeEquals(expected, normalized);
     PublicationTree publication = new PublicationTree(normalized);
-    Tests.print(publication, -1, -1, null, null, true);
+    if (debug) {
+      Tests.print(publication, -1, -1, null, null, true);
+    }
   }
 
   @Test
@@ -281,7 +291,9 @@ final class DocumentTreeHandlerTest {
   @Test
   void testParseXrefLevel1() throws SAXException {
     DocumentTree tree = parse(1, "xref-level1.psml");
-    Tests.print(tree);
+    if (debug) {
+      Tests.print(tree);
+    }
     Part<Heading> p = h1("Test doc 1", "1", 1,
         phantom(2,
             phantom(3,
@@ -299,7 +311,9 @@ final class DocumentTreeHandlerTest {
         Collections.emptyMap(), Collections.emptyMap());
     Tests.assertDocumentTreeEquals(expected, tree);
     tree = tree.normalize(TitleCollapse.auto);
-    Tests.print(tree);
+    if (debug) {
+      Tests.print(tree);
+    }
     List<Part<?>> parts = Arrays.asList(
         phantom(2,
             phantom(3,
