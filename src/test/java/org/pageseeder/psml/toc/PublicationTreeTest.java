@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 final class PublicationTreeTest {
 
+  boolean debug = false;
+
   @Test
   void testEmpty() {
     DocumentTree tree = new DocumentTree.Builder(1).build();
@@ -33,7 +35,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testSimpleReference() throws SAXException {
+  void testSimpleReference() {
     DocumentTree tree = new DocumentTree.Builder(1).part(ref(1, "A", 100L)).part(ref(1, "A", 100L)).build();
     PublicationTree publication = new PublicationTree(tree);
     assertEquals(1, publication.id());
@@ -41,12 +43,14 @@ final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree, publication.tree(1));
     Tests.assertDocumentTreeEquals(tree, publication.root());
     assertValidPublication(publication);
-//    Tests.print(publication);
-//    Tests.print(tree);
+    if (debug) {
+      Tests.print(publication);
+      Tests.print(tree);
+    }
   }
 
   @Test
-  void testSimpleReferenceWithTitle() throws SAXException {
+  void testSimpleReferenceWithTitle() {
     DocumentTree tree = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 100L)).build();
     tree = tree.normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(tree);
@@ -55,12 +59,14 @@ final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree, publication.tree(1));
     Tests.assertDocumentTreeEquals(tree, publication.root());
     assertValidPublication(publication);
-//    Tests.print(publication);
-//    Tests.print(tree);
+    if (debug) {
+      Tests.print(publication);
+      Tests.print(tree);
+    }
   }
 
   @Test
-  void testTwoLevels() throws SAXException {
+  void testTwoLevels() {
     DocumentTree root = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 101L)).build();
     DocumentTree tree = new DocumentTree.Builder(100).title("T").part(h1("T", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
     PublicationTree publication = new PublicationTree(tree);
@@ -70,12 +76,14 @@ final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree, publication.tree(100));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-//    Tests.print(publication);
-//    Tests.print(tree);
+    if (debug) {
+      Tests.print(publication);
+      Tests.print(tree);
+    }
   }
 
   @Test
-  void testModify() throws SAXException {
+  void testModify() {
     DocumentTree root = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 101L)).build();
     DocumentTree tree = new DocumentTree.Builder(100).title("T").part(h1("T", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
     DocumentTree tree2 = new DocumentTree.Builder(101).title("B").part(h1("B", "1", 1)).part(ref(1, "X", 102L)).part(ref(1, "Y", 103L)).build();
@@ -90,13 +98,15 @@ final class PublicationTreeTest {
     assertNull(publication.tree(100));
     Tests.assertDocumentTreeEquals(tree2, publication.tree(101));
     assertValidPublication(publication);
-//    Tests.print(publication);
-//    Tests.print(tree);
+    if (debug) {
+      Tests.print(publication);
+      Tests.print(tree);
+    }
   }
 
 
   @Test
-  void testThreeLevels() throws SAXException {
+  void testThreeLevels() {
     DocumentTree root = new DocumentTree.Builder(1).title("T").part(h1("T", "1", 1)).part(ref(1, "A", 100L)).part(ref(1, "A", 101L)).build();
     DocumentTree inter = new DocumentTree.Builder(100).title("A").part(h1("A", "1", 1)).part(ref(1, "X", 1000L)).part(ref(1, "Y", 1001L)).build();
     DocumentTree tree = new DocumentTree.Builder(1001).title("Y").part(h1("a", "1", 1)).part(h1("b", "1", 1, h2("x", "1", 2))).part(h1("c", "1", 3)).build();
@@ -108,12 +118,14 @@ final class PublicationTreeTest {
     Tests.assertDocumentTreeEquals(tree, publication.tree(1001));
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertValidPublication(publication);
-    Tests.print(publication);
-    Tests.print(tree);
+    if (debug) {
+      Tests.print(publication);
+      Tests.print(tree);
+    }
   }
 
   @Test
-  void testAutoNumbering() throws SAXException, IOException, XRefLoopException, XRefLoopException {
+  void testAutoNumbering() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -145,9 +157,13 @@ final class PublicationTreeTest {
         .part(h1("X2", "6", 1,
             ref(0, "Z2", 1003L)))
         .addReverseReference(100L).addReverseReference(101L).build();
-    //Tests.print(tree);
+    if (debug) {
+      Tests.print(tree);
+    }
     tree = tree.normalize(TitleCollapse.auto);
-    //Tests.print(tree);
+    if (debug) {
+      Tests.print(tree);
+    }
     DocumentTree tree2 = new DocumentTree.Builder(1001).title("Y")
         .part(h1("Y", "1", 1, true, "x.x",
             h2("a", "2", 1, true, "x.x.x"),
@@ -179,15 +195,19 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, true);
-    Tests.print(publication, 1000, 2, numbering, null, true);
-    Tests.print(publication, 1002, -1, numbering, null, true);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, true);
+      Tests.print(publication, 1000, 2, numbering, null, true);
+      Tests.print(publication, 1002, -1, numbering, null, true);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"100-1-1-1",null,"1.",2,"0.1.");
     assertHasPrefix(prefixes,"100-1-default",null,"1.",2,"0.1.");
@@ -227,7 +247,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingTranscluded() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingTranscluded() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -282,20 +302,24 @@ final class PublicationTreeTest {
     Map<Long,List<Long>> transclusions = new HashMap<>();
     FragmentNumbering numbering = new FragmentNumbering(publication, config, new ArrayList<Long>(), transclusions);
     publication = publication.modify(new ArrayList<>(), new HashMap<>(), transclusions, publication.id());
-    Tests.print(publication, -1, -1, numbering, null, true);
-    Tests.print(publication, 101, 1, numbering, null, true);
-    Tests.print(publication, 1001, -1, numbering, null, true);
-    String result = numbering.getAllPrefixes().entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println("Prefixes:\n" + result);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, true);
+      Tests.print(publication, 101, 1, numbering, null, true);
+      Tests.print(publication, 1001, -1, numbering, null, true);
+      String result = numbering.getAllPrefixes().entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println("Prefixes:\n" + result);
+    }
     Map<String,Prefix> prefixes = numbering.getAllTranscludedPrefixes();
-    String tpresult = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println("Transcluded prefixes:\n" + tpresult);
+    if (debug) {
+      String tpresult = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println("Transcluded prefixes:\n" + tpresult);
+    }
     assertHasPrefix(prefixes,"100-1-1-1",null,"1.",2,"0.1.");
     assertHasPrefix(prefixes,"1000-1-1-1",null,"1.1.",3,"0.1.1.");
     assertHasPrefix(prefixes,"1000-1-2-1",null,"1.1.1.",4,"0.1.1.1.");
@@ -329,11 +353,13 @@ final class PublicationTreeTest {
     assertHasPrefix(prefixes,"101-1-2-8",null,"x.x.x.x",6,null);
     assertHasPrefix(prefixes,"101-1-2-9",null,"1.3.3.",4,"0.1.3.3.");
     assertEquals(32, prefixes.size());
-    String tresult = transclusions.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println("Transclusions:\n" + tresult);
+    if (debug) {
+      String tresult = transclusions.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println("Transclusions:\n" + tresult);
+    }
     List<Long> t = transclusions.get(1001L);
     assertNotNull(t);
     assertEquals(2, t.size());
@@ -344,7 +370,7 @@ final class PublicationTreeTest {
 
 
   @Test
-  void testAutoNumberingBlank() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingBlank() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -374,26 +400,32 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-blank.xml");
     // Generate fragment numbering
     List<Long> unusedIds = new ArrayList<>();
-    FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds, new HashMap<Long,List<Long>>());
-    Tests.print(publication, -1, -1, numbering, null, false);
+    FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds, new HashMap<>());
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, false);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"1000-1-2-1",null,"x.x.x",3,null);
     assertHasPrefix(prefixes,"1000-1-5-1",null,"x.x.x.x",4,null);
     assertHasPrefix(prefixes,"1000-1-default",null,"",2,null);
     assertEquals(4, prefixes.size());
-    System.out.println("unusedIds: " + unusedIds);
+    if (debug) {
+      System.out.println("unusedIds: " + unusedIds);
+    }
     assertEquals(1, unusedIds.size());
     assertEquals(100, unusedIds.get(0).longValue());
   }
 
   @Test
-  void testAutoNumberingBlockLabels() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingBlockLabels() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
                 ref(0, "X", 1000L,
@@ -439,13 +471,17 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-block-labels.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, config, false);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, config, false);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"1000-1-1-1",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"1000-1-1a-1","1.","(i)",8,"1.0.0.0.0.0.0.1.");
@@ -477,7 +513,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingRestarts() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingRestarts() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             ref(0, "X", 1000L,
@@ -530,13 +566,17 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-restarts.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, config, false);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, config, false);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"1000-1-1-1",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"1000-1-1a-1","1.","(i)",8,"1.0.0.0.0.0.0.1.");
@@ -572,7 +612,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingBlankFormat() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingBlankFormat() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
               ref(0, "X", 1000L),
@@ -601,13 +641,17 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-blank-format.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, false);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, false);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"1000-1-1-1","","1.",2,"1.1.");
     assertHasPrefix(prefixes,"1000-1-1-2","","1.1.",3,"1.1.1.");
@@ -623,7 +667,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingSkippedLevels() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingSkippedLevels() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("X", "1", 1, true, "",
             h2("a", "2", 1, true, "x.x.x"),
@@ -652,13 +696,17 @@ final class PublicationTreeTest {
     // Generate fragment numbering
     List<Long> unusedIds = new ArrayList<>();
     FragmentNumbering numbering = new FragmentNumbering(publication, config, unusedIds, new HashMap<Long,List<Long>>());
-    Tests.print(publication, -1, -1, numbering, null, false);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, false);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-1-1",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"1-1-2-1",null,"1.1.",2,"1.1.");
     assertHasPrefix(prefixes,"1-1-2-2",null,"1.2.",2,"1.2.");
@@ -677,7 +725,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingLabels() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingLabels() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1, true, "",
             phantom(2,
@@ -725,14 +773,18 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, true);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, true);
+    }
     assertValidPublication(publication, numbering, config);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"100-1-1-1",null,"a.",2,"0.1.");
     assertHasPrefix(prefixes,"100-1-default",null,"a.",2,"0.1.");
@@ -769,7 +821,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingParas() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingParas() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -798,7 +850,9 @@ final class PublicationTreeTest {
               h2("C", "1", 2, true, ""),
               h2("CA", "1", 3, true, "")))
         .addReverseReference(1L).build().normalize(TitleCollapse.auto);
-    System.out.println("Tree 102 level: " + inter3.level());
+    if (debug) {
+      System.out.println("Tree 102 level: " + inter3.level());
+    }
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
             p(1, "1a", 1, true, ""),
@@ -837,14 +891,18 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-paras.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, true);
-    tree.print(System.out);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, true);
+      tree.print(System.out);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"100-1-1-1",null,"1.1.",2,"1.1.");
     assertHasPrefix(prefixes,"100-1-default",null,"1.1.",2,"1.1.");
@@ -889,7 +947,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingParasFixed() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingParasFixed() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
             phantom(2,
@@ -897,7 +955,9 @@ final class PublicationTreeTest {
               phantom(4,
                 ref(5, "B", 1000L)))))).build();
     root = root.normalize(TitleCollapse.always);
-    Tests.print(root);
+    if (debug) {
+      Tests.print(root);
+    }
     DocumentTree tree = new DocumentTree.Builder(1000).title("X")
         .part(h1("X", "1", 1, true, "x.x",
             p(1, "1a", 1, true, ""),
@@ -922,15 +982,19 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-paras-fixed.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, config, true);
-    //tree.print(System.out);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, config, true);
+      tree.print(System.out);
+    }
     assertValidPublication(publication, numbering, config);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"1000-1-1-1",null,"1.",2,"0.1.");
     assertHasPrefix(prefixes,"1000-1-1a-1","1.","(a)",8,"0.1.0.0.0.0.0.1.");
@@ -961,7 +1025,7 @@ final class PublicationTreeTest {
     assertEquals(27, prefixes.size());  }
 
   @Test
-  void testAutoNumberingParasRelative() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingParasRelative() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
           phantom(2,
@@ -1020,14 +1084,18 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-paras-relative.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, true);
-    tree.print(System.out);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, true);
+      tree.print(System.out);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-1x-1",null,"",1,null); //TODO investigate why this is not level 0
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"100-1-1-1",null,"1.",2,"0.1.");
@@ -1069,7 +1137,7 @@ final class PublicationTreeTest {
   }
 
   @Test
-  void testAutoNumberingPerformance() throws SAXException, IOException, XRefLoopException {
+  void testAutoNumberingPerformance() throws IOException, XRefLoopException {
     Builder builder = new DocumentTree.Builder(1).title("T");
     for(int i = 0; i < 500; i++) {
       builder = builder.part(ref(2, "A", 1000L + i));
@@ -1108,22 +1176,32 @@ final class PublicationTreeTest {
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
     long end = System.currentTimeMillis();
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     // print twice to ensure classes are loaded before timing is done
-    Tests.print(publication, 1499, -1, numbering, null, true);
+    if (debug) {
+      Tests.print(publication, 1499, -1, numbering, null, true);
+    }
     long pstart = System.currentTimeMillis();
-    Tests.print(publication, 1499, -1, numbering, null, true);
+    if (debug) {
+      Tests.print(publication, 1499, -1, numbering, null, true);
+    }
     long pend = System.currentTimeMillis();
-    System.out.println("Number of prefixes: " + prefixes.size());
-    System.out.println("Number of transclude prefixes: " + numbering.getAllTranscludedPrefixes().size());
+    if (debug) {
+      System.out.println("Number of prefixes: " + prefixes.size());
+      System.out.println("Number of transclude prefixes: " + numbering.getAllTranscludedPrefixes().size());
+    }
     long gtime = end - start;
     long ptime = pend - pstart;
-    System.out.println("Generation time: " + gtime);
-    System.out.println("Print time: " + ptime);
+    if (debug) {
+      System.out.println("Generation time: " + gtime);
+      System.out.println("Print time: " + ptime);
+    }
     assertEquals(10501, prefixes.size());
     assertEquals(10000, numbering.getAllTranscludedPrefixes().size());
     assertTrue(gtime < 400, "Generation time: " + gtime);
@@ -1193,7 +1271,9 @@ final class PublicationTreeTest {
              tree.path());
     publication = publication.add(tree);
     assertValidPublication(publication);
-    Tests.print(publication);
+    if (debug) {
+      Tests.print(publication);
+    }
   }
 
   @Test
@@ -1201,22 +1281,30 @@ final class PublicationTreeTest {
     DocumentTree tree = Tests.parse(1, "hub.psml").normalize(TitleCollapse.auto);
     PublicationTree publication = new PublicationTree(tree);
     assertValidPublication(publication);
-    Tests.print(publication);
+    if (debug) {
+      Tests.print(publication);
+    }
   }
 
   @Test
   void testParseXrefLevel1() throws SAXException, IOException, XRefLoopException {
     DocumentTree tree = parse(1, "xref-level1.psml");
-    Tests.print(tree);
+    if (debug) {
+      Tests.print(tree);
+    }
     tree = tree.normalize(TitleCollapse.auto);
-    Tests.print(tree);
-    System.out.println(tree.listReverseReferences());
+    if (debug) {
+      Tests.print(tree);
+      System.out.println(tree.listReverseReferences());
+    }
     Map<String, String> fheadings = tree.fragmentheadings();
-    String headings = fheadings.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println("HEADINGS\n" + headings);
+    if (debug) {
+      String headings = fheadings.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println("HEADINGS\n" + headings);
+    }
     assertEquals("Test <inline name=\"test\">doc <sup>1</sup></inline>", fheadings.get("1"));
     assertEquals("My &lt; &amp; > link", fheadings.get("3"));
     assertEquals("Default d5", fheadings.get("6"));
@@ -1224,11 +1312,13 @@ final class PublicationTreeTest {
     assertEquals("Related", fheadings.get("content"));
     assertEquals(5, fheadings.size());
     Map<String, Integer> flevels = tree.fragmentlevels();
-    String levels = flevels.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println("LEVELS\n" + levels);
+    if (debug) {
+      String levels = flevels.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println("LEVELS\n" + levels);
+    }
     assertEquals(Integer.valueOf(0), flevels.get("1"));
     assertEquals(Integer.valueOf(2), flevels.get("2"));
     assertEquals(Integer.valueOf(2), flevels.get("3"));
@@ -1241,15 +1331,19 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, config, true);
-    tree.print(System.out);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, config, true);
+      tree.print(System.out);
+    }
     assertValidPublication(publication, numbering, config);
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-4-2",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-4-3",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-4-4",null,"",2,null);
@@ -1304,14 +1398,18 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config-xrefs-relative.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, true);
-    Tests.print(publication, 1000, 2, numbering, null, true);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, true);
+      Tests.print(publication, 1000, 2, numbering, null, true);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"100-1-1-1",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"100-1-default",null,"1.",1,"1.");
@@ -1373,13 +1471,17 @@ final class PublicationTreeTest {
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
     FragmentNumbering numbering = new FragmentNumbering(publication, config);
-    Tests.print(publication, -1, -1, numbering, null, true);
+    if (debug) {
+      Tests.print(publication, -1, -1, numbering, null, true);
+    }
     Map<String,Prefix> prefixes = numbering.getAllPrefixes();
-    String result = prefixes.entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
+    if (debug) {
+      String result = prefixes.entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+    }
     assertHasPrefix(prefixes,"69152-1-default",null,"",0,null);
     assertHasPrefix(prefixes,"69153-1-1-1",null,"1.",1,"1.");
     assertHasPrefix(prefixes,"69153-1-3-1",null,"1.1.",2,"1.1.");
