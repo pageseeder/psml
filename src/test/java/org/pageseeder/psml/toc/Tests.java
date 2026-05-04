@@ -424,7 +424,7 @@ public class Tests {
       // Won't happen
     }
     xml.flush();
-    System.out.println(xml.toString());
+    System.out.println(xml);
   }
 
   public static void print(PublicationTree o, long cid, int cposition, @Nullable FragmentNumbering number,

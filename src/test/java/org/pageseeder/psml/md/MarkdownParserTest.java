@@ -38,7 +38,6 @@ class MarkdownParserTest {
     PSMLElement document = parseMarkdown("headings.md", false);
     assertNotNull(document);
     assertEquals(PSMLElement.Name.DOCUMENT, document.getElement());
-    System.out.println(toXML(document));
   }
 
   @Test
@@ -46,7 +45,6 @@ class MarkdownParserTest {
     PSMLElement document = parseMarkdown("metadata.md", false);
     assertNotNull(document);
     assertEquals(PSMLElement.Name.DOCUMENT, document.getElement());
-    System.out.println(toXML(document));
   }
 
   @Test
@@ -54,7 +52,6 @@ class MarkdownParserTest {
     PSMLElement fragment = parseMarkdown("table.md", true);
     assertNotNull(fragment);
     assertEquals(PSMLElement.Name.FRAGMENT, fragment.getElement());
-    System.out.println(toXML(fragment));
   }
 
   @Test
@@ -72,7 +69,6 @@ class MarkdownParserTest {
     document.toXML(xml);
     xml.flush();
     String result = xml.toString();
-    System.out.println(result);
 
     // load expected
     String expected = Files.readString(psml.toPath());
@@ -95,7 +91,6 @@ class MarkdownParserTest {
     document.toXML(xml);
     xml.flush();
     String result = xml.toString();
-    System.out.println(result);
 
     // load expected
     String expected = Files.readString(psml.toPath());

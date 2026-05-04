@@ -13,6 +13,8 @@ import static org.pageseeder.psml.toc.Tests.*;
 
 class NumberedTOCGeneratorTest {
 
+  boolean debug = false;
+
   @Test
   void testAutoNumbering() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
@@ -76,17 +78,19 @@ class NumberedTOCGeneratorTest {
       // Won't happen
     }
     xml.flush();
-    System.out.println(xml);
-    String result = numbering.getAllPrefixes().entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println(result);
-    String tresult = numbering.getAllTranscludedPrefixes().entrySet()
-        .stream().sorted(Map.Entry.comparingByKey())
-        .map(entry -> entry.getKey() + " - " + entry.getValue())
-        .collect(Collectors.joining("\n"));
-    System.out.println("Transcluded:\n" + tresult);
+    if (debug) {
+      System.out.println(xml);
+      String result = numbering.getAllPrefixes().entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println(result);
+      String tresult = numbering.getAllTranscludedPrefixes().entrySet()
+          .stream().sorted(Map.Entry.comparingByKey())
+          .map(entry -> entry.getKey() + " - " + entry.getValue())
+          .collect(Collectors.joining("\n"));
+      System.out.println("Transcluded:\n" + tresult);
+    }
   }
 
 }

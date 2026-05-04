@@ -148,7 +148,6 @@ class DiffTest {
     // check results
     assertTrue(CM.exists());
     String xml = Files.readString(CM.toPath());
-    System.out.println(xml);
     assertThat(xml, hasXPath("count(//diff)", equalTo("2")));
   }
 
