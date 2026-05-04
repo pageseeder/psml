@@ -680,7 +680,28 @@ public class ProcessTest {
     //  AsciiMathConverter.convert(math);
     //}
     String math = "10=-2 (x+6)";
-    System.out.println(AsciiMathConverter.convert(math));
+    String actual = AsciiMathConverter.convert(math);
+    String expected = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\">\n" +
+        "  <mstyle displaystyle=\"true\">\n" +
+        "    <mn>10</mn>\n" +
+        "    <mo>=</mo>\n" +
+        "    <mo>-</mo>\n" +
+        "    <mn>2</mn>\n" +
+        "    <mrow>\n" +
+        "      <mo>(</mo>\n" +
+        "      <mi>x</mi>\n" +
+        "      <mo>+</mo>\n" +
+        "      <mn>6</mn>\n" +
+        "      <mo>)</mo>\n" +
+        "    </mrow>\n" +
+        "  </mstyle>\n" +
+        "</math>";
+    try {
+      assertThat(actual, CompareMatcher.isSimilarTo(expected).normalizeWhitespace());
+    } catch (AssertionError error) {
+      System.out.println(actual);
+      throw error;
+    }
   }
 
   @Test
@@ -703,7 +724,14 @@ public class ProcessTest {
     //  TexConverter.convert(tex);
     //}
     String tex = "10=-2 (x+6)";
-    System.out.println(TexConverter.convert(tex));
+    String actual = TexConverter.convert(tex);
+    String expected = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mn>10</mn><mo>=</mo><mo>−</mo><mn>2</mn><mo stretchy=\"false\">(</mo><mi>x</mi><mo>+</mo><mn>6</mn><mo stretchy=\"false\">)</mo></mrow></math>";
+    try {
+      assertThat(actual, CompareMatcher.isSimilarTo(expected).normalizeWhitespace());
+    } catch (AssertionError error) {
+      System.out.println(actual);
+      throw error;
+    }
   }
 
   @Test
