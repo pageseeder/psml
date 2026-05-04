@@ -43,7 +43,6 @@ class LoaderTest {
     PSMLElement element = loader.parse(new StringReader(psml));
     assertNotNull(element);
     assertEquals(Name.DOCUMENT, element.getElement());
-    System.out.println(element);
   }
 
   @Test
@@ -53,7 +52,6 @@ class LoaderTest {
     PSMLElement element = loader.parse(new StringReader(psml));
     assertNotNull(element);
     assertEquals(Name.PARA, element.getElement());
-    System.out.println(element);
   }
 
   @Test
@@ -66,7 +64,6 @@ class LoaderTest {
     assertEquals(2, element.getNodes().size());
     assertEquals(Name.ITEM, ((PSMLElement) element.getNodes().get(0)).getElement());
     assertEquals(Name.ITEM, ((PSMLElement) element.getNodes().get(1)).getElement());
-    System.out.println(element);
   }
 
 }

@@ -207,7 +207,6 @@ final class MarkdownSerializerTest {
     MarkdownSerializer serializer = new MarkdownSerializer();
     StringWriter out = new StringWriter();
     serializer.serialize(psml, out);
-    System.out.println(out);
   }
 
   @Test
@@ -216,7 +215,6 @@ final class MarkdownSerializerTest {
     MarkdownSerializer serializer = new MarkdownSerializer();
     StringWriter out = new StringWriter();
     serializer.serialize(psml, out);
-    System.out.println(out);
   }
 
   private static String toMarkdown(String text) {
