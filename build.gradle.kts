@@ -2,6 +2,7 @@ plugins {
   id("java-library")
   id("maven-publish")
   jacoco
+  alias(libs.plugins.cyclonedx)
   alias(libs.plugins.jreleaser)
   alias(libs.plugins.sonar)
 }
@@ -67,6 +68,23 @@ tasks.wrapper {
   distributionType = Wrapper.DistributionType.BIN
 }
 
+tasks.cyclonedxBom {
+  includeConfigs.set(listOf("runtimeClasspath"))
+  outputFormat.set("all")
+  outputName.set("${project.name}-${version}-sbom")
+}
+
+val cyclonedxJson = layout.buildDirectory.file(
+  "reports/${project.name}-${version}-sbom.json"
+)
+
+val cyclonedxXml = layout.buildDirectory.file(
+  "reports/${project.name}-${version}-sbom.xml"
+)
+tasks.assemble {
+  dependsOn(tasks.cyclonedxBom)
+}
+
 tasks.test {
   useJUnitPlatform()
   // optional: make sure report generation happens after tests when requested
@@ -92,6 +110,19 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
+
+      artifact(cyclonedxJson) {
+        builtBy(tasks.cyclonedxBom)
+        classifier = "sbom"
+        extension = "json"
+      }
+
+      artifact(cyclonedxXml) {
+        builtBy(tasks.cyclonedxBom)
+        classifier = "sbom"
+        extension = "xml"
+      }
+
       pom {
         name.set(title)
         description.set(project.description)
@@ -107,9 +138,9 @@ publishing {
           url.set("https://www.allette.com.au")
         }
         scm {
-          url.set("git@github.com:pageseeder/${gitName}.git")
-          connection.set("scm:git:git@github.com:pageseeder/${gitName}.git")
-          developerConnection.set("scm:git:git@github.com:pageseeder/${gitName}.git")
+          url.set("https://github.com/pageseeder/${gitName}.git")
+          connection.set("scm:git:https://github.com/pageseeder/${gitName}.git")
+          developerConnection.set("scm:git:ssh://git@github.com/pageseeder/${gitName}.git")
         }
         developers {
           developer {
