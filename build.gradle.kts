@@ -69,9 +69,8 @@ tasks.wrapper {
 }
 
 tasks.cyclonedxBom {
-  includeConfigs.set(listOf("runtimeClasspath"))
-  outputFormat.set("all")
-  outputName.set("${project.name}-${version}-sbom")
+  includeConfigs = listOf("runtimeClasspath")
+  outputName = "${project.name}-${version}-sbom"
 }
 
 val cyclonedxJson = layout.buildDirectory.file(
