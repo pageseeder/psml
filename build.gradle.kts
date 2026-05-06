@@ -70,16 +70,8 @@ tasks.wrapper {
 
 tasks.cyclonedxBom {
   includeConfigs = listOf("runtimeClasspath")
-  outputName = "${project.name}-${version}-sbom"
 }
 
-val cyclonedxJson = layout.buildDirectory.file(
-  "reports/${project.name}-${version}-sbom.json"
-)
-
-val cyclonedxXml = layout.buildDirectory.file(
-  "reports/${project.name}-${version}-sbom.xml"
-)
 tasks.assemble {
   dependsOn(tasks.cyclonedxBom)
 }
@@ -109,19 +101,11 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["java"])
-
-      artifact(cyclonedxJson) {
-        builtBy(tasks.cyclonedxBom)
-        classifier = "sbom"
+      artifact(layout.buildDirectory.file("reports/bom.json")) {
+        classifier = "cyclonedx"
         extension = "json"
-      }
-
-      artifact(cyclonedxXml) {
         builtBy(tasks.cyclonedxBom)
-        classifier = "sbom"
-        extension = "xml"
       }
-
       pom {
         name.set(title)
         description.set(project.description)
