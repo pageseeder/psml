@@ -19,6 +19,7 @@ class NumberedTOCGeneratorTest {
   void testAutoNumbering() throws IOException, XRefLoopException {
     DocumentTree root = new DocumentTree.Builder(1).title("T")
         .part(h1("T", "1", 1,
+            toc(),
             phantom(2,
                 ref(1, "A", "2", 100L),
                 ref(1, "B", "2", 101L)))).build().normalize(TitleCollapse.auto);

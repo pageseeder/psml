@@ -6,6 +6,7 @@ package org.pageseeder.psml.process;
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.toc.*;
 import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+import org.pageseeder.psml.util.RelativePaths;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 import java.io.IOException;
@@ -47,12 +48,47 @@ public class NumberedTOCGenerator {
   private int openElements = 0;
 
   /**
+   * External folders format N [= 0 "_", > 0 ""][local|external][<= 1 "", > 1 "N"]
+   */
+  private int externalFolders = 0;
+
+  /**
+   * The export context (used to compute relative paths).
+   */
+  private @Nullable String exportContext = null;
+
+  /**
+   * The group context (used to compute relative paths).
+   */
+  private @Nullable String groupContext = null;
+
+  /**
+   * The PageSeeder site prefix (used to compute relative paths).
+   */
+  private @Nullable String sitePrefix = "/ps";
+
+  /**
    * Constructor
    *
    * @param tree The tree for the TOC
    */
   public NumberedTOCGenerator(PublicationTree tree) {
     this.publicationTree = tree;
+  }
+
+  /**
+   * Set relative paths for href generation
+   *
+   * @param exportCtxt the export context (URL encoded)
+   * @param groupCtxt  the export group context (URL encoded)
+   * @param extFolders the format N [= 0 "_", gt 0 ""][local|external][le 1 "", gt 1 "N"]
+   * @param sitePrefix the pageseeder site prefix
+   */
+  public void setRelativePaths(String exportCtxt, String groupCtxt, int extFolders, String sitePrefix) {
+    this.exportContext = exportCtxt;
+    this.groupContext = groupCtxt;
+    this.externalFolders = extFolders;
+    this.sitePrefix = sitePrefix;
   }
 
   /**
@@ -271,6 +307,11 @@ public class NumberedTOCGenerator {
     // only output idref if there is a corresponding heading
     if (!DocumentTree.NO_FRAGMENT.equals(target.titlefragment())) {
       xml.attribute("idref", treeid + "-" + count + "-" + target.titlefragment() + "-1");
+    }
+    if (this.exportContext != null && this.groupContext != null && this.sitePrefix != null && target.path() != null) {
+      String folder = this.publicationTree.root().path().replaceFirst("/[^/]*$", "");
+      xml.attribute("href", RelativePaths.relativiseFullPath(target.path(), folder,
+              this.exportContext, this.groupContext, this.externalFolders, this.sitePrefix));
     }
   }
 
