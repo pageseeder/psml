@@ -109,13 +109,13 @@ public final class XMLUtils {
    *
    * @throws ProcessException if creating the transformer failed
    */
-  public static Transformer createTransformer(File xslt, @Nullable ErrorListener listener) throws ProcessException {
+  public static Templates createTemplates(File xslt, @Nullable ErrorListener listener) throws ProcessException {
     try {
       TransformerFactory factory = TransformerFactory.newInstance();
       if (listener != null) {
         factory.setErrorListener(listener);
       }
-      return factory.newTemplates(new StreamSource(xslt)).newTransformer();
+      return factory.newTemplates(new StreamSource(xslt));
     } catch (TransformerConfigurationException e) {
       throw new ProcessException("Failed to load XSLT stylesheet: " + e.getMessageAndLocation(), e);
     } catch (TransformerFactoryConfigurationError e) {

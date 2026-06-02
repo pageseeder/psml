@@ -10,9 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
+import javax.xml.transform.*;
 
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.ProcessException;
@@ -140,12 +138,8 @@ public final class XSLTTransformer {
       logger.debug("Transform: Loading XSLT script {}", xslt.getAbsolutePath());
       listener = new XSLTErrorListener(logger);
     }
-    Transformer transformer = XMLUtils.createTransformer(xslt, listener);
-    transformer.setErrorListener(listener);
+    Templates templates = XMLUtils.createTemplates(xslt, listener);
     Map<String, String> params = this.transformationDetails.getParams();
-    for (Map.Entry<String, String> p : params.entrySet()) {
-      transformer.setParameter(p.getKey(), p.getValue());
-    }
     // find schema to validate output
     URL schema = null;
     if (validate) {
@@ -177,10 +171,16 @@ public final class XSLTTransformer {
           logger.debug("Transform: Transforming file {}", relPath);
         // run xslt script
         try {
+          Transformer transformer = templates.newTransformer();
+          for (Map.Entry<String, String> p : params.entrySet()) {
+            transformer.setParameter(p.getKey(), p.getValue());
+          }
           XMLUtils.transform(psmlFiles.get(relPath), output, transformer, schema, null, null);
         } catch (ProcessException ex) {
           if (this.failOnError) throw ex;
           else if (this.logger != null) this.logger.error(ex.getMessage());
+        } catch (TransformerConfigurationException ex) {
+            throw new ProcessException(ex);
         }
       } else if (moveAll) {
         // move/copy it then
