@@ -708,7 +708,11 @@ public class ProcessTest {
   void testTexConverter() throws IOException, ProcessException {
     //String tex = "y = x ^ 2";
     //String tex = "\\frac{2}{3}";
-    //String tex = "\\begin{aligned}a&=b+c\\\\a-c&=b\\end{aligned}";
+    //String tex2 = "\\begin{aligned}a&=b+c\\\\a-c&=b\\end{aligned}";
+    //String tex = "\\begin{aligned}\n" +
+    //        "a&=b+c\\\\\n" +
+    //        "a-c&=b\n" +
+    //        "\\end{aligned}";
     //String tex = "\\begin{eqnarray*}\n" +
     //    "a   &=& b+c\\\\\n" +
     //    "a-c &=& b\n" +
@@ -723,8 +727,11 @@ public class ProcessTest {
     //  String tex = "10=-2x+" + (10000 - i);
     //  TexConverter.convert(tex);
     //}
+    //String expected = TexConverter.convert(tex2);
+    //System.out.println(expected);
     String tex = "10=-2 (x+6)";
     String actual = TexConverter.convert(tex);
+    //System.out.println(actual);
     String expected = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\"><mrow><mn>10</mn><mo>=</mo><mo>−</mo><mn>2</mn><mo stretchy=\"false\">(</mo><mi>x</mi><mo>+</mo><mn>6</mn><mo stretchy=\"false\">)</mo></mrow></math>";
     try {
       assertThat(actual, CompareMatcher.isSimilarTo(expected).normalizeWhitespace());
