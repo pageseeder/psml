@@ -742,6 +742,25 @@ public class ProcessTest {
   }
 
   @Test
+  void testTexConverterWithBr() throws IOException, ProcessException {
+    String tex2 = "\\begin{aligned}a&=b+c\\\\a-c&=b\\end{aligned}";
+    String tex = "\\begin{aligned}<br/>" +
+            " a&=b+c\\\\<br/>" +
+            " a-c&=b<br/>" +
+            "\\end{aligned}";
+    String expected = TexConverter.convert(tex2);
+    //System.out.println(expected);
+    String actual = TexConverter.convert(tex);
+    //System.out.println(actual);
+    try {
+      assertThat(actual, CompareMatcher.isSimilarTo(expected).normalizeWhitespace());
+    } catch (AssertionError error) {
+      System.out.println(actual);
+      throw error;
+    }
+  }
+
+  @Test
   void testTexConvert() throws IOException, ProcessException {
     String filename = "katex_conversion.psml";
     String filename_expected = "katex_conversion_result.psml";

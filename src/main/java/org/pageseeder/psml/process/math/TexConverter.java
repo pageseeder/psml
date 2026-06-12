@@ -51,7 +51,7 @@ public final class TexConverter {
     // sanity check
     if (input == null || input.trim().isEmpty()) return "";
 
-    input = input.trim();
+    input = input.replace("<br/>", " ").trim();
 
     // check cache
     String result = cache.get(input);
