@@ -718,12 +718,17 @@ public final class PSMLProcessHandler extends DefaultHandler {
   @Override
   public void startElement(@Nullable String uri, String localName, String qName, Attributes atts) throws SAXException {
     boolean noNamespace = uri == null || uri.isEmpty();
-    // if converting asciimath or tex, abort conversion due to nested element
+    // if converting asciimath or tex, abort conversion due to nested element (except <br/> in Tex)
     if (this.convertContent != null) {
-      this.elements.push("inline");
-      write("<inline label=\"" + (this.convertingAsciimath ? "asciimath" : "tex") + "\">");
-      write(XMLStrings.text(this.convertContent.toString()));
-      this.convertContent = null;
+      if (!this.convertingAsciimath && "br".equals(qName)) {
+        this.convertContent.append(" ");
+        return;
+      } else {
+        this.elements.push("inline");
+        write("<inline label=\"" + (this.convertingAsciimath ? "asciimath" : "tex") + "\">");
+        write(XMLStrings.text(this.convertContent.toString()));
+        this.convertContent = null;
+      }
     }
     // load URI ID of root document
     if (this.uriID == null && noNamespace && "document".equals(qName)) {
@@ -946,6 +951,9 @@ public final class PSMLProcessHandler extends DefaultHandler {
 
   @Override
   public void endElement(@Nullable String uri, String localName, String qName) throws SAXException {
+    // ignore <br/> if converting Tex content
+    if (this.convertContent != null && !this.convertingAsciimath && "br".equals(qName)) return;
+
     // placeholder content
     if (this.placeholderContent != null) {
       if ("placeholder".equals(qName)) {

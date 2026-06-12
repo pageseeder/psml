@@ -104,6 +104,59 @@
         </inline>
       </para>
     </fragment>
+    <fragment id="9">
+    <para>BR elements:
+      <xref frag="media" type="math" config="mathml">
+        <media-fragment id="media" mediatype="application/mathml+xml">
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <mtable columnalign="right left"
+                    columnspacing="0em"
+                    rowspacing="0.25em">
+              <mtr>
+                <mtd>
+                  <mstyle displaystyle="true" scriptlevel="0">
+                    <mi>a</mi>
+                  </mstyle>
+                </mtd>
+                <mtd>
+                  <mstyle displaystyle="true" scriptlevel="0">
+                    <mrow>
+                      <mrow/>
+                      <mo>=</mo>
+                      <mi>b</mi>
+                      <mo>+</mo>
+                      <mi>c</mi>
+                    </mrow>
+                  </mstyle>
+                </mtd>
+              </mtr>
+              <mtr>
+                <mtd>
+                  <mstyle displaystyle="true" scriptlevel="0">
+                    <mrow>
+                      <mi>d</mi>
+                      <mo>+</mo>
+                      <mi>e</mi>
+                    </mrow>
+                  </mstyle>
+                </mtd>
+                <mtd>
+                  <mstyle displaystyle="true" scriptlevel="0">
+                    <mrow>
+                      <mrow/>
+                      <mo>=</mo>
+                      <mi>f</mi>
+                    </mrow>
+                  </mstyle>
+                </mtd>
+              </mtr>
+            </mtable>
+          </math>
+        </media-fragment>
+      </xref>
+      .
+    </para>
+    </fragment>
     <media-fragment id="3" mediatype="application/mathml+xml">
       <math xmlns="http://www.w3.org/1998/Math/MathML">
         <mrow>

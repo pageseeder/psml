@@ -6,6 +6,7 @@
     </fragment>
   <fragment id="2"><para>This document contains some Katex: <inline label="tex">E = \frac{mc^2}{\sqrt{1-\frac{v^2}{c^2}}}</inline>.</para><para>And more: <inline label="tex">\frac{2}{1+\frac{2}{1+\frac{2}{1}}}</inline>.</para></fragment>
   <fragment id="4"><para>Nested inline: <inline label="tex">xyz<inline label="tex">c = \pm\sqrt{a^2 + b^2}</inline>.</inline></para></fragment>
+  <fragment id="9"><para>BR elements: <inline label="tex">\begin{aligned}<br/>a&amp;=b+c \\<br/>d+e&amp;=f<br/>\end{aligned}</inline>.</para></fragment>
   <media-fragment id="3" mediatype="application/x-tex">c = \pm\sqrt{a^2 + b^2}</media-fragment>
   <media-fragment id="5" mediatype="application/x-tex">\frac{1}{(\sqrt{\phi \sqrt{5}}-\phi) e^{\frac{2}{5} \pi}} = 1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}} {1+\frac{e^{-6\pi}} {1+\frac{e^{-8\pi}} {1+\cdots} } } }</media-fragment>
   <media-fragment id="6" mediatype="application/x-tex">
