@@ -121,6 +121,7 @@ public final class ShiftLeftFilter extends DiffFilter<XMLToken> {
   private int shiftOperations() {
     int shift = 0;
     int p = this.operations.size()-1;
+    if (p - this.lastOperatorCount < 0) return shift;
     Operation<XMLToken> lastChanged = this.operations.get(p);
     Operation<XMLToken> lastUnchanged = this.operations.get(p-this.lastOperatorCount);
     while (p >= 0 && lastUnchanged.operator() == Operator.MATCH && lastChanged.token().equals(lastUnchanged.token())) {

@@ -30,6 +30,17 @@ class ShiftLeftFilterTest {
 
   // --- no-shift cases -------------------------------------------------------
 
+  /**
+   * When the diff sequence opens with 2+ non-MATCH tokens and no preceding MATCH exists,
+   * {@code p - lastOperatorCount} would be -1. The early-return guard must prevent an
+   * {@link IndexOutOfBoundsException}.
+   */
+  @Test
+  void handle_changesAtStart_noShift() {
+    assertNoChange("+a", "+b", "c");
+    assertNoChange("+<li>", "+text", "+</li>", "d");
+  }
+
   @Test
   void handle_allMatch_unchanged() {
     assertNoChange("<ul>", "<li>", "text", "</li>", "</ul>");
