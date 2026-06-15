@@ -78,7 +78,9 @@ tasks.assemble {
 
 tasks.test {
   useJUnitPlatform()
-  // optional: make sure report generation happens after tests when requested
+  // Rhino's bytecode compiler (BodyCodegen) recurses deeply when compiling the KaTeX bundle.
+  // The default 512 KB thread stack is enough on macOS but too small on Linux CI runners.
+  jvmArgs("-Xss4m")
   finalizedBy(tasks.jacocoTestReport)
 }
 
