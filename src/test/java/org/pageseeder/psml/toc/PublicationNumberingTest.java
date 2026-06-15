@@ -3,9 +3,328 @@ package org.pageseeder.psml.toc;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.pageseeder.psml.toc.FragmentNumbering.Prefix;
+import org.pageseeder.psml.toc.PublicationNumbering.ElementName;
 import org.pageseeder.psml.toc.PublicationNumbering.NumberType;
+import org.pageseeder.psml.toc.PublicationNumbering.SkippedLevels;
 
 final class PublicationNumberingTest {
+
+  // ---------------------------------------------------------------------------
+  // NumberType enum
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testNumberTypeFromString_knownValues() {
+    assertEquals(NumberType.DECIMAL,    NumberType.fromString("decimal"));
+    assertEquals(NumberType.LOWERALPHA, NumberType.fromString("loweralpha"));
+    assertEquals(NumberType.UPPERALPHA, NumberType.fromString("upperalpha"));
+    assertEquals(NumberType.LOWERROMAN, NumberType.fromString("lowerroman"));
+    assertEquals(NumberType.UPPERROMAN, NumberType.fromString("upperroman"));
+  }
+
+  @Test
+  void testNumberTypeFromString_unknownDefaultsToDecimal() {
+    assertEquals(NumberType.DECIMAL, NumberType.fromString("unknown"));
+    assertEquals(NumberType.DECIMAL, NumberType.fromString(""));
+  }
+
+  @Test
+  void testNumberTypeToString() {
+    assertEquals("decimal",    NumberType.DECIMAL.toString());
+    assertEquals("loweralpha", NumberType.LOWERALPHA.toString());
+    assertEquals("upperalpha", NumberType.UPPERALPHA.toString());
+    assertEquals("lowerroman", NumberType.LOWERROMAN.toString());
+    assertEquals("upperroman", NumberType.UPPERROMAN.toString());
+  }
+
+  // ---------------------------------------------------------------------------
+  // ElementName enum
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testElementNameFromString_knownValues() {
+    assertEquals(ElementName.HEADING, ElementName.fromString("heading"));
+    assertEquals(ElementName.PARA,    ElementName.fromString("para"));
+    assertEquals(ElementName.ANY,     ElementName.fromString("any"));
+  }
+
+  @Test
+  void testElementNameFromString_unknownDefaultsToHeading() {
+    assertEquals(ElementName.HEADING, ElementName.fromString("unknown"));
+    assertEquals(ElementName.HEADING, ElementName.fromString(""));
+  }
+
+  @Test
+  void testElementNameToString() {
+    assertEquals("heading", ElementName.HEADING.toString());
+    assertEquals("para",    ElementName.PARA.toString());
+    assertEquals("any",     ElementName.ANY.toString());
+  }
+
+  // ---------------------------------------------------------------------------
+  // SkippedLevels enum
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testSkippedLevelsFromString() {
+    assertEquals(SkippedLevels.ONE,  SkippedLevels.fromString("1"));
+    assertEquals(SkippedLevels.ZERO, SkippedLevels.fromString("0"));
+    assertEquals(SkippedLevels.STRIP, SkippedLevels.fromString("strip"));
+  }
+
+  @Test
+  void testSkippedLevelsFromString_unknownDefaultsToOne() {
+    assertEquals(SkippedLevels.ONE, SkippedLevels.fromString("unknown"));
+    assertEquals(SkippedLevels.ONE, SkippedLevels.fromString(""));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Label and SkippedLevels accessors
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testSetGetLabel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    assertEquals("", pn.getLabel());
+    pn.setLabel("chapter");
+    assertEquals("chapter", pn.getLabel());
+  }
+
+  @Test
+  void testSetLabelNull_throws() {
+    PublicationNumbering pn = new PublicationNumbering();
+    assertThrows(IllegalArgumentException.class, () -> pn.setLabel(null));
+  }
+
+  @Test
+  void testSetGetSkippedLevels() {
+    PublicationNumbering pn = new PublicationNumbering();
+    assertEquals(SkippedLevels.ONE, pn.getSkippedLevels());
+    pn.setSkippedLevels(SkippedLevels.ZERO);
+    assertEquals(SkippedLevels.ZERO, pn.getSkippedLevels());
+    pn.setSkippedLevels(SkippedLevels.STRIP);
+    assertEquals(SkippedLevels.STRIP, pn.getSkippedLevels());
+  }
+
+  // ---------------------------------------------------------------------------
+  // addNumberFormat / getNumberFormat
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testAddGetNumberFormat() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addNumberFormat(1, null, "[1].");
+    assertEquals("[1].", pn.getNumberFormat(1, ""));
+    assertNull(pn.getNumberFormat(2, ""));
+  }
+
+  @Test
+  void testAddGetNumberFormat_withBlocklabel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addNumberFormat(2, "chapter", "[1].[2].");
+    assertEquals("[1].[2].", pn.getNumberFormat(2, "chapter"));
+    assertNull(pn.getNumberFormat(2, ""));
+  }
+
+  // ---------------------------------------------------------------------------
+  // addNumberType / getNumberType
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testGetNumberType_fallsBackToNoBlocklabel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addNumberType(1, null, "lowerroman");
+    // exact blocklabel match
+    assertEquals(NumberType.LOWERROMAN, pn.getNumberType(1, ""));
+    // unknown blocklabel falls back to no-blocklabel entry
+    assertEquals(NumberType.LOWERROMAN, pn.getNumberType(1, "chapter"));
+  }
+
+  @Test
+  void testGetNumberType_blocklabelTakesPrecedence() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addNumberType(1, null, "decimal");
+    pn.addNumberType(1, "chapter", "upperalpha");
+    assertEquals(NumberType.UPPERALPHA, pn.getNumberType(1, "chapter"));
+    assertEquals(NumberType.DECIMAL,    pn.getNumberType(1, ""));
+  }
+
+  @Test
+  void testGetNumberType_returnsNullWhenNotConfigured() {
+    PublicationNumbering pn = new PublicationNumbering();
+    assertNull(pn.getNumberType(1, ""));
+  }
+
+  // ---------------------------------------------------------------------------
+  // addRestart / hasRestart / hasRestarts
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testHasRestarts_emptyByDefault() {
+    assertFalse(new PublicationNumbering().hasRestarts());
+  }
+
+  @Test
+  void testAddHasRestart() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addRestart(2, "chapter");
+    assertTrue(pn.hasRestarts());
+    assertTrue(pn.hasRestart(2, "chapter"));
+    assertFalse(pn.hasRestart(2, ""));
+    assertFalse(pn.hasRestart(1, "chapter"));
+  }
+
+  @Test
+  void testAddRestart_nullBlocklabel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addRestart(1, null);
+    assertTrue(pn.hasRestart(1, ""));
+  }
+
+  // ---------------------------------------------------------------------------
+  // hasScheme
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testHasScheme_exactMatch() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addElement(1, "chapter", "heading");
+    assertTrue(pn.hasScheme(1, "chapter", "heading"));
+    assertFalse(pn.hasScheme(1, "chapter", "para"));
+    assertFalse(pn.hasScheme(2, "chapter", "heading"));
+  }
+
+  @Test
+  void testHasScheme_any_matchesAll() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addElement(1, null, "any");
+    assertTrue(pn.hasScheme(1, "", "heading"));
+    assertTrue(pn.hasScheme(1, "", "para"));
+  }
+
+  @Test
+  void testHasScheme_fallsBackToNoBlocklabel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addElement(1, null, "heading");
+    // blocklabel "chapter" has no entry → should fall back to no-blocklabel entry
+    assertTrue(pn.hasScheme(1, "chapter", "heading"));
+    assertFalse(pn.hasScheme(1, "chapter", "para"));
+  }
+
+  @Test
+  void testHasScheme_returnsFalseWhenNotConfigured() {
+    assertFalse(new PublicationNumbering().hasScheme(1, "", "heading"));
+  }
+
+  // ---------------------------------------------------------------------------
+  // numbering – DECIMAL and zero
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testNumberingDecimal() {
+    assertEquals("0",  PublicationNumbering.numbering(0, NumberType.DECIMAL));
+    assertEquals("1",  PublicationNumbering.numbering(1, NumberType.DECIMAL));
+    assertEquals("10", PublicationNumbering.numbering(10, NumberType.DECIMAL));
+  }
+
+  @Test
+  void testNumberingZero_alwaysReturnsZero() {
+    // value == 0 short-circuits to "0" regardless of type
+    assertEquals("0", PublicationNumbering.numbering(0, NumberType.LOWERALPHA));
+    assertEquals("0", PublicationNumbering.numbering(0, NumberType.LOWERROMAN));
+  }
+
+  // ---------------------------------------------------------------------------
+  // getPrefix – no scheme (canonical pass-through)
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testGetPrefix_noScheme_canonical() {
+    PublicationNumbering pn = new PublicationNumbering();
+    Prefix p = pn.getPrefix("1.", "");
+    assertEquals("1.", p.value);
+    assertEquals("1.", p.canonical);
+    assertEquals(1,    p.level);
+    assertNull(p.parentNumber);
+  }
+
+  @Test
+  void testGetPrefix_noScheme_multiLevel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    Prefix p = pn.getPrefix("2.3", "");
+    assertEquals("2.3.", p.value);
+    assertEquals("2.3",  p.canonical);
+    assertEquals(2,      p.level);
+  }
+
+  // ---------------------------------------------------------------------------
+  // getPrefix – with scheme
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testGetPrefix_withScheme_singleLevel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    // separators go inside the brackets: "[1.]" → "3."
+    pn.addNumberFormat(1, null, "[1.]");
+    Prefix p = pn.getPrefix("3.", "");
+    assertEquals("3.", p.value);
+    assertEquals("3.", p.canonical);
+    assertEquals(1,    p.level);
+    assertNull(p.parentNumber);
+  }
+
+  @Test
+  void testGetPrefix_withScheme_multiLevel() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.addNumberFormat(2, null, "[1.][2.]");
+    Prefix p = pn.getPrefix("2.3", "");
+    assertEquals("2.3.", p.value);
+    assertEquals(2,      p.level);
+  }
+
+  @Test
+  void testGetPrefix_withScheme_parentNumber() {
+    PublicationNumbering pn = new PublicationNumbering();
+    // level-2 scheme references only level-2 → level-1 is computed as parentNumber
+    pn.addNumberFormat(1, null, "[1.]");
+    pn.addNumberFormat(2, null, "[2.]");
+    Prefix p = pn.getPrefix("2.3", "");
+    assertEquals("3.", p.value);
+    assertEquals("2.", p.parentNumber);
+  }
+
+  // ---------------------------------------------------------------------------
+  // getPrefix – SkippedLevels.STRIP
+  // ---------------------------------------------------------------------------
+
+  @Test
+  void testGetPrefix_stripSkippedLevels_noScheme() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.setSkippedLevels(SkippedLevels.STRIP);
+    // "0.3." → leading zero level stripped → "3."
+    Prefix p = pn.getPrefix("0.3", "");
+    assertEquals("3.", p.value);
+  }
+
+  @Test
+  void testGetPrefix_stripSkippedLevels_middleZero_noScheme() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.setSkippedLevels(SkippedLevels.STRIP);
+    // "2.0.1." → middle zero stripped → "2.1."
+    Prefix p = pn.getPrefix("2.0.1", "");
+    assertEquals("2.1.", p.value);
+  }
+
+  @Test
+  void testGetPrefix_stripSkippedLevels_withScheme() {
+    PublicationNumbering pn = new PublicationNumbering();
+    pn.setSkippedLevels(SkippedLevels.STRIP);
+    // scheme references levels 1 and 2; value at level 2 is 0 → stripped
+    pn.addNumberFormat(2, null, "[1.][2.]");
+    Prefix p = pn.getPrefix("3.0", "");
+    assertEquals("3.", p.value);
+  }
 
   @Test
   void testLowerRoman() {

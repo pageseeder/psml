@@ -855,7 +855,7 @@ public class ProcessTest {
     // check result
     File result = new File(DEST_FOLDER + "/" + filename);
     String xml = new String(Files.readAllBytes(result.toPath()), StandardCharsets.UTF_8);
-    System.out.println(xml);
+//    System.out.println(xml);
     // validate
     assertThat(Tests.toDOMSource(new StringReader(xml)), new Validates(getSchema("psml-processed.xsd")));
     // test xpaths

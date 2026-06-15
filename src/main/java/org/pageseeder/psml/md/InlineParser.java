@@ -42,42 +42,42 @@ public class InlineParser {
   /**
    * Bold text: <code>**text**</code>
    */
-  private static final String DOUBLE_EMPHASIS = "(\\*\\*(.*?)\\*\\*)";
+  private static final String DOUBLE_EMPHASIS = "(\\*\\*([^*]*)\\*\\*)";
 
   /**
    * Italic text: <code>*text*</code>
    */
-  private static final String EMPHASIS = "(\\*(.*?)\\*)";
+  private static final String EMPHASIS = "(\\*([^*]*)\\*)";
 
   /**
    * Bold text: <code>__text__</code>
    */
-  private static final String DOUBLE_UNDERSCORE = "(__(.*?)__)";
+  private static final String DOUBLE_UNDERSCORE = "(__([^_]*)__)";
 
   /**
    * Italic text: <code>_text_</code>
    */
-  private static final String UNDERSCORE = "(\\b_(.*?)_\\b)";
+  private static final String UNDERSCORE = "(\\b_([^_]*)_\\b)";
 
   /**
    * Escaped code: <code>``code``</code>
    */
-  private static final String CODE_ESCAPE = "(``\\s?(.*?)\\s?``)";
+  private static final String CODE_ESCAPE = "(``\\s?((?:[^`]|`(?!`))*)\\s?``)";
 
   /**
    * Code: <code>`code`</code>
    */
-  private static final String CODE = "(`(.*?)`)";
+  private static final String CODE = "(`([^`]*)`)";
 
   /**
    * Image: <code>![alt](src)</code>
    */
-  private static final String IMAGE = "(\\!\\[(.*?)\\]\\((.*?)\\))";
+  private static final String IMAGE = "(\\!\\[([^\\]]*)\\]\\(([^)]*)\\))";
 
   /**
    * References: <code>[title](url)</code>
    */
-  private static final String REF = "(\\[(.*?)\\]\\((.*?)\\))";
+  private static final String REF = "(\\[([^\\]]*)\\]\\(([^)]*)\\))";
 
   /**
    * Explicit links:
@@ -85,7 +85,7 @@ public class InlineParser {
    *  <code>&lt;https://[url]&gt;</code>
    *  or <code>&lt;mailto:[email]&gt;</code>
    */
-  private static final String LINK = "(<((https?://|mailto:)(.*?))>)";
+  private static final String LINK = "(<((https?://|mailto:)([^>]*))>)";
 
   /**
    * Autolinks when text starts with <code>http://</code> or <code>https://</code>
@@ -152,7 +152,7 @@ public class InlineParser {
         nodes.add(element);
       }
       // Normal emphases with '*' (appear in italic)
-      if (m.group(5) != null) {
+      else if (m.group(5) != null) {
         PSMLElement element = new PSMLElement(Name.ITALIC);
         element.addNodes(parse(m.group(6)));
         nodes.add(element);
@@ -163,16 +163,16 @@ public class InlineParser {
         element.addNodes(parse(m.group(8)));
         nodes.add(element);
       }
-      // Code with '`'
+      // Code escape with '``'
       else if (m.group(9) != null) {
-        String code = m.group(10);
+        String code = m.group(10).strip();
         PSMLElement monospace = new PSMLElement(Name.MONOSPACE);
         if (!code.isEmpty()) {
           monospace.addNode(new PSMLText(code));
         }
         nodes.add(monospace);
       }
-      // Code escape with '``'
+      // Code with '`'
       else if (m.group(11) != null) {
         String code = m.group(12);
         PSMLElement monospace = new PSMLElement(Name.MONOSPACE);

@@ -25,7 +25,7 @@ import java.util.*;
  * @author Philip Rutherford
  * @author Christophe Lauret
  *
- * @version 1.7.0
+ * @version 1.8.3
  * @since 1.0
  */
 public final class PSMLProcessHandler2 extends DefaultHandler {
@@ -548,7 +548,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         && this.numberingAndTOC != null) {
       // only title with the right tokens
       String title = atts.getValue("title") != null ? atts.getValue("title") : atts.getValue("del:title");
-      if (title != null && title.matches(".*?((\\{prefix})|(\\{heading})|(\\{parentnumber})).*?")) {
+      if (title != null && (title.contains("{prefix}") || title.contains("{heading}") || title.contains("{parentnumber}"))) {
 
         this.xrefElementChange = "true".equals(atts.getValue("dfx:insert")) ? DiffType.INSERT :
                                  ("true".equals(atts.getValue("dfx:delete")) ? DiffType.DELETE :
@@ -573,9 +573,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           String newParentNumber = prefix == null ? null : prefix.parentNumber;
 
           // set content and title attribute
-          this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : XMLStrings.text(newPrefix))
-                                         .replaceAll("\\{heading}",      newHeading      == null ? "?" : newHeading)
-                                         .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : XMLStrings.text(newParentNumber));
+          this.resolvedXRefTemplate = title.replace("{prefix}",       newPrefix       == null ? "?" : XMLStrings.text(newPrefix))
+                                         .replace("{heading}",      newHeading      == null ? "?" : newHeading)
+                                         .replace("{parentnumber}", newParentNumber == null ? "" : XMLStrings.text(newParentNumber));
         }
       }
     }
@@ -705,51 +705,51 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
     String frag = atts.getValue("frag");
     if (frag == null)
       throw new ProcessException("XRef has no frag attribute.");
-    Integer global_count = 0;
-    Integer local_count = 0;
-    Integer embed_count = 0;
-    Integer[] uri_counts = null;
+    Integer globalCount = 0;
+    Integer localCount = 0;
+    Integer embedCount = 0;
+    Integer[] uriCounts = null;
 
     // if resolved and type is none try to find targets in ancestor sub-hierarchies
     if (uriid != null && "none".equals(type)) {
       List<String> ancestors = new ArrayList<>(this.ancestorUriIDs);
       for (int i = ancestors.size() - 1; i >= 0; i--) {
         String id = ancestors.get(i);
-        Map<String, Integer[]> sub_hierarchy = this.hierarchyUriFragIDs.get(id);
-        if (sub_hierarchy == null) {
+        Map<String, Integer[]> subHierarchy = this.hierarchyUriFragIDs.get(id);
+        if (subHierarchy == null) {
           String message = "Unable to find subhierarchy for URI ID " + id;
           if (this.failOnError) throw new ProcessException(message);
           else this.logger.error(message);
         } else {
-          uri_counts = sub_hierarchy.get(uriid);
-          if (uri_counts != null) {
-            global_count = uri_counts[0];
-            local_count = uri_counts[1];
-            embed_count = uri_counts[2];
+          uriCounts = subHierarchy.get(uriid);
+          if (uriCounts != null) {
+            globalCount = uriCounts[0];
+            localCount = uriCounts[1];
+            embedCount = uriCounts[2];
             this.logger.debug("Hierarchy {} found ID {} globally {}, locally {} and embedded {} times",
-                id, uriid, uri_counts[0], uri_counts[1], uri_counts[2]);
+                id, uriid, uriCounts[0], uriCounts[1], uriCounts[2]);
           }
           // if link to fragment check transcluded fragments
           if (!"default".equals(frag)) {
-            Integer[] frag_counts = sub_hierarchy.get(uriid + "-" + frag);
-            if (frag_counts != null) {
-              global_count = frag_counts[0];
-              local_count = local_count + frag_counts[1];
-              embed_count = embed_count + frag_counts[2];
+            Integer[] fragCounts = subHierarchy.get(uriid + "-" + frag);
+            if (fragCounts != null) {
+              globalCount = fragCounts[0];
+              localCount = localCount + fragCounts[1];
+              embedCount = embedCount + fragCounts[2];
               this.logger.debug("Hierarchy {} found fragment ID {}-{} globally {} times, locally {} and embedded {} times",
-                  id, uriid, frag, frag_counts[0], frag_counts[1], frag_counts[2]);
+                  id, uriid, frag, fragCounts[0], fragCounts[1], fragCounts[2]);
             }
           }
           // if embedded target or single transcluded target found then finished
-          if (embed_count > 0 || local_count == 1) break;
+          if (embedCount > 0 || localCount == 1) break;
         }
       }
     }
 
     // generate correct target href
-    if (local_count > 0) {
+    if (localCount > 0) {
       // if more than 1 embedded target or only multiple transcluded targets generate error
-      if (embed_count > 1 || (embed_count == 0 && local_count > 1)) {
+      if (embedCount > 1 || (embedCount == 0 && localCount > 1)) {
         String message = "Internal link pointing to " + atts.getValue("href") + " (URIID " + uriid +
             ") fragment "+frag+" is ambiguous because this content appears in multiple locations. See xref" +
             (atts.getValue("title") == null ? "" : (" " + atts.getValue("title"))) +
@@ -760,12 +760,12 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
                 this.errorOnAmbiguous, this.warnOnAmbiguous);
       }
       // if target document is embedded, use that instead of transcluded fragment
-      if (uri_counts != null && uri_counts[2] > 0) {
-        global_count = uri_counts[0];
+      if (uriCounts != null && uriCounts[2] > 0) {
+        globalCount = uriCounts[0];
       }
-      this.xrefTargetPosition = global_count;
-      if ("default".equals(frag)) return "#" + (global_count != 1 ? global_count + "_" : "") + uriid;
-      return "#" + (global_count != 1 ? global_count + "_" : "") + uriid + "-" + frag;
+      this.xrefTargetPosition = globalCount;
+      if ("default".equals(frag)) return "#" + (globalCount != 1 ? globalCount + "_" : "") + uriid;
+      return "#" + (globalCount != 1 ? globalCount + "_" : "") + uriid + "-" + frag;
     } else {
       // external, make it relative
       String relpath = atts.getValue("relpath");
@@ -780,7 +780,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    *
    * @return the relative path
    */
-  private static String relativisePath(String path, String currentLocation) {
+  static String relativisePath(String path, String currentLocation) {
     // build relative path
     StringBuilder relative = new StringBuilder();
     String[] pathElements = path.split("/");

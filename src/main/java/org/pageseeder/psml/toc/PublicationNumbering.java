@@ -119,15 +119,17 @@ public final class PublicationNumbering {
      * @return the type
      */
     public static SkippedLevels fromString(String value) {
-      if ("1".equals(value)) return ONE;
-      if ("0".equals(value)) return ZERO;
-      if ("strip".equals(value)) return STRIP;
-      return ONE;
+      switch (value) {
+        case "1": return ONE;
+        case "0": return ZERO;
+        case "strip": return STRIP;
+        default: return ONE;
+      }
     }
   }
 
   /** A pattern for all schemes */
-  private static final Pattern SCHEME_PATTERN = Pattern.compile("\\[(.*?)([0-9]+)(.*?)\\](?![\\]])");
+  private static final Pattern SCHEME_PATTERN = Pattern.compile("\\[([^0-9\\[\\]]*)([0-9]+)([^\\[\\]]*)\\](?!\\])");
   /** A pattern for canonical labels */
   private static final Pattern CANONICAL_PATTERN = Pattern.compile("(\\d+)\\.");
   /** The lowercase alphabet, for convenience */
@@ -328,7 +330,7 @@ public final class PublicationNumbering {
    */
   public Prefix getPrefix(String canonical, String blocklabel) {
     // make sure it always ends with dot
-    String toParse = !canonical.matches("^.*\\.$") ? canonical + '.' : canonical;
+    String toParse = canonical.endsWith(".") ? canonical : canonical + '.';
     // find level
     int level = toParse.split("\\.").length;
     // compute prefix

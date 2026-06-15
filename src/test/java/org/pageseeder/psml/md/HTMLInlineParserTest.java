@@ -113,13 +113,50 @@ final class HTMLInlineParserTest {
   }
 
   @Test
+  void testPlainText() {
+    assertEquals("", toHTML(""));
+    assertEquals("Hello world", toHTML("Hello world"));
+    assertEquals("Hello, world!", toHTML("Hello, world!"));
+    assertEquals("1 + 1 = 2", toHTML("1 + 1 = 2"));
+  }
+
+  @Test
+  void testMixedInline() {
+    assertEquals("<strong>bold</strong> and <em>italic</em>", toHTML("**bold** and *italic*"));
+    assertEquals("<code>code</code> and <strong>bold</strong>", toHTML("`code` and **bold**"));
+    assertEquals("Text <em>italic</em> more <code>code</code> end", toHTML("Text *italic* more `code` end"));
+    assertEquals("<strong>bold</strong> <em>italic</em> <code>code</code>", toHTML("**bold** *italic* `code`"));
+  }
+
+  @Test
   void testImage() {
     assertEquals("<img alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", toHTML("![Alt text](/path/to/img.jpg)"));
+    assertEquals("<img alt=\"\" src=\"/img.jpg\"/>", toHTML("![](/img.jpg)"));
+    assertEquals("before <img alt=\"alt\" src=\"/img.jpg\"/> after", toHTML("before ![alt](/img.jpg) after"));
+  }
+
+  @Test
+  void testImageExternal() {
+    // External images (http/https src) are rendered as links
+    assertEquals("<a href=\"http://example.com/img.png\">Alt text</a>", toHTML("![Alt text](http://example.com/img.png)"));
+    assertEquals("<a href=\"https://example.com/img.png\">Alt text</a>", toHTML("![Alt text](https://example.com/img.png)"));
+    assertEquals("<a href=\"http://example.com/img.png\"/>", toHTML("![](http://example.com/img.png)"));
   }
 
   @Test
   void testRef() {
     assertEquals("<a href=\"http://example.net/\">test</a>", toHTML("[test](http://example.net/)"));
+    assertEquals("<a href=\"http://example.net/\"/>", toHTML("[](http://example.net/)"));
+    assertEquals("before <a href=\"http://example.net/\">test</a> after", toHTML("before [test](http://example.net/) after"));
+  }
+
+  @Test
+  void testRefWithInlineFormatting() {
+    // Inline formatting inside link titles is parsed recursively
+    assertEquals("<a href=\"http://example.org\"><code>printf</code></a>", toHTML("[`printf`](http://example.org)"));
+    assertEquals("<a href=\"http://example.org\"><em>italic</em></a>", toHTML("[*italic*](http://example.org)"));
+    assertEquals("<a href=\"http://example.org\"><strong>bold</strong></a>", toHTML("[**bold**](http://example.org)"));
+    assertEquals("<a href=\"http://example.org\"><strong>bold</strong></a>", toHTML("[__bold__](http://example.org)"));
   }
 
   @Test
