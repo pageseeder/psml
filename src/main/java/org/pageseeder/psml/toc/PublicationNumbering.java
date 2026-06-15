@@ -119,17 +119,14 @@ public final class PublicationNumbering {
      * @return the type
      */
     public static SkippedLevels fromString(String value) {
-      switch (value) {
-        case "1": return ONE;
-        case "0": return ZERO;
-        case "strip": return STRIP;
-        default: return ONE;
-      }
+      if ("0".equals(value)) return ZERO;
+      if ("strip".equals(value)) return STRIP;
+      return ONE;
     }
   }
 
   /** A pattern for all schemes */
-  private static final Pattern SCHEME_PATTERN = Pattern.compile("\\[([^0-9\\[\\]]*)([0-9]+)([^\\[\\]]*)\\](?!\\])");
+  private static final Pattern SCHEME_PATTERN = Pattern.compile("\\[(.*?)([0-9]+)(.*?)\\](?![\\]])");
   /** A pattern for canonical labels */
   private static final Pattern CANONICAL_PATTERN = Pattern.compile("(\\d+)\\.");
   /** The lowercase alphabet, for convenience */
