@@ -780,7 +780,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
    *
    * @return the relative path
    */
-  private static String relativisePath(String path, String currentLocation) {
+  static String relativisePath(String path, String currentLocation) {
     // build relative path
     StringBuilder relative = new StringBuilder();
     String[] pathElements = path.split("/");
