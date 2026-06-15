@@ -102,7 +102,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath0() {
+  void testRelativiseFullPath0() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group/documents/folder";
@@ -115,7 +115,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath1() {
+  void testRelativiseFullPath1() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group/documents/folder";
@@ -128,7 +128,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath2() {
+  void testRelativiseFullPath2() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group/documents";
@@ -141,7 +141,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath3() {
+  void testRelativiseFullPath3() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group/documents/folder2";
@@ -154,7 +154,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath4() {
+  void testRelativiseFullPath4() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group/documents/folder2/subfolder";
@@ -167,7 +167,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath5() {
+  void testRelativiseFullPath5() {
     // simple example
     String parent       = "/ps/project/group/otherdocuments/subfolder";
     String target       = "/ps/project/group/documents/folder/file.psml";
@@ -181,7 +181,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath6() {
+  void testRelativiseFullPath6() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group2/project/group2/documents";
@@ -195,7 +195,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath7() {
+  void testRelativiseFullPath7() {
     // simple example
     String target       = "/ps/project/group2/documents/folder/file.psml";
     String parent       = "/ps/project/group2/documents";
@@ -208,7 +208,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath8() {
+  void testRelativiseFullPath8() {
     // simple example
     String target       = "/ps/project/group2/documents/folder/file.psml";
     String parent       = "/ps/project/group2/documents/subfolder";
@@ -221,7 +221,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath9() {
+  void testRelativiseFullPath9() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group/documents/subfolder";
@@ -234,7 +234,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath10() {
+  void testRelativiseFullPath10() {
     // simple example
     String target       = "/ps/project/group2/documents/folder/file.psml";
     String parent       = "/ps/project/group/documents/subfolder";
@@ -247,7 +247,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath11() {
+  void testRelativiseFullPath11() {
     // simple example
     String target       = "/ps/project/group/otherdocuments/folder/file.psml";
     String parent       = "/ps/project/group/documents/subfolder";
@@ -260,7 +260,7 @@ class RelativePathsTest {
    * Test relative path computation.
    */
   @Test
-  public void testRelativiseFullPath12() {
+  void testRelativiseFullPath12() {
     // simple example
     String target       = "/ps/project/group2/otherdocuments/folder/file.psml";
     String parent       = "/ps/project/group/documents/subfolder/grandchild";
@@ -273,7 +273,7 @@ class RelativePathsTest {
    * Test relative path computation _external to _local.
    */
   @Test
-  public void testRelativiseFullPath13() {
+  void testRelativiseFullPath13() {
     // simple example
     String target       = "/ps/project/group/otherdocuments/folder/file.psml";
     String parent       = "/ps/project/group2/documents/subfolder/grandchild";
@@ -286,7 +286,7 @@ class RelativePathsTest {
    * Test relative path computation _local to _external.
    */
   @Test
-  public void testRelativiseFullPath14() {
+  void testRelativiseFullPath14() {
     // simple example
     String target       = "/ps/project/group2/otherdocuments/folder/file.psml";
     String parent       = "/ps/project/group/otherdocuments/subfolder/grandchild";
@@ -299,7 +299,7 @@ class RelativePathsTest {
    * Test relative path computation _external to context.
    */
   @Test
-  public void testRelativiseFullPath15() {
+  void testRelativiseFullPath15() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group2/documents/subfolder/grandchild";
@@ -312,7 +312,7 @@ class RelativePathsTest {
    * Test relative path computation _local to context.
    */
   @Test
-  public void testRelativiseFullPath16() {
+  void testRelativiseFullPath16() {
     // simple example
     String target       = "/ps/project/group/documents/folder/file.psml";
     String parent       = "/ps/project/group/otherdocuments/subfolder/grandchild";
@@ -325,7 +325,7 @@ class RelativePathsTest {
    * Test direct relative path computation.
    */
   @Test
-  public void testRelativise1() {
+  void testRelativise1() {
     // simple example
     String target = "/ps/project/group2/documents/folder/file.psml";
     String parent = "/ps/project/group2/documents/subfolder";
@@ -336,7 +336,7 @@ class RelativePathsTest {
    * Test direct relative path computation.
    */
   @Test
-  public void testRelativise2() {
+  void testRelativise2() {
     // simple example
     String target = "/ps/project/group2/documents/folder/file.psml";
     String parent = "/ps/project/group2/documents";
@@ -347,7 +347,7 @@ class RelativePathsTest {
    * Test direct relative path computation.
    */
   @Test
-  public void testRelativise3() {
+  void testRelativise3() {
     // simple example
     String target = "/ps/project/group2/documents/folder/file.psml";
     String parent = "/ps/project/group2/documents/subfolder/something/else";
@@ -358,7 +358,7 @@ class RelativePathsTest {
    * Test direct relative path computation.
    */
   @Test
-  public void testRelativise4() {
+  void testRelativise4() {
     // simple example
     String target = "/something/file.psml";
     String parent = "/something/else/altogether";
