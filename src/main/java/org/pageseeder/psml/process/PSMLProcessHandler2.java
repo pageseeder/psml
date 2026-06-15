@@ -25,7 +25,7 @@ import java.util.*;
  * @author Philip Rutherford
  * @author Christophe Lauret
  *
- * @version 1.7.0
+ * @version 1.8.3
  * @since 1.0
  */
 public final class PSMLProcessHandler2 extends DefaultHandler {
@@ -548,7 +548,7 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
         && this.numberingAndTOC != null) {
       // only title with the right tokens
       String title = atts.getValue("title") != null ? atts.getValue("title") : atts.getValue("del:title");
-      if (title != null && title.matches(".*?((\\{prefix})|(\\{heading})|(\\{parentnumber})).*?")) {
+      if (title != null && (title.contains("{prefix}") || title.contains("{heading}") || title.contains("{parentnumber}"))) {
 
         this.xrefElementChange = "true".equals(atts.getValue("dfx:insert")) ? DiffType.INSERT :
                                  ("true".equals(atts.getValue("dfx:delete")) ? DiffType.DELETE :
@@ -573,9 +573,9 @@ public final class PSMLProcessHandler2 extends DefaultHandler {
           String newParentNumber = prefix == null ? null : prefix.parentNumber;
 
           // set content and title attribute
-          this.resolvedXRefTemplate = title.replaceAll("\\{prefix}",       newPrefix       == null ? "?" : XMLStrings.text(newPrefix))
-                                         .replaceAll("\\{heading}",      newHeading      == null ? "?" : newHeading)
-                                         .replaceAll("\\{parentnumber}", newParentNumber == null ? "" : XMLStrings.text(newParentNumber));
+          this.resolvedXRefTemplate = title.replace("{prefix}",       newPrefix       == null ? "?" : XMLStrings.text(newPrefix))
+                                         .replace("{heading}",      newHeading      == null ? "?" : newHeading)
+                                         .replace("{parentnumber}", newParentNumber == null ? "" : XMLStrings.text(newParentNumber));
         }
       }
     }
