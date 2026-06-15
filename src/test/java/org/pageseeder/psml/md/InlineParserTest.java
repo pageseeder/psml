@@ -115,13 +115,59 @@ final class InlineParserTest {
   }
 
   @Test
+  void testPlainText() {
+    assertEquals("", toPSML(""));
+    assertEquals("Hello world", toPSML("Hello world"));
+    assertEquals("Hello, world!", toPSML("Hello, world!"));
+    assertEquals("1 + 1 = 2", toPSML("1 + 1 = 2"));
+  }
+
+  @Test
+  void testMixedInline() {
+    assertEquals("<bold>bold</bold> and <italic>italic</italic>", toPSML("**bold** and *italic*"));
+    assertEquals("<monospace>code</monospace> and <bold>bold</bold>", toPSML("`code` and **bold**"));
+    assertEquals("Text <italic>italic</italic> more <monospace>code</monospace> end", toPSML("Text *italic* more `code` end"));
+    assertEquals("<bold>bold</bold> <italic>italic</italic> <monospace>code</monospace>", toPSML("**bold** *italic* `code`"));
+  }
+
+  @Test
   void testImage() {
     assertEquals("<image alt=\"Alt text\" src=\"/path/to/img.jpg\"/>", toPSML("![Alt text](/path/to/img.jpg)"));
+    assertEquals("<image alt=\"\" src=\"/img.jpg\"/>", toPSML("![](/img.jpg)"));
+    assertEquals("before <image alt=\"alt\" src=\"/img.jpg\"/> after", toPSML("before ![alt](/img.jpg) after"));
+  }
+
+  @Test
+  void testImageExternal() {
+    // External images (http/https src) are rendered as links
+    assertEquals("<link href=\"http://example.com/img.png\">Alt text</link>", toPSML("![Alt text](http://example.com/img.png)"));
+    assertEquals("<link href=\"https://example.com/img.png\">Alt text</link>", toPSML("![Alt text](https://example.com/img.png)"));
+    assertEquals("<link href=\"http://example.com/img.png\"/>", toPSML("![](http://example.com/img.png)"));
   }
 
   @Test
   void testRef() {
     assertEquals("<link href=\"http://example.net/\">test</link>", toPSML("[test](http://example.net/)"));
+    assertEquals("<link href=\"http://example.net/\"/>", toPSML("[](http://example.net/)"));
+    assertEquals("before <link href=\"http://example.net/\">test</link> after", toPSML("before [test](http://example.net/) after"));
+  }
+
+  @Test
+  void testRefXRef() {
+    // Non-HTTP refs produce XREF elements pointing to internal documents
+    assertEquals("<xref frag=\"default\" href=\"page.psml\" reverselink=\"true\" title=\"title\" display=\"manual\">title</xref>",
+        toPSML("[title](page.psml)"));
+    assertEquals("<xref frag=\"section1\" href=\"page.psml\" reverselink=\"true\" title=\"title\" display=\"manual\">title</xref>",
+        toPSML("[title](page.psml#section1)"));
+  }
+
+  @Test
+  void testRefWithInlineFormatting() {
+    // Inline formatting inside link titles is parsed recursively
+    assertEquals("<link href=\"http://example.org\"><monospace>printf</monospace></link>", toPSML("[`printf`](http://example.org)"));
+    assertEquals("<link href=\"http://example.org\"><italic>italic</italic></link>", toPSML("[*italic*](http://example.org)"));
+    assertEquals("<link href=\"http://example.org\"><bold>bold</bold></link>", toPSML("[**bold**](http://example.org)"));
+    assertEquals("<link href=\"http://example.org\"><bold>bold</bold></link>", toPSML("[__bold__](http://example.org)"));
   }
 
   @Test
