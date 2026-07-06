@@ -127,5 +127,11 @@
         <link href="https://pageseeder.org/" uriid="776806">https://pageseeder.org/</link>
       </property>
     </properties-fragment>
+    <fragment id="8">
+      <para><image src="test2.jpg"/> </para>
+      <block label="figure">
+        <para numbered="true" indent="1">My <bold>special</bold> figure</para>
+      </block>
+    </fragment>
   </section>
 </document>

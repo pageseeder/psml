@@ -286,10 +286,10 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
     }
     if (isParent("block") && this.currentBlockLabel != null) {
       para = para.blocklabel(this.currentBlockLabel);
+      newXmlBuffer();
     }
     this.currentParagraph = para;
     newBuffer();
-    this.firstHeading = false;
     this.counter++;
   }
 
@@ -442,17 +442,35 @@ public final class DocumentTreeHandler extends BasicHandler<DocumentTree> {
       }
     } else if ("para".equals(element) && this.currentParagraph != null) {
       String title = buffer(true);
+      String xmltitle = xmlBuffer(true);
       Paragraph para = this.currentParagraph;
       // only store content for numbered paras to save memory
-      if (title != null && para.numbered() && this.paraTitles) {
-        // if no wrapping blocklabel truncate title to 40 chars
-        if ("".equals(para.blocklabel()) && title.length() > 40) {
-          title = title.substring(0, 40) + "...";
-        // else truncate title to 100 chars to save memory
-        } else if (title.length() > 100) {
-          title = title.substring(0, 100) + "...";
+      if (title != null && para.numbered()) {
+        // set fragment heading for numbered block
+        if (!"".equals(para.blocklabel()) && xmltitle != null && this.firstHeading) {
+          // trunctate title to 250 chars to save memory
+          if (xmltitle.length() > 250) {
+            title = title.length() > 250 ? title.substring(0, 250) + "..." : title;
+            this._tree.putFragmentHeading(this.fragment, XMLStrings.text(title));
+          } else {
+            this._tree.putFragmentHeading(this.fragment, xmltitle);
+          }
+          this.firstHeading = false;
         }
-        para = para.title(title);
+        if (this.paraTitles) {
+          // if no wrapping blocklabel truncate title to 40 chars
+          if ("".equals(para.blocklabel()) && title.length() > 40) {
+            title = title.substring(0, 40) + "...";
+          // else truncate title to 100 chars to save memory
+          } else if (title.length() > 100) {
+            title = title.substring(0, 100) + "...";
+          }
+          para = para.title(title);
+        }
+      }
+      // don't set fragment heading after para with text content
+      if (title != null && !title.trim().isEmpty()) {
+        this.firstHeading = false;
       }
       this._expander.addLeaf(para);
       this.currentParagraph = null;
