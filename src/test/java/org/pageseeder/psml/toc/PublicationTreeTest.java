@@ -1309,8 +1309,9 @@ final class PublicationTreeTest {
     assertEquals("My &lt; &amp; > link", fheadings.get("3"));
     assertEquals("Default d5", fheadings.get("6"));
     assertEquals("https://pageseeder.org/", fheadings.get("7"));
+    assertEquals("My <bold>special</bold> figure", fheadings.get("8"));
     assertEquals("Related", fheadings.get("content"));
-    assertEquals(5, fheadings.size());
+    assertEquals(6, fheadings.size());
     Map<String, Integer> flevels = tree.fragmentlevels();
     if (debug) {
       String levels = flevels.entrySet()
@@ -1325,8 +1326,9 @@ final class PublicationTreeTest {
     assertEquals(Integer.valueOf(2), flevels.get("4"));
     assertEquals(Integer.valueOf(2), flevels.get("6"));
     assertEquals(Integer.valueOf(2), flevels.get("7"));
+    assertEquals(Integer.valueOf(2), flevels.get("8"));
     assertEquals(Integer.valueOf(1), flevels.get("content"));
-    assertEquals(7, flevels.size());
+    assertEquals(8, flevels.size());
     PublicationTree publication = new PublicationTree(tree);
     PublicationConfig config = Tests.parseConfig("publication-config.xml");
     // Generate fragment numbering
@@ -1347,8 +1349,9 @@ final class PublicationTreeTest {
     assertHasPrefix(prefixes,"1-1-4-2",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-4-3",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-4-4",null,"",2,null);
+    assertHasPrefix(prefixes,"1-1-8-2",null,"",2,null);
     assertHasPrefix(prefixes,"1-1-default",null,"",0,null);
-    assertEquals(4, prefixes.size());
+    assertEquals(5, prefixes.size());
   }
 
   @Test
