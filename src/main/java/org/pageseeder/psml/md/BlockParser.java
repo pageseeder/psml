@@ -155,11 +155,17 @@ public class BlockParser {
   /**
    * Process a single line
    *
+   * <p>This is a flat dispatch over mutually exclusive line types (blank, list item, code,
+   * blockquote, table, metadata, heading, paragraph, etc). Each non-trivial case already
+   * delegates to its own {@code processXxx} method; the remaining complexity is the dispatch
+   * itself, which reads more clearly as a single sequential if/else chain than split further.
+   *
    * @param line  The current line
    * @param next  The next line
    * @param state The state of the parser
    * @param options Markdown options to use
    */
+  @SuppressWarnings({"java:S3776", "java:S6541"})
   public static void processLine(String line, @Nullable String next, State state, MarkdownInputOptions options) {
     state.line++;
 
@@ -241,102 +247,120 @@ public class BlockParser {
 
     // Probably a paragraph or heading
     else {
-      if (options.isDocument()) {
-        state.ensureFragment();
-      }
-
-      // We're in a fenced code block
-      if (state.isElement(Name.PREFORMAT)) {
-
-        // Just add the line
-        state.append(line);
-
-      } else {
-
-        // Heading using ATX style
-        Matcher m = ATX_HEADING_PATTERN.matcher(line);
-        if (m.matches()) {
-          state.commitUpToBlockOrFragment();
-          String level = Integer.toString(m.group(1).length());
-          String text = stripHeadingCloser(m.group(2));
-
-          if (options.isNewFragmentPerHeading()) {
-            state.ensureFragment();
-            state.newFragment();
-          }
-
-          // In document mode, headings create new fragments
-          if (options.isDocument() && !state.isEmpty() && !"1".equals(level)) {
-            state.newFragment();
-          }
-
-          PSMLElement heading = new PSMLElement(Name.HEADING);
-          heading.setAttribute("level", level);
-          state.push(heading, text);
-          state.commit();
-
-          // In document mode, we move to the next section after H1
-          if (options.isDocument()) {
-            PSMLElement section = state.ancestor(Name.SECTION);
-            if (section != null && "title".equals(section.getAttribute("id"))) {
-              state.commitUpto(Name.DOCUMENT);
-            }
-          }
-
-        } else {
-
-          boolean isTitle = false;
-
-          // Let's check whether we have a heading using SetExt style
-          PSMLElement element = new PSMLElement(Name.PARA);
-          if (next != null) {
-            if (next.matches("\\s*==+\\s*")) {
-              // We use the '====' as a marker for a new section
-              if (options.isDocument() && !state.isEmpty()) {
-                state.newSection();
-              }
-              element = new PSMLElement(Name.HEADING);
-              element.setAttribute("level", "1");
-
-              // Special case for the 'title' section
-              if (options.isDocument()) {
-                PSMLElement section = state.ancestor(Name.SECTION);
-                if (section != null && "title".equals(section.getAttribute("id"))) {
-                  isTitle = true;
-                }
-              }
-
-            } else if (next.matches("\\s*--+\\s*")) {
-              // We use the '---' as a marker for a new fragment
-              if (options.isDocument() && !state.isEmpty()) {
-                state.newFragment();
-              }
-              element = new PSMLElement(Name.HEADING);
-              element.setAttribute("level", "2");
-            }
-          }
-
-          if (!state.isElement(element.getElement())) {
-            state.commitUpToBlockOrFragment();
-            state.push(element, line.trim());
-          } else {
-            if (state.lineBreak) {
-              state.lineBreak();
-            }
-            state.append(line.trim());
-          }
-
-          // If the line break occurs before 66 characters, we assume it is intentional and insert a break
-          state.lineBreak = line.length() < options.getLineBreakThreshold();
-
-          // Special case: we terminate the section title
-          if (isTitle) {
-            state.commitUpto(Name.DOCUMENT);
-          }
-        }
-      }
+      processParagraphOrHeading(line, next, state, options);
     }
 
+  }
+
+  /**
+   * Handles any line not recognized as one of the other block types: preformatted
+   * continuation, an ATX-style heading, a SetExt-style heading, or plain paragraph text.
+   */
+  private static void processParagraphOrHeading(String line, @Nullable String next, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+
+    // We're in a fenced code block: just add the line
+    if (state.isElement(Name.PREFORMAT)) {
+      state.append(line);
+      return;
+    }
+
+    // Heading using ATX style
+    Matcher m = ATX_HEADING_PATTERN.matcher(line);
+    if (m.matches()) {
+      processAtxHeading(m, state, options);
+    } else {
+      processSetextHeadingOrParagraph(line, next, state, options);
+    }
+  }
+
+  private static void processAtxHeading(Matcher m, State state, MarkdownInputOptions options) {
+    state.commitUpToBlockOrFragment();
+    String level = Integer.toString(m.group(1).length());
+    String text = stripHeadingCloser(m.group(2));
+
+    if (options.isNewFragmentPerHeading()) {
+      state.ensureFragment();
+      state.newFragment();
+    }
+
+    // In document mode, headings create new fragments
+    if (options.isDocument() && !state.isEmpty() && !"1".equals(level)) {
+      state.newFragment();
+    }
+
+    PSMLElement heading = new PSMLElement(Name.HEADING);
+    heading.setAttribute("level", level);
+    state.push(heading, text);
+    state.commit();
+
+    // In document mode, we move to the next section after H1
+    if (options.isDocument() && isCurrentSectionTitle(state)) {
+      state.commitUpto(Name.DOCUMENT);
+    }
+  }
+
+  private static void processSetextHeadingOrParagraph(String line, @Nullable String next, State state, MarkdownInputOptions options) {
+    PSMLElement element = resolveSetextElement(next, state, options);
+    boolean isTitle = options.isDocument() && "1".equals(element.getAttribute("level")) && isCurrentSectionTitle(state);
+
+    if (!state.isElement(element.getElement())) {
+      state.commitUpToBlockOrFragment();
+      state.push(element, line.trim());
+    } else {
+      if (state.lineBreak) {
+        state.lineBreak();
+      }
+      state.append(line.trim());
+    }
+
+    // If the line break occurs before 66 characters, we assume it is intentional and insert a break
+    state.lineBreak = line.length() < options.getLineBreakThreshold();
+
+    // Special case: we terminate the section title
+    if (isTitle) {
+      state.commitUpto(Name.DOCUMENT);
+    }
+  }
+
+  /**
+   * Determines whether the current line, together with the next line, forms a SetExt-style
+   * heading (level 1 using '===', level 2 using '---'), or is otherwise a plain paragraph.
+   */
+  private static PSMLElement resolveSetextElement(@Nullable String next, State state, MarkdownInputOptions options) {
+    if (next == null) return new PSMLElement(Name.PARA);
+
+    if (next.matches("\\s*==+\\s*")) {
+      // We use the '====' as a marker for a new section
+      if (options.isDocument() && !state.isEmpty()) {
+        state.newSection();
+      }
+      PSMLElement element = new PSMLElement(Name.HEADING);
+      element.setAttribute("level", "1");
+      return element;
+    }
+
+    if (next.matches("\\s*--+\\s*")) {
+      // We use the '---' as a marker for a new fragment
+      if (options.isDocument() && !state.isEmpty()) {
+        state.newFragment();
+      }
+      PSMLElement element = new PSMLElement(Name.HEADING);
+      element.setAttribute("level", "2");
+      return element;
+    }
+
+    return new PSMLElement(Name.PARA);
+  }
+
+  /**
+   * @return <code>true</code> if the current element is a descendant of the 'title' section.
+   */
+  private static boolean isCurrentSectionTitle(State state) {
+    PSMLElement section = state.ancestor(Name.SECTION);
+    return section != null && "title".equals(section.getAttribute("id"));
   }
 
   private static void processListItem(String line, State state, MarkdownInputOptions options) {
