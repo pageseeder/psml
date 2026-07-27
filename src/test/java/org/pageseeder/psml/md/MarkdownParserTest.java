@@ -23,11 +23,11 @@ import org.pageseeder.xmlwriter.XMLStringWriter;
 import org.pageseeder.xmlwriter.XMLWriter;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MarkdownParserTest {
 
@@ -45,6 +45,22 @@ class MarkdownParserTest {
     PSMLElement document = parseMarkdown("metadata.md", false);
     assertNotNull(document);
     assertEquals(PSMLElement.Name.DOCUMENT, document.getElement());
+  }
+
+  @Test
+  void testParseFragment_MetadataNotCommittedAfterContentStarted() throws IOException {
+    String md = "# Title\n"
+               + "\n"
+               + "Intro note. Authority: PSML digest.\n"
+               + "\n"
+               + "## Section one\n"
+               + "Body text.\n";
+    MarkdownParser parser = new MarkdownParser();
+    parser.getConfig().setFragmentMode(false);
+    PSMLElement document = parser.parse(new StringReader(md));
+    String xml = toXML(document);
+    assertEquals(-1, xml.indexOf("<property"), "Content after the title must not be parsed as metadata: " + xml);
+    assertTrue(xml.contains("Intro note. Authority: PSML digest."));
   }
 
   @Test
@@ -72,7 +88,7 @@ class MarkdownParserTest {
 
     // load expected
     String expected = Files.readString(psml.toPath());
-    expected = expected.replaceAll("\r", "");
+    expected = expected.replace("\r", "");
     assertEquals(expected, result);
   }
 
@@ -94,7 +110,7 @@ class MarkdownParserTest {
 
     // load expected
     String expected = Files.readString(psml.toPath());
-    expected = expected.replaceAll("\r", "");
+    expected = expected.replace("\r", "");
     assertEquals(expected, result);
   }
 
