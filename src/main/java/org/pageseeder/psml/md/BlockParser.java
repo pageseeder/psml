@@ -45,7 +45,7 @@ import org.pageseeder.psml.util.NilDiagnosticCollector;
  *
  * @author Christophe Lauret
  *
- * @version 1.7.4
+ * @version 1.8.5
  * @since 1.0
  */
 @SuppressWarnings("java:S1192")
@@ -234,8 +234,8 @@ public class BlockParser {
       processTableRow(line, next, state, options);
     }
 
-    // Metadata (document mode only)
-    else if (options.isDocument() && !state.isDescendantOf(Name.SECTION) && line.matches("^[^:]+:\\s.*")) {
+    // Metadata (document mode only, and only before any content has been committed)
+    else if (options.isDocument() && !state.isContentStarted() && line.matches("^[^:]+:\\s.*")) {
       processMetadataProperty(line, state, options);
     }
 
@@ -621,6 +621,14 @@ public class BlockParser {
     private int sectionPosition = 0;
 
     /**
+     * Set to <code>true</code> once the first real content section has been started.
+     * Metadata (URI info / properties) may only be parsed before this happens, so that
+     * body content resembling "key: value" is never mistaken for metadata after the
+     * document body has begun.
+     */
+    private boolean contentStarted = false;
+
+    /**
      * Id of the fragment being processed
      */
     private int fragmentId = 0;
@@ -747,7 +755,16 @@ public class BlockParser {
         section.setAttribute("id", sectionId);
         push(section);
         this.sectionPosition++;
+        this.contentStarted = true;
       }
+    }
+
+    /**
+     * @return <code>true</code> if a content section has already been started, meaning
+     *         metadata (URI info / properties) can no longer be parsed.
+     */
+    public boolean isContentStarted() {
+      return this.contentStarted;
     }
 
     /**
