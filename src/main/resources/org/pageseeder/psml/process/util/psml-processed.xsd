@@ -2176,6 +2176,11 @@
         <xs:documentation>If 'true' the target is a URL (external URI). INFORMATIONAL - ignored by upload.</xs:documentation>
       </xs:annotation>
     </xs:attribute>
+    <xs:attribute name="message" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Error message if unable to transclude content. INFORMATIONAL - rejected by upload.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <!--
