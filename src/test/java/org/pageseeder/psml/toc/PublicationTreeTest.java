@@ -93,6 +93,7 @@ final class PublicationTreeTest {
     assertTrue(publication.listReverseReferences().isEmpty());
     Tests.assertDocumentTreeEquals(tree, publication.tree(100));
     Tests.assertDocumentTreeEquals(root, publication.root());
+    // Logs "ERROR Attempt to remove publication root id 1" and doesn't remove root
     publication = publication.modify(Arrays.asList(1L, 100L), Collections.singletonMap(101L, tree2), Collections.emptyMap(), 1L);
     Tests.assertDocumentTreeEquals(root, publication.root());
     assertNull(publication.tree(100));
