@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -206,6 +207,40 @@ public class LexicalTokenizerTest {
   void testWords_Contraction() {
     List<TextToken> tokens = LexicalTokenizer.tokenize("I don't know O'Sullivan", t -> t);
     assertEquals(toLexicalTokens("I"," don't", " know", " O'Sullivan"), tokens);
+  }
+
+  @Test
+  void testWords_ContractionTypographic() {
+    List<TextToken> tokens = LexicalTokenizer.tokenize("I don’t know O’Sullivan", t -> t);
+    assertEquals(toLexicalTokens("I"," don’t", " know", " O’Sullivan"), tokens);
+  }
+
+  @Test
+  void testWords_ContractionModifierLetter() {
+    List<TextToken> tokens = LexicalTokenizer.tokenize("Iʼm here", t -> t);
+    assertEquals(toLexicalTokens("Iʼm", " here"), tokens);
+  }
+
+  @Test
+  void testWords_TrailingTypographicApostrophe() {
+    List<TextToken> tokens = LexicalTokenizer.tokenize("the dogs’ bowls", t -> t);
+    assertEquals(toLexicalTokens("the", " dogs", "’", " bowls"), tokens);
+  }
+
+  @Test
+  void testWords_ContractionQuoteFolding() {
+    LexicalNormalizer normalizer = LexicalNormalizer.of(Set.of(NormalizationFeature.QUOTE_FOLDING));
+    List<TextToken> straight = LexicalTokenizer.tokenize("I'm here", normalizer);
+    List<TextToken> typographic = LexicalTokenizer.tokenize("I’m here", normalizer);
+    assertEquals(straight, typographic);
+  }
+
+  @Test
+  void testQuoted_TypographicQuoteFolding() {
+    LexicalNormalizer normalizer = LexicalNormalizer.of(Set.of(NormalizationFeature.QUOTE_FOLDING));
+    List<TextToken> straight = LexicalTokenizer.tokenize("say 'hi'", normalizer);
+    List<TextToken> typographic = LexicalTokenizer.tokenize("say ‘hi’", normalizer);
+    assertEquals(straight, typographic);
   }
 
   @Test
