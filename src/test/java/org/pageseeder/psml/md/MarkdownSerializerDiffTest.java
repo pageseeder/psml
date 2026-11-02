@@ -5,10 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.pageseeder.psml.md.MarkdownOutputOptions.DesignatorStyle;
 import org.pageseeder.psml.md.MarkdownOutputOptions.DiffFormat;
+import org.pageseeder.psml.md.MarkdownOutputOptions.ImageFormat;
+import org.pageseeder.psml.md.MarkdownOutputOptions.SuperSubFormat;
+import org.pageseeder.psml.md.MarkdownOutputOptions.XrefFormat;
 import org.pageseeder.psml.md.MarkdownOutputOptions.PropertiesFormat;
 import org.pageseeder.psml.md.MarkdownOutputOptions.TableFormat;
 import org.pageseeder.psml.model.Loader;
 import org.pageseeder.psml.model.PSMLElement;
+import org.pageseeder.psml.model.PSMLElement.Name;
+import org.pageseeder.psml.model.PSMLText;
 import org.pageseeder.psml.util.ListDiagnosticCollector;
 
 import java.io.IOException;
@@ -144,7 +149,7 @@ class MarkdownSerializerDiffTest {
   @Test
   void testInsertedInlineElement() throws IOException {
     String xml = "<para" + NS + ">See <xref diff:insert='true' href='a.psml' ins:href='true'><diff:ins>Doc</diff:ins></xref>.</para>";
-    assertEquals("See <ins>**Doc**</ins>.", toMarkdown(xml));
+    assertEquals("See **<ins>Doc</ins>**.", toMarkdown(xml));
   }
 
   @Test
@@ -264,6 +269,110 @@ class MarkdownSerializerDiffTest {
       MarkdownOutputOptions options = MarkdownOutputOptions.defaultOptions().table(format);
       assertEquals(toMarkdown(load(xml), options), toMarkdown(load(xml), options.diff(DiffFormat.INS_DEL)), format.name());
     }
+  }
+
+  // Phase 6: other content
+
+  @Test
+  void testXref_Formats() throws IOException {
+    String xml = "<para" + NS + ">See <xref href='b.psml' del:href='a.psml' ins:href='true'>Doc<diff:del> A</diff:del><diff:ins> B</diff:ins></xref>.</para>";
+    assertEquals("See **Doc<del> A</del><ins> B</ins>**.", toMarkdown(xml));
+    assertEquals("See [Doc<del> A</del><ins> B</ins>](b.psml).", toMarkdown(load(xml), INS_DEL.xref(XrefFormat.LOCAL_LINK)).trim());
+    assertEquals("See Doc<del> A</del><ins> B</ins>.", toMarkdown(load(xml), INS_DEL.xref(XrefFormat.TEXT)).trim());
+  }
+
+  @Test
+  void testXref_Deleted() throws IOException {
+    String xml = "<para" + NS + ">See <xref diff:delete='true' del:href='a.psml'><diff:del>Doc</diff:del></xref>.</para>";
+    assertEquals("See **<del>Doc</del>**.", toMarkdown(xml));
+    assertEquals("See [<del>Doc</del>](a.psml).", toMarkdown(load(xml), INS_DEL.xref(XrefFormat.LOCAL_LINK)).trim());
+  }
+
+  @Test
+  void testXref_TextMarkerWins() throws IOException {
+    String xml = "<para" + NS + "><xref diff:delete='true' del:href='a.psml'><diff:ins>content.</diff:ins></xref></para>";
+    assertEquals("**<ins>content.</ins>**", toMarkdown(xml));
+  }
+
+  @Test
+  void testXref_InInsertedPara() throws IOException {
+    String xml = "<para" + NS + " diff:insert='true'><diff:ins>See </diff:ins><xref diff:insert='true' href='a.psml' ins:href='true'><diff:ins>Doc</diff:ins></xref><diff:ins>.</diff:ins></para>";
+    assertEquals("<ins>See **Doc**.</ins>", toMarkdown(xml));
+  }
+
+  @Test
+  void testLink() throws IOException {
+    String xml = "<para" + NS + "><link href='https://x.test'><diff:del>old</diff:del><diff:ins>new</diff:ins></link></para>";
+    assertEquals("[<del>old</del><ins>new</ins>](https://x.test)", toMarkdown(xml));
+  }
+
+  @Test
+  void testPlaceholder_ModelApi() throws IOException {
+    // Built with the model API: the loader does not currently resolve <placeholder> (Name.PLACEHOLDER is "name")
+    PSMLElement para = new PSMLElement(Name.PARA).addNodes(
+        new PSMLElement(Name.PLACEHOLDER).setAttribute("diff:insert", "true").setAttribute("name", "client").setAttribute("ins:name", "true"),
+        new PSMLText(" "),
+        new PSMLElement(Name.PLACEHOLDER).setAttribute("name", "p").addNode(new PSMLElement(Name.DIFF_INS).setText("Text")),
+        new PSMLText(" "),
+        new PSMLElement(Name.PLACEHOLDER).setAttribute("diff:delete", "true").setAttribute("del:name", "gone"));
+    assertEquals("[[<ins>client</ins>]] [[<ins>Text</ins>]] [[<del>gone</del>]]", toMarkdown(para, INS_DEL).trim());
+    assertEquals("[[client]] [[Text]] [[]]", toMarkdown(para, MarkdownOutputOptions.defaultOptions()).trim());
+  }
+
+  @Test
+  void testImage_ExcludedCreatesNoMarkers() throws IOException {
+    String xml = "<para" + NS + ">See <image diff:insert='true' src='a.png' ins:src='true' alt='A' ins:alt='true'/> here.</para>";
+    assertEquals("See <ins>![A](a.png)</ins> here.", toMarkdown(xml));
+    assertEquals("See  here.", toMarkdown(load(xml), INS_DEL.image(ImageFormat.NONE)).trim());
+    assertEquals("See  here.", toMarkdown(load(xml), INS_DEL.image(ImageFormat.DATA_URI)).trim());
+  }
+
+  @Test
+  void testPreformat_WhollyInsertedOrDeleted() throws IOException {
+    String inserted = "<fragment" + NS + " id='1'><preformat diff:insert='true' role='lang-js'><diff:ins>let x;</diff:ins></preformat></fragment>";
+    assertEquals("<ins>\n```js\nlet x;\n```\n</ins>", toMarkdown(inserted));
+    String deleted = "<fragment" + NS + " id='1'><preformat diff:delete='true' del:role='lang-js'><diff:del>let x;</diff:del></preformat></fragment>";
+    assertEquals("<del>\n```js\nlet x;\n```\n</del>", toMarkdown(deleted));
+  }
+
+  @Test
+  void testMediaFragment() throws IOException {
+    String xml = "<media-fragment" + NS + " id='1' mediatype='text/x-python'>print(<diff:del>1</diff:del><diff:ins>2</diff:ins>)</media-fragment>";
+    assertEquals("<del>\n```py\nprint(1)\n```\n</del>\n<ins>\n```py\nprint(2)\n```\n</ins>", toMarkdown(xml));
+  }
+
+  @Test
+  void testMonospace_Backticks() throws IOException {
+    String xml = "<para" + NS + "><monospace>a`<diff:ins>b</diff:ins></monospace> <monospace diff:insert='true'><diff:ins>c</diff:ins></monospace></para>";
+    assertEquals("<del>`a\\``</del><ins>`a\\`b`</ins> <ins>`c`</ins>", toMarkdown(xml));
+  }
+
+  @Test
+  void testSupSub_Formats() throws IOException {
+    assertEquals("E = mc<del>²</del><ins>³</ins> and H<del>₂</del><ins>₃</ins>O", fixture("supsub", INS_DEL.superSub(SuperSubFormat.UNICODE)));
+    assertEquals("E = mc<sup><del>2</del><ins>3</ins></sup> and H<sub><del>2</del><ins>3</ins></sub>O", fixture("supsub", INS_DEL.superSub(SuperSubFormat.HTML)));
+    assertEquals("E = mc^<del>2</del><ins>3</ins>^ and H~<del>2</del><ins>3</ins>~O", fixture("supsub", INS_DEL.superSub(SuperSubFormat.CARET_TILDE)));
+    String inserted = "<para" + NS + ">x<sup diff:insert='true'><diff:ins>2</diff:ins></sup></para>";
+    assertEquals("x<ins>²</ins>", toMarkdown(load(inserted), INS_DEL.superSub(SuperSubFormat.UNICODE)).trim());
+  }
+
+  @Test
+  void testUnicodePreserved() throws IOException {
+    String xml = "<para" + NS + ">It\u2019s <diff:del>\"old\"</diff:del><diff:ins>\u201Cnew\u201D</diff:ins> caf\u00E9</para>";
+    assertEquals("It\u2019s <del>\"old\"</del><ins>\u201Cnew\u201D</ins> caf\u00E9", toMarkdown(xml));
+  }
+
+  @Test
+  void testCodeAndInline_NoDiffSameInBothModes() throws IOException {
+    String xml = "<fragment id='1'><para>Use <monospace>a`b</monospace>, <xref href='a.psml'>A <bold>doc</bold></xref>, "
+        + "<link href='https://x.test'>link</link>, <placeholder name='p'/> and x<sup>2</sup>.</para>"
+        + "<preformat role='lang-java'>\nint x;\n\n</preformat></fragment>";
+    for (SuperSubFormat format : SuperSubFormat.values()) {
+      MarkdownOutputOptions options = MarkdownOutputOptions.defaultOptions().superSub(format);
+      assertEquals(toMarkdown(load(xml), options), toMarkdown(load(xml), options.diff(DiffFormat.INS_DEL)), format.name());
+    }
+    String media = "<media-fragment id='1' mediatype='text/x-java'>class A {}</media-fragment>";
+    assertEquals(toMarkdown(load(media), MarkdownOutputOptions.defaultOptions()), toMarkdown(load(media), INS_DEL));
   }
 
 }

@@ -330,7 +330,10 @@ public class MarkdownSerializer {
      */
     private String marked(DiffOperation op, String text) {
       if (text.isEmpty() || op == DiffOperation.NONE || op == state.open) return text;
-      return DiffMarkers.open(op) + text + DiffMarkers.close(op);
+      String marked = DiffMarkers.open(op) + text + DiffMarkers.close(op);
+      if (state.open == DiffOperation.NONE) return marked;
+      // Close the marker for the other operation and reopen it after
+      return DiffMarkers.close(state.open) + marked + DiffMarkers.open(state.open);
     }
 
     /**
@@ -364,19 +367,60 @@ public class MarkdownSerializer {
       if (container != null && opOf(container) != DiffOperation.NONE) inherited = opOf(container);
       List<Segment> segments = new ArrayList<>();
       collectSegments(element, inherited, segments);
+      return markedText(segments, text -> text);
+    }
+
+    /**
+     * Returns the text of the segments with sentinels for diff markers, merging adjacent segments
+     * with the same operation.
+     *
+     * <p>A marker already open in the output is not repeated; a segment with another operation
+     * closes it and reopens it after.
+     *
+     * @param segments  The segments of text
+     * @param transform A transformation applied to the text of each segment
+     */
+    private String markedText(List<Segment> segments, TextTransform transform) {
+      DiffOperation base = state.open;
       StringBuilder out = new StringBuilder();
-      DiffOperation open = DiffOperation.NONE;
+      DiffOperation current = base;
       for (Segment segment : segments) {
         if (segment.text.isEmpty()) continue;
-        if (segment.op != open) {
-          if (open != DiffOperation.NONE) out.append(DiffMarkers.close(open));
-          if (segment.op != DiffOperation.NONE) out.append(DiffMarkers.open(segment.op));
-          open = segment.op;
-        }
-        out.append(segment.text);
+        DiffOperation target = segment.op == DiffOperation.NONE ? base : segment.op;
+        current = switchMarker(out, base, current, target);
+        out.append(transform.apply(segment.text));
       }
-      if (open != DiffOperation.NONE) out.append(DiffMarkers.close(open));
+      switchMarker(out, base, current, base);
       return out.toString();
+    }
+
+    /**
+     * Switches the marker in the output from the current operation to the target operation,
+     * given the operation of the marker open outside.
+     *
+     * @return the target operation
+     */
+    private static DiffOperation switchMarker(StringBuilder out, DiffOperation base, DiffOperation current, DiffOperation target) {
+      if (target == current) return current;
+      if (current != base) {
+        out.append(DiffMarkers.close(current));
+        if (base != DiffOperation.NONE) out.append(DiffMarkers.open(base));
+      }
+      if (target != base) {
+        if (base != DiffOperation.NONE) out.append(DiffMarkers.close(base));
+        out.append(DiffMarkers.open(target));
+      }
+      return target;
+    }
+
+    /**
+     * Returns the visible text of an inline element whose markup is flattened (xref, link, placeholder).
+     *
+     * <p>In diff mode, the text keeps its diff markers.
+     */
+    private String inlineText(PSMLElement element) {
+      if (!this.diff) return normalizeText(element.getText());
+      return DiffMarkers.escape(normalizeText(markedText(element, null)));
     }
 
     /**
@@ -399,7 +443,7 @@ public class MarkdownSerializer {
      *
      * <p>Unchanged content is returned as is. Content that only exists in one version is wrapped once.
      */
-    private String codeChange(PSMLElement element, CodeFormat format) {
+    private String codeChange(PSMLElement element, TextTransform format) {
       List<Segment> segments = new ArrayList<>();
       collectSegments(element, state.inherited, segments);
       String oldText = projection(segments, DiffOperation.INSERT);
@@ -412,11 +456,10 @@ public class MarkdownSerializer {
     }
 
     /**
-     * Inline elements whose output does not go through {@link #processChildren(PSMLElement, Appendable)},
-     * so an inserted or deleted one is wrapped as a whole.
+     * Inline elements without visible text, so an inserted or deleted one is wrapped as a whole.
      */
     private static boolean isWrappedWhole(Name name) {
-      return name == Name.IMAGE || name == Name.XREF || name == Name.LINK || name == Name.PLACEHOLDER;
+      return name == Name.IMAGE;
     }
 
     /**
@@ -852,7 +895,7 @@ public class MarkdownSerializer {
     }
 
     private void serializeLink(PSMLElement link, Appendable out) throws IOException {
-      String text = clean(normalizeText(link.getText()));
+      String text = inlineText(link);
       String url = attr(link, "href");
       out.append("[").append(text).append("](").append(url).append(")");
     }
@@ -875,17 +918,93 @@ public class MarkdownSerializer {
     }
 
     private void serializeMediaFragment(PSMLElement fragment, Appendable out) throws IOException {
-      out.append("\n```");
-      String mediatype = fragment.getAttribute("mediatype");
-      if (mediatype != null) {
-        out.append(toLang(mediatype));
+      String mediatype = attr(fragment, "mediatype");
+      String lang = mediatype != null ? toLang(mediatype) : "";
+      if (this.diff) {
+        serializeCodeBlockDiff(fragment, lang, out);
+        return;
       }
+      out.append("\n```");
+      out.append(lang);
       String text = fragment.getText();
       if (!text.startsWith("\n")) out.append("\n");
       out.append(text.replaceAll("\\s+$", "")).append("\n```\n");
     }
 
+    /**
+     * Formats text as a fenced code block.
+     */
+    private static String toFencedCode(String text, String lang) {
+      StringBuilder out = new StringBuilder("```").append(lang);
+      if (!text.startsWith("\n")) out.append('\n');
+      return out.append(text.replaceAll("\\s+$", "")).append("\n```").toString();
+    }
+
+    /**
+     * Serializes a code block in diff mode.
+     *
+     * <p>Unchanged code is serialized as without diff. Changed code is serialized as the old
+     * version in a fenced block inside {@code <del>} followed by the new version in a fenced
+     * block inside {@code <ins>}, each marker on its own line. Code that only exists in one
+     * version is wrapped once.
+     */
+    private void serializeCodeBlockDiff(PSMLElement element, String lang, Appendable out) throws IOException {
+      List<Segment> segments = new ArrayList<>();
+      collectSegments(element, state.inherited, segments);
+      String oldText = projection(segments, DiffOperation.INSERT);
+      String newText = projection(segments, DiffOperation.DELETE);
+      out.append('\n');
+      if (oldText.equals(newText)) {
+        out.append(toFencedCode(newText, lang)).append('\n');
+        return;
+      }
+      if (!oldText.isEmpty()) {
+        out.append(marked(DiffOperation.DELETE, "\n" + toFencedCode(oldText, lang) + "\n")).append('\n');
+      }
+      if (!newText.isEmpty()) {
+        out.append(marked(DiffOperation.INSERT, "\n" + toFencedCode(newText, lang) + "\n")).append('\n');
+      }
+    }
+
+    /**
+     * @return {@code true} if the element only contains text and Diff-X text elements containing text.
+     */
+    private static boolean hasOnlyDiffText(PSMLElement element) {
+      for (PSMLNode node : element.getNodes()) {
+        if (node instanceof PSMLElement) {
+          PSMLElement child = (PSMLElement) node;
+          if (!child.getElement().isDiff() || child.hasChildElements()) return false;
+        }
+      }
+      return true;
+    }
+
+    /**
+     * Returns the text of the element with diff markers, each piece of text converted separately.
+     */
+    private String convertedText(PSMLElement element, TextTransform conversion) {
+      List<Segment> segments = new ArrayList<>();
+      collectSegments(element, state.inherited, segments);
+      return markedText(segments, conversion);
+    }
+
+    /**
+     * @return {@code true} if some text in the element has a diff operation other than the open marker.
+     */
+    private boolean hasChangedText(PSMLElement element) {
+      List<Segment> segments = new ArrayList<>();
+      collectSegments(element, state.inherited, segments);
+      for (Segment segment : segments) {
+        if (segment.op != DiffOperation.NONE && segment.op != state.open && !segment.text.isEmpty()) return true;
+      }
+      return false;
+    }
+
     private void serializeMonospace(PSMLElement monospace, Appendable out) throws IOException {
+      if (this.diff && hasChangedText(monospace)) {
+        out.append(codeChange(monospace, text -> "`" + normalizeText(text).replace("`", "\\`") + "`"));
+        return;
+      }
       out.append("`");
       processChildren(monospace, out);
       out.append("`");
@@ -928,12 +1047,17 @@ public class MarkdownSerializer {
     }
 
     private void serializePreformat(PSMLElement element, Appendable out) throws IOException {
-      out.append("\n```");
-      String role = element.getAttribute("role");
+      String role = attr(element, "role");
+      String language = "";
       if (role != null && (role.startsWith("language-") || role.startsWith("lang-"))) {
-        String language = role.substring(role.indexOf('-') + 1);
-        out.append(language);
+        language = role.substring(role.indexOf('-') + 1);
       }
+      if (this.diff) {
+        serializeCodeBlockDiff(element, language, out);
+        return;
+      }
+      out.append("\n```");
+      out.append(language);
       String text = element.getText();
       if (!text.startsWith("\n")) out.append("\n");
       out.append(text.replaceAll("\\s+$", "")).append("\n```\n");
@@ -941,8 +1065,9 @@ public class MarkdownSerializer {
 
     private void serializePlaceholder(PSMLElement placeholder, Appendable out) throws IOException {
       String name = clean(attrOrElse(placeholder, "name", ""));
-      String text = clean(normalizeText(placeholder.getText()));
-      out.append("[[").append(text.isEmpty() ? name : text).append("]]");
+      String text = inlineText(placeholder);
+      boolean empty = this.diff ? DiffMarkers.strip(text).isEmpty() : text.isEmpty();
+      out.append("[[").append(empty ? marked(state.inherited, name) : text).append("]]");
     }
 
     private void serializeProperty(PSMLElement property, Appendable out) throws IOException {
@@ -1064,7 +1189,9 @@ public class MarkdownSerializer {
           out.append("</sup>");
           break;
         case UNICODE:
-          if (!element.hasChildElements() && Superscripts.isReplaceable(element.getText())) {
+          if (this.diff && hasOnlyDiffText(element) && Superscripts.isReplaceable(element.getText())) {
+            out.append(convertedText(element, Superscripts::toSuperscript));
+          } else if (!element.hasChildElements() && Superscripts.isReplaceable(element.getText())) {
             out.append(Superscripts.toSuperscript(element.getText()));
           } else {
             collector.warn("Superscript text contains character for which there is no Unicode equivalent");
@@ -1092,7 +1219,9 @@ public class MarkdownSerializer {
           out.append("</sub>");
           break;
         case UNICODE:
-          if (!element.hasChildElements() && Subscripts.isReplaceable(element.getText())) {
+          if (this.diff && hasOnlyDiffText(element) && Subscripts.isReplaceable(element.getText())) {
+            out.append(convertedText(element, Subscripts::toSubscript));
+          } else if (!element.hasChildElements() && Subscripts.isReplaceable(element.getText())) {
             out.append(Subscripts.toSubscript(element.getText()));
           } else {
             collector.warn("Subscript text contains character for which there is no Unicode equivalent");
@@ -1131,7 +1260,7 @@ public class MarkdownSerializer {
     }
 
     private void serializeXref(PSMLElement link, Appendable out) throws IOException {
-      String text = clean(normalizeText(link.getText()));
+      String text = inlineText(link);
       String url = attrOrElse(link, "href", "");
       switch (options.xref()) {
         case EXTERNAL_LINK:
@@ -1286,10 +1415,10 @@ public class MarkdownSerializer {
   }
 
   /**
-   * Formats one version of code-like content in its code syntax.
+   * Transforms a piece of text, for example to format one version of code-like content in its code syntax.
    */
   @FunctionalInterface
-  private interface CodeFormat {
+  private interface TextTransform {
     String apply(String text);
   }
 
