@@ -83,6 +83,9 @@ MarkdownSerializer serializer = new MarkdownSerializer();
 serializer.serialize(psml, System.out);
 ```
 
+To show the changes in combined Diff-X PSML as `<ins>`/`<del>` markers, use
+`MarkdownOutputOptions.defaultOptions().diff(DiffFormat.INS_DEL)`. See [Diff output in Markdown](docs/markdown-diff.md).
+
 **HTML → PSML:**
 
 ```java
