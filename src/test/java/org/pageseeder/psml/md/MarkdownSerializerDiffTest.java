@@ -375,4 +375,80 @@ class MarkdownSerializerDiffTest {
     assertEquals(toMarkdown(load(media), MarkdownOutputOptions.defaultOptions()), toMarkdown(load(media), INS_DEL));
   }
 
+  // Phase 7: diagnostics
+
+  private static List<String> warnings(String xml, MarkdownOutputOptions options, StringBuilder out) throws IOException {
+    ListDiagnosticCollector collector = new ListDiagnosticCollector();
+    MarkdownSerializer serializer = new MarkdownSerializer();
+    serializer.setOptions(options);
+    serializer.serialize(load(xml), out, collector);
+    return collector.getWarnings();
+  }
+
+  private static boolean isDiffWarning(String warning) {
+    return warning.contains("Diff-X") || warning.contains("inserted and deleted") || warning.contains("diff:");
+  }
+
+  @Test
+  void testDiagnostics_Conflict() throws IOException {
+    StringBuilder out = new StringBuilder();
+    List<String> warnings = warnings("<para" + NS + " diff:insert='true' diff:delete='true'><diff:del>a</diff:del><diff:ins>b</diff:ins> c</para>", INS_DEL, out);
+    assertEquals("<del>a</del><ins>b</ins> c", out.toString().trim());
+    assertEquals(1, warnings.size(), warnings.toString());
+    assertTrue(warnings.get(0).contains("<para> is marked as both inserted and deleted"), warnings.get(0));
+  }
+
+  @Test
+  void testDiagnostics_InvalidValue() throws IOException {
+    StringBuilder out = new StringBuilder();
+    List<String> warnings = warnings("<para" + NS + " diff:insert='yes'>x</para>", INS_DEL, out);
+    assertEquals("x", out.toString().trim());
+    assertEquals(1, warnings.size(), warnings.toString());
+    assertTrue(warnings.get(0).contains("invalid value for diff:insert ('yes')"), warnings.get(0));
+  }
+
+  @Test
+  void testDiagnostics_UnknownElementAndAttribute() throws IOException {
+    StringBuilder out = new StringBuilder();
+    List<String> warnings = warnings("<para" + NS + " diff:other='1'>a<diff:foo>b</diff:foo></para>", INS_DEL, out);
+    assertEquals("ab", out.toString().trim());
+    assertEquals(2, warnings.size(), warnings.toString());
+    // The inherited operation still applies to the content of an unknown element
+    StringBuilder inserted = new StringBuilder();
+    warnings("<para" + NS + " diff:insert='true'><diff:foo>b</diff:foo></para>", INS_DEL, inserted);
+    assertEquals("<ins>b</ins>", inserted.toString().trim());
+  }
+
+  @Test
+  void testDiagnostics_TableCellReportedOnce() throws IOException {
+    String xml = "<table" + NS + "><row><cell diff:insert='true' diff:delete='true'><diff:ins>x</diff:ins></cell></row></table>";
+    for (TableFormat format : TableFormat.values()) {
+      StringBuilder out = new StringBuilder();
+      List<String> warnings = warnings(xml, INS_DEL.table(format), out);
+      assertEquals(1, warnings.stream().filter(MarkdownSerializerDiffTest::isDiffWarning).count(), format + ": " + warnings);
+    }
+  }
+
+  @Test
+  void testDiagnostics_IgnoreModeSilent() throws IOException {
+    List<String> warnings = warnings("<para" + NS + " diff:insert='true' diff:delete='true' diff:x='1'><diff:foo>a</diff:foo></para>",
+        MarkdownOutputOptions.defaultOptions(), new StringBuilder());
+    assertTrue(warnings.isEmpty(), warnings.toString());
+  }
+
+  @Test
+  void testDiagnostics_ValidMarkupSilent() throws IOException {
+    MarkdownOutputOptions[] variants = {
+        INS_DEL, INS_DEL.properties(PropertiesFormat.VALUE_PAIRS), INS_DEL.table(TableFormat.HTML),
+        INS_DEL.table(TableFormat.NORMALIZED), INS_DEL.superSub(SuperSubFormat.UNICODE)
+    };
+    for (String name : MarkdownDiffFixtures.names()) {
+      String xml = Files.readString(MarkdownDiffFixtures.GENERATED.resolve(name + ".psml"));
+      for (MarkdownOutputOptions options : variants) {
+        List<String> warnings = warnings(xml, options, new StringBuilder());
+        assertTrue(warnings.stream().noneMatch(MarkdownSerializerDiffTest::isDiffWarning), name + ": " + warnings);
+      }
+    }
+  }
+
 }

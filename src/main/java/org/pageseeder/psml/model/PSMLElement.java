@@ -165,6 +165,16 @@ public class PSMLElement implements PSMLNode {
     DIFF_DEL("diff:del", true),
 
     /**
+     * Any other element in a Diff-X namespace, written as {@code <diff:unknown>}.
+     *
+     * <p>Like {@link #UNKNOWN}, the original name is not kept. It is reported as unsupported
+     * diff markup by the Markdown serializer.
+     *
+     * @since 1.8.6
+     */
+    DIFF_UNKNOWN("diff:unknown", true),
+
+    /**
      * &lt;displaytitle&lt; element
      *
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-displaytitle.html">displaytitle element</a>
@@ -615,7 +625,7 @@ public class PSMLElement implements PSMLNode {
     /**
      * Returns the PSML name matching the specified element name.
      *
-     * <p>Diff-X names ({@link #DIFF_INS} and {@link #DIFF_DEL}) are never returned by this method,
+     * <p>Diff-X names ({@link #DIFF_INS}, {@link #DIFF_DEL} and {@link #DIFF_UNKNOWN}) are never returned by this method,
      * because a name alone does not identify the Diff-X namespace.
      *
      * @param name The element name
@@ -624,7 +634,7 @@ public class PSMLElement implements PSMLNode {
      */
     public static Name forElement(String name) {
       for (Name element : values()) {
-        if (element.element.equals(name) && !element.isDiff()) return element;
+        if (element.element.equals(name) && !element.isDiff() && element != DIFF_UNKNOWN) return element;
       }
       return Name.UNKNOWN;
     }
@@ -632,8 +642,8 @@ public class PSMLElement implements PSMLNode {
     /**
      * Returns the PSML name for the specified namespace-qualified element.
      *
-     * <p>Elements in the current or legacy Diff-X namespace resolve to {@link #DIFF_INS} or
-     * {@link #DIFF_DEL} whatever their prefix. Any other element resolves using its qualified
+     * <p>Elements in the current or legacy Diff-X namespaces resolve to {@link #DIFF_INS},
+     * {@link #DIFF_DEL} or {@link #DIFF_UNKNOWN} whatever their prefix. Any other element resolves using its qualified
      * name as {@link #forElement(String)} does.
      *
      * @param uri       The namespace URI (may be empty)
@@ -645,10 +655,11 @@ public class PSMLElement implements PSMLNode {
      * @since 1.8.6
      */
     public static Name forElement(@Nullable String uri, String localName, String qName) {
-      if (DiffX.PREFIX.equals(DiffX.prefixFor(uri))) {
-        if ("ins".equals(localName)) return DIFF_INS;
-        if ("del".equals(localName)) return DIFF_DEL;
-        return UNKNOWN;
+      String prefix = DiffX.prefixFor(uri);
+      if (prefix != null) {
+        if (DiffX.PREFIX.equals(prefix) && "ins".equals(localName)) return DIFF_INS;
+        if (DiffX.PREFIX.equals(prefix) && "del".equals(localName)) return DIFF_DEL;
+        return DIFF_UNKNOWN;
       }
       return forElement(qName);
     }
@@ -771,6 +782,18 @@ public class PSMLElement implements PSMLNode {
       if (this.name == element) return true;
     }
     return false;
+  }
+
+  /**
+   * Returns the names of the attributes on this element.
+   *
+   * @return An unmodifiable view of the attribute names (may be empty).
+   *
+   * @since 1.8.6
+   */
+  public Set<String> getAttributeNames() {
+    if (this.attributes == null) return Collections.emptySet();
+    return Collections.unmodifiableSet(this.attributes.keySet());
   }
 
   /**
@@ -1174,7 +1197,7 @@ public class PSMLElement implements PSMLNode {
    * @since 1.8.6
    */
   public boolean hasDiffMarkup() {
-    if (this.name.isDiff()) return true;
+    if (this.name.isDiff() || this.name == Name.DIFF_UNKNOWN) return true;
     if (this.attributes != null) {
       for (String attribute : this.attributes.keySet()) {
         if (DiffX.isDiffAttribute(attribute)) return true;

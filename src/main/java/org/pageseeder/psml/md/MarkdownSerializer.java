@@ -288,6 +288,11 @@ public class MarkdownSerializer {
      */
     private boolean sentinelWarning = false;
 
+    /**
+     * Elements already checked for diff annotations, so each is reported at most once.
+     */
+    private final Set<PSMLElement> checked = Collections.newSetFromMap(new IdentityHashMap<>());
+
     Instance(MarkdownOutputOptions options, DiagnosticCollector collector) {
       this.options = options;
       this.collector = Objects.requireNonNull(collector);
@@ -301,6 +306,7 @@ public class MarkdownSerializer {
       }
       DiffOperation inherited = state.inherited;
       Name name = element.getElement();
+      checkDiffMarkup(element);
       DiffOperation op = opOf(element);
       if (op != DiffOperation.NONE) state.inherited = op;
       try {
@@ -311,6 +317,40 @@ public class MarkdownSerializer {
         }
       } finally {
         state.inherited = inherited;
+      }
+    }
+
+    /**
+     * Reports unsupported or contradictory diff annotations on the element.
+     *
+     * <ul>
+     *   <li>{@code diff:insert} and {@code diff:delete} both {@code true}: no operation is inherited
+     *   from the element; only the text markers inside it apply.</li>
+     *   <li>{@code diff:insert} or {@code diff:delete} other than {@code true}/{@code false}: ignored.</li>
+     *   <li>Any other element or attribute in the Diff-X namespace: ignored, the content is
+     *   serialized without markers of its own.</li>
+     * </ul>
+     */
+    private void checkDiffMarkup(PSMLElement element) {
+      if (!this.checked.add(element)) return;
+      Name name = element.getElement();
+      String label = "<" + name.element() + ">";
+      if (name == Name.DIFF_UNKNOWN) {
+        this.collector.warn("Unsupported Diff-X element: its content is serialized without diff markers");
+      }
+      if (element.isConflictingDiffOperation()) {
+        this.collector.warn("Element " + label + " is marked as both inserted and deleted: only the text markers inside it apply");
+      }
+      for (String attribute : element.getAttributeNames()) {
+        if (!attribute.startsWith("diff:")) continue;
+        if ("diff:insert".equals(attribute) || "diff:delete".equals(attribute)) {
+          String value = element.getAttribute(attribute);
+          if (!"true".equals(value) && !"false".equals(value)) {
+            this.collector.warn("Element " + label + " has an invalid value for " + attribute + " ('" + value + "'): it is ignored");
+          }
+        } else {
+          this.collector.warn("Element " + label + " has an unsupported Diff-X attribute " + attribute + ": it is ignored");
+        }
       }
     }
 
@@ -344,6 +384,7 @@ public class MarkdownSerializer {
      * the text but it is not escaped.
      */
     private void collectSegments(PSMLElement element, DiffOperation inherited, List<Segment> segments) {
+      checkDiffMarkup(element);
       DiffOperation op = opOf(element);
       DiffOperation current = op != DiffOperation.NONE ? op : inherited;
       for (PSMLNode node : element.getNodes()) {
@@ -364,7 +405,10 @@ public class MarkdownSerializer {
      */
     String markedText(PSMLElement element, @Nullable PSMLElement container) {
       DiffOperation inherited = state.inherited;
-      if (container != null && opOf(container) != DiffOperation.NONE) inherited = opOf(container);
+      if (container != null) {
+        checkDiffMarkup(container);
+        if (opOf(container) != DiffOperation.NONE) inherited = opOf(container);
+      }
       List<Segment> segments = new ArrayList<>();
       collectSegments(element, inherited, segments);
       return markedText(segments, text -> text);

@@ -148,6 +148,7 @@ class LoaderTest {
     PSMLElement para = parse("<para" + NS_CURRENT + " diff:insert='true' diff:delete='true'>x</para>");
     assertEquals(DiffOperation.NONE, para.getDiffOperation());
     assertTrue(para.isConflictingDiffOperation());
+    assertEquals(java.util.Set.of("diff:insert", "diff:delete"), para.getAttributeNames());
   }
 
   @Test
@@ -168,8 +169,11 @@ class LoaderTest {
 
   @Test
   void testParse_UnknownDiffElement() throws IOException {
-    PSMLElement para = parse("<para" + NS_CURRENT + "><diff:other>a</diff:other></para>");
-    assertEquals(Name.UNKNOWN, child(para, 0).getElement());
+    PSMLElement para = parse("<para" + NS_CURRENT + "><diff:other>a</diff:other><ins:x>b</ins:x></para>");
+    assertEquals(Name.DIFF_UNKNOWN, child(para, 0).getElement());
+    assertEquals(Name.DIFF_UNKNOWN, child(para, 1).getElement());
+    assertTrue(para.hasDiffMarkup());
+    assertEquals(Name.UNKNOWN, Name.forElement("diff:unknown"));
   }
 
   @Test
