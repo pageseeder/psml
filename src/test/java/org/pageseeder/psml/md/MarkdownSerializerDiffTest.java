@@ -10,7 +10,8 @@ import org.pageseeder.psml.md.MarkdownOutputOptions.SuperSubFormat;
 import org.pageseeder.psml.md.MarkdownOutputOptions.XrefFormat;
 import org.pageseeder.psml.md.MarkdownOutputOptions.PropertiesFormat;
 import org.pageseeder.psml.md.MarkdownOutputOptions.TableFormat;
-import org.pageseeder.psml.model.Loader;
+import org.pageseeder.psml.PSML;
+import org.pageseeder.psml.diff.PSMLDiffer;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLText;
@@ -32,6 +33,34 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * <p>Fixtures: {@code src/test/data/mddiff/generated/<name>.psml} (see {@link MarkdownDiffFixtures})
  * with the expected output in {@code src/test/data/mddiff/expected/<name>.md}.
+ *
+ * <p>Spec acceptance tests ({@code .plans/psml-markdown-diff.md}):
+ * <ol>
+ *   <li>Unchanged PSML, same output in both modes: {@link #testAcceptance1_ExistingInputsSameInBothModes()},
+ *       {@link #testNoDiff_SameInBothModes()}, {@link #testTable_NoDiffSameInBothModes()},
+ *       {@link #testCodeAndInline_NoDiffSameInBothModes()}</li>
+ *   <li>Default options preserve existing output: {@code MarkdownSerializerTest} (unchanged),
+ *       {@link #testIgnore_DiffMarkupNotEmitted()}</li>
+ *   <li>Inline insertion, deletion, replacement: fixture {@code para-inline}</li>
+ *   <li>Whole paragraph insertion/deletion: fixtures {@code para-insert}, {@code para-delete}</li>
+ *   <li>Threshold paragraph replacement: fixture {@code para-replace}</li>
+ *   <li>Headings, lists, nested formatting, multi-block fragments: fixtures {@code heading-*}, {@code list-item},
+ *       {@link #testNestedFormatting()}, {@link #testMultiBlockFragment()}, {@link #testDeletedAttributes()}</li>
+ *   <li>Namespaces and literal markers: {@link #testAlternatePrefixes()}, {@link #testNotDiff_UnqualifiedAndLiteralMarkers()},
+ *       {@link #testSentinelsRemoved()}</li>
+ *   <li>Attribute-backed properties: fixtures {@code property-value}, {@code property-insert}, {@code property-delete},
+ *       {@link #testProperties_ValuePairs()}, {@link #testProperties_ValueAddedOrRemoved()}</li>
+ *   <li>Multi-value and markup properties: fixture {@code property-multivalue}, {@link #testProperties_MarkupValue()},
+ *       {@link #testProperties_InsertedFragment()}</li>
+ *   <li>Tables: fixtures {@code table-*}, {@code testTable_*}</li>
+ *   <li>Images and cross-references: fixture {@code image}, {@link #testImage_ExcludedCreatesNoMarkers()}, {@code testXref_*}</li>
+ *   <li>Code-like content and sup/sub: fixtures {@code preformat}, {@code monospace}, {@code property-markdown},
+ *       {@code supsub}, {@link #testSupSub_Formats()}, {@link #testMediaFragment()}</li>
+ *   <li>Roots: {@link #testDiffRoot()}, {@link #testMultiBlockFragment()}, {@link #testDocumentIgnoresCompare()}</li>
+ *   <li>Unicode: {@link #testUnicodePreserved()}</li>
+ *   <li>Direction through {@code PSMLDiffer}: {@link #testAcceptance15_LiveDiffer()}</li>
+ *   <li>Diagnostics: {@code testDiagnostics_*}</li>
+ * </ol>
  */
 class MarkdownSerializerDiffTest {
 
@@ -44,7 +73,7 @@ class MarkdownSerializerDiffTest {
       + " xmlns:del='https://www.pageseeder.org/diffx/delete'";
 
   private static PSMLElement load(String xml) throws IOException {
-    return new Loader().parse(new StringReader(xml));
+    return PSML.load(new StringReader(xml));
   }
 
   private static String toMarkdown(PSMLElement element, MarkdownOutputOptions options) throws IOException {
@@ -449,6 +478,48 @@ class MarkdownSerializerDiffTest {
         assertTrue(warnings.stream().noneMatch(MarkdownSerializerDiffTest::isDiffWarning), name + ": " + warnings);
       }
     }
+  }
+
+  // Acceptance tests 1 and 15
+
+  @Test
+  void testAcceptance1_ExistingInputsSameInBothModes() throws IOException {
+    List<Path> inputs = new ArrayList<>();
+    try (Stream<Path> files = Files.list(Paths.get("src/test/resources/org/pageseeder/psml/md"))) {
+      files.filter(f -> f.toString().endsWith(".psml")).sorted().forEach(inputs::add);
+    }
+    try (Stream<Path> files = Files.list(MarkdownDiffFixtures.PAIRS)) {
+      files.sorted().forEach(inputs::add);
+    }
+    List<MarkdownOutputOptions> variants = new ArrayList<>();
+    for (TableFormat format : TableFormat.values()) {
+      variants.add(MarkdownOutputOptions.defaultOptions().table(format));
+    }
+    variants.add(MarkdownOutputOptions.defaultOptions().properties(PropertiesFormat.VALUE_PAIRS).superSub(SuperSubFormat.UNICODE));
+    assertFalse(inputs.isEmpty());
+    for (Path input : inputs) {
+      String xml = Files.readString(input);
+      for (MarkdownOutputOptions options : variants) {
+        assertEquals(toMarkdown(load(xml), options), toMarkdown(load(xml), options.diff(DiffFormat.INS_DEL)), input + " " + options);
+      }
+    }
+  }
+
+  @Test
+  void testAcceptance15_LiveDiffer() throws Exception {
+    String oldXml = "<fragment id='1'><para>Payment within 30 days.</para><property name='d' title='Due' value='old'/></fragment>";
+    String newXml = "<fragment id='1'><para>Payment within 14 days.</para><property name='d' title='Due' value='new'/></fragment>";
+    PSMLDiffer differ = new PSMLDiffer(4_000_000);
+    // The differ reverses its public arguments internally: pass the current (new) version first, like DiffHandler
+    java.io.StringWriter diff = new java.io.StringWriter();
+    differ.diff(new StringReader(newXml), new StringReader(oldXml), diff);
+    String md = toMarkdown(load(diff.toString()), INS_DEL.properties(PropertiesFormat.VALUE_PAIRS)).trim();
+    assertEquals("Payment within<del> 30</del><ins> 14</ins> days.\nDue: <del>old</del><ins>new</ins>", md);
+    // Passing the arguments the other way round swaps the operations
+    java.io.StringWriter reversed = new java.io.StringWriter();
+    differ.diff(new StringReader(oldXml), new StringReader(newXml), reversed);
+    String mdReversed = toMarkdown(load(reversed.toString()), INS_DEL.properties(PropertiesFormat.VALUE_PAIRS)).trim();
+    assertEquals("Payment within<del> 14</del><ins> 30</ins> days.\nDue: <del>new</del><ins>old</ins>", mdReversed);
   }
 
 }
