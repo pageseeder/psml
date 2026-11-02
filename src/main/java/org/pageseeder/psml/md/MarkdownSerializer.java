@@ -16,7 +16,9 @@
 package org.pageseeder.psml.md;
 
 import org.jspecify.annotations.Nullable;
+import org.pageseeder.psml.md.MarkdownOutputOptions.DiffFormat;
 import org.pageseeder.psml.model.PSMLElement;
+import org.pageseeder.psml.model.PSMLElement.DiffOperation;
 import org.pageseeder.psml.model.PSMLElement.Name;
 import org.pageseeder.psml.model.PSMLNode;
 import org.pageseeder.psml.model.PSMLText;
@@ -33,7 +35,20 @@ import java.util.*;
 /**
  * This class is responsible for serializing PSML content into Markdown format.
  *
- * @version 1.6.9
+ * <h2>Diff output</h2>
+ * <p>With {@link DiffFormat#INS_DEL}, combined Diff-X PSML (for example a {@code <diff>} element
+ * or a fragment produced by {@link org.pageseeder.psml.diff.PSMLDiffer}) is serialized with
+ * {@code <ins>} and {@code <del>} markers:
+ * <pre>{@code
+ * MarkdownSerializer serializer = new MarkdownSerializer();
+ * serializer.setOptions(MarkdownOutputOptions.defaultOptions().diff(DiffFormat.INS_DEL));
+ * serializer.serialize(diffFragment, out);
+ * }</pre>
+ * <p>For example, {@code <para diff:insert="true"><diff:ins>New paragraph.</diff:ins></para>}
+ * becomes {@code <ins>New paragraph.</ins>}, and {@code ## <ins>New heading</ins>} keeps the
+ * heading syntax outside the marker. The {@code <compare>} element is ignored in both modes.
+ *
+ * @version 1.8.6
  * @since 1.0
  */
 @SuppressWarnings("java:S1192")
@@ -76,7 +91,7 @@ public class MarkdownSerializer {
    */
   public void serialize(PSMLElement element, Appendable out) throws IOException {
     Instance instance = new Instance(this.options, new NilDiagnosticCollector());
-    instance.serialize(element, out);
+    serialize(instance, element, out);
   }
 
   /**
@@ -92,7 +107,20 @@ public class MarkdownSerializer {
    */
   public void serialize(PSMLElement element, Appendable out, DiagnosticCollector collector) throws IOException {
     Instance instance = new Instance(this.options, collector);
-    instance.serialize(element, out);
+    serialize(instance, element, out);
+  }
+
+  /**
+   * In diff mode, serializes into a buffer so that diff markers can be finished before being written.
+   */
+  private static void serialize(Instance instance, PSMLElement element, Appendable out) throws IOException {
+    if (instance.diff) {
+      StringBuilder buffer = new StringBuilder();
+      instance.serialize(element, buffer);
+      out.append(DiffMarkers.finish(buffer));
+    } else {
+      instance.serialize(element, out);
+    }
   }
 
   /**
@@ -118,6 +146,16 @@ public class MarkdownSerializer {
 
     private String host = "";
     private String path = "";
+
+    /**
+     * The diff operation that applies to the visible content being serialized (diff mode only).
+     */
+    private DiffOperation inherited = DiffOperation.NONE;
+
+    /**
+     * The diff marker currently open in the output (diff mode only).
+     */
+    private DiffOperation open = DiffOperation.NONE;
 
     public void push(Name name) {
       this.context.push(name);
@@ -240,12 +278,114 @@ public class MarkdownSerializer {
 
     private final DiagnosticCollector collector;
 
+    /**
+     * Whether diff markers are emitted ({@link DiffFormat#INS_DEL}).
+     */
+    private final boolean diff;
+
+    /**
+     * Whether a warning was already reported for sentinel characters in the source.
+     */
+    private boolean sentinelWarning = false;
+
     Instance(MarkdownOutputOptions options, DiagnosticCollector collector) {
       this.options = options;
       this.collector = Objects.requireNonNull(collector);
+      this.diff = options.diff() == DiffFormat.INS_DEL;
     }
 
     void serialize(PSMLElement element, Appendable out) throws IOException {
+      if (!this.diff) {
+        serializeElement(element, out);
+        return;
+      }
+      DiffOperation inherited = state.inherited;
+      Name name = element.getElement();
+      DiffOperation op = name.isDiff()
+          ? (name == Name.DIFF_INS ? DiffOperation.INSERT : DiffOperation.DELETE)
+          : element.getDiffOperation();
+      if (op != DiffOperation.NONE) state.inherited = op;
+      try {
+        if (op != DiffOperation.NONE && op != state.open && isWrappedWhole(name)) {
+          wrap(op, out, () -> serializeElement(element, out));
+        } else {
+          serializeElement(element, out);
+        }
+      } finally {
+        state.inherited = inherited;
+      }
+    }
+
+    /**
+     * Inline elements whose output does not go through {@link #processChildren(PSMLElement, Appendable)},
+     * so an inserted or deleted one is wrapped as a whole.
+     */
+    private static boolean isWrappedWhole(Name name) {
+      return name == Name.IMAGE || name == Name.XREF || name == Name.LINK || name == Name.PLACEHOLDER;
+    }
+
+    /**
+     * Writes the output of the action inside a marker for the specified operation.
+     *
+     * <p>If a marker for another operation is open, it is closed first and reopened after.
+     */
+    private void wrap(DiffOperation op, Appendable out, IOAction action) throws IOException {
+      DiffOperation previous = state.open;
+      if (previous != DiffOperation.NONE) out.append(DiffMarkers.close(previous));
+      out.append(DiffMarkers.open(op));
+      state.open = op;
+      try {
+        action.run();
+      } finally {
+        state.open = previous;
+      }
+      out.append(DiffMarkers.close(op));
+      if (previous != DiffOperation.NONE) out.append(DiffMarkers.open(previous));
+    }
+
+    /**
+     * Returns the attribute value, falling back on the deleted value in diff mode.
+     *
+     * <p>A deleted element only has its attributes in the Diff-X delete namespace.
+     */
+    private @Nullable String attr(PSMLElement element, String name) {
+      String value = element.getAttribute(name);
+      if (value == null && this.diff) value = element.getDeletedAttribute(name);
+      return value;
+    }
+
+    private String attrOrElse(PSMLElement element, String name, String defaultValue) {
+      String value = attr(element, name);
+      return value != null ? value : defaultValue;
+    }
+
+    private int attrOrElse(PSMLElement element, String name, int defaultValue) {
+      String value = attr(element, name);
+      if (value == null) return defaultValue;
+      try {
+        return Integer.parseInt(value);
+      } catch (NumberFormatException ex) {
+        return defaultValue;
+      }
+    }
+
+    /**
+     * In diff mode, removes sentinel characters and escapes marker-like text from source text.
+     */
+    private String clean(@Nullable String text) {
+      if (text == null || !this.diff) return text == null ? "" : text;
+      String cleaned = text;
+      if (DiffMarkers.hasSentinels(cleaned)) {
+        if (!this.sentinelWarning) {
+          this.collector.warn("Removed reserved characters U+E000 to U+E003 from the source text");
+          this.sentinelWarning = true;
+        }
+        cleaned = DiffMarkers.strip(cleaned);
+      }
+      return DiffMarkers.escape(cleaned);
+    }
+
+    private void serializeElement(PSMLElement element, Appendable out) throws IOException {
       Name name = element.getElement();
       state.push(name);
 
@@ -405,7 +545,8 @@ public class MarkdownSerializer {
     }
 
     private void serializeBlockAsQuoted(PSMLElement block, Appendable out) throws IOException {
-      String label = block.getAttribute("label");
+      String label = attr(block, "label");
+      if (label != null) label = clean(label);
       out.append("> ");
       if (label != null) {
         out.append(this.options.designator().format(label)).append(": ");
@@ -417,14 +558,15 @@ public class MarkdownSerializer {
     }
 
     private void serializeBlockAsFenced(PSMLElement block, Appendable out) throws IOException {
-      String label = block.getAttributeOrElse("label", "");
+      String label = clean(attrOrElse(block, "label", ""));
       out.append("~~~").append(label);
       processChildren(block, out);
       out.append("~~~\n");
     }
 
     private void serializeBlockAsLabelText(PSMLElement block, Appendable out) throws IOException {
-      String label = block.getAttribute("label");
+      String label = attr(block, "label");
+      if (label != null) label = clean(label);
       if (label != null) {
         out.append(this.options.designator().format(label)).append(": ");
       }
@@ -535,16 +677,16 @@ public class MarkdownSerializer {
     }
 
     private void serializeHeading(PSMLElement heading, Appendable out) throws IOException {
-      int level = heading.getAttributeOrElse("level", 1);
-      String prefix = heading.getAttribute("prefix");
+      int level = attrOrElse(heading, "level", 1);
+      String prefix = attr(heading, "prefix");
       out.append("\n");
       for (int i = 0; i < Math.min(level, 6); i++) {
         out.append('#');
       }
       out.append(' ');
       if (prefix != null) {
-        out.append(prefix).append(' ');
-      } else if ("true".equals(heading.getAttribute("numbered"))) {
+        out.append(clean(prefix)).append(' ');
+      } else if ("true".equals(attr(heading, "numbered"))) {
         out.append(state.nextHeadingPrefix(level - 1));
       }
       processChildren(heading, out);
@@ -552,8 +694,9 @@ public class MarkdownSerializer {
     }
 
     private void serializeImage(PSMLElement image, Appendable out) throws IOException {
-      String src = image.getAttributeOrElse("src", "");
-      String alt = image.getAttribute("alt");
+      String src = attrOrElse(image, "src", "");
+      String alt = attr(image, "alt");
+      if (alt != null) alt = clean(alt);
       if (options.designator() != MarkdownOutputOptions.DesignatorStyle.NONE) {
         out.append(options.designator().format(state.nextImage()));
         if (alt != null) {
@@ -581,8 +724,8 @@ public class MarkdownSerializer {
           collector.warn("Data URI images are not currently supported");
           break;
         case IMG_TAG:
-          String width = image.getAttributeOrElse("width", "");
-          String height = image.getAttributeOrElse("height", "");
+          String width = attrOrElse(image, "width", "");
+          String height = attrOrElse(image, "height", "");
           out.append("<img src=\"").append(src).append('"');
           out.append(" alt=\"").append(alt).append('"');
           if (!width.isEmpty()) {
@@ -610,8 +753,8 @@ public class MarkdownSerializer {
     }
 
     private void serializeLink(PSMLElement link, Appendable out) throws IOException {
-      String text = normalizeText(link.getText());
-      String url = link.getAttribute("href");
+      String text = clean(normalizeText(link.getText()));
+      String url = attr(link, "href");
       out.append("[").append(text).append("](").append(url).append(")");
     }
 
@@ -667,9 +810,9 @@ public class MarkdownSerializer {
     }
 
     private void serializePara(PSMLElement para, Appendable out) throws IOException {
-      String prefix = para.getAttribute("prefix");
+      String prefix = attr(para, "prefix");
       boolean inTableOrItem = state.isDescendantOf(Name.TABLE) || state.isDescendantOf(Name.ITEM);
-      int indent = para.getAttributeOrElse("indent", 0);
+      int indent = attrOrElse(para, "indent", 0);
       if (!inTableOrItem) out.append("\n");
       if (indent > 0) {
         for (int i = 0; i < Math.min(indent, 6); i++) {
@@ -677,8 +820,8 @@ public class MarkdownSerializer {
         }
       }
       if (prefix != null) {
-        out.append(prefix).append(" ");
-      } else if ("true".equals(para.getAttribute("numbered"))) {
+        out.append(clean(prefix)).append(" ");
+      } else if ("true".equals(attr(para, "numbered"))) {
         out.append(state.nextParaPrefix(indent));
       }
       processChildren(para, out);
@@ -698,14 +841,14 @@ public class MarkdownSerializer {
     }
 
     private void serializePlaceholder(PSMLElement placeholder, Appendable out) throws IOException {
-      String name = placeholder.getAttributeOrElse("name", "");
-      String text = normalizeText(placeholder.getText());
+      String name = clean(attrOrElse(placeholder, "name", ""));
+      String text = clean(normalizeText(placeholder.getText()));
       out.append("[[").append(text.isEmpty() ? name : text).append("]]");
     }
 
     private void serializeProperty(PSMLElement property, Appendable out) throws IOException {
-      String name = property.getAttributeOrElse("name", "");
-      String title = property.getAttributeOrElse("title", name);
+      String name = attrOrElse(property, "name", "");
+      String title = clean(attrOrElse(property, "title", name));
       String value = toPropertyValue(property);
       if (state.isDescendantOf(Name.METADATA) || options.properties() == MarkdownOutputOptions.PropertiesFormat.VALUE_PAIRS) {
         out.append(normalizeText(title)).append(": ").append(value).append("\n");
@@ -851,8 +994,8 @@ public class MarkdownSerializer {
     }
 
     private void serializeXref(PSMLElement link, Appendable out) throws IOException {
-      String text = normalizeText(link.getText());
-      String url = link.getAttributeOrElse("href", "");
+      String text = clean(normalizeText(link.getText()));
+      String url = attrOrElse(link, "href", "");
       switch (options.xref()) {
         case EXTERNAL_LINK:
           String externalHref = state.toExternalUrl(url);
@@ -871,26 +1014,72 @@ public class MarkdownSerializer {
       }
     }
 
-    @SuppressWarnings("java:S3776")
     private void processChildren(PSMLElement element, Appendable out) throws IOException {
-      for (PSMLNode node : element.getNodes()) {
-        if (node instanceof PSMLText) {
-          String text = normalizeText(node.getText());
-          if (state.isDescendantOf(Name.ITALIC) && this.options.italic() == MarkdownOutputOptions.ItalicFormat.ASTERISK
-           || state.isDescendantOf(Name.BOLD) && this.options.bold() == MarkdownOutputOptions.BoldFormat.DOUBLE_ASTERISK) {
-            text = text.replace("*", "\\*");
-          }
-          if (state.isDescendantOf(Name.BOLD) && this.options.bold() == MarkdownOutputOptions.BoldFormat.DOUBLE_UNDERSCORE
-           || state.isDescendantOf(Name.ITALIC) && this.options.italic() == MarkdownOutputOptions.ItalicFormat.UNDERSCORE) {
-            text = text.replace("_", "\\_");
-          }
-          if (state.isDescendantOf(Name.MONOSPACE)) {
-            text = text.replace("`", "\\`");
-          }
-          out.append(text);
-        } else {
-          serialize((PSMLElement) node, out);
+      if (this.diff && state.inherited != DiffOperation.NONE && state.inherited != state.open) {
+        processChildrenInRuns(element, out);
+      } else {
+        for (PSMLNode node : element.getNodes()) {
+          processNode(node, out);
         }
+      }
+    }
+
+    /**
+     * Processes the children, wrapping each run of consecutive inline nodes in a marker for the
+     * inherited operation. Child blocks are processed separately and mark their own content.
+     */
+    private void processChildrenInRuns(PSMLElement element, Appendable out) throws IOException {
+      List<PSMLNode> nodes = element.getNodes();
+      int i = 0;
+      while (i < nodes.size()) {
+        if (isInline(nodes.get(i))) {
+          int j = i;
+          while (j < nodes.size() && isInline(nodes.get(j))) j++;
+          List<PSMLNode> run = nodes.subList(i, j);
+          if (isWhiteSpaceOnly(run)) {
+            for (PSMLNode node : run) processNode(node, out);
+          } else {
+            wrap(state.inherited, out, () -> {
+              for (PSMLNode node : run) processNode(node, out);
+            });
+          }
+          i = j;
+        } else {
+          processNode(nodes.get(i), out);
+          i++;
+        }
+      }
+    }
+
+    private static boolean isInline(PSMLNode node) {
+      return node instanceof PSMLText || ((PSMLElement) node).getElement().isInline();
+    }
+
+    private static boolean isWhiteSpaceOnly(List<PSMLNode> run) {
+      for (PSMLNode node : run) {
+        if (!(node instanceof PSMLText) || !node.getText().trim().isEmpty()) return false;
+      }
+      return true;
+    }
+
+    @SuppressWarnings("java:S3776")
+    private void processNode(PSMLNode node, Appendable out) throws IOException {
+      if (node instanceof PSMLText) {
+        String text = clean(normalizeText(node.getText()));
+        if (state.isDescendantOf(Name.ITALIC) && this.options.italic() == MarkdownOutputOptions.ItalicFormat.ASTERISK
+         || state.isDescendantOf(Name.BOLD) && this.options.bold() == MarkdownOutputOptions.BoldFormat.DOUBLE_ASTERISK) {
+          text = text.replace("*", "\\*");
+        }
+        if (state.isDescendantOf(Name.BOLD) && this.options.bold() == MarkdownOutputOptions.BoldFormat.DOUBLE_UNDERSCORE
+         || state.isDescendantOf(Name.ITALIC) && this.options.italic() == MarkdownOutputOptions.ItalicFormat.UNDERSCORE) {
+          text = text.replace("_", "\\_");
+        }
+        if (state.isDescendantOf(Name.MONOSPACE)) {
+          text = text.replace("`", "\\`");
+        }
+        out.append(text);
+      } else {
+        serialize((PSMLElement) node, out);
       }
     }
 
@@ -940,10 +1129,18 @@ public class MarkdownSerializer {
       }
     }
 
-    private static String textOf(@Nullable PSMLElement element) {
-      return element == null ? "" : normalizeText(element.getText());
+    private String textOf(@Nullable PSMLElement element) {
+      return element == null ? "" : clean(normalizeText(element.getText()));
     }
 
+  }
+
+  /**
+   * An output action that may throw an I/O exception.
+   */
+  @FunctionalInterface
+  private interface IOAction {
+    void run() throws IOException;
   }
 
 }

@@ -1,0 +1,1 @@
+<diff><fragment xmlns:diff="https://www.pageseeder.org/diffx" xmlns:ins="https://www.pageseeder.org/diffx/insert" xmlns:del="https://www.pageseeder.org/diffx/delete" id="1"><para>Call <monospace><diff:del>foo</diff:del><diff:ins>bar</diff:ins>()</monospace> now.</para></fragment></diff>

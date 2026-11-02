@@ -1,0 +1,1 @@
+<diff><fragment xmlns:diff="https://www.pageseeder.org/diffx" xmlns:ins="https://www.pageseeder.org/diffx/insert" xmlns:del="https://www.pageseeder.org/diffx/delete" id="1"><preformat role="lang-java">int x =<diff:del> 1</diff:del><diff:ins> 2</diff:ins>;</preformat></fragment></diff>

@@ -34,7 +34,7 @@ import org.pageseeder.xmlwriter.XMLWriter;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.9
+ * @version 1.8.6
  * @since 1.0
  */
 @SuppressWarnings("java:S1192")
@@ -145,6 +145,24 @@ public class PSMLElement implements PSMLNode {
      * @see <a href="https://dev.pageseeder.com/api/psml/element_reference/element-diff.html">diff element</a>
      */
     DIFF("diff"),
+
+    /**
+     * Diff-X inserted text, written as {@code <diff:ins>}.
+     *
+     * <p>Only resolved from an element in a Diff-X namespace, see {@link #forElement(String, String, String)}.
+     *
+     * @since 1.8.6
+     */
+    DIFF_INS("diff:ins", true),
+
+    /**
+     * Diff-X deleted text, written as {@code <diff:del>}.
+     *
+     * <p>Only resolved from an element in a Diff-X namespace, see {@link #forElement(String, String, String)}.
+     *
+     * @since 1.8.6
+     */
+    DIFF_DEL("diff:del", true),
 
     /**
      * &lt;displaytitle&lt; element
@@ -594,13 +612,74 @@ public class PSMLElement implements PSMLNode {
       return this.attributes;
     }
 
+    /**
+     * Returns the PSML name matching the specified element name.
+     *
+     * <p>Diff-X names ({@link #DIFF_INS} and {@link #DIFF_DEL}) are never returned by this method,
+     * because a name alone does not identify the Diff-X namespace.
+     *
+     * @param name The element name
+     *
+     * @return The corresponding name or {@link #UNKNOWN}
+     */
     public static Name forElement(String name) {
       for (Name element : values()) {
-        if (element.element.equals(name)) return element;
+        if (element.element.equals(name) && !element.isDiff()) return element;
       }
       return Name.UNKNOWN;
     }
 
+    /**
+     * Returns the PSML name for the specified namespace-qualified element.
+     *
+     * <p>Elements in the current or legacy Diff-X namespace resolve to {@link #DIFF_INS} or
+     * {@link #DIFF_DEL} whatever their prefix. Any other element resolves using its qualified
+     * name as {@link #forElement(String)} does.
+     *
+     * @param uri       The namespace URI (may be empty)
+     * @param localName The local name
+     * @param qName     The qualified name
+     *
+     * @return The corresponding name or {@link #UNKNOWN}
+     *
+     * @since 1.8.6
+     */
+    public static Name forElement(@Nullable String uri, String localName, String qName) {
+      if (DiffX.PREFIX.equals(DiffX.prefixFor(uri))) {
+        if ("ins".equals(localName)) return DIFF_INS;
+        if ("del".equals(localName)) return DIFF_DEL;
+        return UNKNOWN;
+      }
+      return forElement(qName);
+    }
+
+    /**
+     * @return {@code true} for the Diff-X text names {@link #DIFF_INS} and {@link #DIFF_DEL}.
+     *
+     * @since 1.8.6
+     */
+    public boolean isDiff() {
+      return this == DIFF_INS || this == DIFF_DEL;
+    }
+
+  }
+
+  /**
+   * A structural Diff-X operation on an element, from the {@code diff:insert} and
+   * {@code diff:delete} attributes.
+   *
+   * @since 1.8.6
+   */
+  public enum DiffOperation {
+
+    /** Not inserted or deleted. */
+    NONE,
+
+    /** Inserted element ({@code diff:insert="true"}). */
+    INSERT,
+
+    /** Deleted element ({@code diff:delete="true"}). */
+    DELETE
   }
 
   /**
@@ -1024,10 +1103,115 @@ public class PSMLElement implements PSMLNode {
     return out.toString();
   }
 
+  /**
+   * Returns the structural diff operation on this element.
+   *
+   * <p>This only reflects the {@code diff:insert} and {@code diff:delete} attributes. It returns
+   * {@link DiffOperation#NONE} when both are {@code true}, see {@link #isConflictingDiffOperation()}.
+   * Diff-X text elements ({@link Name#DIFF_INS} and {@link Name#DIFF_DEL}) are identified by
+   * their name instead.
+   *
+   * @return the diff operation on this element.
+   *
+   * @since 1.8.6
+   */
+  public DiffOperation getDiffOperation() {
+    if (this.attributes == null) return DiffOperation.NONE;
+    boolean insert = "true".equals(this.attributes.get(DiffX.INSERT_ATTRIBUTE));
+    boolean delete = "true".equals(this.attributes.get(DiffX.DELETE_ATTRIBUTE));
+    if (insert == delete) return DiffOperation.NONE;
+    return insert ? DiffOperation.INSERT : DiffOperation.DELETE;
+  }
+
+  /**
+   * @return {@code true} if both {@code diff:insert} and {@code diff:delete} are {@code true} on this element.
+   *
+   * @since 1.8.6
+   */
+  public boolean isConflictingDiffOperation() {
+    return this.attributes != null
+        && "true".equals(this.attributes.get(DiffX.INSERT_ATTRIBUTE))
+        && "true".equals(this.attributes.get(DiffX.DELETE_ATTRIBUTE));
+  }
+
+  /**
+   * Indicates whether the specified attribute was inserted or changed by the diff.
+   *
+   * <p>Diff-X marks an inserted or changed attribute with {@code ins:<name>="true"}; the
+   * attribute itself holds the new value.
+   *
+   * @param name The name of the attribute (without prefix)
+   *
+   * @return {@code true} if {@code ins:<name>} is {@code true}.
+   *
+   * @since 1.8.6
+   */
+  public boolean isInsertedAttribute(String name) {
+    return "true".equals(getAttribute(DiffX.INS_PREFIX + ':' + name));
+  }
+
+  /**
+   * Returns the old value of an attribute that was deleted or changed by the diff.
+   *
+   * <p>Diff-X stores the old value in {@code del:<name>}. A deleted element has all its
+   * attributes in this form only.
+   *
+   * @param name The name of the attribute (without prefix)
+   *
+   * @return The value of {@code del:<name>} or {@code null}.
+   *
+   * @since 1.8.6
+   */
+  public @Nullable String getDeletedAttribute(String name) {
+    return getAttribute(DiffX.DEL_PREFIX + ':' + name);
+  }
+
+  /**
+   * Indicates whether this element or any of its descendants contains Diff-X markup.
+   *
+   * @return {@code true} if this element or a descendant is a Diff-X text element or has a Diff-X attribute.
+   *
+   * @since 1.8.6
+   */
+  public boolean hasDiffMarkup() {
+    if (this.name.isDiff()) return true;
+    if (this.attributes != null) {
+      for (String attribute : this.attributes.keySet()) {
+        if (DiffX.isDiffAttribute(attribute)) return true;
+      }
+    }
+    if (this.nodes != null) {
+      for (PSMLNode node : this.nodes) {
+        if (node instanceof PSMLElement && ((PSMLElement) node).hasDiffMarkup()) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>If this element contains diff markup, the Diff-X namespaces are declared on it.
+   */
   @Override
   public void toXML(XMLWriter xml) throws IOException {
+    toXML(xml, hasDiffMarkup());
+  }
+
+  /**
+   * Writes this element as XML.
+   *
+   * @param xml          The XML writer
+   * @param declareDiffX Whether to declare the Diff-X namespaces on this element
+   */
+  private void toXML(XMLWriter xml, boolean declareDiffX) throws IOException {
     boolean hasChildren = !this.name.isInline() && hasOnlyElementAsChildren();
     xml.openElement(this.name.element(), hasChildren);
+    if (declareDiffX) {
+      xml.attribute("xmlns:" + DiffX.PREFIX, DiffX.NS_URI);
+      xml.attribute("xmlns:" + DiffX.INS_PREFIX, DiffX.INS_NS_URI);
+      xml.attribute("xmlns:" + DiffX.DEL_PREFIX, DiffX.DEL_NS_URI);
+    }
     // Se attributes if any
     if (this.attributes != null) {
       for (Entry<String, String> e : this.attributes.entrySet()) {
@@ -1037,7 +1221,8 @@ public class PSMLElement implements PSMLNode {
     // Process nodes if any
     if (this.nodes != null) {
       for (PSMLNode node : this.nodes) {
-        node.toXML(xml);
+        if (node instanceof PSMLElement) ((PSMLElement) node).toXML(xml, false);
+        else node.toXML(xml);
       }
     }
     xml.closeElement();

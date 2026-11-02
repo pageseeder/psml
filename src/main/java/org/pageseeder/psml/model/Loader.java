@@ -40,7 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Christophe Lauret
  *
- * @version 1.7.4
+ * @version 1.8.6
  * @since 1.0
  */
 public final class Loader {
@@ -160,13 +160,32 @@ public final class Loader {
       // Commit any text
       commitText();
       // Push a new element
-      PSMLElement element = new PSMLElement(Name.forElement(qName));
+      PSMLElement element = new PSMLElement(Name.forElement(uri, localName, qName));
       for (int i=0; i < attributes.getLength(); i++) {
-        String name = attributes.getQName(i);
         String value = attributes.getValue(i);
-        element.setAttribute(name, value);
+        element.setAttribute(toAttributeName(attributes, i), value);
       }
       push(element);
+    }
+
+    /**
+     * Returns the name of the attribute to store in the model.
+     *
+     * <p>Attributes in a Diff-X namespace (current or legacy) use the fixed model prefixes
+     * {@code diff:}, {@code ins:} and {@code del:} whatever their source prefix. Other attributes
+     * keep their qualified name, except that an attribute from another namespace using one of these
+     * prefixes gets an underscore after its prefix (for example {@code diff_:insert}) so that it
+     * cannot be mistaken for diff markup.
+     */
+    private static String toAttributeName(Attributes attributes, int i) {
+      String prefix = DiffX.prefixFor(attributes.getURI(i));
+      if (prefix != null) return prefix + ':' + attributes.getLocalName(i);
+      String qName = attributes.getQName(i);
+      if (DiffX.isDiffAttribute(qName)) {
+        int colon = qName.indexOf(':');
+        return qName.substring(0, colon) + '_' + qName.substring(colon);
+      }
+      return qName;
     }
 
     @Override
