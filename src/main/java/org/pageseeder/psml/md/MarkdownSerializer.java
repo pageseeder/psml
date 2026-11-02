@@ -301,9 +301,7 @@ public class MarkdownSerializer {
       }
       DiffOperation inherited = state.inherited;
       Name name = element.getElement();
-      DiffOperation op = name.isDiff()
-          ? (name == Name.DIFF_INS ? DiffOperation.INSERT : DiffOperation.DELETE)
-          : element.getDiffOperation();
+      DiffOperation op = opOf(element);
       if (op != DiffOperation.NONE) state.inherited = op;
       try {
         if (op != DiffOperation.NONE && op != state.open && isWrappedWhole(name)) {
@@ -314,6 +312,103 @@ public class MarkdownSerializer {
       } finally {
         state.inherited = inherited;
       }
+    }
+
+    /**
+     * Returns the diff operation that an element applies to its content.
+     */
+    private static DiffOperation opOf(PSMLElement element) {
+      Name name = element.getElement();
+      if (name == Name.DIFF_INS) return DiffOperation.INSERT;
+      if (name == Name.DIFF_DEL) return DiffOperation.DELETE;
+      return element.getDiffOperation();
+    }
+
+    /**
+     * Returns the text wrapped in a marker for the operation, unless it is empty, the operation
+     * is NONE, or a marker for the same operation is already open.
+     */
+    private String marked(DiffOperation op, String text) {
+      if (text.isEmpty() || op == DiffOperation.NONE || op == state.open) return text;
+      return DiffMarkers.open(op) + text + DiffMarkers.close(op);
+    }
+
+    /**
+     * Collects the text of an element as segments tagged with the diff operation that applies to them.
+     *
+     * <p>Text markers ({@code diff:ins}, {@code diff:del}) are the innermost operation, so they take
+     * priority over the operation inherited from structural annotations. Sentinels are removed from
+     * the text but it is not escaped.
+     */
+    private void collectSegments(PSMLElement element, DiffOperation inherited, List<Segment> segments) {
+      DiffOperation op = opOf(element);
+      DiffOperation current = op != DiffOperation.NONE ? op : inherited;
+      for (PSMLNode node : element.getNodes()) {
+        if (node instanceof PSMLText) {
+          segments.add(new Segment(current, stripSentinels(node.getText())));
+        } else {
+          collectSegments((PSMLElement) node, current, segments);
+        }
+      }
+    }
+
+    /**
+     * Returns the text of the element with sentinels for diff markers, merging adjacent segments
+     * with the same operation. The text is not escaped or normalized.
+     *
+     * @param element   The element
+     * @param container An element containing it whose diff operation also applies (may be null)
+     */
+    String markedText(PSMLElement element, @Nullable PSMLElement container) {
+      DiffOperation inherited = state.inherited;
+      if (container != null && opOf(container) != DiffOperation.NONE) inherited = opOf(container);
+      List<Segment> segments = new ArrayList<>();
+      collectSegments(element, inherited, segments);
+      StringBuilder out = new StringBuilder();
+      DiffOperation open = DiffOperation.NONE;
+      for (Segment segment : segments) {
+        if (segment.text.isEmpty()) continue;
+        if (segment.op != open) {
+          if (open != DiffOperation.NONE) out.append(DiffMarkers.close(open));
+          if (segment.op != DiffOperation.NONE) out.append(DiffMarkers.open(segment.op));
+          open = segment.op;
+        }
+        out.append(segment.text);
+      }
+      if (open != DiffOperation.NONE) out.append(DiffMarkers.close(open));
+      return out.toString();
+    }
+
+    /**
+     * Returns the old or new version of the text of an element.
+     *
+     * @param segments The segments of text
+     * @param excluded The operation to leave out: INSERT for the old version, DELETE for the new one
+     */
+    private static String projection(List<Segment> segments, DiffOperation excluded) {
+      StringBuilder out = new StringBuilder();
+      for (Segment segment : segments) {
+        if (segment.op != excluded) out.append(segment.text);
+      }
+      return out.toString();
+    }
+
+    /**
+     * Formats code-like content as {@code <del>old</del><ins>new</ins>}, where each version is
+     * formatted in its own code syntax.
+     *
+     * <p>Unchanged content is returned as is. Content that only exists in one version is wrapped once.
+     */
+    private String codeChange(PSMLElement element, CodeFormat format) {
+      List<Segment> segments = new ArrayList<>();
+      collectSegments(element, state.inherited, segments);
+      String oldText = projection(segments, DiffOperation.INSERT);
+      String newText = projection(segments, DiffOperation.DELETE);
+      if (oldText.equals(newText)) return format.apply(newText);
+      StringBuilder out = new StringBuilder();
+      if (!oldText.isEmpty()) out.append(marked(DiffOperation.DELETE, format.apply(oldText)));
+      if (!newText.isEmpty()) out.append(marked(DiffOperation.INSERT, format.apply(newText)));
+      return out.toString();
     }
 
     /**
@@ -374,15 +469,19 @@ public class MarkdownSerializer {
      */
     private String clean(@Nullable String text) {
       if (text == null || !this.diff) return text == null ? "" : text;
-      String cleaned = text;
-      if (DiffMarkers.hasSentinels(cleaned)) {
-        if (!this.sentinelWarning) {
-          this.collector.warn("Removed reserved characters U+E000 to U+E003 from the source text");
-          this.sentinelWarning = true;
-        }
-        cleaned = DiffMarkers.strip(cleaned);
+      return DiffMarkers.escape(stripSentinels(text));
+    }
+
+    /**
+     * Removes sentinel characters from source text, reporting a warning the first time.
+     */
+    private String stripSentinels(String text) {
+      if (!DiffMarkers.hasSentinels(text)) return text;
+      if (!this.sentinelWarning) {
+        this.collector.warn("Removed reserved characters U+E000 to U+E003 from the source text");
+        this.sentinelWarning = true;
       }
-      return DiffMarkers.escape(cleaned);
+      return DiffMarkers.strip(text);
     }
 
     private void serializeElement(PSMLElement element, Appendable out) throws IOException {
@@ -850,14 +949,46 @@ public class MarkdownSerializer {
       String name = attrOrElse(property, "name", "");
       String title = clean(attrOrElse(property, "title", name));
       String value = toPropertyValue(property);
+      String label = normalizeText(title);
+      if (this.diff) label = marked(state.inherited, label);
       if (state.isDescendantOf(Name.METADATA) || options.properties() == MarkdownOutputOptions.PropertiesFormat.VALUE_PAIRS) {
-        out.append(normalizeText(title)).append(": ").append(value).append("\n");
+        out.append(label).append(": ").append(value).append("\n");
       } else {
-        out.append("| ").append(normalizeText(title)).append(" | ").append(value).append(" |\n");
+        out.append("| ").append(label).append(" | ").append(value).append(" |\n");
       }
     }
 
+    /**
+     * Returns the value of an attribute-backed property in diff mode, reconstructing the old
+     * and new values from the Diff-X attribute annotations.
+     *
+     * <p>A replaced value is written {@code <del>old</del><ins>new</ins>}, deletion first.
+     *
+     * @return the value or {@code null} if the property has no value attribute in either version.
+     */
+    private @Nullable String toPropertyValueDiff(PSMLElement property) {
+      String newValue = property.getAttribute("value");
+      String oldValue = property.getDeletedAttribute("value");
+      if (newValue == null && oldValue == null) return null;
+      String newText = newValue != null ? clean(normalizeText(newValue.replace("\n", "<br>"))) : "";
+      String oldText = oldValue != null ? clean(normalizeText(oldValue.replace("\n", "<br>"))) : "";
+      DiffOperation op = state.inherited;
+      if (op == DiffOperation.DELETE) return marked(op, oldValue != null ? oldText : newText);
+      if (op == DiffOperation.INSERT) return marked(op, newText);
+      if (oldValue != null && !oldText.equals(newText)) {
+        return marked(DiffOperation.DELETE, oldText) + marked(DiffOperation.INSERT, newText);
+      }
+      if (oldValue == null && property.isInsertedAttribute("value")) {
+        return marked(DiffOperation.INSERT, newText);
+      }
+      return newText;
+    }
+
     private String toPropertyValue(PSMLElement property) throws IOException {
+      if (this.diff) {
+        String value = toPropertyValueDiff(property);
+        if (value != null) return value;
+      }
       String value = property.getAttribute("value");
       // Single value
       if (value != null) {
@@ -866,6 +997,7 @@ public class MarkdownSerializer {
       // Markdown
       PSMLElement markdown = property.getFirstChildElement(Name.MARKDOWN);
       if (markdown != null) {
+        if (this.diff) return codeChange(markdown, text -> clean(text.replace("\n", "<br>")));
         return markdown.getText().replace("\n", "<br>");
       }
       StringBuilder out = new StringBuilder();
@@ -877,7 +1009,11 @@ public class MarkdownSerializer {
         for (PSMLElement v : values) {
           if (first) first = false;
           else out.append(", ");
-          out.append(normalizeText(v.getText()));
+          if (this.diff) {
+            out.append(DiffMarkers.escape(normalizeText(markedText(v, null))));
+          } else {
+            out.append(normalizeText(v.getText()));
+          }
         }
         out.append("]");
         return out.toString();
@@ -909,7 +1045,8 @@ public class MarkdownSerializer {
         out.append("|---|---|\n");
       }
       for (PSMLElement property : fragment.getChildElements(Name.PROPERTY)) {
-        serializeProperty(property, out);
+        // Through serialize so that the property's own diff operation applies
+        serialize(property, out);
       }
     }
 
@@ -970,7 +1107,7 @@ public class MarkdownSerializer {
     }
 
     private void serializeTable(PSMLElement table, Appendable out) throws IOException {
-      MarkdownTable tableOut = new MarkdownTable(table, state.nextTable(), this.collector);
+      MarkdownTable tableOut = new MarkdownTable(table, state.nextTable(), this.collector, this.diff ? this::markedText : null);
       tableOut.format(out, options);
     }
 
@@ -1133,6 +1270,27 @@ public class MarkdownSerializer {
       return element == null ? "" : clean(normalizeText(element.getText()));
     }
 
+  }
+
+  /**
+   * A piece of text with the diff operation that applies to it.
+   */
+  private static final class Segment {
+    private final DiffOperation op;
+    private final String text;
+
+    Segment(DiffOperation op, String text) {
+      this.op = op;
+      this.text = text;
+    }
+  }
+
+  /**
+   * Formats one version of code-like content in its code syntax.
+   */
+  @FunctionalInterface
+  private interface CodeFormat {
+    String apply(String text);
   }
 
   /**

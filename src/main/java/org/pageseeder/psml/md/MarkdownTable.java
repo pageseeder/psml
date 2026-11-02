@@ -19,11 +19,28 @@ import java.util.Objects;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.7
+ * @version 1.8.6
  * @since 1.0
  */
 @SuppressWarnings("java:S1192") // No value in creating constants for each element/attribute name
 class MarkdownTable {
+
+  /**
+   * Renders the text of a cell or caption with diff markers (as sentinels).
+   *
+   * @since 1.8.6
+   */
+  @FunctionalInterface
+  interface CellRenderer {
+
+    /**
+     * @param element   The cell or caption to render
+     * @param container The row containing the cell, or {@code null} for a caption
+     *
+     * @return The text with sentinels for diff markers, not escaped or normalized.
+     */
+    String render(PSMLElement element, @Nullable PSMLElement container);
+  }
 
   private enum CellAlignment {
     NONE, LEFT, CENTER, RIGHT
@@ -66,13 +83,24 @@ class MarkdownTable {
    */
   private final CellStyle[] columnStyles;
 
+  /**
+   * Renders cell and caption text in diff mode; {@code null} to use their plain text.
+   */
+  private final @Nullable CellRenderer renderer;
+
   MarkdownTable(PSMLElement table, String name, DiagnosticCollector collector) {
+    this(table, name, collector, null);
+  }
+
+  MarkdownTable(PSMLElement table, String name, DiagnosticCollector collector, @Nullable CellRenderer renderer) {
+    this.renderer = renderer;
     this.table = Objects.requireNonNull(table);
     this.name = name;
     this.collector = collector;
-    this.columnCount = countColumnsForTable(table);
-    this.columnAlignments = toColumnAlignments(this.table.getChildElements(PSMLElement.Name.COL), this.columnCount);
-    this.columnStyles = toColumnStyles(this.table.getChildElements(PSMLElement.Name.COL), this.columnCount);
+    boolean diff = renderer != null;
+    this.columnCount = countColumnsForTable(table, diff);
+    this.columnAlignments = toColumnAlignments(this.table.getChildElements(PSMLElement.Name.COL), this.columnCount, diff);
+    this.columnStyles = toColumnStyles(this.table.getChildElements(PSMLElement.Name.COL), this.columnCount, diff);
     if (PSMLElement.Name.TABLE != table.getElement()) {
       this.collector.error(name+" is not a table!");
     }
@@ -91,17 +119,17 @@ class MarkdownTable {
    * @param table the table represented as a {@code PSMLElement}
    * @return the maximum number of columns found among the rows of the table
    */
-  private static int countColumnsForTable(PSMLElement table) {
+  private static int countColumnsForTable(PSMLElement table, boolean diff) {
     final int maxRowsChecked = 10;
     int count = 0;
     int rowsChecked = 0;
     // Check the col elements first
     for (PSMLElement col : table.getChildElements(PSMLElement.Name.COL)) {
-      count += col.getAttributeOrElse("colspan", 1);
+      count += intAttr(col, "colspan", 1, diff);
     }
     // Go through the rows
     for (PSMLElement row : table.getChildElements(PSMLElement.Name.ROW)) {
-      count = Math.max(count, countColumnsInRow(row));
+      count = Math.max(count, countColumnsInRow(row, diff));
       if (++rowsChecked >= maxRowsChecked) break;
     }
     return count;
@@ -115,10 +143,10 @@ class MarkdownTable {
    * @param row the table row represented as a {@code PSMLElement}, or null
    * @return the total number of columns in the row; 0 if {@code row} is null
    */
-  private static int countColumnsInRow(PSMLElement row) {
+  private static int countColumnsInRow(PSMLElement row, boolean diff) {
     int count = 0;
     for (PSMLElement cell : row.getChildElements(PSMLElement.Name.CELL, PSMLElement.Name.HCELL)) {
-      count += cell.getAttributeOrElse("colspan", 1);
+      count += intAttr(cell, "colspan", 1, diff);
     }
     return count;
   }
@@ -131,12 +159,12 @@ class MarkdownTable {
    * @param columnCount the total number of columns in the table
    * @return an array of {@code CellAlignment} values representing the alignment for each column
    */
-  private static CellAlignment[] toColumnAlignments(List<PSMLElement> columns, int columnCount) {
+  private static CellAlignment[] toColumnAlignments(List<PSMLElement> columns, int columnCount, boolean diff) {
     CellAlignment[] alignments = new CellAlignment[columnCount];
     Arrays.fill(alignments, CellAlignment.NONE);
     int i = 0;
     for (PSMLElement col : columns) {
-      String attribute = col.getAttribute("align");
+      String attribute = attr(col, "align", diff);
       CellAlignment alignment = toCellAlignment(attribute);
       alignments[i] = alignment;
       i++;
@@ -156,12 +184,12 @@ class MarkdownTable {
    * @param columnCount the total number of columns in the table, specifying the size of the resulting styles array
    * @return an array of {@code CellStyle} values, where each index corresponds to the style of a specific column
    */
-  private static CellStyle[] toColumnStyles(List<PSMLElement> columns, int columnCount) {
+  private static CellStyle[] toColumnStyles(List<PSMLElement> columns, int columnCount, boolean diff) {
     CellStyle[] styles = new CellStyle[columnCount];
     Arrays.fill(styles, CellStyle.NONE);
     int i = 0;
     for (PSMLElement col : columns) {
-      String attribute = col.getAttribute("part");
+      String attribute = attr(col, "part", diff);
       CellStyle style = toCellStyle(attribute);
       styles[i] = style;
       i++;
@@ -199,7 +227,10 @@ class MarkdownTable {
     out.append("\n").append(options.designator().format(name));
     PSMLElement captionElement = table.getFirstChildElement(PSMLElement.Name.CAPTION);
     if (captionElement != null) {
-      out.append(": ").append(captionElement.getText());
+      String caption = this.renderer != null
+          ? DiffMarkers.escape(this.renderer.render(captionElement, null))
+          : captionElement.getText();
+      out.append(": ").append(caption);
     }
     out.append("\n\n");
   }
@@ -247,7 +278,7 @@ class MarkdownTable {
     for (PSMLElement row : rows) {
       String[] cells = toCells(row, rowIndex, false);
       for (int i=0; i < cells.length; i++) {
-        columnWidths[i] = Math.max(columnWidths[i], Math.min(MAX_COLUMN_WIDTH, cells[i].length()+2));
+        columnWidths[i] = Math.max(columnWidths[i], Math.min(MAX_COLUMN_WIDTH, displayLength(cells[i])+2));
       }
       rowIndex++;
       // Only scan the first 20 rows to compute the width
@@ -304,11 +335,12 @@ class MarkdownTable {
     out.append("  <caption>").append(this.name);
     PSMLElement caption = table.getFirstChildElement(PSMLElement.Name.CAPTION);
     if (caption != null) {
-      out.append(": ").append(XML.escape(caption.getText()));
+      String text = this.renderer != null ? this.renderer.render(caption, null) : caption.getText();
+      out.append(": ").append(XML.escape(text));
     }
     out.append("</caption>\n");
     for (PSMLElement row : table.getChildElements(PSMLElement.Name.ROW)) {
-      boolean isHeaderRow = "header".equals(row.getAttribute("part"));
+      boolean isHeaderRow = "header".equals(attr(row, "part"));
       out.append("  <tr>\n");
       List<PSMLElement> cells = row.getChildElements(PSMLElement.Name.CELL, PSMLElement.Name.HCELL);
       int span = 0;
@@ -320,14 +352,17 @@ class MarkdownTable {
         if (this.columnAlignments[i+span] != CellAlignment.NONE) {
           out.append(" style=\"text-align:").append(this.columnAlignments[i].toString().toLowerCase()).append(";\"");
         }
-        if (td.getAttribute("colspan") != null) {
-          out.append(" colspan=\"").append(td.getAttribute("colspan")).append('"');
-          span += td.getAttributeOrElse("colspan", 1) - 1;
+        String colspan = attr(td, "colspan");
+        if (colspan != null) {
+          out.append(" colspan=\"").append(colspan).append('"');
+          span += intAttr(td, "colspan", 1, this.renderer != null) - 1;
         }
-        if (td.getAttribute("rowspan") != null) {
-          out.append(" rowspan=\"").append(td.getAttribute("rowspan")).append('"');
+        String rowspan = attr(td, "rowspan");
+        if (rowspan != null) {
+          out.append(" rowspan=\"").append(rowspan).append('"');
         }
-        out.append('>').append(XML.escape(td.getText().trim())).append("</").append(elementName).append(">\n");
+        String text = this.renderer != null ? this.renderer.render(td, row) : td.getText();
+        out.append('>').append(XML.escape(text.trim())).append("</").append(elementName).append(">\n");
       }
       out.append("  </tr>\n");
     }
@@ -368,7 +403,7 @@ class MarkdownTable {
       } else out.append(' ');
       String cell = cells[i];
       CellAlignment align = this.columnAlignments[i];
-      int pad = Math.max(columnWidths[i] - cell.length() - 2, 0);
+      int pad = Math.max(columnWidths[i] - displayLength(cell) - 2, 0);
       if (align == CellAlignment.RIGHT) {
         out.append(" ".repeat(pad));
         out.append(cell);
@@ -396,19 +431,19 @@ class MarkdownTable {
 
   private String[] toCells(PSMLElement row, int rowIndex, boolean normalize) {
     String[] cells = new String[this.columnCount];
-    CellStyle rowStyle = toCellStyle(row.getAttribute("part"));
+    CellStyle rowStyle = toCellStyle(attr(row, "part"));
     int i = 0;
     for (PSMLElement cell : row.getChildElements(PSMLElement.Name.CELL, PSMLElement.Name.HCELL)) {
       // Compute text
       CellStyle style = rowStyle != CellStyle.NONE ? rowStyle : columnStyles[i];
-      cells[i] = toText(cell, rowIndex, style);
+      cells[i] = toText(row, cell, rowIndex, style);
 
       // Deal with spans
-      int rowspan = cell.getAttributeOrElse("rowspan", 1);
+      int rowspan = intAttr(cell, "rowspan", 1, this.renderer != null);
       if (rowspan > 1) {
         this.collector.warn("Table cell "+(i+1)+" at row "+(rowIndex+1)+" has rowspan attribute, which is not supported in Markdown.");
       }
-      int colspan = cell.getAttributeOrElse("colspan", 1);
+      int colspan = intAttr(cell, "colspan", 1, this.renderer != null);
       if (colspan > 1) {
         if (!normalize) {
           this.collector.warn("Table cell "+(i+1)+" at row "+(rowIndex+1)+" has colspan attribute, which is not supported in Markdown.");
@@ -428,8 +463,47 @@ class MarkdownTable {
     return cells;
   }
 
-  private static String toText(PSMLElement cell, int rowIndex, CellStyle style) {
-    String text = MarkdownSerializer.normalizeText(cell.getText().trim().replace("\n", "<br>"));
+  /**
+   * Returns the attribute value, falling back on the deleted value in diff mode.
+   */
+  private @Nullable String attr(PSMLElement element, String name) {
+    return attr(element, name, this.renderer != null);
+  }
+
+  private static @Nullable String attr(PSMLElement element, String name, boolean diff) {
+    String value = element.getAttribute(name);
+    if (value == null && diff) value = element.getDeletedAttribute(name);
+    return value;
+  }
+
+  private static int intAttr(PSMLElement element, String name, int defaultValue, boolean diff) {
+    String value = attr(element, name, diff);
+    if (value == null) return defaultValue;
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException ex) {
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Returns the length of the cell text once diff sentinels are converted to tags.
+   */
+  private static int displayLength(String cell) {
+    int length = cell.length();
+    for (int i = 0; i < cell.length(); i++) {
+      char c = cell.charAt(i);
+      if (c == DiffMarkers.INS_OPEN || c == DiffMarkers.DEL_OPEN) length += 4;
+      else if (c == DiffMarkers.INS_CLOSE || c == DiffMarkers.DEL_CLOSE) length += 5;
+    }
+    return length;
+  }
+
+  private String toText(PSMLElement row, PSMLElement cell, int rowIndex, CellStyle style) {
+    String raw = this.renderer != null
+        ? DiffMarkers.escape(this.renderer.render(cell, row)).replace("|", "\\|")
+        : cell.getText();
+    String text = MarkdownSerializer.normalizeText(raw.trim().replace("\n", "<br>"));
     if (style == CellStyle.BOLD && rowIndex > 0) {
       text = "**"+text.replace("*", "\\*")+"**";
     } else if (style == CellStyle.ITALIC) {

@@ -3,7 +3,10 @@ package org.pageseeder.psml.md;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.pageseeder.psml.md.MarkdownOutputOptions.DesignatorStyle;
 import org.pageseeder.psml.md.MarkdownOutputOptions.DiffFormat;
+import org.pageseeder.psml.md.MarkdownOutputOptions.PropertiesFormat;
+import org.pageseeder.psml.md.MarkdownOutputOptions.TableFormat;
 import org.pageseeder.psml.model.Loader;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.util.ListDiagnosticCollector;
@@ -155,6 +158,112 @@ class MarkdownSerializerDiffTest {
     String xml = "<document level='portable'><section id='s'><fragment id='1'><para>Current text</para></fragment></section>"
         + "<compare><compareto version='1'/><diff><fragment" + NS + " id='1'><para>Current<diff:ins> text</diff:ins></para></fragment></diff></compare></document>";
     assertEquals("Current text", toMarkdown(xml));
+  }
+
+  private static String fixture(String name, MarkdownOutputOptions options) throws IOException {
+    Path source = MarkdownDiffFixtures.GENERATED.resolve(name + ".psml");
+    return toMarkdown(load(Files.readString(source)), options).trim();
+  }
+
+  // Phase 4: properties
+
+  @Test
+  void testProperties_ValuePairs() throws IOException {
+    MarkdownOutputOptions pairs = INS_DEL.properties(PropertiesFormat.VALUE_PAIRS);
+    assertEquals("Effective date: <del>1 July 2026</del><ins>1 August 2026</ins>", fixture("property-value", pairs));
+    assertEquals("A: alpha\n<ins>B</ins>: <ins>beta</ins>", fixture("property-insert", pairs));
+    assertEquals("A: alpha\n<del>B</del>: <del>beta</del>", fixture("property-delete", pairs));
+    assertEquals("Tags: [red, <del>green</del><ins>blue</ins>]", fixture("property-multivalue", pairs));
+    assertEquals("Notes: <del>Some *old* text</del><ins>Some *new* text</ins>", fixture("property-markdown", pairs));
+  }
+
+  @Test
+  void testProperties_ValueAddedOrRemoved() throws IOException {
+    String xml = "<properties-fragment" + NS + " id='1'>"
+        + "<property name='a' title='A' value='new' ins:value='true'/>"
+        + "<property name='b' title='B' del:value='old'/></properties-fragment>";
+    assertEquals("A: <ins>new</ins>\nB: <del>old</del>", toMarkdown(load(xml), INS_DEL.properties(PropertiesFormat.VALUE_PAIRS)).trim());
+  }
+
+  @Test
+  void testProperties_InsertedFragment() throws IOException {
+    String xml = "<properties-fragment" + NS + " id='1' diff:insert='true'>"
+        + "<property diff:insert='true' name='a' ins:name='true' title='A' ins:title='true' value='x' ins:value='true'/>"
+        + "<property name='tags' title='Tags' multiple='true'><value><diff:ins>t</diff:ins></value></property></properties-fragment>";
+    assertEquals("| Name | Value |\n|---|---|\n| <ins>A</ins> | <ins>x</ins> |\n| <ins>Tags</ins> | [<ins>t</ins>] |", toMarkdown(xml));
+  }
+
+  @Test
+  void testProperties_MarkupValue() throws IOException {
+    String xml = "<properties-fragment" + NS + " id='1'><property name='a' title='A'>"
+        + "<para>Some<diff:del> old</diff:del><diff:ins> new</diff:ins> text</para></property></properties-fragment>";
+    // The para line breaks become <br> as in the legacy output
+    assertEquals("A: <br>Some<del> old</del><ins> new</ins> text<br>", toMarkdown(load(xml), INS_DEL.properties(PropertiesFormat.VALUE_PAIRS)).trim());
+  }
+
+  @Test
+  void testProperties_MetadataNotIncluded() throws IOException {
+    String xml = "<document" + NS + "><metadata><properties><property name='a' title='A' del:value='1' value='2' ins:value='true'/></properties></metadata>"
+        + "<section id='s'><fragment id='1'><para>Text</para></fragment></section></document>";
+    assertEquals("Text", toMarkdown(load(xml), INS_DEL.metadata(false)).trim());
+    assertTrue(toMarkdown(load(xml), INS_DEL).contains("A: <del>1</del><ins>2</ins>"));
+  }
+
+  // Phase 5: tables
+
+  @Test
+  void testTable_Formats() throws IOException {
+    String row = "| <ins>c</ins> | <ins>d</ins> |";
+    assertTrue(fixture("table-row", INS_DEL.table(TableFormat.COMPACT)).endsWith("|---|---|\n| a | b |\n" + row));
+    assertTrue(fixture("table-row", INS_DEL.table(TableFormat.NORMALIZED)).endsWith("|---|---|\n| a | b |\n" + row));
+    String html = fixture("table-row", INS_DEL.table(TableFormat.HTML));
+    assertTrue(html.contains("<tr>\n    <td><ins>c</ins></td>\n    <td><ins>d</ins></td>\n  </tr>"), html);
+  }
+
+  @Test
+  void testTable_CaptionHtml() throws IOException {
+    String md = fixture("table-caption", INS_DEL.table(TableFormat.HTML).designator(DesignatorStyle.DOUBLE_ASTERISK));
+    assertTrue(md.startsWith("**Table 1**: <del>Old</del><ins>New</ins> caption\n"), md);
+    assertTrue(md.contains("<caption>Table 1: <del>Old</del><ins>New</ins> caption</caption>"), md);
+  }
+
+  @Test
+  void testTable_HtmlEscaping() throws IOException {
+    String xml = "<table" + NS + "><row><cell>a &lt;ins&gt; &amp; <diff:ins>b</diff:ins></cell></row></table>";
+    assertTrue(toMarkdown(load(xml), INS_DEL.table(TableFormat.HTML)).contains("<td>a &lt;ins&gt; &amp; <ins>b</ins></td>"));
+  }
+
+  @Test
+  void testTable_SpansAndPipes() throws IOException {
+    String xml = "<table" + NS + "><row><cell colspan='2'><diff:del>a|b</diff:del><diff:ins>c</diff:ins></cell></row>"
+        + "<row><cell>x</cell><cell>y</cell></row></table>";
+    String md = toMarkdown(load(xml), INS_DEL.table(TableFormat.NORMALIZED)).trim();
+    assertEquals("| <del>a\\|b</del><ins>c</ins> | <del>a\\|b</del><ins>c</ins> |\n|---|---|\n| x | y |", md);
+  }
+
+  @Test
+  void testTable_DeletedRowAndCell() throws IOException {
+    String xml = "<table" + NS + "><row part='header'><cell>H1</cell><cell>H2</cell></row>"
+        + "<row diff:delete='true' del:part='footer'><cell diff:delete='true'><diff:del>x</diff:del></cell><cell diff:delete='true'><diff:del>y</diff:del></cell></row>"
+        + "<row><cell diff:delete='true' del:colspan='2'><diff:del>wide</diff:del></cell></row></table>";
+    String md = toMarkdown(load(xml), INS_DEL.table(TableFormat.COMPACT)).trim();
+    assertEquals("| H1 | H2 |\n|---|---|\n| *<del>x</del>* | *<del>y</del>* |\n| <del>wide</del> |  |", md);
+  }
+
+  @Test
+  void testTable_PrettyWidths() throws IOException {
+    String xml = "<table" + NS + "><row><cell>Header</cell></row><row><cell><diff:ins>abc</diff:ins></cell></row></table>";
+    assertEquals("| Header         |\n|----------------|\n| <ins>abc</ins> |", toMarkdown(xml));
+  }
+
+  @Test
+  void testTable_NoDiffSameInBothModes() throws IOException {
+    String xml = "<table><col align='right'/><col/><row part='header'><cell>H1</cell><cell>H2</cell></row>"
+        + "<row><cell colspan='2'>wide</cell></row><row part='footer'><cell>f <bold>1</bold></cell><cell>f2</cell></row></table>";
+    for (TableFormat format : TableFormat.values()) {
+      MarkdownOutputOptions options = MarkdownOutputOptions.defaultOptions().table(format);
+      assertEquals(toMarkdown(load(xml), options), toMarkdown(load(xml), options.diff(DiffFormat.INS_DEL)), format.name());
+    }
   }
 
 }
