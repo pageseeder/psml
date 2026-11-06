@@ -988,7 +988,8 @@ public class MarkdownSerializer {
     /**
      * Serializes a code block in diff mode.
      *
-     * <p>Unchanged code is serialized as without diff. Changed code is serialized as the old
+     * <p>Unchanged code is serialized as without diff, except that literal marker tags are
+     * escaped. Changed code is serialized as the old
      * version in a fenced block inside {@code <del>} followed by the new version in a fenced
      * block inside {@code <ins>}, each marker on its own line. Code that only exists in one
      * version is wrapped once.
@@ -1095,7 +1096,7 @@ public class MarkdownSerializer {
       String role = attr(element, "role");
       String language = "";
       if (role != null && (role.startsWith("language-") || role.startsWith("lang-"))) {
-        language = role.substring(role.indexOf('-') + 1);
+        language = clean(role.substring(role.indexOf('-') + 1));
       }
       if (this.diff) {
         serializeCodeBlockDiff(element, language, out);

@@ -123,7 +123,7 @@ Embedded Markdown property values work the same way: `<del>Some *old* text</del>
 
 ## Escaping and diagnostics
 
-In `INS_DEL` mode, literal source text that looks like a marker (`<ins`, `</ins`, `<del`, `</del`, in any case) is written as `&lt;ins`, and so on, so it can't pass for a marker. The serializer uses the characters U+E000 to U+E003 internally; if they appear in the source, they are removed with a warning.
+In `INS_DEL` mode, literal text that looks like a marker (`<ins`, `</ins`, `<del`, `</del`, in any case, followed by whitespace, `/`, `>` or the end of the text) is written as `&lt;ins`, and so on, so it can't pass for a marker. This applies to the whole output, including code, attribute values such as URLs, and text that only looks like a marker once its pieces are joined. Other markup is left alone, such as `<insert>` or `<div>`, as is code such as `a<del)`. In code, the escaped text appears literally as `&lt;del>`, and it can't be told apart from a source that already contained `&lt;del>`. The serializer uses the characters U+E000 to U+E003 internally; if they appear in the source, they are removed with a warning.
 
 Unsupported or contradictory annotations are reported through the `DiagnosticCollector` passed to `serialize(element, out, collector)`:
 

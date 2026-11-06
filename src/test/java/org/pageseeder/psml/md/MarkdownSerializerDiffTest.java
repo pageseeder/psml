@@ -411,6 +411,59 @@ class MarkdownSerializerDiffTest {
   }
 
   @Test
+  void testLiteralMarkers_SplitInUnchangedMonospace() throws IOException {
+    assertEquals("<ins>`&lt;ins>`</ins>",
+        toMarkdown("<para" + NS + " diff:insert='true'><monospace>&lt;<diff:ins>ins</diff:ins>&gt;</monospace></para>"));
+    assertEquals("<del>`&lt;/del>`</del>",
+        toMarkdown("<para" + NS + " diff:delete='true'><monospace>&lt;<diff:del>/del</diff:del>&gt;</monospace></para>"));
+    assertEquals("<ins>`&lt;del>`</ins>",
+        toMarkdown("<para" + NS + " diff:insert='true'><monospace><diff:ins>&lt;</diff:ins><diff:ins>del&gt;</diff:ins></monospace></para>"));
+  }
+
+  @Test
+  void testLiteralMarkers_JoinedInOutput() throws IOException {
+    assertEquals("<ins>&lt;del>x</ins>",
+        toMarkdown("<para" + NS + " diff:insert='true'><diff:ins>&lt;</diff:ins><diff:ins>del&gt;x</diff:ins></para>"));
+    assertEquals("&lt;ins>x", toMarkdown(load("<para" + NS + ">&lt;<bold>ins</bold>&gt;x</para>"),
+        INS_DEL.bold(MarkdownOutputOptions.BoldFormat.IGNORE)).trim());
+    assertEquals("`&lt;ins>`", toMarkdown(load("<monospace" + NS + ">&lt;<italic>ins</italic>&gt;</monospace>"),
+        INS_DEL.italic(MarkdownOutputOptions.ItalicFormat.IGNORE)).trim());
+    // The markers around the excluded image are removed, which joins the text
+    assertEquals("&lt;ins>x", toMarkdown(load("<para" + NS + ">&lt;<image diff:insert='true' src='a.png'/>ins&gt;x</para>"),
+        INS_DEL.image(ImageFormat.DATA_URI)).trim());
+  }
+
+  @Test
+  void testLiteralMarkers_InAttributes() throws IOException {
+    assertEquals("```&lt;ins>\nx\n```", toMarkdown("<preformat" + NS + " role='lang-&lt;ins&gt;'>x</preformat>"));
+    assertEquals("[t](a&lt;del>b)", toMarkdown("<link" + NS + " href='a&lt;del&gt;b'>t</link>"));
+    assertEquals("![a&lt;del>b.png](a&lt;del>b.png)", toMarkdown("<image" + NS + " src='a&lt;del&gt;b.png'/>"));
+  }
+
+  @Test
+  void testSentinelsRemoved_FenceLanguage() throws IOException {
+    assertEquals("```java\nx\n```", toMarkdown("<preformat" + NS + " role='lang-java'>x</preformat>"));
+    assertEquals("<ins>\n```java\nx\n```\n</ins>",
+        toMarkdown("<preformat" + NS + " diff:insert='true' role='lang-java'><diff:ins>x</diff:ins></preformat>"));
+  }
+
+  @Test
+  void testLiteralMarkers_TagForms() throws IOException {
+    assertEquals("&lt;del/> &lt;ins class=\"x\"> &lt;INS> &lt;/del>",
+        toMarkdown("<para" + NS + ">&lt;del/&gt; &lt;ins class=\"x\"&gt; &lt;INS&gt; &lt;/del&gt;</para>"));
+    assertEquals("x <ins>&lt;del</ins> y", toMarkdown("<para" + NS + ">x <diff:ins>&lt;del</diff:ins> y</para>"));
+    assertEquals("a &lt;del && b", toMarkdown("<para" + NS + ">a &lt;del &amp;&amp; b</para>"));
+  }
+
+  @Test
+  void testLiteralMarkers_OtherTextUnchanged() throws IOException {
+    assertEquals("```\nif (a<del) { b<ins; }\n```", toMarkdown("<preformat" + NS + ">if (a&lt;del) { b&lt;ins; }</preformat>"));
+    assertEquals("`a<del;`", toMarkdown("<monospace" + NS + ">a&lt;del;</monospace>"));
+    assertEquals("<insert> <delete> <ins-x> <div> <br>",
+        toMarkdown("<para" + NS + ">&lt;insert&gt; &lt;delete&gt; &lt;ins-x&gt; &lt;div&gt; &lt;br&gt;</para>"));
+  }
+
+  @Test
   void testSupSub_Formats() throws IOException {
     assertEquals("E = mc<del>²</del><ins>³</ins> and H<del>₂</del><ins>₃</ins>O", fixture("supsub", INS_DEL.superSub(SuperSubFormat.UNICODE)));
     assertEquals("E = mc<sup><del>2</del><ins>3</ins></sup> and H<sub><del>2</del><ins>3</ins></sub>O", fixture("supsub", INS_DEL.superSub(SuperSubFormat.HTML)));

@@ -24,8 +24,9 @@ import java.util.regex.Pattern;
  *
  * <p>While serializing, markers are written as private-use sentinel characters so that they
  * survive trimming, line splitting, whitespace normalization and XML escaping. Once the whole
- * output is available, {@link #finish(CharSequence)} removes empty marker pairs and converts the
- * sentinels to {@code <ins>}, {@code </ins>}, {@code <del>} and {@code </del>}.
+ * output is available, {@link #finish(CharSequence)} removes empty marker pairs, escapes literal
+ * marker-like text and converts the sentinels to {@code <ins>}, {@code </ins>}, {@code <del>} and
+ * {@code </del>}.
  *
  * @author Christophe Lauret
  *
@@ -48,8 +49,12 @@ final class DiffMarkers {
   /** Matches any sentinel character. */
   private static final Pattern SENTINELS = Pattern.compile("[-]");
 
-  /** Matches the start of literal text that looks like an ins/del tag. */
-  private static final Pattern MARKER_LIKE = Pattern.compile("<(?=/?(?i:ins|del)(?![A-Za-z0-9_.:-]))");
+  /**
+   * Matches the start of literal text that looks like an ins/del tag: the name must be followed by
+   * whitespace, {@code /}, {@code >}, a sentinel or the end of the text, so that code such as
+   * {@code a<del)} is left alone.
+   */
+  private static final Pattern MARKER_LIKE = Pattern.compile("<(?=/?(?i:ins|del)(?:[\\s/>\\uE000-\\uE003]|$))");
 
   private DiffMarkers() {
   }
@@ -100,13 +105,16 @@ final class DiffMarkers {
   }
 
   /**
-   * Removes empty marker pairs and converts the sentinels to tags.
+   * Removes empty marker pairs, escapes literal marker-like text and converts the sentinels to tags.
+   *
+   * <p>Generated markers are still sentinels at this point, so any marker-like text is literal. This
+   * covers text that only becomes marker-like once its pieces are joined in the output.
    *
    * @param serialized The serialized output containing sentinels
    * @return The final Markdown
    */
   static String finish(CharSequence serialized) {
-    String text = removeEmptyPairs(serialized.toString());
+    String text = escape(removeEmptyPairs(serialized.toString()));
     StringBuilder out = new StringBuilder(text.length() + 32);
     for (int i = 0; i < text.length(); i++) {
       char c = text.charAt(i);
