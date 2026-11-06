@@ -1244,7 +1244,8 @@ public class PSMLElement implements PSMLNode {
     // Process nodes if any
     if (this.nodes != null) {
       for (PSMLNode node : this.nodes) {
-        if (node instanceof PSMLElement) ((PSMLElement) node).toXML(xml, false);
+        // Only bypass public dispatch for the base class: subclasses may override toXML.
+        if (node.getClass() == PSMLElement.class) ((PSMLElement) node).toXML(xml, false);
         else node.toXML(xml);
       }
     }
