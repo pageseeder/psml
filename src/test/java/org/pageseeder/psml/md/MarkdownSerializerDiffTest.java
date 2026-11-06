@@ -377,6 +377,40 @@ class MarkdownSerializerDiffTest {
   }
 
   @Test
+  void testCode_LiteralMarkersEscaped() throws IOException {
+    String literal = "&lt;InS&gt;literal&lt;/InS&gt; &lt;del&gt;old&lt;/del&gt;";
+    String escaped = "&lt;InS>literal&lt;/InS> &lt;del>old&lt;/del>";
+    String raw = "<InS>literal</InS> <del>old</del>";
+    for (String name : new String[]{"monospace", "preformat", "media-fragment"}) {
+      boolean inline = "monospace".equals(name);
+      String xml = "<" + name + NS + ">" + literal + "</" + name + ">";
+      String expected = inline ? "`" + escaped + "`" : "```\n" + escaped + "\n```";
+      assertEquals(expected, toMarkdown(xml), name);
+      String legacy = inline ? "`" + raw + "`" : "```\n" + raw + "\n```";
+      assertEquals(legacy, toMarkdown(load(xml), MarkdownOutputOptions.defaultOptions()).trim(), name);
+
+      String changed = "<" + name + NS + ">" + literal + "<diff:ins>x</diff:ins></" + name + ">";
+      String oldCode = inline ? "`" + escaped + "`" : "\n```\n" + escaped + "\n```\n";
+      String newCode = inline ? "`" + escaped + "x`" : "\n```\n" + escaped + "x\n```\n";
+      assertEquals("<del>" + oldCode + "</del>" + (inline ? "" : "\n")
+          + "<ins>" + newCode + "</ins>", toMarkdown(changed), name);
+    }
+  }
+
+  @Test
+  void testCode_LiteralMarkerReconstructedByProjection() throws IOException {
+    // Neither source text node contains a complete marker prefix; the old/new projections do.
+    for (String name : new String[]{"monospace", "preformat", "media-fragment"}) {
+      boolean inline = "monospace".equals(name);
+      String xml = "<" + name + NS + ">&lt;<diff:del>del</diff:del><diff:ins>ins</diff:ins>&gt;</" + name + ">";
+      String oldCode = inline ? "`&lt;del>`" : "\n```\n&lt;del>\n```\n";
+      String newCode = inline ? "`&lt;ins>`" : "\n```\n&lt;ins>\n```\n";
+      assertEquals("<del>" + oldCode + "</del>" + (inline ? "" : "\n")
+          + "<ins>" + newCode + "</ins>", toMarkdown(xml), name);
+    }
+  }
+
+  @Test
   void testSupSub_Formats() throws IOException {
     assertEquals("E = mc<del>²</del><ins>³</ins> and H<del>₂</del><ins>₃</ins>O", fixture("supsub", INS_DEL.superSub(SuperSubFormat.UNICODE)));
     assertEquals("E = mc<sup><del>2</del><ins>3</ins></sup> and H<sub><del>2</del><ins>3</ins></sub>O", fixture("supsub", INS_DEL.superSub(SuperSubFormat.HTML)));

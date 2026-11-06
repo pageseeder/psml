@@ -976,9 +976,10 @@ public class MarkdownSerializer {
     }
 
     /**
-     * Formats text as a fenced code block.
+     * Formats projected text as a fenced code block in diff mode, escaping literal marker tags.
      */
     private static String toFencedCode(String text, String lang) {
+      text = DiffMarkers.escape(text);
       StringBuilder out = new StringBuilder("```").append(lang);
       if (!text.startsWith("\n")) out.append('\n');
       return out.append(text.replaceAll("\\s+$", "")).append("\n```").toString();
@@ -1046,7 +1047,7 @@ public class MarkdownSerializer {
 
     private void serializeMonospace(PSMLElement monospace, Appendable out) throws IOException {
       if (this.diff && hasChangedText(monospace)) {
-        out.append(codeChange(monospace, text -> "`" + normalizeText(text).replace("`", "\\`") + "`"));
+        out.append(codeChange(monospace, text -> "`" + DiffMarkers.escape(normalizeText(text)).replace("`", "\\`") + "`"));
         return;
       }
       out.append("`");
