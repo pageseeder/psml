@@ -331,7 +331,21 @@ class MarkdownTable {
    */
   public void formatHtml(Appendable out) throws IOException {
     out.append("<table>\n");
-    // Caption
+    formatHtmlCaption(out);
+    for (PSMLElement row : table.getChildElements(PSMLElement.Name.ROW)) {
+      boolean isHeaderRow = "header".equals(attr(row, "part"));
+      out.append("  <tr>\n");
+      List<PSMLElement> cells = row.getChildElements(PSMLElement.Name.CELL, PSMLElement.Name.HCELL);
+      int span = 0;
+      for (int i=0; i < cells.size(); i++) {
+        span += formatHtmlCell(out, row, cells.get(i), i + span, isHeaderRow);
+      }
+      out.append("  </tr>\n");
+    }
+    out.append("</table>\n");
+  }
+
+  private void formatHtmlCaption(Appendable out) throws IOException {
     out.append("  <caption>").append(this.name);
     PSMLElement caption = table.getFirstChildElement(PSMLElement.Name.CAPTION);
     if (caption != null) {
@@ -339,34 +353,34 @@ class MarkdownTable {
       out.append(": ").append(XML.escape(text));
     }
     out.append("</caption>\n");
-    for (PSMLElement row : table.getChildElements(PSMLElement.Name.ROW)) {
-      boolean isHeaderRow = "header".equals(attr(row, "part"));
-      out.append("  <tr>\n");
-      List<PSMLElement> cells = row.getChildElements(PSMLElement.Name.CELL, PSMLElement.Name.HCELL);
-      int span = 0;
-      for (int i=0; i < cells.size(); i++) {
-        PSMLElement td = cells.get(i);
-        String elementName = isHeaderRow || td.getElement() == PSMLElement.Name.HCELL ? "th" : "td";
-        out.append("    <").append(elementName);
-        // Compute alignment before spans
-        if (this.columnAlignments[i+span] != CellAlignment.NONE) {
-          out.append(" style=\"text-align:").append(this.columnAlignments[i].toString().toLowerCase()).append(";\"");
-        }
-        String colspan = attr(td, "colspan");
-        if (colspan != null) {
-          out.append(" colspan=\"").append(colspan).append('"');
-          span += intAttr(td, "colspan", 1, this.renderer != null) - 1;
-        }
-        String rowspan = attr(td, "rowspan");
-        if (rowspan != null) {
-          out.append(" rowspan=\"").append(rowspan).append('"');
-        }
-        String text = this.renderer != null ? this.renderer.render(td, row) : td.getText();
-        out.append('>').append(XML.escape(text.trim())).append("</").append(elementName).append(">\n");
-      }
-      out.append("  </tr>\n");
+  }
+
+  /**
+   * Formats a single HTML table cell.
+   *
+   * @return the number of additional columns spanned by this cell
+   */
+  private int formatHtmlCell(Appendable out, PSMLElement row, PSMLElement td, int column, boolean isHeaderRow) throws IOException {
+    String elementName = isHeaderRow || td.getElement() == PSMLElement.Name.HCELL ? "th" : "td";
+    out.append("    <").append(elementName);
+    // Compute alignment before spans
+    CellAlignment align = this.columnAlignments[column];
+    if (align != CellAlignment.NONE) {
+      out.append(" style=\"text-align:").append(align.toString().toLowerCase()).append(";\"");
     }
-    out.append("</table>\n");
+    int extraSpan = 0;
+    String colspan = attr(td, "colspan");
+    if (colspan != null) {
+      out.append(" colspan=\"").append(colspan).append('"');
+      extraSpan = intAttr(td, "colspan", 1, this.renderer != null) - 1;
+    }
+    String rowspan = attr(td, "rowspan");
+    if (rowspan != null) {
+      out.append(" rowspan=\"").append(rowspan).append('"');
+    }
+    String text = this.renderer != null ? this.renderer.render(td, row) : td.getText();
+    out.append('>').append(XML.escape(text.trim())).append("</").append(elementName).append(">\n");
+    return extraSpan;
   }
 
   private void formatCompactRow(Appendable out, String[] cells) throws IOException {
@@ -435,25 +449,9 @@ class MarkdownTable {
     int i = 0;
     for (PSMLElement cell : row.getChildElements(PSMLElement.Name.CELL, PSMLElement.Name.HCELL)) {
       // Compute text
-      CellStyle style = rowStyle != CellStyle.NONE ? rowStyle : columnStyles[i];
+      CellStyle style = rowStyle == CellStyle.NONE ? columnStyles[i] : rowStyle;
       cells[i] = toText(row, cell, rowIndex, style);
-
-      // Deal with spans
-      int rowspan = intAttr(cell, "rowspan", 1, this.renderer != null);
-      if (rowspan > 1) {
-        this.collector.warn("Table cell "+(i+1)+" at row "+(rowIndex+1)+" has rowspan attribute, which is not supported in Markdown.");
-      }
-      int colspan = intAttr(cell, "colspan", 1, this.renderer != null);
-      if (colspan > 1) {
-        if (!normalize) {
-          this.collector.warn("Table cell "+(i+1)+" at row "+(rowIndex+1)+" has colspan attribute, which is not supported in Markdown.");
-        }
-        for (int j=1; j < colspan; j++) {
-          cells[i+j] = normalize ? cells[i] : "";
-        }
-      }
-
-      i += colspan;
+      i += applySpans(cells, cell, i, rowIndex, normalize);
       if (i >= cells.length) break;
     }
     // Ensure that all cells have a value
@@ -461,6 +459,29 @@ class MarkdownTable {
       cells[i] = "";
     }
     return cells;
+  }
+
+  /**
+   * Handles the row and column spans of the cell at the specified index, warning about
+   * unsupported spans and filling the spanned cells.
+   *
+   * @return the number of columns spanned by the cell
+   */
+  private int applySpans(String[] cells, PSMLElement cell, int i, int rowIndex, boolean normalize) {
+    int rowspan = intAttr(cell, "rowspan", 1, this.renderer != null);
+    if (rowspan > 1) {
+      this.collector.warn("Table cell "+(i+1)+" at row "+(rowIndex+1)+" has rowspan attribute, which is not supported in Markdown.");
+    }
+    int colspan = intAttr(cell, "colspan", 1, this.renderer != null);
+    if (colspan > 1) {
+      if (!normalize) {
+        this.collector.warn("Table cell "+(i+1)+" at row "+(rowIndex+1)+" has colspan attribute, which is not supported in Markdown.");
+      }
+      for (int j=1; j < colspan; j++) {
+        cells[i+j] = normalize ? cells[i] : "";
+      }
+    }
+    return colspan;
   }
 
   /**
