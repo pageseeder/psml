@@ -140,9 +140,9 @@ public class MarkdownSerializer {
 
     private int propertiesCounter = 0;
 
-    private final int[] headingPrefix = new int[]{0, 0, 0, 0, 0, 0};
+    private final int[] headingPrefix = {0, 0, 0, 0, 0, 0};
 
-    private final int[] paraPrefix = new int[]{0, 0, 0, 0, 0};
+    private final int[] paraPrefix = {0, 0, 0, 0, 0};
 
     private String host = "";
     private String path = "";
@@ -386,7 +386,7 @@ public class MarkdownSerializer {
     private void collectSegments(PSMLElement element, DiffOperation inherited, List<Segment> segments) {
       checkDiffMarkup(element);
       DiffOperation op = opOf(element);
-      DiffOperation current = op != DiffOperation.NONE ? op : inherited;
+      DiffOperation current = op == DiffOperation.NONE ? inherited : op;
       for (PSMLNode node : element.getNodes()) {
         if (node instanceof PSMLText) {
           segments.add(new Segment(current, stripSentinels(node.getText())));
@@ -891,7 +891,7 @@ public class MarkdownSerializer {
         out.append("\n");
       }
       if (alt == null) {
-        alt = !src.isEmpty() ? src.substring(src.lastIndexOf('/') + 1) : "";
+        alt = src.isEmpty() ? "" : src.substring(src.lastIndexOf('/') + 1);
       }
       switch (options.image()) {
         case LOCAL:
@@ -906,7 +906,7 @@ public class MarkdownSerializer {
           out.append("![").append(alt).append("](").append(url).append(")");
           break;
         case DATA_URI:
-          // TODO Not supported
+          // Data URI images are not supported
           collector.warn("Data URI images are not currently supported");
           break;
         case IMG_TAG:
@@ -954,7 +954,7 @@ public class MarkdownSerializer {
           out.append("    ");
         }
         out.append("- ");
-        // TODO multiple paragraph, blocks
+        // Note: items are serialized inline, multiple paragraphs and blocks are not supported
         processChildren(item, out);
         out.append('\n');
         state.pop();
@@ -972,7 +972,7 @@ public class MarkdownSerializer {
       out.append(lang);
       String text = fragment.getText();
       if (!text.startsWith("\n")) out.append("\n");
-      out.append(text.replaceAll("\\s+$", "")).append("\n```\n");
+      out.append(stripTrailingWhitespace(text)).append("\n```\n");
     }
 
     /**
@@ -982,7 +982,7 @@ public class MarkdownSerializer {
       text = DiffMarkers.escape(text);
       StringBuilder out = new StringBuilder("```").append(lang);
       if (!text.startsWith("\n")) out.append('\n');
-      return out.append(text.replaceAll("\\s+$", "")).append("\n```").toString();
+      return out.append(stripTrailingWhitespace(text)).append("\n```").toString();
     }
 
     /**
@@ -1106,7 +1106,7 @@ public class MarkdownSerializer {
       out.append(language);
       String text = element.getText();
       if (!text.startsWith("\n")) out.append("\n");
-      out.append(text.replaceAll("\\s+$", "")).append("\n```\n");
+      out.append(stripTrailingWhitespace(text)).append("\n```\n");
     }
 
     private void serializePlaceholder(PSMLElement placeholder, Appendable out) throws IOException {
@@ -1171,39 +1171,43 @@ public class MarkdownSerializer {
         if (this.diff) return codeChange(markdown, text -> clean(text.replace("\n", "<br>")));
         return markdown.getText().replace("\n", "<br>");
       }
-      StringBuilder out = new StringBuilder();
       // Multiple values
       List<PSMLElement> values = property.getChildElements(Name.VALUE);
       if (!values.isEmpty()) {
-        out.append("[");
-        boolean first = true;
-        for (PSMLElement v : values) {
-          if (first) first = false;
-          else out.append(", ");
-          if (this.diff) {
-            out.append(DiffMarkers.escape(normalizeText(markedText(v, null))));
-          } else {
-            out.append(normalizeText(v.getText()));
-          }
-        }
-        out.append("]");
-        return out.toString();
+        return toMultipleValues(values);
       }
       // Xrefs
       List<PSMLElement> xrefs = property.getChildElements(Name.XREF);
       if (!xrefs.isEmpty()) {
-        boolean first = true;
-        for (PSMLElement xref : xrefs) {
-          if (first) first = false;
-          else out.append(", ");
-          serialize(xref, out);
-        }
-        return out.toString();
+        return toXrefList(xrefs);
       }
-
       // Could be some markup
+      StringBuilder out = new StringBuilder();
       processChildren(property, out);
       return normalizeText(out.toString().replace("\n", "<br>"));
+    }
+
+    private String toMultipleValues(List<PSMLElement> values) {
+      StringBuilder out = new StringBuilder("[");
+      for (int i = 0; i < values.size(); i++) {
+        if (i > 0) out.append(", ");
+        PSMLElement v = values.get(i);
+        if (this.diff) {
+          out.append(DiffMarkers.escape(normalizeText(markedText(v, null))));
+        } else {
+          out.append(normalizeText(v.getText()));
+        }
+      }
+      return out.append("]").toString();
+    }
+
+    private String toXrefList(List<PSMLElement> xrefs) throws IOException {
+      StringBuilder out = new StringBuilder();
+      for (int i = 0; i < xrefs.size(); i++) {
+        if (i > 0) out.append(", ");
+        serialize(xrefs.get(i), out);
+      }
+      return out.toString();
     }
 
     private void serializePropertiesFragment(PSMLElement fragment, Appendable out) throws IOException {
@@ -1347,14 +1351,7 @@ public class MarkdownSerializer {
         if (isInline(nodes.get(i))) {
           int j = i;
           while (j < nodes.size() && isInline(nodes.get(j))) j++;
-          List<PSMLNode> run = nodes.subList(i, j);
-          if (isWhiteSpaceOnly(run)) {
-            for (PSMLNode node : run) processNode(node, out);
-          } else {
-            wrap(state.inherited, out, () -> {
-              for (PSMLNode node : run) processNode(node, out);
-            });
-          }
+          processInlineRun(nodes.subList(i, j), out);
           i = j;
         } else {
           processNode(nodes.get(i), out);
@@ -1363,8 +1360,33 @@ public class MarkdownSerializer {
       }
     }
 
+    /**
+     * Processes a run of consecutive inline nodes, wrapping it in a marker for the inherited
+     * operation unless it only contains white space.
+     */
+    private void processInlineRun(List<PSMLNode> run, Appendable out) throws IOException {
+      if (isWhiteSpaceOnly(run)) {
+        processNodes(run, out);
+      } else {
+        wrap(state.inherited, out, () -> processNodes(run, out));
+      }
+    }
+
+    private void processNodes(List<PSMLNode> nodes, Appendable out) throws IOException {
+      for (PSMLNode node : nodes) processNode(node, out);
+    }
+
     private static boolean isInline(PSMLNode node) {
       return node instanceof PSMLText || ((PSMLElement) node).getElement().isInline();
+    }
+
+    /**
+     * Removes trailing white space ({@code [ \t\n\x0B\f\r]}) without using a backtracking regex.
+     */
+    private static String stripTrailingWhitespace(String text) {
+      int end = text.length();
+      while (end > 0 && " \t\n\u000B\f\r".indexOf(text.charAt(end - 1)) >= 0) end--;
+      return text.substring(0, end);
     }
 
     private static boolean isWhiteSpaceOnly(List<PSMLNode> run) {
