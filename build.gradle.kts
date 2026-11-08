@@ -64,7 +64,7 @@ sonar {
 }
 
 tasks.wrapper {
-  gradleVersion = "8.14.4"
+  gradleVersion = "8.14.6"
   distributionType = Wrapper.DistributionType.BIN
 }
 
