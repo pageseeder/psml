@@ -2,6 +2,7 @@
 junit = "5.14.2"
 junit-platform = "1.14.2"
 slf4j = "2.0.17"
+versions-plugin = "0.66.0"
 xmlunit = "2.11.0"
 
 [libraries]
@@ -33,3 +34,4 @@ junit = [
 cyclonedx = { id = "org.cyclonedx.bom", version = "2.4.1" }
 jreleaser = { id = "org.jreleaser", version = "1.24.0" }
 sonar = { id = "org.sonarqube", version = "7.3.0.8198" }
+versions = { id = "io.github.ben-manes.versions", version.ref = "versions-plugin" }
