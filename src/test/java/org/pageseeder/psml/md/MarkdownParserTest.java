@@ -16,6 +16,7 @@
 package org.pageseeder.psml.md;
 
 import org.junit.jupiter.api.Test;
+import org.pageseeder.psml.html.HTMLElement;
 import org.pageseeder.psml.model.PSMLElement;
 import org.pageseeder.psml.toc.Tests;
 import org.pageseeder.xmlwriter.XML.NamespaceAware;
@@ -26,6 +27,7 @@ import java.io.*;
 import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -112,6 +114,24 @@ class MarkdownParserTest {
     String expected = Files.readString(psml.toPath());
     expected = expected.replace("\r", "");
     assertEquals(expected, result);
+  }
+
+  @Test
+  void testParseToHTML_FragmentWrapsInSection() throws IOException {
+    MarkdownParser parser = new MarkdownParser();
+    parser.getConfig().setFragmentMode(true);
+    HTMLElement html = parser.parseToHTML(new StringReader("# Title\n\nSome text.\n"));
+    assertEquals(HTMLElement.Name.SECTION, html.getElement());
+    assertFalse(html.getNodes().isEmpty());
+  }
+
+  @Test
+  void testParseToHTML_DocumentWrapsInArticle() throws IOException {
+    MarkdownParser parser = new MarkdownParser();
+    parser.getConfig().setFragmentMode(false);
+    HTMLElement html = parser.parseToHTML(new StringReader("# Title\n\nSome text.\n"));
+    assertEquals(HTMLElement.Name.ARTICLE, html.getElement());
+    assertFalse(html.getNodes().isEmpty());
   }
 
   private static PSMLElement parseMarkdown(String filename, boolean isFragment) {
