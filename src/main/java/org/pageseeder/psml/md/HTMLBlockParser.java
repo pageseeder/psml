@@ -130,10 +130,7 @@ public class HTMLBlockParser {
 
     // Separators
     else if (line.matches("\\s*\\*\\s?\\*\\s?\\*[\\s\\*]*")) {
-      if (options.isDocument()) {
-        state.ensureFragment();
-        state.newFragment();
-      }
+      processSeparator(state, options);
     }
 
     // Empty lines are used to separate the different kinds of blocks, except inside fenced (```) code
@@ -148,29 +145,31 @@ public class HTMLBlockParser {
 
     // Continuation of a list item
     else if (state.isInList()) {
-      if (options.isDocument()) {
-        state.ensureFragment();
-      }
-      if (!state.context.isEmpty() && state.text != null) {
-        state.append(line.trim());
-      }
+      processListContinuation(line, state, options);
     }
 
     // Lines starting with four spaces: preformatted code
     else if (line.matches("\\s{4}.*") && !state.isFenced()) {
-      if (options.isDocument()) {
-        state.ensureFragment();
-      }
-      if (!state.isElement(Name.PRE)) {
-        state.commitUpto(Name.SECTION);
-        state.push(Name.PRE, line.substring(4));
-      } else {
-        state.append(line.substring(4));
-      }
+      processIndentedCode(line, state, options);
     }
 
+    // Any other kind of block
+    else {
+      processOtherBlock(line, next, state, options);
+    }
+  }
+
+  /**
+   * Process a line which is not a heading marker, separator, empty line, list or indented code.
+   *
+   * @param line  The current line
+   * @param next  The next line
+   * @param state The state of the parser
+   * @param options The markdown options to use
+   */
+  private static void processOtherBlock(String line, @Nullable String next, State state, MarkdownInputOptions options) {
     // Beginning/end of fenced code block
-    else if (line.startsWith("```")) {
+    if (line.startsWith("```")) {
       processFencedCode(line, state, options);
     }
 
@@ -191,86 +190,142 @@ public class HTMLBlockParser {
 
     // Metadata (document mode only)
     else if (options.isDocument() && !state.isDescendantOf(Name.SECTION) && line.matches("^\\w+:\\s.*")) {
-      processMetadataDefinition(line, state, options);
+      processMetadataDefinition(line, state);
     }
 
     // Probably a paragraph or heading
     else {
-      if (options.isDocument()) {
-        state.ensureFragment();
-      }
+      processParagraphOrHeading(line, next, state, options);
+    }
+  }
 
-      // We're in a fenced code block
-      if (state.isElement(Name.PRE) || (state.isElement(Name.CODE) && state.isDescendantOf(Name.PRE))) {
+  private static void processSeparator(State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+      state.newFragment();
+    }
+  }
 
-        // Just add the line
-        state.append(line);
+  private static void processListContinuation(String line, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+    if (!state.context.isEmpty() && state.text != null) {
+      state.append(line.trim());
+    }
+  }
 
-      } else {
+  private static void processIndentedCode(String line, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
+    }
+    if (!state.isElement(Name.PRE)) {
+      state.commitUpto(Name.SECTION);
+      state.push(Name.PRE, line.substring(4));
+    } else {
+      state.append(line.substring(4));
+    }
+  }
 
-        // Heading using ATX style
-        Matcher m = ATX_HEADING_PATTERN.matcher(line);
-        if (m.matches()) {
-          state.commitUpto(Name.SECTION);
-          int level = m.group(1).length();
-          String text = stripHeadingCloser(m.group(2));
-          HTMLElement heading = newHeadingElement(level);
-          state.push(heading, text);
-          state.commit();
-
-        } else {
-
-          boolean isTitle = false;
-
-          // Assume paragraph, but check whether we have a heading using SetExt style
-          HTMLElement element = new HTMLElement(Name.P);
-          if (next != null) {
-            if (next.matches("\\s*==+\\s*")) {
-              // We use the '====' as a marker for a new section
-              if (options.isDocument() && !state.current().isEmpty()) {
-                state.newSection();
-              }
-              element = newHeadingElement(1);
-
-              // Special case for title section
-              if (options.isDocument()) {
-                HTMLElement section = state.ancestor(Name.SECTION);
-                if (section != null && "title".equals(section.getAttribute("id"))) {
-                  isTitle = true;
-                }
-              }
-
-            } else if (next.matches("\\s*--+\\s*")) {
-              // We use the '----' as a marker for a new fragment
-              if (options.isDocument() && !state.current().isEmpty()) {
-                state.newFragment();
-              }
-              element = newHeadingElement(2);
-            }
-          }
-
-          // Check whether the current element matches what we found (h1, h2 or p)
-          if (!state.isElement(element.getElement())) {
-            state.commitUpto(Name.SECTION);
-            state.push(element, line.trim());
-          } else {
-            if (state.lineBreak) {
-              state.lineBreak();
-            }
-            state.append(line.trim());
-          }
-
-          // If the line break occurs before 66 characters, we assume it is intentional and insert a line break
-          state.lineBreak = line.length() < options.getLineBreakThreshold();
-
-          // Special case: we terminate the section title
-          if (isTitle) {
-            state.commitUpto(Name.ARTICLE);
-          }
-        }
-      }
+  /**
+   * Handles any line not recognized as one of the other block types: fenced code
+   * content, an ATX-style heading, a SetExt-style heading, or plain paragraph text.
+   */
+  private static void processParagraphOrHeading(String line, @Nullable String next, State state, MarkdownInputOptions options) {
+    if (options.isDocument()) {
+      state.ensureFragment();
     }
 
+    // We're in a fenced code block: just add the line
+    if (isInPreformatted(state)) {
+      state.append(line);
+      return;
+    }
+
+    // Heading using ATX style
+    Matcher m = ATX_HEADING_PATTERN.matcher(line);
+    if (m.matches()) {
+      processAtxHeading(m, state);
+    } else {
+      processSetextHeadingOrParagraph(line, next, state, options);
+    }
+  }
+
+  private static void processAtxHeading(Matcher m, State state) {
+    state.commitUpto(Name.SECTION);
+    int level = m.group(1).length();
+    String text = stripHeadingCloser(m.group(2));
+    HTMLElement heading = newHeadingElement(level);
+    state.push(heading, text);
+    state.commit();
+  }
+
+  private static void processSetextHeadingOrParagraph(String line, @Nullable String next, State state, MarkdownInputOptions options) {
+    // Assume paragraph, but check whether we have a heading using SetExt style
+    HTMLElement element = resolveSetextElement(next, state, options);
+
+    // Special case for title section
+    boolean isTitle = options.isDocument() && element.isElement(Name.H1) && isCurrentSectionTitle(state);
+
+    // Check whether the current element matches what we found (h1, h2 or p)
+    if (!state.isElement(element.getElement())) {
+      state.commitUpto(Name.SECTION);
+      state.push(element, line.trim());
+    } else {
+      if (state.lineBreak) {
+        state.lineBreak();
+      }
+      state.append(line.trim());
+    }
+
+    // If the line break occurs before 66 characters, we assume it is intentional and insert a line break
+    state.lineBreak = line.length() < options.getLineBreakThreshold();
+
+    // Special case: we terminate the section title
+    if (isTitle) {
+      state.commitUpto(Name.ARTICLE);
+    }
+  }
+
+  /**
+   * Determines whether the current line, together with the next line, forms a SetExt-style
+   * heading (h1 using '===', h2 using '---'), or is otherwise a plain paragraph.
+   */
+  private static HTMLElement resolveSetextElement(@Nullable String next, State state, MarkdownInputOptions options) {
+    if (next == null) return new HTMLElement(Name.P);
+
+    if (next.matches("\\s*==+\\s*")) {
+      // We use the '====' as a marker for a new section
+      if (options.isDocument() && !state.current().isEmpty()) {
+        state.newSection();
+      }
+      return newHeadingElement(1);
+    }
+
+    if (next.matches("\\s*--+\\s*")) {
+      // We use the '----' as a marker for a new fragment
+      if (options.isDocument() && !state.current().isEmpty()) {
+        state.newFragment();
+      }
+      return newHeadingElement(2);
+    }
+
+    return new HTMLElement(Name.P);
+  }
+
+  /**
+   * @return <code>true</code> if the current element is a descendant of the 'title' section.
+   */
+  private static boolean isCurrentSectionTitle(State state) {
+    HTMLElement section = state.ancestor(Name.SECTION);
+    return section != null && "title".equals(section.getAttribute("id"));
+  }
+
+  /**
+   * @return <code>true</code> if the current element is preformatted text or code within it.
+   */
+  private static boolean isInPreformatted(State state) {
+    return state.isElement(Name.PRE) || (state.isElement(Name.CODE) && state.isDescendantOf(Name.PRE));
   }
 
   /**
@@ -327,7 +382,7 @@ public class HTMLBlockParser {
     if (options.isDocument()) {
       state.ensureFragment();
     }
-    if (state.isElement(Name.PRE) || (state.isElement(Name.CODE) && state.isDescendantOf(Name.PRE))) {
+    if (isInPreformatted(state)) {
       state.setFenced(false);
       state.append("");
       state.commitUpto(Name.SECTION);
@@ -375,18 +430,7 @@ public class HTMLBlockParser {
     // check if already in a blockquote
     HTMLElement current = state.current();
     if (current != null && current.isElement(Name.BLOCKQUOTE)) {
-      List<HTMLNode> children = current.getNodes();
-      HTMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
-      if (last instanceof HTMLElement) {
-        HTMLElement lastElement = (HTMLElement) last;
-        if (lastElement.isElement(Name.P)) {
-          if (text.matches("\\s*")) {
-            current.addNode(new HTMLElement(Name.P));
-          } else {
-            lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
-          }
-        }
-      }
+      appendToBlockquote(current, text);
     } else {
       state.commitUpto(Name.SECTION);
       // create new blockquote
@@ -398,7 +442,27 @@ public class HTMLBlockParser {
     }
   }
 
-  private static void processMetadataDefinition(String line, State state, MarkdownInputOptions options) {
+  /**
+   * Append the text to the last paragraph of the blockquote, or start a new paragraph
+   * if the text is blank.
+   *
+   * @param blockquote The current blockquote element
+   * @param text       The quoted text without the chevron
+   */
+  private static void appendToBlockquote(HTMLElement blockquote, String text) {
+    List<HTMLNode> children = blockquote.getNodes();
+    HTMLNode last = children.isEmpty() ? null : children.get(children.size()-1);
+    if (!(last instanceof HTMLElement)) return;
+    HTMLElement lastElement = (HTMLElement) last;
+    if (!lastElement.isElement(Name.P)) return;
+    if (text.matches("\\s*")) {
+      blockquote.addNode(new HTMLElement(Name.P));
+    } else {
+      lastElement.addText((lastElement.getText().isEmpty() ? "" : " ")+text);
+    }
+  }
+
+  private static void processMetadataDefinition(String line, State state) {
     int colon = line.indexOf(':');
     if (!state.isDescendantOf(Name.DL)) {
       state.push(Name.DL);
@@ -417,40 +481,67 @@ public class HTMLBlockParser {
     String[] columns = line.substring(1).split("\\|");
     boolean inTable = state.isDescendantOf(Name.TABLE);
     boolean isHeaderRow = false;
-    if (!inTable && next != null && next.startsWith("|") && next.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
-      HTMLElement table = new HTMLElement(Name.TABLE);
-      String[] cols = next.substring(1).split("\\|");
-      for (String col : cols) {
-        String align = toColAlign(col);
-        HTMLElement colElement = new HTMLElement(Name.COL);
-        if (align != null) colElement.setAttribute("align", align);
-        table.addNode(colElement);
-      }
-      state.push(table);
+    if (!inTable && next != null && next.startsWith("|") && isSeparatorRow(next, columns.length)) {
+      state.push(newTable(next));
       inTable = true;
       isHeaderRow = true;
     }
 
-    if (inTable) {
-      if (!line.matches("^\\|([\\s:-]+\\|){"+columns.length+"}")) {
-        HTMLElement row = new HTMLElement(Name.TR);
-        state.push(row);
-
-        for (String col : columns) {
-          String text = col.trim();
-          if (isHeaderRow && text.matches("^\\*\\*(.*)\\*\\*$")) {
-            text = text.substring(2, text.length() - 2);
-          }
-          state.push(isHeaderRow ? Name.TH : Name.TD, text);
-          state.commit();
-        }
-
-        state.commit();
-      }
-    } else {
+    if (!inTable) {
       // Not a table
       state.push(Name.P, line.trim());
+    } else if (!isSeparatorRow(line, columns.length)) {
+      addTableRow(columns, isHeaderRow, state);
     }
+  }
+
+  /**
+   * @param line    The line to test
+   * @param columns The expected number of columns
+   *
+   * @return <code>true</code> if the line is a table separator row, such as <code>|---|:--:|</code>
+   */
+  private static boolean isSeparatorRow(String line, int columns) {
+    return line.matches("^\\|([\\s:-]+\\|){"+columns+"}");
+  }
+
+  /**
+   * Creates a new table element with the column alignments from the separator row.
+   *
+   * @param separator The separator row defining the columns
+   *
+   * @return a new table element
+   */
+  private static HTMLElement newTable(String separator) {
+    HTMLElement table = new HTMLElement(Name.TABLE);
+    String[] cols = separator.substring(1).split("\\|");
+    for (String col : cols) {
+      String align = toColAlign(col);
+      HTMLElement colElement = new HTMLElement(Name.COL);
+      if (align != null) colElement.setAttribute("align", align);
+      table.addNode(colElement);
+    }
+    return table;
+  }
+
+  /**
+   * Adds and commits a table row with its cells.
+   *
+   * @param columns     The text of each cell
+   * @param isHeaderRow Whether this is the header row
+   * @param state       The state of the parser
+   */
+  private static void addTableRow(String[] columns, boolean isHeaderRow, State state) {
+    state.push(new HTMLElement(Name.TR));
+    for (String col : columns) {
+      String text = col.trim();
+      if (isHeaderRow && text.matches("^\\*\\*(.*)\\*\\*$")) {
+        text = text.substring(2, text.length() - 2);
+      }
+      state.push(isHeaderRow ? Name.TH : Name.TD, text);
+      state.commit();
+    }
+    state.commit();
   }
 
   private static String stripHeadingCloser(String text) {
@@ -503,7 +594,7 @@ public class HTMLBlockParser {
     /**
      * The section identifiers.
      */
-    private final String[] sectionIds = new String[]{"title", "content"};
+    private final String[] sectionIds = {"title", "content"};
 
     /**
      * Position of the section
