@@ -94,6 +94,19 @@ tasks.jacocoTestReport {
   }
 }
 
+tasks.jar {
+  manifest {
+    attributes(
+      "Automatic-Module-Name" to "org.pageseeder.psml",
+      "Build-Jdk-Spec" to java.toolchain.languageVersion.get().toString(),
+      "Bundle-License" to "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "Implementation-Title" to title,
+      "Implementation-Vendor" to "Allette Systems",
+      "Implementation-Version" to project.version.toString()
+    )
+  }
+}
+
 tasks.withType<Javadoc> {
   options {
     encoding = "UTF-8"
@@ -153,6 +166,15 @@ publishing {
     maven {
       url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
     }
+  }
+}
+
+// Maven Central only requires MD5 and SHA-1 checksums; keep SHA-512 and drop the redundant
+// SHA-256 files to reduce the number of files in the deployment bundle.
+tasks.withType<PublishToMavenRepository>().configureEach {
+  val stagingDir = layout.buildDirectory.dir("staging-deploy")
+  doLast {
+    stagingDir.get().asFileTree.matching { include("**/*.sha256") }.forEach { it.delete() }
   }
 }
 
