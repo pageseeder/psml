@@ -94,6 +94,19 @@ tasks.jacocoTestReport {
   }
 }
 
+tasks.jar {
+  manifest {
+    attributes(
+      "Automatic-Module-Name" to "org.pageseeder.psml",
+      "Build-Jdk-Spec" to java.toolchain.languageVersion.get().toString(),
+      "Bundle-License" to "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "Implementation-Title" to title,
+      "Implementation-Vendor" to "Allette Systems",
+      "Implementation-Version" to project.version.toString()
+    )
+  }
+}
+
 tasks.withType<Javadoc> {
   options {
     encoding = "UTF-8"
