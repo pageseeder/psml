@@ -1,0 +1,1 @@
+<diff><fragment xmlns:diff="https://www.pageseeder.org/diffx" xmlns:ins="https://www.pageseeder.org/diffx/insert" xmlns:del="https://www.pageseeder.org/diffx/delete" id="1"><list><item>One</item><item diff:insert="true"><diff:ins>Three</diff:ins></item><item>Two</item></list></fragment></diff>

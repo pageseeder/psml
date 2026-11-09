@@ -307,8 +307,11 @@ public final class LexicalTokenizer implements TextTokenizer {
     while (j < n) {
       int c = codePointAt(s, j);
 
+      // The typographic apostrophe (U+2019) is allowed like the straight apostrophe so that contractions
+      // such as "I\u2019m" produce the same tokens regardless of the apostrophe used
       boolean allowed = Character.isLetter(c) || Character.isDigit(c)
-          || c == '\'' || c == '-' || c == '&' || c == '.' || c == '/' || c == '_' || c == '@' || c == '\u200B';
+          || c == '\'' || c == '\u2019'
+          || c == '-' || c == '&' || c == '.' || c == '/' || c == '_' || c == '@' || c == '\u200B';
       if (!allowed) break;
 
       j += Character.charCount(c);

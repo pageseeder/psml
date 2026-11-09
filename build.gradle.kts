@@ -5,6 +5,7 @@ plugins {
   alias(libs.plugins.cyclonedx)
   alias(libs.plugins.jreleaser)
   alias(libs.plugins.sonar)
+  alias(libs.plugins.versions)
 }
 
 val title: String by project
@@ -64,7 +65,7 @@ sonar {
 }
 
 tasks.wrapper {
-  gradleVersion = "8.14.4"
+  gradleVersion = "8.14.6"
   distributionType = Wrapper.DistributionType.BIN
 }
 

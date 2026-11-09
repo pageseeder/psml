@@ -673,6 +673,20 @@ public class HTMLElement implements HTMLNode {
   }
 
   /**
+   * Indicates whether the name of this element matches any of the specified names.
+   *
+   * @param names the names to test against.
+   *
+   * @return <code>true</code> if and only if it matches one of the names.
+   */
+  public boolean isAnyElement(Name... names) {
+    for (Name n : names) {
+      if (this.name == n) return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the attribute value for the specified attribute.
    *
    * @param name The name of the attribute.
@@ -697,7 +711,7 @@ public class HTMLElement implements HTMLNode {
    */
   public HTMLElement setAttribute(String name, String value) {
     if (this.attributes == null) {
-      this.attributes = new HashMap<>(4);
+      this.attributes = new LinkedHashMap<>(4);
     }
     this.attributes.put(name, value);
     return this;

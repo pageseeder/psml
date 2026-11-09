@@ -1,0 +1,1 @@
+<diff><properties-fragment xmlns:diff="https://www.pageseeder.org/diffx" xmlns:ins="https://www.pageseeder.org/diffx/insert" xmlns:del="https://www.pageseeder.org/diffx/delete" id="1"><property name="a" title="A" value="alpha"/><property diff:insert="true" name="b" ins:name="true" title="B" ins:title="true" value="beta" ins:value="true"/></properties-fragment></diff>

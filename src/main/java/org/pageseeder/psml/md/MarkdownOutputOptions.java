@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @author Christophe Lauret
  *
- * @version 1.6.10
+ * @version 1.8.6
  * @since 1.6.0
  */
 public final class MarkdownOutputOptions {
@@ -375,6 +375,40 @@ public final class MarkdownOutputOptions {
   }
 
   /**
+   * Specifies how Diff-X changes in combined diff PSML are written.
+   *
+   * <p>For example, with {@link #INS_DEL}:
+   * <pre>{@code
+   * <para>Payment within<diff:del> 30</diff:del><diff:ins> 14</diff:ins> days.</para>
+   * }</pre>
+   * <p>is serialized as:
+   * <pre>{@code
+   * Payment within<del> 30</del><ins> 14</ins> days.
+   * }</pre>
+   *
+   * @since 1.8.6
+   */
+  public enum DiffFormat {
+
+    /**
+     * Diff annotations are not emitted (default).
+     *
+     * <p>The content is serialized exactly as without this option: inserted and deleted text
+     * both appear unmarked. This does not accept or reject the changes.
+     */
+    IGNORE,
+
+    /**
+     * Changes are emitted as literal HTML-style {@code <ins>} and {@code <del>} tags in the Markdown.
+     *
+     * <p>Inserted and deleted elements are annotated on their visible content, and literal
+     * marker-like text in the source is escaped so that it cannot be mistaken for an annotation.
+     */
+    INS_DEL
+
+  }
+
+  /**
    * Specifies the style to use for designators for table captions, images, properties and block labels.
    *
    * <p>The designator can be: "Table", "Image", "Properties" or the label name.</p>
@@ -467,6 +501,8 @@ public final class MarkdownOutputOptions {
 
   private final TableFormat table;
 
+  private final DiffFormat diff;
+
   @SuppressWarnings("java:S107")
   private MarkdownOutputOptions(
       boolean metadata,
@@ -479,7 +515,8 @@ public final class MarkdownOutputOptions {
       SuperSubFormat superSub,
       UnderlineFormat underline,
       PropertiesFormat properties,
-      TableFormat table) {
+      TableFormat table,
+      DiffFormat diff) {
     this.metadata = metadata;
     this.designator = designator;
     this.bold = Objects.requireNonNull(bold);
@@ -491,6 +528,7 @@ public final class MarkdownOutputOptions {
     this.underline = Objects.requireNonNull(underline);
     this.properties = Objects.requireNonNull(properties);
     this.table = Objects.requireNonNull(table);
+    this.diff = Objects.requireNonNull(diff);
   }
 
   /**
@@ -515,7 +553,8 @@ public final class MarkdownOutputOptions {
         SuperSubFormat.IGNORE,
         UnderlineFormat.IGNORE,
         PropertiesFormat.TABLE,
-        TableFormat.PRETTY
+        TableFormat.PRETTY,
+        DiffFormat.IGNORE
     );
   }
 
@@ -638,6 +677,17 @@ public final class MarkdownOutputOptions {
   }
 
   /**
+   * Retrieves how Diff-X changes are written in the Markdown output.
+   *
+   * @return the diff format option, {@link DiffFormat#IGNORE} by default.
+   *
+   * @since 1.8.6
+   */
+  public DiffFormat diff() {
+    return this.diff;
+  }
+
+  /**
    * Sets whether metadata should be included in the Markdown output.
    *
    * @param include true to include metadata in the output, false to exclude it.
@@ -645,7 +695,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions metadata(boolean include) {
     if (this.metadata == include) return this;
-    return new MarkdownOutputOptions(include, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(include, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -660,10 +710,10 @@ public final class MarkdownOutputOptions {
   public MarkdownOutputOptions captions(boolean include) {
     if (include) {
       if (this.designator != DesignatorStyle.NONE) return this;
-      return new MarkdownOutputOptions(this.metadata, DesignatorStyle.DOUBLE_ASTERISK, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+      return new MarkdownOutputOptions(this.metadata, DesignatorStyle.DOUBLE_ASTERISK, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
     } else {
       if (this.designator == DesignatorStyle.NONE) return this;
-      return new MarkdownOutputOptions(this.metadata, DesignatorStyle.NONE, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+      return new MarkdownOutputOptions(this.metadata, DesignatorStyle.NONE, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
     }
   }
 
@@ -678,7 +728,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions designator(DesignatorStyle style) {
     if (this.designator == style) return this;
-    return new MarkdownOutputOptions(this.metadata, style, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, style, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -689,7 +739,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions bold(BoldFormat format) {
     if (this.bold == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, format, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, format, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -700,7 +750,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions italic(ItalicFormat format) {
     if (this.italic == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, format, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, format, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -711,7 +761,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions image(ImageFormat format) {
     if (this.image == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, format, this.xref, this.block, this.superSub, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, format, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -725,7 +775,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions xref(XrefFormat format) {
     if (this.xref == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, format, this.block, this.superSub, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, format, this.block, this.superSub, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -738,7 +788,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions block(BlockFormat format) {
     if (this.block == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, format, this.superSub, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, format, this.superSub, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -750,7 +800,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions superSub(SuperSubFormat format) {
     if (this.superSub == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, format, this.underline, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, format, this.underline, this.properties, this.table, this.diff);
   }
 
   /**
@@ -761,7 +811,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions underline(UnderlineFormat format) {
     if (this.underline == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, format, this.properties, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, format, this.properties, this.table, this.diff);
   }
 
   /**
@@ -772,7 +822,7 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions properties(PropertiesFormat format) {
     if (this.properties == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, format, this.table);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, format, this.table, this.diff);
   }
 
   /**
@@ -783,7 +833,24 @@ public final class MarkdownOutputOptions {
    */
   public MarkdownOutputOptions table(TableFormat format) {
     if (this.table == format) return this;
-    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, format);
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, format, this.diff);
+  }
+
+  /**
+   * Configures how Diff-X changes are written in the Markdown output.
+   *
+   * <pre>{@code
+   * MarkdownOutputOptions options = MarkdownOutputOptions.defaultOptions().diff(DiffFormat.INS_DEL);
+   * }</pre>
+   *
+   * @param format the diff format option to be applied.
+   * @return a new instance of {@code MarkdownOutputOptions} with the updated diff setting.
+   *
+   * @since 1.8.6
+   */
+  public MarkdownOutputOptions diff(DiffFormat format) {
+    if (this.diff == format) return this;
+    return new MarkdownOutputOptions(this.metadata, this.designator, this.bold, this.italic, this.image, this.xref, this.block, this.superSub, this.underline, this.properties, this.table, format);
   }
 
   /**
@@ -810,12 +877,13 @@ public final class MarkdownOutputOptions {
         superSub == that.superSub &&
         underline == that.underline &&
         properties == that.properties &&
-        table == that.table;
+        table == that.table &&
+        diff == that.diff;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(metadata, designator, bold, italic, image, xref, block, superSub, underline, properties, table);
+    return Objects.hash(metadata, designator, bold, italic, image, xref, block, superSub, underline, properties, table, diff);
   }
 
   @Override
@@ -832,6 +900,7 @@ public final class MarkdownOutputOptions {
         ", underline=" + underline +
         ", properties=" + properties +
         ", table=" + table +
+        ", diff=" + diff +
         '}';
   }
 
@@ -854,6 +923,7 @@ public final class MarkdownOutputOptions {
     private UnderlineFormat underline = UnderlineFormat.IGNORE;
     private PropertiesFormat properties = PropertiesFormat.TABLE;
     private TableFormat table = TableFormat.PRETTY;
+    private DiffFormat diff = DiffFormat.IGNORE;
 
     /**
      * Creates a new Builder with default options.
@@ -881,6 +951,7 @@ public final class MarkdownOutputOptions {
       builder.underline = options.underline();
       builder.properties = options.properties();
       builder.table = options.table();
+      builder.diff = options.diff();
       return builder;
     }
 
@@ -1001,6 +1072,19 @@ public final class MarkdownOutputOptions {
     }
 
     /**
+     * Configures how Diff-X changes are written in the Markdown output.
+     *
+     * @param format the diff format option to be applied.
+     * @return this builder instance
+     *
+     * @since 1.8.6
+     */
+    public Builder diff(DiffFormat format) {
+      this.diff = Objects.requireNonNull(format);
+      return this;
+    }
+
+    /**
      * Sets the bold formatting option for the Markdown output.
      *
      * @param format the bold formatting option to be applied
@@ -1039,7 +1123,8 @@ public final class MarkdownOutputOptions {
           superSub,
           underline,
           properties,
-          table
+          table,
+          diff
       );
     }
   }

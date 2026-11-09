@@ -1,0 +1,1 @@
+<diff><properties-fragment xmlns:diff="https://www.pageseeder.org/diffx" xmlns:ins="https://www.pageseeder.org/diffx/insert" xmlns:del="https://www.pageseeder.org/diffx/delete" id="1"><property datatype="markdown" name="notes" title="Notes"><markdown>Some *<diff:del>old</diff:del><diff:ins>new</diff:ins>* text</markdown></property></properties-fragment></diff>

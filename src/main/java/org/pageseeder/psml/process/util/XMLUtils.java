@@ -8,33 +8,39 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.jspecify.annotations.Nullable;
 import org.pageseeder.psml.process.ProcessException;
 import org.pageseeder.psml.xml.XML;
 import org.pageseeder.psml.xml.XMLStrings;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
+import org.xml.sax.*;
 
 /**
  * A utility class for XML data.
  *
  * @author  Christophe Lauret
  *
- * @version 1.7.4
  * @since 0.9.0
  */
 public final class XMLUtils {
+
+  /**
+   * Compiled schemas, keyed by URL. Schema instances are immutable and thread-safe.
+   */
+  private static final Map<String, Schema> SCHEMAS = new ConcurrentHashMap<>();
 
   /**
    * Prevent creation of instances.
@@ -164,23 +170,24 @@ public final class XMLUtils {
       // Transform
       try (InputStream fis = Files.newInputStream(inPath);
            OutputStream fos = Files.newOutputStream(outPath)) {
-        Source source = new SAXSource(XMLReaderFactory.createXMLReader(), new InputSource(fis));
+        Source source = new SAXSource(newXMLReader(), new InputSource(fis));
         source.setSystemId(in.toURI().toString());
         t.transform(source, new StreamResult(fos));
       }
 
       // validate now if needed
       if (schema != null) {
+        Schema compiled;
+        try {
+          compiled = getSchema(schema);
+        } catch (SAXException ex) {
+          throw new ProcessException("Failed to load schema " + schema + ": " + ex.getMessage(), ex);
+        }
         try (InputStream fis = Files.newInputStream(outPath)) {
-          XMLReader reader = XMLReaderFactory.createXMLReader();
-          reader.setFeature("http://xml.org/sax/features/validation", true);
-          reader.setFeature("http://apache.org/xml/features/validation/schema", true);
-          reader.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
+          Validator validator = compiled.newValidator();
           XMLParserErrorHandler errorHandler = new XMLParserErrorHandler();
-          reader.setErrorHandler(errorHandler);
-          String path = schema.toString().replace(" ", "%20");
-          reader.setProperty("http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", path);
-          reader.parse(new InputSource(fis));
+          validator.setErrorHandler(errorHandler);
+          validator.validate(new StreamSource(fis, out.toURI().toString()));
           if (errors != null)
             errors.addAll(errorHandler.getErrors());
           else if (errorHandler.hasErrors()) {
@@ -205,6 +212,38 @@ public final class XMLUtils {
     }
   }
 
+  /**
+   * Returns the compiled schema for the URL, compiling and caching it on first use.
+   */
+  private static Schema getSchema(URL url) throws SAXException {
+    String key = url.toExternalForm();
+    Schema schema = SCHEMAS.get(key);
+    if (schema == null) {
+      SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      try {
+        factory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
+      } catch (SAXNotRecognizedException | SAXNotSupportedException ignore) {
+        // this feature only checks the schema not the content, so carry on without it
+      }
+      schema = factory.newSchema(url);
+      Schema existing = SCHEMAS.putIfAbsent(key, schema);
+      if (existing != null) schema = existing;
+    }
+    return schema;
+  }
+
+  /**
+   * Creates a new namespace-aware XML reader (same behaviour as XMLReaderFactory.createXMLReader()).
+   */
+  private static XMLReader newXMLReader() throws SAXException {
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    factory.setNamespaceAware(true);
+    try {
+      return factory.newSAXParser().getXMLReader();
+    } catch (ParserConfigurationException ex) {
+      throw new SAXException("Unable to configure SAX parser", ex);
+    }
+  }
   /**
    * Parse the XML input using the handler provided.
    *

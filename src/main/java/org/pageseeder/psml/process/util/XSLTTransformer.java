@@ -235,6 +235,9 @@ public final class XSLTTransformer {
     @Override
     public void fatalError(TransformerException exception) throws TransformerException {
       this.log.error("Transformer fatal error: {}", exception.getMessageAndLocation());
+      // a fatal error must stop the transformation (JAXP contract), so the processor
+      // unwinds properly and the finally block can release resources
+      throw exception;
     }
 
     @Override

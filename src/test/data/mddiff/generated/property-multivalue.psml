@@ -1,0 +1,1 @@
+<diff><properties-fragment xmlns:diff="https://www.pageseeder.org/diffx" xmlns:ins="https://www.pageseeder.org/diffx/insert" xmlns:del="https://www.pageseeder.org/diffx/delete" id="1"><property multiple="true" name="tags" title="Tags"><value>red</value><value><diff:del>green</diff:del><diff:ins>blue</diff:ins></value></property></properties-fragment></diff>
